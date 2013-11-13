@@ -5,6 +5,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NServiceBus.NHibernate", "N
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NServiceBus.NHibernate.Tests", "NServiceBus.NHibernate.Tests\NServiceBus.NHibernate.Tests.csproj", "{7F6284D7-8DBE-44D3-875C-C59FC7489287}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NServiceBus.NHibernate.PerformanceTests", "NServiceBus.NHibernate.PerformanceTests\NServiceBus.NHibernate.PerformanceTests.csproj", "{96467E41-F299-474C-AB0D-00B7CCD73E26}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -19,6 +21,10 @@ Global
 		{7F6284D7-8DBE-44D3-875C-C59FC7489287}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7F6284D7-8DBE-44D3-875C-C59FC7489287}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7F6284D7-8DBE-44D3-875C-C59FC7489287}.Release|Any CPU.Build.0 = Release|Any CPU
+		{96467E41-F299-474C-AB0D-00B7CCD73E26}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{96467E41-F299-474C-AB0D-00B7CCD73E26}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{96467E41-F299-474C-AB0D-00B7CCD73E26}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{96467E41-F299-474C-AB0D-00B7CCD73E26}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
