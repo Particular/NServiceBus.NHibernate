@@ -58,6 +58,13 @@
     <Reference Include="System.Transactions" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="GatewayStorage\BaseStorage.cs" />
+    <Compile Include="GatewayStorage\TestMessage.cs" />
+    <Compile Include="GatewayStorage\When_acking_an_already_acked_message.cs" />
+    <Compile Include="GatewayStorage\When_acking_an_existing_message.cs" />
+    <Compile Include="GatewayStorage\When_storing_a_duplicate_message.cs" />
+    <Compile Include="GatewayStorage\When_storing_a_new_message.cs" />
+    <Compile Include="GatewayStorage\When_updating_a_header_of_message.cs" />
     <Compile Include="Persistence\ConfigureSqlLiteIfRunningInDebugModeAndNoConfigPropertiesSet.cs" />
     <Compile Include="Persistence\NHibernateProperties.cs" />
     <Compile Include="Persistence\ThrowIfRequiredPropertiesAreMissing.cs" />
