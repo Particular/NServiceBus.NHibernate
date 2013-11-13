@@ -44,7 +44,7 @@
       <SubType>Designer</SubType>
     </None>
     <Reference Include="Iesi.Collections">
-      <HintPath>..\packages\Iesi.Collections\lib\net40\Iesi.Collections.dll</HintPath>
+      <HintPath>..\packages\Iesi.Collections\lib\Net35\Iesi.Collections.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="NHibernate">
