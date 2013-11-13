@@ -1,8 +1,11 @@
 namespace NServiceBus.UnitOfWork.NHibernate
 {
     using System;
+    using System.Data;
     using System.Transactions;
     using global::NHibernate;
+    using global::NHibernate.Impl;
+    using IsolationLevel = System.Transactions.IsolationLevel;
 
     /// <summary>
     /// Implementation of unit of work management with NHibernate
@@ -12,11 +15,15 @@ namespace NServiceBus.UnitOfWork.NHibernate
         [ThreadStatic]
         private static ISession currentSession;
 
+        [ThreadStatic]
+        private static IDbConnection connection;
+
         internal ISession GetCurrentSession()
         {
             if (currentSession == null)
             {
-                currentSession = SessionFactory.OpenSession();
+                connection = ((SessionFactoryImpl)SessionFactory).ConnectionProvider.GetConnection();
+                currentSession = SessionFactory.OpenSession(connection);
                 currentSession.BeginTransaction(GetIsolationLevel());
             }
 
@@ -25,6 +32,7 @@ namespace NServiceBus.UnitOfWork.NHibernate
 
         void IManageUnitsOfWork.Begin()
         {
+            connection = null;
             currentSession = null;
         }
 
@@ -32,6 +40,7 @@ namespace NServiceBus.UnitOfWork.NHibernate
         {
             if (SessionFactory == null || currentSession == null) return;
 
+            using (connection)
             using (currentSession)
             using (currentSession.Transaction)
             {
