@@ -76,6 +76,10 @@
     <Compile Include="SagaPersister\When_persisting_a_saga_with_a_unique_property.cs" />
     <Compile Include="SagaPersister\When_persisting_sagas_on_non_transactional_endpoints.cs" />
     <Compile Include="SagaPersister\When_persisting_sagas_on_transactional_endpoints.cs" />
+    <Compile Include="TimeoutPersister\EnsuringBackwardsCompatability.cs" />
+    <Compile Include="TimeoutPersister\InMemoryDBFixture.cs" />
+    <Compile Include="TimeoutPersister\When_fetching_timeouts_from_storage.cs" />
+    <Compile Include="TimeoutPersister\When_removing_timeouts_from_the_storage.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="hibernate.cfg.xml">
