@@ -2,91 +2,122 @@ namespace NServiceBus.UnitOfWork.NHibernate
 {
     using System;
     using System.Data;
+    using System.Threading;
     using System.Transactions;
     using global::NHibernate;
     using global::NHibernate.Impl;
-    using IsolationLevel = System.Transactions.IsolationLevel;
+    using IsolationLevel = System.Data.IsolationLevel;
 
     /// <summary>
-    /// Implementation of unit of work management with NHibernate
+    ///     Implementation of unit of work management with NHibernate
     /// </summary>
-    public class UnitOfWorkManager : IManageUnitsOfWork
+    public class UnitOfWorkManager : IManageUnitsOfWork, IDisposable
     {
-        [ThreadStatic]
-        private static ISession currentSession;
+        /// <summary>
+        ///     Injected NHibernate session factory.
+        /// </summary>
+        public ISessionFactory SessionFactory { get; set; }
 
-        [ThreadStatic]
-        private static IDbConnection connection;
-
-        internal ISession GetCurrentSession()
+        public void Dispose()
         {
-            if (currentSession == null)
-            {
-                connection = ((SessionFactoryImpl)SessionFactory).ConnectionProvider.GetConnection();
-                currentSession = SessionFactory.OpenSession(connection);
-                currentSession.BeginTransaction(GetIsolationLevel());
-            }
-
-            return currentSession;
+            // Injected
         }
 
         void IManageUnitsOfWork.Begin()
         {
-            connection = null;
-            currentSession = null;
+            session.Value = null;
+            connection.Value = null;
         }
 
         void IManageUnitsOfWork.End(Exception ex)
         {
-            if (SessionFactory == null || currentSession == null) return;
-
-            using (connection)
-            using (currentSession)
-            using (currentSession.Transaction)
+            if (session.Value == null)
             {
-                if (!currentSession.Transaction.IsActive)
-                    return;
+                return;
+            }
 
-                if (ex != null)
+            try
+            {
+                using (session.Value)
+                using (session.Value.Transaction)
                 {
-                    // Due to a race condition in NH3.3, explicit rollback can cause exceptions and corrupt the connection pool. 
-                    // Especially if there are more than one NH session taking part in the DTC transaction
-                    //currentSession.Transaction.Rollback();
+                    if (!session.Value.Transaction.IsActive)
+                    {
+                        return;
+                    }
+
+                    if (ex != null)
+                    {
+                        // Due to a race condition in NH3.3, explicit rollback can cause exceptions and corrupt the connection pool. 
+                        // Especially if there are more than one NH session taking part in the DTC transaction
+                        //currentSession.Transaction.Rollback();
+                    }
+                    else
+                    {
+                        session.Value.Transaction.Commit();
+                    }
                 }
-                else
-                    currentSession.Transaction.Commit();
+            }
+            finally
+            {
+                if (connection.Value != null)
+                {
+                    connection.Value.Dispose();
+                }
             }
         }
 
-        /// <summary>
-        /// Injected NHibernate session factory.
-        /// </summary>
-        public ISessionFactory SessionFactory { get; set; }
+        internal ISession GetCurrentSession()
+        {
+            if (session.Value == null)
+            {
+                var sessionFactoryImpl = SessionFactory as SessionFactoryImpl;
 
-        private System.Data.IsolationLevel GetIsolationLevel()
+                if (sessionFactoryImpl != null)
+                {
+                    connection.Value = sessionFactoryImpl.ConnectionProvider.GetConnection();
+                    session.Value = SessionFactory.OpenSession(connection.Value);
+                }
+                else
+                {
+                    session.Value = SessionFactory.OpenSession();
+                }
+
+                session.Value.BeginTransaction(GetIsolationLevel());
+            }
+
+            return session.Value;
+        }
+
+        IsolationLevel GetIsolationLevel()
         {
             if (Transaction.Current == null)
-                return System.Data.IsolationLevel.Unspecified;
+            {
+                return IsolationLevel.Unspecified;
+            }
 
             switch (Transaction.Current.IsolationLevel)
             {
-                case IsolationLevel.Chaos:
-                    return System.Data.IsolationLevel.Chaos;
-                case IsolationLevel.ReadCommitted:
-                    return System.Data.IsolationLevel.ReadCommitted;
-                case IsolationLevel.ReadUncommitted:
-                    return System.Data.IsolationLevel.ReadUncommitted;
-                case IsolationLevel.RepeatableRead:
-                    return System.Data.IsolationLevel.RepeatableRead;
-                case IsolationLevel.Serializable:
-                    return System.Data.IsolationLevel.Serializable;
-                case IsolationLevel.Snapshot:
-                    return System.Data.IsolationLevel.Snapshot;
-                case IsolationLevel.Unspecified:
-                    return System.Data.IsolationLevel.Unspecified;
+                case System.Transactions.IsolationLevel.Chaos:
+                    return IsolationLevel.Chaos;
+                case System.Transactions.IsolationLevel.ReadCommitted:
+                    return IsolationLevel.ReadCommitted;
+                case System.Transactions.IsolationLevel.ReadUncommitted:
+                    return IsolationLevel.ReadUncommitted;
+                case System.Transactions.IsolationLevel.RepeatableRead:
+                    return IsolationLevel.RepeatableRead;
+                case System.Transactions.IsolationLevel.Serializable:
+                    return IsolationLevel.Serializable;
+                case System.Transactions.IsolationLevel.Snapshot:
+                    return IsolationLevel.Snapshot;
+                case System.Transactions.IsolationLevel.Unspecified:
+                    return IsolationLevel.Unspecified;
                 default:
-                    return System.Data.IsolationLevel.Unspecified;
+                    return IsolationLevel.Unspecified;
             }
         }
+
+        ThreadLocal<IDbConnection> connection = new ThreadLocal<IDbConnection>();
+        ThreadLocal<ISession> session = new ThreadLocal<ISession>();
     }
 }
