@@ -2,7 +2,10 @@
 {
     using System;
     using NServiceBus.Saga;
+    //using NServiceBus.SagaPersisters.NHibernate;
 
+    //enable the below attribute to play with different lock modes
+    //[LockMode(LockModes.None)]
     public class SagaData : IContainSagaData
     {
         public virtual string Originator { get; set; }
