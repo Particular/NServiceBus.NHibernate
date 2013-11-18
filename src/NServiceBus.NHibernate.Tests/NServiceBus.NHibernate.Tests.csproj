@@ -33,15 +33,20 @@
     <Reference Include="Iesi.Collections">
       <HintPath>..\packages\Iesi.Collections\lib\Net35\Iesi.Collections.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.CSharp" />
     <Reference Include="NHibernate">
       <HintPath>..\packages\NHibernate\lib\Net35\NHibernate.dll</HintPath>
     </Reference>
-    <Reference Include="NServiceBus, Version=4.3.0.0, Culture=neutral, PublicKeyToken=9fc386479f8a226c, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="NServiceBus">
       <HintPath>..\packages\NServiceBus.Interfaces\lib\net40\NServiceBus.dll</HintPath>
     </Reference>
+    <Reference Include="NServiceBus, Version=4.3.0.0, Culture=neutral, PublicKeyToken=9fc386479f8a226c, processorArchitecture=MSIL">
+      <HintPath>..\packages\NServiceBus.Interfaces\lib\net40\NServiceBus.dll</HintPath>
+    </Reference>
+    <Reference Include="NServiceBus.Core">
+      <HintPath>..\packages\NServiceBus\lib\net40\NServiceBus.Core.dll</HintPath>
+    </Reference>
     <Reference Include="NServiceBus.Core, Version=4.3.0.0, Culture=neutral, PublicKeyToken=9fc386479f8a226c, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\NServiceBus\lib\net40\NServiceBus.Core.dll</HintPath>
     </Reference>
     <Reference Include="nunit.framework">
@@ -50,10 +55,12 @@
     <Reference Include="System" />
     <Reference Include="System.configuration" />
     <Reference Include="System.Core" />
-    <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Data.SQLite">
       <HintPath>..\packages\System.Data.SQLite.x64\lib\net40\System.Data.SQLite.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Data.SQLite.Linq">
+      <HintPath>..\packages\System.Data.SQLite.x64\lib\net40\System.Data.SQLite.Linq.dll</HintPath>
     </Reference>
     <Reference Include="System.Transactions" />
   </ItemGroup>
