@@ -1,0 +1,129 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{7F6284D7-8DBE-44D3-875C-C59FC7489287}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>NServiceBus.NHibernate.Tests</RootNamespace>
+    <AssemblyName>NServiceBus.NHibernate.Tests</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Iesi.Collections">
+      <HintPath>..\packages\Iesi.Collections\lib\Net35\Iesi.Collections.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="NHibernate">
+      <HintPath>..\packages\NHibernate\lib\Net35\NHibernate.dll</HintPath>
+    </Reference>
+    <Reference Include="NServiceBus">
+      <HintPath>..\packages\NServiceBus.Interfaces\lib\net40\NServiceBus.dll</HintPath>
+    </Reference>
+    <Reference Include="NServiceBus.Core">
+      <HintPath>..\packages\NServiceBus\lib\net40\NServiceBus.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="nunit.framework">
+      <HintPath>..\packages\NUnit\lib\nunit.framework.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.configuration" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Data.SQLite">
+      <HintPath>..\packages\System.Data.SQLite.x64\lib\net40\System.Data.SQLite.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Data.SQLite.Linq">
+      <HintPath>..\packages\System.Data.SQLite.x64\lib\net40\System.Data.SQLite.Linq.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Transactions" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="GatewayStorage\BaseStorage.cs" />
+    <Compile Include="GatewayStorage\TestMessage.cs" />
+    <Compile Include="GatewayStorage\When_acking_an_already_acked_message.cs" />
+    <Compile Include="GatewayStorage\When_acking_an_existing_message.cs" />
+    <Compile Include="GatewayStorage\When_storing_a_duplicate_message.cs" />
+    <Compile Include="GatewayStorage\When_storing_a_new_message.cs" />
+    <Compile Include="GatewayStorage\When_updating_a_header_of_message.cs" />
+    <Compile Include="Persistence\ConfigureSqlLiteIfRunningInDebugModeAndNoConfigPropertiesSet.cs" />
+    <Compile Include="Persistence\NHibernateProperties.cs" />
+    <Compile Include="Persistence\ThrowIfRequiredPropertiesAreMissing.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SagaPersister\FakeConfigurationSource.cs" />
+    <Compile Include="SagaPersister\InMemoryFixture.cs" />
+    <Compile Include="SagaPersister\MySaga.cs" />
+    <Compile Include="SagaPersister\SQLiteConfiguration.cs" />
+    <Compile Include="SagaPersister\TestSaga.cs" />
+    <Compile Include="SagaPersister\When_automapping_sagas.cs" />
+    <Compile Include="SagaPersister\When_automapping_sagas_with_abstract_base_class.cs" />
+    <Compile Include="SagaPersister\When_automapping_sagas_with_nested_types.cs" />
+    <Compile Include="SagaPersister\When_building_the_sessionfactory.cs" />
+    <Compile Include="SagaPersister\When_configuring_the_saga_persister_from_appconfig.cs" />
+    <Compile Include="SagaPersister\When_configuring_the_saga_persister_to_use_sqlite.cs" />
+    <Compile Include="SagaPersister\When_persisting_a_saga_with_a_unique_property.cs" />
+    <Compile Include="SagaPersister\When_persisting_sagas_on_non_transactional_endpoints.cs" />
+    <Compile Include="SagaPersister\When_persisting_sagas_on_transactional_endpoints.cs" />
+    <Compile Include="SubscriptionStorage\Config\When_configuring_the_subscription_storage.cs" />
+    <Compile Include="SubscriptionStorage\EnsuringBackwardsCompatability.cs" />
+    <Compile Include="SubscriptionStorage\InMemoryDBFixture.cs" />
+    <Compile Include="SubscriptionStorage\TestData.cs" />
+    <Compile Include="SubscriptionStorage\When_initializing_the_storage_with_existing_v2X_subscriptions.cs" />
+    <Compile Include="SubscriptionStorage\When_listing_subscribers_for_message_types.cs" />
+    <Compile Include="SubscriptionStorage\When_receiving_a_subscription_message.cs" />
+    <Compile Include="SubscriptionStorage\When_receiving_a_unsubscription_message.cs" />
+    <Compile Include="SubscriptionStorage\When_using_semantic_versioning_of_messages.cs" />
+    <Compile Include="TimeoutPersister\EnsuringBackwardsCompatability.cs" />
+    <Compile Include="TimeoutPersister\InMemoryDBFixture.cs" />
+    <Compile Include="TimeoutPersister\When_fetching_timeouts_from_storage.cs" />
+    <Compile Include="TimeoutPersister\When_removing_timeouts_from_the_storage.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="hibernate.cfg.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <EmbeddedResource Include="SagaPersister\TestSagaWithHbmlXmlOverride.hbm.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+    <None Include="Testing.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="ripple.dependencies.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\NServiceBus.NHibernate\NServiceBus.NHibernate.csproj">
+      <Project>{281646e3-32e0-4f4d-bcf6-1dc5efc6c268}</Project>
+      <Name>NServiceBus.NHibernate</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
