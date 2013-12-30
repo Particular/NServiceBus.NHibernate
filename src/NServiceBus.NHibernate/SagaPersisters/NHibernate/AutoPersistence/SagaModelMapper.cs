@@ -6,24 +6,26 @@ namespace NServiceBus.SagaPersisters.NHibernate.AutoPersistence
     using System.Linq;
     using System.Reflection;
     using Attributes;
+    using global::NHibernate;
     using global::NHibernate.Cfg.MappingSchema;
     using global::NHibernate.Mapping.ByCode;
+    using global::NHibernate.Type;
     using Saga;
 
     public class SagaModelMapper
     {
         public ConventionModelMapper Mapper { get; private set; }
-        readonly IEnumerable<Type> _entityTypes;
-        readonly IEnumerable<Type> _sagaEntities;
+        readonly List<Type> _entityTypes;
+        readonly List<Type> _sagaEntities;
 
         public SagaModelMapper(IEnumerable<Type> typesToScan)
         {
             Mapper = new ConventionModelMapper();
-
+            var types = typesToScan.ToList();
             _sagaEntities =
-                typesToScan.Where(t => typeof (IContainSagaData).IsAssignableFrom(t) && !t.IsInterface);
+                types.Where(t => typeof(IContainSagaData).IsAssignableFrom(t) && !t.IsInterface).ToList();
 
-            _entityTypes = GetTypesThatShouldBeAutoMapped(_sagaEntities, typesToScan);
+            _entityTypes = GetTypesThatShouldBeAutoMapped(_sagaEntities, types).ToList();
 
             Mapper.IsTablePerClass((type, b) => false);
             Mapper.IsTablePerConcreteClass((type, b) => _sagaEntities.Contains(type));
@@ -37,7 +39,6 @@ namespace NServiceBus.SagaPersisters.NHibernate.AutoPersistence
                            !(memberType == typeof (string) || memberType == typeof (byte[]) || memberType.IsArray);
                 });
             Mapper.IsPersistentProperty((info, b) => !HasAttribute<RowVersionAttribute>(info));
-
             Mapper.BeforeMapClass += ApplyClassConvention;
             Mapper.BeforeMapUnionSubclass += ApplySubClassConvention;
             Mapper.BeforeMapProperty += ApplyPropertyConvention;
@@ -52,14 +53,36 @@ namespace NServiceBus.SagaPersisters.NHibernate.AutoPersistence
             else
                 map.Id(idMapper => idMapper.Generator(Generators.Assigned));
 
-            var tableAttribute = GetAttribute<TableNameAttribute>(type);
-
             var rowVersionProperty = type.GetProperties()
                                          .Where(HasAttribute<RowVersionAttribute>)
                                          .FirstOrDefault();
 
             if (rowVersionProperty != null)
-                map.Version(rowVersionProperty, mapper => mapper.Generated(VersionGeneration.Always));
+            {
+                map.Version(rowVersionProperty, mapper =>
+                {
+                    mapper.Generated(VersionGeneration.Never);
+
+                    if (rowVersionProperty.PropertyType == typeof(DateTime))
+                    {
+                        mapper.Type(new TimestampType());
+                    }
+
+                    if(rowVersionProperty.PropertyType == typeof(byte[]))
+                    {
+                        mapper.Type(new BinaryBlobType());
+                        mapper.Generated(VersionGeneration.Always);
+                        mapper.UnsavedValue(null);
+                        mapper.Column(cm =>
+                        {
+                            cm.NotNullable(false);
+                            cm.SqlType(NHibernateUtil.Timestamp.Name);
+                        });
+                    }
+                });
+            }
+
+            var tableAttribute = GetAttribute<TableNameAttribute>(type);
 
             if (tableAttribute != null)
             {
