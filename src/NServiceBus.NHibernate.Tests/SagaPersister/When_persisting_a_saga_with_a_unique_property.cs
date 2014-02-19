@@ -1,8 +1,8 @@
 ﻿namespace NServiceBus.SagaPersisters.NHibernate.Tests
 {
     using System;
-    using global::NHibernate.Exceptions;
     using NUnit.Framework;
+    using Persistence.NHibernate;
     using Saga;
 
     [TestFixture]
@@ -29,7 +29,7 @@
                                        UniqueString = "whatever"
                                    });
 
-            Assert.Throws<GenericADOException>(() => UnitOfWork.End());
+            Assert.Throws<UniqueKeyException>(() => UnitOfWork.End());
         }
     }
 

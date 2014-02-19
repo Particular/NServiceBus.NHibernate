@@ -2,24 +2,40 @@
 
 namespace Runner
 {
-    using System.Collections;
-    using System.Collections.Generic;
     using System.Configuration;
     using System.Diagnostics;
-    using System.Text;
     using System.Threading;
     using System.Threading.Tasks;
     using System.Transactions;
     using NServiceBus;
     using NServiceBus.Features;
     using NServiceBus.Persistence.NHibernate;
+    using NServiceBus.Unicast.Transport;
     using Runner.Saga;
 
     class Program
     {
         static void Main(string[] args)
         {
-            var numberOfThreads = int.Parse(args[0]);
+            NHibernateSettingRetriever.ConnectionStrings = () => new ConnectionStringSettingsCollection { new ConnectionStringSettings("NServiceBus/Persistence", SqlServerConnectionString) };
+
+
+            TransportConnectionString.Override(() => "deadLetter=false;journal=false");
+
+            var testCaseToRun = args[0];
+
+            int numberOfThreads;
+
+            if (!int.TryParse(testCaseToRun, out numberOfThreads))
+            {
+                var testCase = TestCase.Load(testCaseToRun, args);
+
+                testCase.Run();
+                testCase.DumpSettings();
+
+                return;
+            }
+
             var volatileMode = (args[4].ToLower() == "volatile");
             var suppressDTC = (args[4].ToLower() == "suppressdtc");
             var twoPhaseCommit = (args[4].ToLower() == "twophasecommit");

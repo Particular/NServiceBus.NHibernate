@@ -10,6 +10,7 @@ namespace NServiceBus.TimeoutPersisters.NHibernate.Tests
     using NServiceBus.Config.ConfigurationSource;
     using NUnit.Framework;
     using Persistence.NHibernate;
+    using Environment = global::NHibernate.Cfg.Environment;
 
     public abstract class InMemoryDBFixture
     {
@@ -26,7 +27,8 @@ namespace NServiceBus.TimeoutPersisters.NHibernate.Tests
 
             NHibernateSettingRetriever.AppSettings = () => new NameValueCollection
                                                                {
-                                                                   {"NServiceBus/Persistence/NHibernate/dialect", dialect}
+                                                                   {"NServiceBus/Persistence/NHibernate/dialect", dialect},
+                                                                   {"NServiceBus/Persistence/NHibernate/" + Environment.SqlExceptionConverter, typeof(SqlLiteUniqueKeyConstraintExceptionConverter).AssemblyQualifiedName}
                                                                };
 
             NHibernateSettingRetriever.ConnectionStrings = () => new ConnectionStringSettingsCollection
@@ -46,5 +48,7 @@ namespace NServiceBus.TimeoutPersisters.NHibernate.Tests
 
             new Installer.Installer().Install(WindowsIdentity.GetCurrent().Name);
         }
+
+       
     }
 }

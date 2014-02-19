@@ -3,11 +3,14 @@ namespace NServiceBus.TimeoutPersisters.NHibernate
     using System;
     using System.Collections;
     using System.Collections.Generic;
-    using System.Data;
     using System.Linq;
+    using System.Transactions;
     using global::NHibernate;
+    using global::NHibernate.Exceptions;
+    using Persistence.NHibernate;
     using Serializers.Json;
     using Timeout.Core;
+    using IsolationLevel = System.Data.IsolationLevel;
 
     /// <summary>
     /// Timeout storage implementation for NHibernate.
@@ -70,14 +73,28 @@ namespace NServiceBus.TimeoutPersisters.NHibernate
         /// <param name="timeout">Timeout data.</param>
         public void Add(TimeoutData timeout)
         {
-            var newId = Guid.NewGuid();
+            var timeoutId = Guid.Empty;
 
+            string messageId;
+            if (timeout.Headers.TryGetValue(Headers.MessageId, out messageId))
+            {
+                Guid.TryParse(messageId, out timeoutId);
+
+            }
+
+            if (timeoutId == Guid.Empty)
+            {
+                timeoutId = Guid.NewGuid();
+            }
+
+            using(new TransactionScope(TransactionScopeOption.Suppress)) //the operation is idempotent so we can avoid DTC here
             using (var session = SessionFactory.OpenSession())
             using (var tx = session.BeginTransaction(IsolationLevel.ReadCommitted))
             {
+
                 session.Save(new TimeoutEntity
                 {
-                    Id = newId,
+                    Id = timeoutId,
                     CorrelationId = timeout.CorrelationId,
                     Destination = timeout.Destination,
                     SagaId = timeout.SagaId,
@@ -87,10 +104,17 @@ namespace NServiceBus.TimeoutPersisters.NHibernate
                     Endpoint = timeout.OwningTimeoutManager,
                 });
 
-                tx.Commit();
+                try
+                {
+                    tx.Commit();
+                }
+                catch (UniqueKeyException)
+                {
+                }
+                
             }
 
-            timeout.Id = newId.ToString();
+            timeout.Id = timeoutId.ToString();
         }
 
         /// <summary>

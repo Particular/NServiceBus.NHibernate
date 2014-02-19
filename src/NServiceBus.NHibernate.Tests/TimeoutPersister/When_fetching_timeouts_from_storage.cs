@@ -47,7 +47,7 @@ namespace NServiceBus.TimeoutPersisters.NHibernate.Tests
                 Headers = new Dictionary<string, string> { { "Bar", "34234" }, { "Foo", "aString1" }, { "Super", "aString2" } },
                 OwningTimeoutManager = Configure.EndpointName,
             });
-            
+
 
 
             DateTime nextTimeToRunQuery;

@@ -19,7 +19,7 @@ namespace NServiceBus.Persistence.NHibernate
     /// </summary>
     public static class ConfigureNHibernate
     {
-        private const string Message =
+        const string Message =
             @"
 To run NServiceBus with NHibernate you need to at least specify the database connectionstring.
 Here is an example of what is required:
@@ -48,7 +48,7 @@ Here is an example of what is required:
 
         static readonly ILog Logger = LogManager.GetLogger(typeof(ConfigureNHibernate));
         static readonly Regex PropertyRetrievalRegex = new Regex(@"NServiceBus/Persistence/NHibernate/([\W\w]+)$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
-        private static ConnectionStringSettingsCollection connectionStringSettingsCollection;
+        static ConnectionStringSettingsCollection connectionStringSettingsCollection;
 
         public static string DefaultDialect = "NHibernate.Dialect.MsSql2008Dialect";
 
@@ -96,18 +96,24 @@ Here is an example of what is required:
                 configurationProperties[Environment.Dialect] = DefaultDialect;
             }
 
+            if (!configurationProperties.ContainsKey(Environment.SqlExceptionConverter))
+            {
+                configurationProperties[Environment.SqlExceptionConverter] = typeof(UniqueKeyConstraintExceptionConverter).AssemblyQualifiedName;
+            }
+
+
             TimeoutPersisterProperties = OverrideConnectionStringSettingIfNotNull(configurationProperties,
-                                                                                  "NServiceBus/Persistence/NHibernate/Timeout");
+                "NServiceBus/Persistence/NHibernate/Timeout");
             SubscriptionStorageProperties = OverrideConnectionStringSettingIfNotNull(configurationProperties,
-                                                                                     "NServiceBus/Persistence/NHibernate/Subscription");
+                "NServiceBus/Persistence/NHibernate/Subscription");
             SagaPersisterProperties = OverrideConnectionStringSettingIfNotNull(configurationProperties,
-                                                                               "NServiceBus/Persistence/NHibernate/Saga");
+                "NServiceBus/Persistence/NHibernate/Saga");
             GatewayPersisterProperties = OverrideConnectionStringSettingIfNotNull(configurationProperties,
-                                                                                  "NServiceBus/Persistence/NHibernate/Gateway");
+                "NServiceBus/Persistence/NHibernate/Gateway");
             GatewayDeduplicationProperties = OverrideConnectionStringSettingIfNotNull(configurationProperties,
-                                                                                  "NServiceBus/Persistence/NHibernate/Deduplication");
+                "NServiceBus/Persistence/NHibernate/Deduplication");
             DistributorPersisterProperties = OverrideConnectionStringSettingIfNotNull(configurationProperties,
-                                                                                      "NServiceBus/Persistence/NHibernate/Distributor");
+                "NServiceBus/Persistence/NHibernate/Distributor");
         }
 
         /// <summary>
@@ -177,7 +183,7 @@ Here is an example of what is required:
         /// <param name="properties">The properties to use.</param>
         public static void ConfigureSqlLiteIfRunningInDebugModeAndNoConfigPropertiesSet(IDictionary<string, string> properties)
         {
-            if (!System.Diagnostics.Debugger.IsAttached || properties.Count != 0) 
+            if (!System.Diagnostics.Debugger.IsAttached || properties.Count != 0)
                 return;
 
             var warningMsg =
@@ -202,12 +208,12 @@ PM> Install-Package System.Data.SQLite.{1}
             return new Configuration().SetProperties(properties);
         }
 
-        private static string GetConfigFileIfExists()
+        static string GetConfigFileIfExists()
         {
             return AppDomain.CurrentDomain.SetupInformation.ConfigurationFile ?? "App.config";
         }
 
-        private static Configuration CreateNHibernateConfiguration()
+        static Configuration CreateNHibernateConfiguration()
         {
             var configuration = new Configuration();
             var hc = ConfigurationManager.GetSection(CfgXmlHelper.CfgSectionName) as IHibernateConfiguration;
@@ -222,7 +228,7 @@ PM> Install-Package System.Data.SQLite.{1}
             return configuration;
         }
 
-        private static string GetDefaultConfigurationFilePath()
+        static string GetDefaultConfigurationFilePath()
         {
             var baseDir = AppDomain.CurrentDomain.BaseDirectory;
 
@@ -234,7 +240,7 @@ PM> Install-Package System.Data.SQLite.{1}
             return Path.Combine(binPath, Configuration.DefaultHibernateCfgFileName);
         }
 
-        private static IDictionary<string, string> OverrideConnectionStringSettingIfNotNull(
+        static IDictionary<string, string> OverrideConnectionStringSettingIfNotNull(
             IDictionary<string, string> properties, string name)
         {
             var connectionStringOverride = GetConnectionStringOrNull(name);
@@ -250,7 +256,7 @@ PM> Install-Package System.Data.SQLite.{1}
             return overriddenProperties;
         }
 
-        private static string GetConnectionStringOrNull(string name)
+        static string GetConnectionStringOrNull(string name)
         {
             var connectionStringSettings = connectionStringSettingsCollection[name];
 
@@ -262,4 +268,9 @@ PM> Install-Package System.Data.SQLite.{1}
             return connectionStringSettings.ConnectionString;
         }
     }
+
 }
+
+
+
+   

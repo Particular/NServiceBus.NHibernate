@@ -12,8 +12,10 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
     using NUnit.Framework;
     using Persistence.NHibernate;
     using Saga;
+    using TimeoutPersisters.NHibernate.Tests;
     using UnitOfWork;
     using UnitOfWork.NHibernate;
+    using Environment = global::NHibernate.Cfg.Environment;
 
     public class InMemoryFixture
     {
@@ -32,7 +34,8 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
 
             NHibernateSettingRetriever.AppSettings = () => new NameValueCollection
                                                                {
-                                                                   {"NServiceBus/Persistence/NHibernate/dialect", dialect}
+                                                                   {"NServiceBus/Persistence/NHibernate/dialect", dialect},
+                                                                    {"NServiceBus/Persistence/NHibernate/" + Environment.SqlExceptionConverter, typeof(SqlLiteUniqueKeyConstraintExceptionConverter).AssemblyQualifiedName}
                                                                };
 
             NHibernateSettingRetriever.ConnectionStrings = () => new ConnectionStringSettingsCollection
