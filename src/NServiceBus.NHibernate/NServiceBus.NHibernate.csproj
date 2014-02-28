@@ -96,7 +96,7 @@
     <Compile Include="Persistence\NHibernate\AddressUserType.cs" />
     <Compile Include="Persistence\NHibernate\ConfigureNHibernate.cs" />
     <Compile Include="Persistence\NHibernate\NHibernateSettingRetriever.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="AssemblyInfo.cs" />
     <Compile Include="SagaPersisters\NHibernate\AutoPersistence\Attributes\LockModeAttribute.cs" />
     <Compile Include="SagaPersisters\NHibernate\AutoPersistence\Attributes\TableNameAttribute.cs" />
     <Compile Include="SagaPersisters\NHibernate\AutoPersistence\SagaModelMapper.cs" />

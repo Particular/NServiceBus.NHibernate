@@ -1,19 +1,15 @@
-﻿using System;
-
-namespace Runner
+﻿namespace Runner
 {
-    using System.Collections;
-    using System.Collections.Generic;
+    using System;
     using System.Configuration;
     using System.Diagnostics;
-    using System.Text;
     using System.Threading;
     using System.Threading.Tasks;
     using System.Transactions;
     using NServiceBus;
     using NServiceBus.Features;
     using NServiceBus.Persistence.NHibernate;
-    using Runner.Saga;
+    using Saga;
 
     class Program
     {
