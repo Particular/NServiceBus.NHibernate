@@ -3,8 +3,10 @@
     using System;
     using System.Collections.Generic;
     using Config;
-    using NHibernate;
-    using NHibernate.Cfg;
+    // ReSharper disable RedundantNameQualifier
+    using global::NHibernate;
+    using global::NHibernate.Cfg;
+// ReSharper restore RedundantNameQualifier
     using Persistence.NHibernate;
     using SagaPersisters.NHibernate;
     using SagaPersisters.NHibernate.Config.Internal;
