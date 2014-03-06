@@ -31,7 +31,9 @@ namespace NServiceBus.SagaPersisters.NHibernate.Config.Internal
             var scannedAssemblies = typesToScan.Select(t => t.Assembly).Distinct();
 
             foreach (var assembly in scannedAssemblies)
+            {
                 nhibernateConfiguration.AddAssembly(assembly);
+            }
 
             var modelMapper =
                 new SagaModelMapper(typesToScan.Except(nhibernateConfiguration.ClassMappings.Select(x => x.MappedClass)));
