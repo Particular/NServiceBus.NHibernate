@@ -31,7 +31,7 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
             Assert.IsNotNull(persister);
         }       
     }
-
+    
     public class SagaWithAbstractBaseClass : MyOwnAbstractBase
     {
         public virtual Guid OrderId { get; set; }
