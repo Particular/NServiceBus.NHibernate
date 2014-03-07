@@ -2,14 +2,11 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
 {
     using System;
     using System.Linq;
-    using Config.Internal;
-    using global::NHibernate.Cfg;
     using global::NHibernate.Engine;
     using global::NHibernate.Id;
     using global::NHibernate.Impl;
     using global::NHibernate.Persister.Entity;
     using NUnit.Framework;
-    using Saga;
 
     [TestFixture]
     public class When_autoMapping_sagas
@@ -20,14 +17,7 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
         [SetUp]
         public void SetUp()
         {
-            var assemblyContainingSagas = typeof (TestSaga).Assembly;
-            var types = assemblyContainingSagas.GetTypes().ToList();
-            types.Add(typeof(ContainSagaData));
-
-            var builder = new SessionFactoryBuilder(types);
-            var properties = SQLiteConfiguration.InMemory();
-
-            sessionFactory = builder.Build(new Configuration().AddProperties(properties)) as SessionFactoryImpl;
+            sessionFactory = SessionFactoryHelper.Build();
 
             persisterForTestSaga = sessionFactory.GetEntityPersisterFor<TestSaga>();
         }
