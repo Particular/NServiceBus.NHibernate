@@ -1,8 +1,6 @@
 ﻿namespace NServiceBus.SagaPersisters.NHibernate.Tests
 {
-    using System.Linq;
     using NUnit.Framework;
-    using Saga;
 
     [TestFixture]
     public class When_configuring_the_saga_persister_to_use_sqlite
@@ -14,8 +12,7 @@
         {
             Configure.Features.Enable<Features.Sagas>();
 
-            var types = typeof(MySaga).Assembly.GetTypes().ToList();
-            types.Add(typeof(ContainSagaData));
+            var types = SessionFactoryHelper.Types();
 
             config = Configure.With(types)
                 .DefineEndpointName("Foo")

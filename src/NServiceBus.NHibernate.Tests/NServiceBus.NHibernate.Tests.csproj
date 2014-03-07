@@ -73,11 +73,13 @@
     <Compile Include="SagaPersister\FakeConfigurationSource.cs" />
     <Compile Include="SagaPersister\InMemoryFixture.cs" />
     <Compile Include="SagaPersister\MySaga.cs" />
+    <Compile Include="SagaPersister\SessionFactoryHelper.cs" />
     <Compile Include="SagaPersister\SQLiteConfiguration.cs" />
     <Compile Include="SagaPersister\TestSaga.cs" />
     <Compile Include="SagaPersister\When_automapping_sagas.cs" />
     <Compile Include="SagaPersister\When_automapping_sagas_with_abstract_base_class.cs" />
     <Compile Include="SagaPersister\When_automapping_sagas_with_nested_types.cs" />
+    <Compile Include="SagaPersister\When_autoMapping_sagas_with_row_version.cs" />
     <Compile Include="SagaPersister\When_building_the_sessionfactory.cs" />
     <Compile Include="SagaPersister\When_configuring_the_saga_persister_from_appconfig.cs" />
     <Compile Include="SagaPersister\When_configuring_the_saga_persister_to_use_sqlite.cs" />
