@@ -11,7 +11,7 @@ public class ConfigureSagaPersister
             new ConnectionStringSettings("NServiceBus/Persistence", SqlServerConnectionString)
         };
 
-        config.NHibernateSagaPersister();
+        config.UseNHibernateSagaPersister();
     }
 
     static string SqlServerConnectionString = @"Server=localhost\sqlexpress;Database=nservicebus;Trusted_Connection=True;";

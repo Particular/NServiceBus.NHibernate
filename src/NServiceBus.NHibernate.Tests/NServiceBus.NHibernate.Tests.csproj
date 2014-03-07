@@ -20,6 +20,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -69,15 +70,16 @@
     <Compile Include="Persistence\ConfigureSqlLiteIfRunningInDebugModeAndNoConfigPropertiesSet.cs" />
     <Compile Include="Persistence\NHibernateProperties.cs" />
     <Compile Include="Persistence\ThrowIfRequiredPropertiesAreMissing.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SagaPersister\FakeConfigurationSource.cs" />
     <Compile Include="SagaPersister\InMemoryFixture.cs" />
     <Compile Include="SagaPersister\MySaga.cs" />
+    <Compile Include="SagaPersister\SessionFactoryHelper.cs" />
     <Compile Include="SagaPersister\SQLiteConfiguration.cs" />
     <Compile Include="SagaPersister\TestSaga.cs" />
     <Compile Include="SagaPersister\When_automapping_sagas.cs" />
     <Compile Include="SagaPersister\When_automapping_sagas_with_abstract_base_class.cs" />
     <Compile Include="SagaPersister\When_automapping_sagas_with_nested_types.cs" />
+    <Compile Include="SagaPersister\When_autoMapping_sagas_with_row_version.cs" />
     <Compile Include="SagaPersister\When_building_the_sessionfactory.cs" />
     <Compile Include="SagaPersister\When_configuring_the_saga_persister_from_appconfig.cs" />
     <Compile Include="SagaPersister\When_configuring_the_saga_persister_to_use_sqlite.cs" />
@@ -117,13 +119,5 @@
       <Name>NServiceBus.NHibernate</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
 </Project>
