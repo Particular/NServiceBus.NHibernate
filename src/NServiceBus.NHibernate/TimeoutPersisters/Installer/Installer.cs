@@ -2,7 +2,6 @@ namespace NServiceBus.TimeoutPersisters.NHibernate.Installer
 {
     using System;
     using Config;
-    using global::NHibernate.Tool.hbm2ddl;
     using Installation;
     using Installation.Environments;
     using NServiceBus.Config;
@@ -45,8 +44,10 @@ namespace NServiceBus.TimeoutPersisters.NHibernate.Installer
                 ConfigureNHibernate.ThrowIfRequiredPropertiesAreMissing(ConfigureNHibernate.TimeoutPersisterProperties);
 
                 var configuration = ConfigureNHibernate.CreateConfigurationWith(ConfigureNHibernate.TimeoutPersisterProperties);
+               
                 ConfigureNHibernate.AddMappings<TimeoutEntityMap>(configuration);
-                new SchemaUpdate(configuration).Execute(false, true);
+
+                new HackedSchemaUpdate(configuration).Execute(false, true);
             }
         }
     }
