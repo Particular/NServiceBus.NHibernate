@@ -47,7 +47,7 @@ namespace NServiceBus.TimeoutPersisters.NHibernate.Installer
                
                 ConfigureNHibernate.AddMappings<TimeoutEntityMap>(configuration);
 
-                new HackedSchemaUpdate(configuration).Execute(false, true);
+                new OptimizedSchemaUpdate(configuration).Execute(false, true);
             }
         }
     }
