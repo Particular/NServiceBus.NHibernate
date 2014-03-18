@@ -39,22 +39,34 @@ namespace NServiceBus.UnitOfWork.NHibernate
             try
             {
                 using (session.Value)
-                using (session.Value.Transaction)
                 {
-                    if (!session.Value.Transaction.IsActive)
+                    if (ex == null)
+                    {
+                        session.Value.Flush();
+                    } 
+
+                    if (Transaction.Current != null)
                     {
                         return;
                     }
 
-                    if (ex != null)
+                    using (session.Value.Transaction)
                     {
-                        // Due to a race condition in NH3.3, explicit rollback can cause exceptions and corrupt the connection pool. 
-                        // Especially if there are more than one NH session taking part in the DTC transaction
-                        //currentSession.Transaction.Rollback();
-                    }
-                    else
-                    {
-                        session.Value.Transaction.Commit();
+                        if (!session.Value.Transaction.IsActive)
+                        {
+                            return;
+                        }
+
+                        if (ex != null)
+                        {
+                            // Due to a race condition in NH3.3, explicit rollback can cause exceptions and corrupt the connection pool. 
+                            // Especially if there are more than one NH session taking part in the DTC transaction
+                            //currentSession.Transaction.Rollback();
+                        }
+                        else
+                        {
+                            session.Value.Transaction.Commit();
+                        }
                     }
                 }
             }
@@ -83,7 +95,12 @@ namespace NServiceBus.UnitOfWork.NHibernate
                     session.Value = SessionFactory.OpenSession();
                 }
 
-                session.Value.BeginTransaction(GetIsolationLevel());
+                session.Value.FlushMode = FlushMode.Never;
+
+                if (Transaction.Current == null)
+                {
+                    session.Value.BeginTransaction(GetIsolationLevel());
+                }
             }
 
             return session.Value;
