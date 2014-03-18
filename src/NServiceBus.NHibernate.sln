@@ -1,6 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2012
+# Visual Studio 2013
+VisualStudioVersion = 12.0.30110.0
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NServiceBus.NHibernate", "NServiceBus.NHibernate\NServiceBus.NHibernate.csproj", "{281646E3-32E0-4F4D-BCF6-1DC5EFC6C268}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NServiceBus.NHibernate.Tests", "NServiceBus.NHibernate.Tests\NServiceBus.NHibernate.Tests.csproj", "{7F6284D7-8DBE-44D3-875C-C59FC7489287}"
@@ -8,6 +10,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NServiceBus.NHibernate.PerformanceTests", "NServiceBus.NHibernate.PerformanceTests\NServiceBus.NHibernate.PerformanceTests.csproj", "{96467E41-F299-474C-AB0D-00B7CCD73E26}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NServiceBus.NHibernate.AcceptanceTests", "NServiceBus.NHibernate.AcceptanceTests\NServiceBus.NHibernate.AcceptanceTests.csproj", "{8BF5E2C0-8F97-4746-9A8B-10CB38CF8B97}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NServiceBus.NHibernate.AcceptanceTests-Oracle", "NServiceBus.NHibernate.AcceptanceTests-Oracle\NServiceBus.NHibernate.AcceptanceTests-Oracle.csproj", "{0412098A-6622-44AF-8932-C4C77E525B1F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -31,6 +35,10 @@ Global
 		{8BF5E2C0-8F97-4746-9A8B-10CB38CF8B97}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8BF5E2C0-8F97-4746-9A8B-10CB38CF8B97}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8BF5E2C0-8F97-4746-9A8B-10CB38CF8B97}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0412098A-6622-44AF-8932-C4C77E525B1F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0412098A-6622-44AF-8932-C4C77E525B1F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0412098A-6622-44AF-8932-C4C77E525B1F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0412098A-6622-44AF-8932-C4C77E525B1F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
