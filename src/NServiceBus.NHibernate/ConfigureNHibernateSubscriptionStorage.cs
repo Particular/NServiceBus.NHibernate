@@ -104,6 +104,8 @@ namespace NServiceBus
 
             ConfigureNHibernate.AddMappings<SubscriptionMap>(configuration);
 
+            Unicast.Subscriptions.NHibernate.Installer.Installer.configuration = configuration;
+
             var sessionSource = new SubscriptionStorageSessionProvider(configuration.BuildSessionFactory());
 
             config.Configurer.RegisterSingleton<ISubscriptionStorageSessionProvider>(sessionSource);

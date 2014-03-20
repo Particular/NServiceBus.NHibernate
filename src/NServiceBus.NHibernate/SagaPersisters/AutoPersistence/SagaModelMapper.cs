@@ -14,8 +14,17 @@ namespace NServiceBus.SagaPersisters.NHibernate.AutoPersistence
 
     public class SagaModelMapper
     {
+        readonly Func<Type, string> tableNamingConvention;
+
         public SagaModelMapper(IEnumerable<Type> typesToScan)
+            : this(typesToScan, DefaultTableNameConvention)
         {
+            
+        }
+
+        public SagaModelMapper(IEnumerable<Type> typesToScan, Func<Type,string> tableNamingConvention)
+        {
+            this.tableNamingConvention = tableNamingConvention;
             Mapper = new ConventionModelMapper();
 
             this.typesToScan = typesToScan.ToList();
@@ -99,18 +108,24 @@ namespace NServiceBus.SagaPersisters.NHibernate.AutoPersistence
                 return;
             }
 
+            var namingConvention = tableNamingConvention(type);
+            map.Table(namingConvention);
+        }
+
+        static string DefaultTableNameConvention(Type type)
+        {
             //if the type is nested use the name of the parent
-            if (type.DeclaringType != null)
+            if (type.DeclaringType == null)
             {
-                if (typeof(IContainSagaData).IsAssignableFrom(type))
-                {
-                    map.Table(type.DeclaringType.Name);
-                }
-                else
-                {
-                    map.Table(type.DeclaringType.Name + "_" + type.Name);
-                }
+                return type.Name;
             }
+
+            if (typeof(IContainSagaData).IsAssignableFrom(type))
+            {
+                return type.DeclaringType.Name;
+            }
+
+            return type.DeclaringType.Name + "_" + type.Name;
         }
 
         void ApplySubClassConvention(IModelInspector mi, Type type, IUnionSubclassAttributesMapper map)
@@ -127,18 +142,8 @@ namespace NServiceBus.SagaPersisters.NHibernate.AutoPersistence
                 return;
             }
 
-            //if the type is nested use the name of the parent
-            if (type.DeclaringType != null)
-            {
-                if (typeof(IContainSagaData).IsAssignableFrom(type))
-                {
-                    map.Table(type.DeclaringType.Name);
-                }
-                else
-                {
-                    map.Table(type.DeclaringType.Name + "_" + type.Name);
-                }
-            }
+            var namingConvention = tableNamingConvention(type);
+            map.Table(namingConvention);
         }
 
         void ApplyPropertyConvention(IModelInspector mi, PropertyPath type, IPropertyMapper map)
