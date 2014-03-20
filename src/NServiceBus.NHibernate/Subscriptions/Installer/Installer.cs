@@ -1,12 +1,9 @@
 namespace NServiceBus.Unicast.Subscriptions.NHibernate.Installer
 {
-    using System;
-    using Config;
+    using global::NHibernate.Cfg;
     using global::NHibernate.Tool.hbm2ddl;
     using Installation;
     using Installation.Environments;
-    using NServiceBus.Config;
-    using Persistence.NHibernate;
 
     /// <summary>
     /// Installer for <see cref="SubscriptionStorage"/>
@@ -18,6 +15,8 @@ namespace NServiceBus.Unicast.Subscriptions.NHibernate.Installer
         /// </summary>
         public static bool RunInstaller { get; set; }
 
+        internal static Configuration configuration;
+
         /// <summary>
         /// Executes the installer.
         /// </summary>
@@ -26,26 +25,6 @@ namespace NServiceBus.Unicast.Subscriptions.NHibernate.Installer
         {
             if (RunInstaller)
             {
-                var configSection = Configure.GetConfigSection<DBSubscriptionStorageConfig>();
-
-                if (configSection != null)
-                {
-                    if (configSection.NHibernateProperties.Count == 0)
-                    {
-                        throw new InvalidOperationException(
-                            "No NHibernate properties found. Please specify NHibernateProperties in your DBSubscriptionStorageConfig section");
-                    }
-
-                    foreach (var property in configSection.NHibernateProperties.ToProperties())
-                    {
-                        ConfigureNHibernate.SubscriptionStorageProperties[property.Key] = property.Value;
-                    }
-                }
-
-                ConfigureNHibernate.ThrowIfRequiredPropertiesAreMissing(ConfigureNHibernate.SubscriptionStorageProperties);
-
-                var configuration = ConfigureNHibernate.CreateConfigurationWith(ConfigureNHibernate.SubscriptionStorageProperties);
-                ConfigureNHibernate.AddMappings<SubscriptionMap>(configuration);
                 new SchemaUpdate(configuration).Execute(false, true);
             }
         }

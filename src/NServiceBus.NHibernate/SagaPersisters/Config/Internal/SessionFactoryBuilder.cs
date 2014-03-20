@@ -3,9 +3,11 @@ namespace NServiceBus.SagaPersisters.NHibernate.Config.Internal
     using System;
     using System.Collections.Generic;
     using System.Configuration;
+    using System.IO;
     using System.Linq;
     using AutoPersistence;
     using global::NHibernate;
+    using global::NHibernate.Mapping.ByCode;
     using Configuration = global::NHibernate.Cfg.Configuration;
 
     /// <summary>
@@ -14,13 +16,21 @@ namespace NServiceBus.SagaPersisters.NHibernate.Config.Internal
     public class SessionFactoryBuilder
     {
         private readonly IEnumerable<Type> typesToScan;
+        readonly Func<Type, string> tableNamingConvention;
 
         /// <summary>
         /// Constructor that accepts the types to scan for saga data classes
         /// </summary>
-        public SessionFactoryBuilder(IEnumerable<Type> typesToScan)
+// ReSharper disable IntroduceOptionalParameters.Global
+        public SessionFactoryBuilder(IEnumerable<Type> typesToScan) : this(typesToScan, null)
+// ReSharper restore IntroduceOptionalParameters.Global
+        {
+        }
+
+        public SessionFactoryBuilder(IEnumerable<Type> typesToScan, Func<Type, string> tableNamingConvention)
         {
             this.typesToScan = typesToScan;
+            this.tableNamingConvention = tableNamingConvention;
         }
 
         /// <summary>
@@ -35,10 +45,21 @@ namespace NServiceBus.SagaPersisters.NHibernate.Config.Internal
                 nhibernateConfiguration.AddAssembly(assembly);
             }
 
-            var modelMapper =
-                new SagaModelMapper(typesToScan.Except(nhibernateConfiguration.ClassMappings.Select(x => x.MappedClass)));
+            var types = typesToScan.Except(nhibernateConfiguration.ClassMappings.Select(x => x.MappedClass));
+            SagaModelMapper modelMapper;
+            if (tableNamingConvention == null)
+            {
+                modelMapper = new SagaModelMapper(types);
+            }
+            else
+            {
+                modelMapper = new SagaModelMapper(types, tableNamingConvention);
+            }
 
-            nhibernateConfiguration.AddMapping(modelMapper.Compile());
+            var mappingDocument = modelMapper.Compile();
+            File.WriteAllText(@"C:\temp\dsfdsfd.txt", mappingDocument.AsString());
+
+            nhibernateConfiguration.AddMapping(mappingDocument);
 
             try
             {

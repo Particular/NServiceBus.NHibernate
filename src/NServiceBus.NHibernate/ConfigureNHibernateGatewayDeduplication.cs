@@ -82,6 +82,8 @@
 
             ConfigureNHibernate.AddMappings<DeduplicationMessageMap>(configuration);
 
+            Deduplication.NHibernate.Installer.Installer.configuration = configuration;
+
             config.Configurer.ConfigureComponent<Deduplication.NHibernate.GatewayDeduplication>(
                 DependencyLifecycle.SingleInstance)
                 .ConfigureProperty(p => p.SessionFactory, configuration.BuildSessionFactory());

@@ -82,6 +82,8 @@ namespace NServiceBus
 
             ConfigureNHibernate.AddMappings<GatewayMessageMap>(configuration);
 
+            GatewayPersister.NHibernate.Installer.Installer.configuration = configuration;
+
             config.Configurer.ConfigureComponent<GatewayPersister.NHibernate.GatewayPersister>(
                 DependencyLifecycle.SingleInstance)
                 .ConfigureProperty(p => p.SessionFactory, configuration.BuildSessionFactory());
