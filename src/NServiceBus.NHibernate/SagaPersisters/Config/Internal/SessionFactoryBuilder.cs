@@ -56,10 +56,7 @@ namespace NServiceBus.SagaPersisters.NHibernate.Config.Internal
                 modelMapper = new SagaModelMapper(types, tableNamingConvention);
             }
 
-            var mappingDocument = modelMapper.Compile();
-            File.WriteAllText(@"C:\temp\dsfdsfd.txt", mappingDocument.AsString());
-
-            nhibernateConfiguration.AddMapping(mappingDocument);
+            nhibernateConfiguration.AddMapping(modelMapper.Compile());
 
             try
             {
