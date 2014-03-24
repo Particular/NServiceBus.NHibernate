@@ -25,7 +25,7 @@ namespace NServiceBus.SagaPersisters.NHibernate.Config.Installer
         {
             if (RunInstaller)
             {
-                new SchemaUpdate(configuration).Execute(true, true);
+                new SchemaUpdate(configuration).Execute(false, true);
             }
         }
     }
