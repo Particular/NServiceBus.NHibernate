@@ -116,6 +116,7 @@
             public virtual bool MessageThreeReceived { get; set; }
             public virtual IList<ChildData> RelatedData { get; set; }
         }
+
         [Serializable]
         public class Message2 : IMessage
         {
@@ -139,6 +140,7 @@
             public virtual Guid Id { get; set; }
             public virtual TestSagaData TestSagaData { get; set; }
         }
+
         [Serializable]
         public class SagaCompleted : IMessage
         {
