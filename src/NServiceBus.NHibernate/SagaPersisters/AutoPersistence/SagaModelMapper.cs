@@ -161,7 +161,14 @@ namespace NServiceBus.SagaPersisters.NHibernate.AutoPersistence
         {
             map.Cascade(Cascade.All | Cascade.DeleteOrphans);
             map.Key(km => km.Column(type.LocalMember.DeclaringType.Name + "_id"));
-            map.Inverse(true);
+
+            var bagType = type.LocalMember.GetPropertyOrFieldType().DetermineCollectionElementType();
+            var parentType = type.LocalMember.DeclaringType;
+
+            if (bagType.HasPublicPropertyOf(parentType))
+            {
+                map.Inverse(true);
+            }
         }
 
         void ApplyManyToOneConvention(IModelInspector mi, PropertyPath type, IManyToOneMapper map)
