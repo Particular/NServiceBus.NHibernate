@@ -7,9 +7,9 @@ using NServiceBus;
 using NServiceBus.Persistence.NHibernate;
 using NServiceBus.Saga;
 
-public class ConfigureSagaPersister
+public abstract class ConfigurePersistences
 {
-    public void Configure(Configure config)
+    protected ConfigurePersistences()
     {
         NHibernateSettingRetriever.ConnectionStrings = () => new ConnectionStringSettingsCollection
         {
@@ -21,7 +21,29 @@ public class ConfigureSagaPersister
                                                                    {"NServiceBus/Persistence/NHibernate/connection.driver_class", "NHibernate.Driver.OracleDataClientDriver"},
                                                                    {"NServiceBus/Persistence/NHibernate/dialect", "NHibernate.Dialect.Oracle10gDialect"}
                                                                };
+    }
+}
 
+public class ConfigureTimeoutStorage : ConfigurePersistences
+{
+    public void Configure(Configure config)
+    {
+        config.UseNHibernateTimeoutPersister();
+    }
+}
+
+public class ConfigureSubscriptionStorage : ConfigurePersistences
+{
+    public void Configure(Configure config)
+    {
+        config.UseNHibernateSubscriptionPersister();
+    }
+}
+
+public class ConfigureSagaPersister : ConfigurePersistences
+{
+    public void Configure(Configure config)
+    {
         config.UseNHibernateSagaPersister(type =>
         {
             var tablename = DefaultTableNameConvention(type);

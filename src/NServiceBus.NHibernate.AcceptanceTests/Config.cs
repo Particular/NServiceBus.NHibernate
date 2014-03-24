@@ -2,17 +2,37 @@
 using NServiceBus;
 using NServiceBus.Persistence.NHibernate;
 
-public class ConfigureSagaPersister
+public abstract class ConfigurePersistences
 {
-    public void Configure(Configure config)
+    protected ConfigurePersistences()
     {
         NHibernateSettingRetriever.ConnectionStrings = () => new ConnectionStringSettingsCollection
         {
-            new ConnectionStringSettings("NServiceBus/Persistence", SqlServerConnectionString)
+            new ConnectionStringSettings("NServiceBus/Persistence", @"Server=localhost\sqlexpress;Database=nservicebus;Trusted_Connection=True;")
         };
+    }
+}
 
+public class ConfigureTimeoutStorage : ConfigurePersistences
+{
+    public void Configure(Configure config)
+    {
+        config.UseNHibernateTimeoutPersister();
+    }
+}
+
+public class ConfigureSubscriptionStorage : ConfigurePersistences
+{
+    public void Configure(Configure config)
+    {
+        config.UseNHibernateSubscriptionPersister();
+    }
+}
+
+public class ConfigureSagaPersister : ConfigurePersistences
+{
+    public void Configure(Configure config)
+    {
         config.UseNHibernateSagaPersister();
     }
-
-    static string SqlServerConnectionString = @"Server=localhost\sqlexpress;Database=nservicebus;Trusted_Connection=True;";
 }
