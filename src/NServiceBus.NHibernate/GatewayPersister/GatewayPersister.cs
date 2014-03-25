@@ -8,6 +8,7 @@ namespace NServiceBus.GatewayPersister.NHibernate
     using Gateway.Persistence;
     using global::NHibernate;
     using global::NHibernate.Exceptions;
+    using Persistence.NHibernate;
     using Serializers.Json;
 
     /// <summary>
@@ -31,7 +32,7 @@ namespace NServiceBus.GatewayPersister.NHibernate
         public bool InsertMessage(string clientId, DateTime timeReceived, Stream message, IDictionary<string, string> headers)
         {
             using (var session = SessionFactory.OpenSession())
-            using (var tx = session.BeginTransaction(IsolationLevel.ReadCommitted))
+            using (var tx = session.BeginAmbientTransactionAware(IsolationLevel.ReadCommitted))
             {
                 var gatewayMessage = session.Get<GatewayMessage>(clientId);
 
@@ -80,7 +81,7 @@ namespace NServiceBus.GatewayPersister.NHibernate
             headers = null;
 
             using (var session = SessionFactory.OpenSession())
-            using (var tx = session.BeginTransaction(IsolationLevel.ReadCommitted))
+            using (var tx = session.BeginAmbientTransactionAware(IsolationLevel.ReadCommitted))
             {
                 var gatewayMessage = session.Get<GatewayMessage>(clientId);
 
@@ -116,7 +117,7 @@ namespace NServiceBus.GatewayPersister.NHibernate
         public void UpdateHeader(string clientId, string headerKey, string newValue)
         {
             using (var session = SessionFactory.OpenSession())
-            using (var tx = session.BeginTransaction(IsolationLevel.ReadCommitted))
+            using (var tx = session.BeginAmbientTransactionAware(IsolationLevel.ReadCommitted))
             {
                 var gatewayMessage = session.Get<GatewayMessage>(clientId);
 

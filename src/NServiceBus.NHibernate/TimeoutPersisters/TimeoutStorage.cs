@@ -3,11 +3,12 @@ namespace NServiceBus.TimeoutPersisters.NHibernate
     using System;
     using System.Collections;
     using System.Collections.Generic;
-    using System.Data;
     using System.Linq;
     using global::NHibernate;
+    using Persistence.NHibernate;
     using Serializers.Json;
     using Timeout.Core;
+    using IsolationLevel = System.Data.IsolationLevel;
 
     /// <summary>
     /// Timeout storage implementation for NHibernate.
@@ -30,7 +31,7 @@ namespace NServiceBus.TimeoutPersisters.NHibernate
             var now = DateTime.UtcNow;
             
             using (var session = SessionFactory.OpenStatelessSession())
-            using (var tx = session.BeginTransaction(IsolationLevel.ReadCommitted))
+            using (var tx = session.BeginAmbientTransactionAware(IsolationLevel.ReadCommitted))
             {
                 var results = session.QueryOver<TimeoutEntity>()
                     .Where(x => x.Endpoint == Configure.EndpointName)
@@ -73,7 +74,7 @@ namespace NServiceBus.TimeoutPersisters.NHibernate
             var newId = Guid.NewGuid();
 
             using (var session = SessionFactory.OpenSession())
-            using (var tx = session.BeginTransaction(IsolationLevel.ReadCommitted))
+            using (var tx = session.BeginAmbientTransactionAware(IsolationLevel.ReadCommitted))
             {
                 session.Save(new TimeoutEntity
                 {
@@ -104,7 +105,7 @@ namespace NServiceBus.TimeoutPersisters.NHibernate
             int result;
 
             using (var session = SessionFactory.OpenStatelessSession())
-            using (var tx = session.BeginTransaction(IsolationLevel.ReadCommitted))
+            using (var tx = session.BeginAmbientTransactionAware(IsolationLevel.ReadCommitted))
             {
                 var te = session.Get<TimeoutEntity>(new Guid(timeoutId));
 
@@ -151,7 +152,7 @@ namespace NServiceBus.TimeoutPersisters.NHibernate
         public void RemoveTimeoutBy(Guid sagaId)
         {
             using (var session = SessionFactory.OpenStatelessSession())
-            using (var tx = session.BeginTransaction(IsolationLevel.ReadCommitted))
+            using (var tx = session.BeginAmbientTransactionAware(IsolationLevel.ReadCommitted))
             {
                 var queryString = string.Format("delete {0} where SagaId = :sagaid",
                                         typeof(TimeoutEntity));
