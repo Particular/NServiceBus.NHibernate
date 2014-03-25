@@ -3,11 +3,9 @@ namespace NServiceBus.SagaPersisters.NHibernate.Config.Internal
     using System;
     using System.Collections.Generic;
     using System.Configuration;
-    using System.IO;
     using System.Linq;
     using AutoPersistence;
     using global::NHibernate;
-    using global::NHibernate.Mapping.ByCode;
     using Configuration = global::NHibernate.Cfg.Configuration;
 
     /// <summary>
