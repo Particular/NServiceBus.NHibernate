@@ -6,7 +6,6 @@ namespace NServiceBus.Unicast.Subscriptions.NHibernate
     using global::NHibernate.Criterion;
     using Logging;
     using MessageDrivenSubscriptions;
-    using Persistence.NHibernate;
 
     /// <summary>
     /// Subscription storage using NHibernate for persistence 
@@ -24,7 +23,7 @@ namespace NServiceBus.Unicast.Subscriptions.NHibernate
         {
             using (var transaction = new TransactionScope(TransactionScopeOption.Suppress))
             using (var session = subscriptionStorageSessionProvider.OpenSession())
-            using (var tx = session.BeginAmbientTransactionAware(System.Data.IsolationLevel.ReadCommitted))
+            using (var tx = session.BeginTransaction(System.Data.IsolationLevel.ReadCommitted))
             {
                 foreach (var messageType in messageTypes)
                 {
@@ -56,7 +55,7 @@ namespace NServiceBus.Unicast.Subscriptions.NHibernate
         {
             using (var transaction = new TransactionScope(TransactionScopeOption.Suppress))
             using (var session = subscriptionStorageSessionProvider.OpenSession())
-            using (var tx = session.BeginAmbientTransactionAware(System.Data.IsolationLevel.ReadCommitted))            
+            using (var tx = session.BeginTransaction(System.Data.IsolationLevel.ReadCommitted))            
             {
                 var subscriptions = session.QueryOver<Subscription>()
                     .Where(
@@ -78,7 +77,7 @@ namespace NServiceBus.Unicast.Subscriptions.NHibernate
         {
             using (var transaction = new TransactionScope(TransactionScopeOption.Suppress))
             using (var session = subscriptionStorageSessionProvider.OpenStatelessSession())
-            using (var tx = session.BeginAmbientTransactionAware(System.Data.IsolationLevel.ReadCommitted))
+            using (var tx = session.BeginTransaction(System.Data.IsolationLevel.ReadCommitted))
             {
                 var results = session.QueryOver<Subscription>()
                               .Where(s => s.TypeName.IsIn(messageTypes.Select(mt => mt.TypeName).ToList()))
@@ -99,7 +98,7 @@ namespace NServiceBus.Unicast.Subscriptions.NHibernate
         {
             using (var transaction = new TransactionScope(TransactionScopeOption.Suppress))
             using (var session = subscriptionStorageSessionProvider.OpenStatelessSession())
-            using (var tx = session.BeginAmbientTransactionAware(System.Data.IsolationLevel.ReadCommitted))
+            using (var tx = session.BeginTransaction(System.Data.IsolationLevel.ReadCommitted))
             {
                 var v2XSubscriptions = session.QueryOver<Subscription>()
                     .Where(s => s.TypeName == null)
