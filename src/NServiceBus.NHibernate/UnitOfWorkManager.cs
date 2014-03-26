@@ -84,7 +84,7 @@ namespace NServiceBus.UnitOfWork.NHibernate
             if (session.Value == null)
             {
                 var sessionFactoryImpl = SessionFactory as SessionFactoryImpl;
-
+                
                 if (sessionFactoryImpl != null)
                 {
                     connection.Value = sessionFactoryImpl.ConnectionProvider.GetConnection();

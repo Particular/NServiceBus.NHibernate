@@ -5,6 +5,7 @@ namespace NServiceBus.TimeoutPersisters.NHibernate
     using System.Collections.Generic;
     using System.Linq;
     using global::NHibernate;
+    using IdGeneration;
     using Persistence.NHibernate;
     using Serializers.Json;
     using Timeout.Core;
@@ -71,14 +72,25 @@ namespace NServiceBus.TimeoutPersisters.NHibernate
         /// <param name="timeout">Timeout data.</param>
         public void Add(TimeoutData timeout)
         {
-            var newId = Guid.NewGuid();
+            var timeoutId = Guid.Empty;
+
+            string messageId;
+            if (timeout.Headers.TryGetValue(Headers.MessageId, out messageId))
+            {
+                Guid.TryParse(messageId, out timeoutId);
+            }
+
+            if (timeoutId == Guid.Empty)
+            {
+                timeoutId = CombGuid.Generate();
+            }
 
             using (var session = SessionFactory.OpenSession())
             using (var tx = session.BeginAmbientTransactionAware(IsolationLevel.ReadCommitted))
             {
                 session.Save(new TimeoutEntity
                 {
-                    Id = newId,
+                    Id = timeoutId,
                     CorrelationId = timeout.CorrelationId,
                     Destination = timeout.Destination,
                     SagaId = timeout.SagaId,
@@ -91,7 +103,7 @@ namespace NServiceBus.TimeoutPersisters.NHibernate
                 tx.Commit();
             }
 
-            timeout.Id = newId.ToString();
+            timeout.Id = timeoutId.ToString();
         }
 
         /// <summary>
