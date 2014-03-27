@@ -5,7 +5,7 @@ namespace NServiceBus.UnitOfWork.NHibernate
     using System.Threading;
     using System.Transactions;
     using global::NHibernate;
-    using global::NHibernate.Impl;
+    using Persistence.NHibernate;
     using IsolationLevel = System.Data.IsolationLevel;
 
     /// <summary>
@@ -83,18 +83,9 @@ namespace NServiceBus.UnitOfWork.NHibernate
         {
             if (session.Value == null)
             {
-                var sessionFactoryImpl = SessionFactory as SessionFactoryImpl;
+                connection.Value = SessionFactory.GetConnection();
+                session.Value = SessionFactory.OpenSessionEx(connection.Value);
                 
-                if (sessionFactoryImpl != null)
-                {
-                    connection.Value = sessionFactoryImpl.ConnectionProvider.GetConnection();
-                    session.Value = SessionFactory.OpenSession(connection.Value);
-                }
-                else
-                {
-                    session.Value = SessionFactory.OpenSession();
-                }
-
                 session.Value.FlushMode = FlushMode.Never;
 
                 if (Transaction.Current == null)
