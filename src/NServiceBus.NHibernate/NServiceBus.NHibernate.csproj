@@ -108,6 +108,7 @@
     <Compile Include="SagaPersisters\SagaPersister.cs" />
     <Compile Include="TimeoutPersisters\Config\TimeoutEntityMap.cs" />
     <Compile Include="TimeoutPersisters\Installer\Installer.cs" />
+    <Compile Include="TimeoutPersisters\Installer\OptimizedSchemaUpdate.cs" />
     <Compile Include="TimeoutPersisters\TimeoutEntity.cs" />
     <Compile Include="TimeoutPersisters\TimeoutStorage.cs" />
     <Compile Include="Subscriptions\Config\SubscriptionMap.cs" />
