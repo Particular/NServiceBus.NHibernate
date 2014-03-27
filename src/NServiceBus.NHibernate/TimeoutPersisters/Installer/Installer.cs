@@ -1,7 +1,6 @@
 namespace NServiceBus.TimeoutPersisters.NHibernate.Installer
 {
     using global::NHibernate.Cfg;
-    using global::NHibernate.Tool.hbm2ddl;
     using Installation;
     using Installation.Environments;
 
@@ -25,7 +24,7 @@ namespace NServiceBus.TimeoutPersisters.NHibernate.Installer
         {
             if (RunInstaller)
             {
-                new SchemaUpdate(configuration).Execute(false, true);
+                new OptimizedSchemaUpdate(configuration).Execute(false, true);
             }
         }
     }
