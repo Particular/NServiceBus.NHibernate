@@ -99,6 +99,7 @@
     <Compile Include="Persistence\ConfigureNHibernate.cs" />
     <Compile Include="Persistence\NHibernateSettingRetriever.cs" />
     <Compile Include="AssemblyInfo.cs" />
+    <Compile Include="Persistence\ISessionFactoryExtensions.cs" />
     <Compile Include="SagaPersisters\AutoPersistence\Attributes\LockModeAttribute.cs" />
     <Compile Include="SagaPersisters\AutoPersistence\Attributes\TableNameAttribute.cs" />
     <Compile Include="SagaPersisters\AutoPersistence\SagaModelMapper.cs" />

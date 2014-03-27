@@ -26,7 +26,8 @@
         /// <returns><value>true</value> if successfully added.</returns>
         public bool DeduplicateMessage(string clientId, DateTime timeReceived)
         {
-            using (var session = SessionFactory.OpenSession())
+            using (var conn = SessionFactory.GetConnection())
+            using (var session = SessionFactory.OpenSessionEx(conn))
             using (var tx = session.BeginAmbientTransactionAware(IsolationLevel.ReadCommitted))
             {
                 var gatewayMessage = session.Get<DeduplicationMessage>(clientId);
