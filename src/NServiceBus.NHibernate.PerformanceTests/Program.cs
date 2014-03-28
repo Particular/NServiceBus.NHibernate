@@ -20,6 +20,7 @@
             var suppressDTC = (args[4].ToLower() == "suppressdtc");
             var twoPhaseCommit = (args[4].ToLower() == "twophasecommit");
             var saga = (args[5].ToLower() == "sagamessages");
+            var publish = (args[5].ToLower() == "publishmessages");
             var concurrency = int.Parse(args[7]);
 
             TransportConfigOverride.MaximumConcurrencyLevel = numberOfThreads;
@@ -73,7 +74,11 @@
                 NHibernateSettingRetriever.ConnectionStrings = () => new ConnectionStringSettingsCollection { new ConnectionStringSettings("NServiceBus/Persistence", SqlServerConnectionString) };
                 config.UseNHibernateSagaPersister();
             }
-
+            else if (publish)
+            {
+                NHibernateSettingRetriever.ConnectionStrings = () => new ConnectionStringSettingsCollection { new ConnectionStringSettings("NServiceBus/Persistence", SqlServerConnectionString) };
+                config.UseNHibernateSubscriptionPersister(TimeSpan.FromSeconds(1));
+            }
 
             if (suppressDTC)
             {
@@ -88,6 +93,11 @@
                 if (saga)
                 {
                     SeedSagaMessages(numberOfMessages, endpointName, concurrency);
+                }
+                else if (publish)
+                {
+                    Statistics.PublishTimeNoTx = PublishEvents(numberOfMessages / 2, numberOfThreads, false);
+                    Statistics.PublishTimeWithTx = PublishEvents(numberOfMessages / 2, numberOfThreads, true);
                 }
                 else
                 {
@@ -168,6 +178,37 @@
                     {
                         bus.Send(inputQueue, message);
                     }
+                });
+            sw.Stop();
+
+            return sw.Elapsed;
+        }
+
+        static TimeSpan PublishEvents(int numberOfMessages, int numberOfThreads, bool createTransaction)
+        {
+            var sw = new Stopwatch();
+            var bus = Configure.Instance.Builder.Build<IBus>();
+
+            sw.Start();
+            Parallel.For(
+                0,
+                numberOfMessages,
+                new ParallelOptions { MaxDegreeOfParallelism = numberOfThreads },
+                x =>
+                {
+                    if (createTransaction)
+                    {
+                        using (var tx = new TransactionScope())
+                        {
+                            bus.Publish<TestEvent>();
+                            tx.Complete();
+                        }
+                    }
+                    else
+                    {
+                        bus.Publish<TestEvent>();
+                    }
+                    Interlocked.Increment(ref Statistics.NumberOfMessages);
                 });
             sw.Stop();
 
