@@ -6,6 +6,7 @@
     using Gateway.Deduplication;
     using global::NHibernate;
     using global::NHibernate.Exceptions;
+    using Persistence.NHibernate;
 
     /// <summary>
     /// NHibernate Gateway deduplication
@@ -25,8 +26,9 @@
         /// <returns><value>true</value> if successfully added.</returns>
         public bool DeduplicateMessage(string clientId, DateTime timeReceived)
         {
-            using (var session = SessionFactory.OpenSession())
-            using (var tx = session.BeginTransaction(IsolationLevel.ReadCommitted))
+            using (var conn = SessionFactory.GetConnection())
+            using (var session = SessionFactory.OpenSessionEx(conn))
+            using (var tx = session.BeginAmbientTransactionAware(IsolationLevel.ReadCommitted))
             {
                 var gatewayMessage = session.Get<DeduplicationMessage>(clientId);
 

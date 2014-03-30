@@ -5,7 +5,7 @@ namespace NServiceBus.UnitOfWork.NHibernate
     using System.Threading;
     using System.Transactions;
     using global::NHibernate;
-    using global::NHibernate.Impl;
+    using Persistence.NHibernate;
     using IsolationLevel = System.Data.IsolationLevel;
 
     /// <summary>
@@ -39,22 +39,34 @@ namespace NServiceBus.UnitOfWork.NHibernate
             try
             {
                 using (session.Value)
-                using (session.Value.Transaction)
                 {
-                    if (!session.Value.Transaction.IsActive)
+                    if (ex == null)
+                    {
+                        session.Value.Flush();
+                    } 
+
+                    if (Transaction.Current != null)
                     {
                         return;
                     }
 
-                    if (ex != null)
+                    using (session.Value.Transaction)
                     {
-                        // Due to a race condition in NH3.3, explicit rollback can cause exceptions and corrupt the connection pool. 
-                        // Especially if there are more than one NH session taking part in the DTC transaction
-                        //currentSession.Transaction.Rollback();
-                    }
-                    else
-                    {
-                        session.Value.Transaction.Commit();
+                        if (!session.Value.Transaction.IsActive)
+                        {
+                            return;
+                        }
+
+                        if (ex != null)
+                        {
+                            // Due to a race condition in NH3.3, explicit rollback can cause exceptions and corrupt the connection pool. 
+                            // Especially if there are more than one NH session taking part in the DTC transaction
+                            //currentSession.Transaction.Rollback();
+                        }
+                        else
+                        {
+                            session.Value.Transaction.Commit();
+                        }
                     }
                 }
             }
@@ -71,19 +83,15 @@ namespace NServiceBus.UnitOfWork.NHibernate
         {
             if (session.Value == null)
             {
-                var sessionFactoryImpl = SessionFactory as SessionFactoryImpl;
+                connection.Value = SessionFactory.GetConnection();
+                session.Value = SessionFactory.OpenSessionEx(connection.Value);
+                
+                session.Value.FlushMode = FlushMode.Never;
 
-                if (sessionFactoryImpl != null)
+                if (Transaction.Current == null)
                 {
-                    connection.Value = sessionFactoryImpl.ConnectionProvider.GetConnection();
-                    session.Value = SessionFactory.OpenSession(connection.Value);
+                    session.Value.BeginTransaction(GetIsolationLevel());
                 }
-                else
-                {
-                    session.Value = SessionFactory.OpenSession();
-                }
-
-                session.Value.BeginTransaction(GetIsolationLevel());
             }
 
             return session.Value;

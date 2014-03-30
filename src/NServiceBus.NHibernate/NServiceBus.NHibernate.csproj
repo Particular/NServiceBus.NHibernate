@@ -92,11 +92,14 @@
     <Compile Include="GatewayPersister\Config\GatewayMessageMap.cs" />
     <Compile Include="GatewayPersister\GatewayPersister.cs" />
     <Compile Include="GatewayPersister\Installer\Installer.cs" />
+    <Compile Include="Persistence\AmbientTransactionAwareWrapper.cs" />
+    <Compile Include="Persistence\ISessionExtensions.cs" />
     <Compile Include="Persistence\NHibernatePersistence.cs" />
     <Compile Include="Persistence\AddressUserType.cs" />
     <Compile Include="Persistence\ConfigureNHibernate.cs" />
     <Compile Include="Persistence\NHibernateSettingRetriever.cs" />
     <Compile Include="AssemblyInfo.cs" />
+    <Compile Include="Persistence\ISessionFactoryExtensions.cs" />
     <Compile Include="SagaPersisters\AutoPersistence\Attributes\LockModeAttribute.cs" />
     <Compile Include="SagaPersisters\AutoPersistence\Attributes\TableNameAttribute.cs" />
     <Compile Include="SagaPersisters\AutoPersistence\SagaModelMapper.cs" />

@@ -94,8 +94,8 @@
                 }
 
             }
-
         }
+
         public class CompletionHandler:IHandleMessages<SagaCompleted>
         {
             public Context Context { get; set; }
@@ -105,10 +105,11 @@
                 Context.SagaCompleted = true;
             }
         }
+
         public class TestSagaData : IContainSagaData
         {
             [RowVersion]
-            public virtual byte[] Version { get; set; }
+            public virtual DateTime Version { get; set; }
             public virtual Guid Id { get; set; }
             public virtual string Originator { get; set; }
             public virtual string OriginalMessageId { get; set; }
@@ -119,6 +120,7 @@
             public virtual bool MessageThreeReceived { get; set; }
             public virtual IList<ChildData> RelatedData { get; set; }
         }
+
         [Serializable]
         public class Message2 : IMessage
         {

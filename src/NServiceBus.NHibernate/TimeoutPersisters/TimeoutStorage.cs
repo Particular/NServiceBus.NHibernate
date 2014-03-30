@@ -3,11 +3,13 @@ namespace NServiceBus.TimeoutPersisters.NHibernate
     using System;
     using System.Collections;
     using System.Collections.Generic;
-    using System.Data;
     using System.Linq;
     using global::NHibernate;
+    using IdGeneration;
+    using Persistence.NHibernate;
     using Serializers.Json;
     using Timeout.Core;
+    using IsolationLevel = System.Data.IsolationLevel;
 
     /// <summary>
     /// Timeout storage implementation for NHibernate.
@@ -29,19 +31,20 @@ namespace NServiceBus.TimeoutPersisters.NHibernate
         {
             var now = DateTime.UtcNow;
             
-            using (var session = SessionFactory.OpenStatelessSession())
-            using (var tx = session.BeginTransaction(IsolationLevel.ReadCommitted))
+            using (var conn = SessionFactory.GetConnection())
+            using (var session = SessionFactory.OpenStatelessSessionEx(conn))
+            using (var tx = session.BeginAmbientTransactionAware(IsolationLevel.ReadCommitted))
             {
                 var results = session.QueryOver<TimeoutEntity>()
                     .Where(x => x.Endpoint == Configure.EndpointName)
                     .And(x => x.Time >= startSlice && x.Time <= now)
                     .OrderBy(x => x.Time).Asc
                     .Select(x => x.Id, x => x.Time)
-                    .List <object[]>()
-                    .Select(properties => new Tuple<string, DateTime>(((Guid)properties[0]).ToString(), (DateTime) properties[1]))
+                    .List<object[]>()
+                    .Select(properties => new Tuple<string, DateTime>(((Guid) properties[0]).ToString(), (DateTime) properties[1]))
                     .ToList();
 
-               //Retrieve next time we need to run query
+                //Retrieve next time we need to run query
                 var startOfNextChunk = session.QueryOver<TimeoutEntity>()
                     .Where(x => x.Endpoint == Configure.EndpointName)
                     .Where(x => x.Time > now)
@@ -70,14 +73,26 @@ namespace NServiceBus.TimeoutPersisters.NHibernate
         /// <param name="timeout">Timeout data.</param>
         public void Add(TimeoutData timeout)
         {
-            var newId = Guid.NewGuid();
+            var timeoutId = Guid.Empty;
 
-            using (var session = SessionFactory.OpenSession())
-            using (var tx = session.BeginTransaction(IsolationLevel.ReadCommitted))
+            string messageId;
+            if (timeout.Headers.TryGetValue(Headers.MessageId, out messageId))
+            {
+                Guid.TryParse(messageId, out timeoutId);
+            }
+
+            if (timeoutId == Guid.Empty)
+            {
+                timeoutId = CombGuid.Generate();
+            }
+
+            using (var conn = SessionFactory.GetConnection())
+            using (var session = SessionFactory.OpenSessionEx(conn))
+            using (var tx = session.BeginAmbientTransactionAware(IsolationLevel.ReadCommitted))
             {
                 session.Save(new TimeoutEntity
                 {
-                    Id = newId,
+                    Id = timeoutId,
                     CorrelationId = timeout.CorrelationId,
                     Destination = timeout.Destination,
                     SagaId = timeout.SagaId,
@@ -90,7 +105,7 @@ namespace NServiceBus.TimeoutPersisters.NHibernate
                 tx.Commit();
             }
 
-            timeout.Id = newId.ToString();
+            timeout.Id = timeoutId.ToString();
         }
 
         /// <summary>
@@ -103,8 +118,9 @@ namespace NServiceBus.TimeoutPersisters.NHibernate
         {
             int result;
 
-            using (var session = SessionFactory.OpenStatelessSession())
-            using (var tx = session.BeginTransaction(IsolationLevel.ReadCommitted))
+            using (var conn = SessionFactory.GetConnection())
+            using (var session = SessionFactory.OpenStatelessSessionEx(conn))
+            using (var tx = session.BeginAmbientTransactionAware(IsolationLevel.ReadCommitted))
             {
                 var te = session.Get<TimeoutEntity>(new Guid(timeoutId));
 
@@ -150,8 +166,9 @@ namespace NServiceBus.TimeoutPersisters.NHibernate
         /// <param name="sagaId">The saga id of the timeouts to remove.</param>
         public void RemoveTimeoutBy(Guid sagaId)
         {
-            using (var session = SessionFactory.OpenStatelessSession())
-            using (var tx = session.BeginTransaction(IsolationLevel.ReadCommitted))
+            using (var conn = SessionFactory.GetConnection())
+            using (var session = SessionFactory.OpenStatelessSessionEx(conn))
+            using (var tx = session.BeginAmbientTransactionAware(IsolationLevel.ReadCommitted))
             {
                 var queryString = string.Format("delete {0} where SagaId = :sagaid",
                                         typeof(TimeoutEntity));
