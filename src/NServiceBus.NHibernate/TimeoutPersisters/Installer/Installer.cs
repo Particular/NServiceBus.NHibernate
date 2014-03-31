@@ -1,12 +1,8 @@
 namespace NServiceBus.TimeoutPersisters.NHibernate.Installer
 {
-    using System;
-    using Config;
-    using global::NHibernate.Tool.hbm2ddl;
+    using global::NHibernate.Cfg;
     using Installation;
     using Installation.Environments;
-    using NServiceBus.Config;
-    using Persistence.NHibernate;
 
     /// <summary>
     /// Installer for <see cref="TimeoutStorage"/>
@@ -18,6 +14,8 @@ namespace NServiceBus.TimeoutPersisters.NHibernate.Installer
         /// </summary>
         public static bool RunInstaller { get; set; }
 
+        internal static Configuration configuration;
+
         /// <summary>
         /// Executes the installer.
         /// </summary>
@@ -26,27 +24,7 @@ namespace NServiceBus.TimeoutPersisters.NHibernate.Installer
         {
             if (RunInstaller)
             {
-                var configSection = Configure.GetConfigSection<TimeoutPersisterConfig>();
-
-                if (configSection != null)
-                {
-                    if (configSection.NHibernateProperties.Count == 0)
-                    {
-                        throw new InvalidOperationException(
-                            "No NHibernate properties found. Please specify NHibernateProperties in your TimeoutPersisterConfig section");
-                    }
-
-                    foreach (var property in configSection.NHibernateProperties.ToProperties())
-                    {
-                        ConfigureNHibernate.TimeoutPersisterProperties[property.Key] = property.Value;
-                    }
-                }
-
-                ConfigureNHibernate.ThrowIfRequiredPropertiesAreMissing(ConfigureNHibernate.TimeoutPersisterProperties);
-
-                var configuration = ConfigureNHibernate.CreateConfigurationWith(ConfigureNHibernate.TimeoutPersisterProperties);
-                ConfigureNHibernate.AddMappings<TimeoutEntityMap>(configuration);
-                new SchemaUpdate(configuration).Execute(false, true);
+                new OptimizedSchemaUpdate(configuration).Execute(false, true);
             }
         }
     }

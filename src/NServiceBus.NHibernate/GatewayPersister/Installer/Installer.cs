@@ -1,10 +1,9 @@
 namespace NServiceBus.GatewayPersister.NHibernate.Installer
 {
-    using Config;
+    using global::NHibernate.Cfg;
     using global::NHibernate.Tool.hbm2ddl;
     using Installation;
     using Installation.Environments;
-    using Persistence.NHibernate;
 
     /// <summary>
     /// Installer for <see cref="GatewayPersister"/>
@@ -16,6 +15,8 @@ namespace NServiceBus.GatewayPersister.NHibernate.Installer
         /// </summary>
         public static bool RunInstaller { get; set; }
 
+        internal static Configuration configuration;
+
         /// <summary>
         /// Executes the installer.
         /// </summary>
@@ -24,10 +25,6 @@ namespace NServiceBus.GatewayPersister.NHibernate.Installer
         {
             if (RunInstaller)
             {
-                ConfigureNHibernate.ThrowIfRequiredPropertiesAreMissing(ConfigureNHibernate.GatewayPersisterProperties);
-
-                var configuration = ConfigureNHibernate.CreateConfigurationWith(ConfigureNHibernate.GatewayPersisterProperties);
-                ConfigureNHibernate.AddMappings<GatewayMessageMap>(configuration);
                 new SchemaUpdate(configuration).Execute(false, true);
             }
         }

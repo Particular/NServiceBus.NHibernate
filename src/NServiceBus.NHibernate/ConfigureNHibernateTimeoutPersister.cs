@@ -101,6 +101,7 @@ namespace NServiceBus
 
             TimeoutPersisters.NHibernate.Installer.Installer.RunInstaller = autoUpdateSchema;
             ConfigureNHibernate.AddMappings<TimeoutEntityMap>(configuration);
+            TimeoutPersisters.NHibernate.Installer.Installer.configuration = configuration;
 
             config.Configurer.ConfigureComponent<TimeoutStorage>(DependencyLifecycle.SingleInstance)
                 .ConfigureProperty(p => p.SessionFactory, configuration.BuildSessionFactory());
