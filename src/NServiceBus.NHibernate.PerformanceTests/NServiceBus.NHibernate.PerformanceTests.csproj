@@ -64,6 +64,7 @@
     <Compile Include="Saga\TestSaga.cs" />
     <Compile Include="Statistics.cs" />
     <Compile Include="StatisticsUoW.cs" />
+    <Compile Include="TestEvent.cs" />
     <Compile Include="TestMessage.cs" />
     <Compile Include="TestMessageHandler.cs" />
     <Compile Include="TestObject.cs" />

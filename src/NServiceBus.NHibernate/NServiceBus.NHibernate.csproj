@@ -106,6 +106,7 @@
     <Compile Include="SagaPersisters\Config\Installer\Installer.cs" />
     <Compile Include="SagaPersisters\Config\Internal\SessionFactoryBuilder.cs" />
     <Compile Include="SagaPersisters\SagaPersister.cs" />
+    <Compile Include="Subscriptions\CachedSubscriptionStorage.cs" />
     <Compile Include="TimeoutPersisters\Config\TimeoutEntityMap.cs" />
     <Compile Include="TimeoutPersisters\Installer\Installer.cs" />
     <Compile Include="TimeoutPersisters\Installer\OptimizedSchemaUpdate.cs" />

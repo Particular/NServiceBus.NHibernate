@@ -7,6 +7,7 @@ namespace NServiceBus
     using global::NHibernate.Cfg;
     // ReSharper restore RedundantNameQualifier
     using Persistence.NHibernate;
+    using Unicast.Subscriptions.MessageDrivenSubscriptions;
     using Unicast.Subscriptions.NHibernate;
     using Unicast.Subscriptions.NHibernate.Config;
 
@@ -44,6 +45,11 @@ namespace NServiceBus
         /// <returns>The configuration object.</returns>
         public static Configure UseNHibernateSubscriptionPersister(this Configure config)
         {
+            return UseNHibernateSubscriptionPersister(config, cacheExpiration: null);
+        }
+
+        public static Configure UseNHibernateSubscriptionPersister(this Configure config, TimeSpan? cacheExpiration)
+        {
             var configSection = Configure.GetConfigSection<DBSubscriptionStorageConfig>();
 
             if (configSection != null)
@@ -65,7 +71,7 @@ namespace NServiceBus
             var properties = ConfigureNHibernate.SubscriptionStorageProperties;
 
             return config.UseNHibernateSubscriptionPersisterInternal(ConfigureNHibernate.CreateConfigurationWith(properties),
-                                                                configSection == null || configSection.UpdateSchema);
+                                                                configSection == null || configSection.UpdateSchema, cacheExpiration);
         }
 
         /// <summary>
@@ -77,12 +83,17 @@ namespace NServiceBus
         /// <returns>The <see cref="Configure" /> object.</returns>
         public static Configure UseNHibernateSubscriptionPersister(this Configure config, Configuration configuration)
         {
+            return UseNHibernateSubscriptionPersister(config, configuration, null);
+        }
+
+        public static Configure UseNHibernateSubscriptionPersister(this Configure config, Configuration configuration, TimeSpan? cacheExpiration)
+        {
             foreach (var property in configuration.Properties)
             {
                 ConfigureNHibernate.SubscriptionStorageProperties[property.Key] = property.Value;
             }
 
-            return config.UseNHibernateSubscriptionPersisterInternal(configuration, true);
+            return config.UseNHibernateSubscriptionPersisterInternal(configuration, true, cacheExpiration);
         }
 
         /// <summary>
@@ -96,7 +107,7 @@ namespace NServiceBus
             return config;
         }
 
-        static Configure UseNHibernateSubscriptionPersisterInternal(this Configure config, Configuration configuration, bool autoUpdateSchema)
+        static Configure UseNHibernateSubscriptionPersisterInternal(this Configure config, Configuration configuration, bool autoUpdateSchema, TimeSpan? cacheExpiration = null)
         {
             ConfigureNHibernate.ThrowIfRequiredPropertiesAreMissing(ConfigureNHibernate.SubscriptionStorageProperties);
 
@@ -108,8 +119,13 @@ namespace NServiceBus
 
             var sessionSource = new SubscriptionStorageSessionProvider(configuration.BuildSessionFactory());
 
-            config.Configurer.RegisterSingleton<ISubscriptionStorageSessionProvider>(sessionSource);
-            config.Configurer.ConfigureComponent<SubscriptionStorage>(DependencyLifecycle.InstancePerCall);
+            if (cacheExpiration.HasValue)
+                config.Configurer.RegisterSingleton<ISubscriptionStorage>(new CachedSubscriptionStorage(sessionSource, cacheExpiration.Value));
+            else
+            {
+                config.Configurer.RegisterSingleton<ISubscriptionStorageSessionProvider>(sessionSource);
+                config.Configurer.ConfigureComponent<SubscriptionStorage>(DependencyLifecycle.InstancePerCall);
+            }
 
             return config;
         }
