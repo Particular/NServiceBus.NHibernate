@@ -11,6 +11,8 @@
     <AssemblyName>NServiceBus.NHibernate.Tests</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <AssemblyOriginatorKeyFile>..\NServiceBus.snk</AssemblyOriginatorKeyFile>
+    <SignAssembly>true</SignAssembly>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -21,6 +23,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <PlatformTarget>x64</PlatformTarget>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -38,11 +41,13 @@
     <Reference Include="NHibernate">
       <HintPath>..\packages\NHibernate\lib\Net35\NHibernate.dll</HintPath>
     </Reference>
-    <Reference Include="NServiceBus">
-      <HintPath>..\packages\NServiceBus.Interfaces\lib\net40\NServiceBus.dll</HintPath>
+    <Reference Include="NServiceBus, Version=4.6.0.0, Culture=neutral, PublicKeyToken=9fc386479f8a226c, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\NServiceBus\binaries\NServiceBus.dll</HintPath>
     </Reference>
-    <Reference Include="NServiceBus.Core">
-      <HintPath>..\packages\NServiceBus\lib\net40\NServiceBus.Core.dll</HintPath>
+    <Reference Include="NServiceBus.Core, Version=4.6.0.0, Culture=neutral, PublicKeyToken=9fc386479f8a226c, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\NServiceBus\binaries\NServiceBus.Core.dll</HintPath>
     </Reference>
     <Reference Include="nunit.framework">
       <HintPath>..\packages\NUnit\lib\nunit.framework.dll</HintPath>
@@ -67,6 +72,8 @@
     <Compile Include="GatewayStorage\When_storing_a_duplicate_message.cs" />
     <Compile Include="GatewayStorage\When_storing_a_new_message.cs" />
     <Compile Include="GatewayStorage\When_updating_a_header_of_message.cs" />
+    <Compile Include="Outbox\InMemoryDBFixture.cs" />
+    <Compile Include="Outbox\When_adding_outbox_messages.cs" />
     <Compile Include="Persistence\ConfigureSqlLiteIfRunningInDebugModeAndNoConfigPropertiesSet.cs" />
     <Compile Include="Persistence\NHibernateProperties.cs" />
     <Compile Include="Persistence\ThrowIfRequiredPropertiesAreMissing.cs" />

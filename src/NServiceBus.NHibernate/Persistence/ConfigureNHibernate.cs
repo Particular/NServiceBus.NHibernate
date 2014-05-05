@@ -34,7 +34,7 @@ Here is an example of what is required:
   </appSettings>
   
   <connectionStrings>
-    <!-- Default connection string for all Nhibernate/Sql persisters -->
+    <!-- Default connection string for all NHibernate/Sql persisters -->
     <add name=""NServiceBus/Persistence"" connectionString=""Data Source=.\SQLEXPRESS;Initial Catalog=nservicebus;Integrated Security=True"" />
     
     <!-- Optional overrides per persister -->
@@ -97,17 +97,19 @@ Here is an example of what is required:
             }
 
             TimeoutPersisterProperties = OverrideConnectionStringSettingIfNotNull(configurationProperties,
-                                                                                  "NServiceBus/Persistence/NHibernate/Timeout");
+                "NServiceBus/Persistence/NHibernate/Timeout");
             SubscriptionStorageProperties = OverrideConnectionStringSettingIfNotNull(configurationProperties,
-                                                                                     "NServiceBus/Persistence/NHibernate/Subscription");
+                "NServiceBus/Persistence/NHibernate/Subscription");
             SagaPersisterProperties = OverrideConnectionStringSettingIfNotNull(configurationProperties,
-                                                                               "NServiceBus/Persistence/NHibernate/Saga");
+                "NServiceBus/Persistence/NHibernate/Saga");
             GatewayPersisterProperties = OverrideConnectionStringSettingIfNotNull(configurationProperties,
-                                                                                  "NServiceBus/Persistence/NHibernate/Gateway");
+                "NServiceBus/Persistence/NHibernate/Gateway");
             GatewayDeduplicationProperties = OverrideConnectionStringSettingIfNotNull(configurationProperties,
-                                                                                  "NServiceBus/Persistence/NHibernate/Deduplication");
+                "NServiceBus/Persistence/NHibernate/Deduplication");
             DistributorPersisterProperties = OverrideConnectionStringSettingIfNotNull(configurationProperties,
-                                                                                      "NServiceBus/Persistence/NHibernate/Distributor");
+                "NServiceBus/Persistence/NHibernate/Distributor");
+            OutboxPersisterProperties = OverrideConnectionStringSettingIfNotNull(configurationProperties,
+                "NServiceBus/Persistence/NHibernate/Outbox");
         }
 
         /// <summary>
@@ -139,6 +141,11 @@ Here is an example of what is required:
         /// Distributor persister NHibernate properties.
         /// </summary>
         public static IDictionary<string, string> DistributorPersisterProperties { get; private set; }
+
+        /// <summary>
+        /// Outbox persister NHibernate properties.
+        /// </summary>
+        public static IDictionary<string, string> OutboxPersisterProperties { get; private set; }
 
         /// <summary>
         /// Adds T mapping to <paramref name="configuration"/> .

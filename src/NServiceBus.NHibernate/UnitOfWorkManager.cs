@@ -6,6 +6,7 @@ namespace NServiceBus.UnitOfWork.NHibernate
     using System.Transactions;
     using global::NHibernate;
     using Persistence.NHibernate;
+    using Pipeline;
     using IsolationLevel = System.Data.IsolationLevel;
 
     /// <summary>
@@ -17,6 +18,7 @@ namespace NServiceBus.UnitOfWork.NHibernate
         ///     Injected NHibernate session factory.
         /// </summary>
         public ISessionFactory SessionFactory { get; set; }
+        public PipelineExecutor PipelineExecutor { get; set; }
 
         public void Dispose()
         {
@@ -83,7 +85,7 @@ namespace NServiceBus.UnitOfWork.NHibernate
         {
             if (session.Value == null)
             {
-                connection.Value = SessionFactory.GetConnection();
+                connection.Value = SessionFactory.GetConnection(PipelineExecutor);
                 session.Value = SessionFactory.OpenSessionEx(connection.Value);
                 
                 session.Value.FlushMode = FlushMode.Never;

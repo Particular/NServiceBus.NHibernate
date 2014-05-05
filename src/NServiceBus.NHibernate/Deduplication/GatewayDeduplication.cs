@@ -7,6 +7,7 @@
     using global::NHibernate;
     using global::NHibernate.Exceptions;
     using Persistence.NHibernate;
+    using Pipeline;
 
     /// <summary>
     /// NHibernate Gateway deduplication
@@ -17,6 +18,7 @@
         /// Creates <c>ISession</c>s.
         /// </summary>
         public ISessionFactory SessionFactory { get; set; }
+        public PipelineExecutor PipelineExecutor { get; set; }
 
         /// <summary>
         /// Adds a new message
@@ -26,7 +28,7 @@
         /// <returns><value>true</value> if successfully added.</returns>
         public bool DeduplicateMessage(string clientId, DateTime timeReceived)
         {
-            using (var conn = SessionFactory.GetConnection())
+            using (var conn = SessionFactory.GetConnection(PipelineExecutor))
             using (var session = SessionFactory.OpenSessionEx(conn))
             using (var tx = session.BeginAmbientTransactionAware(IsolationLevel.ReadCommitted))
             {

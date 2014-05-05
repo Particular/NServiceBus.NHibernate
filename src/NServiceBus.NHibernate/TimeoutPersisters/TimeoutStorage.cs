@@ -7,6 +7,7 @@ namespace NServiceBus.TimeoutPersisters.NHibernate
     using global::NHibernate;
     using IdGeneration;
     using Persistence.NHibernate;
+    using Pipeline;
     using Serializers.Json;
     using Timeout.Core;
     using IsolationLevel = System.Data.IsolationLevel;
@@ -20,6 +21,7 @@ namespace NServiceBus.TimeoutPersisters.NHibernate
         /// The current <see cref="ISessionFactory"/>.
         /// </summary>
         public ISessionFactory SessionFactory { get; set; }
+        public PipelineExecutor PipelineExecutor { get; set; }
 
         /// <summary>
         /// Retrieves the next range of timeouts that are due.
@@ -30,8 +32,8 @@ namespace NServiceBus.TimeoutPersisters.NHibernate
         public List<Tuple<string, DateTime>> GetNextChunk(DateTime startSlice, out DateTime nextTimeToRunQuery)
         {
             var now = DateTime.UtcNow;
-            
-            using (var conn = SessionFactory.GetConnection())
+
+            using (var conn = SessionFactory.GetConnection(PipelineExecutor))
             using (var session = SessionFactory.OpenStatelessSessionEx(conn))
             using (var tx = session.BeginAmbientTransactionAware(IsolationLevel.ReadCommitted))
             {
@@ -86,7 +88,7 @@ namespace NServiceBus.TimeoutPersisters.NHibernate
                 timeoutId = CombGuid.Generate();
             }
 
-            using (var conn = SessionFactory.GetConnection())
+            using (var conn = SessionFactory.GetConnection(PipelineExecutor))
             using (var session = SessionFactory.OpenSessionEx(conn))
             using (var tx = session.BeginAmbientTransactionAware(IsolationLevel.ReadCommitted))
             {
@@ -117,7 +119,7 @@ namespace NServiceBus.TimeoutPersisters.NHibernate
         {
             int result;
 
-            using (var conn = SessionFactory.GetConnection())
+            using (var conn = SessionFactory.GetConnection(PipelineExecutor))
             using (var session = SessionFactory.OpenStatelessSessionEx(conn))
             using (var tx = session.BeginAmbientTransactionAware(IsolationLevel.ReadCommitted))
             {
@@ -164,7 +166,7 @@ namespace NServiceBus.TimeoutPersisters.NHibernate
         /// <param name="sagaId">The saga id of the timeouts to remove.</param>
         public void RemoveTimeoutBy(Guid sagaId)
         {
-            using (var conn = SessionFactory.GetConnection())
+            using (var conn = SessionFactory.GetConnection(PipelineExecutor))
             using (var session = SessionFactory.OpenStatelessSessionEx(conn))
             using (var tx = session.BeginAmbientTransactionAware(IsolationLevel.ReadCommitted))
             {

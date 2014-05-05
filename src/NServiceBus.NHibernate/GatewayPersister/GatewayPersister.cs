@@ -9,6 +9,7 @@ namespace NServiceBus.GatewayPersister.NHibernate
     using global::NHibernate;
     using global::NHibernate.Exceptions;
     using Persistence.NHibernate;
+    using Pipeline;
     using Serializers.Json;
 
     /// <summary>
@@ -20,6 +21,7 @@ namespace NServiceBus.GatewayPersister.NHibernate
         /// Creates <c>ISession</c>s.
         /// </summary>
         public ISessionFactory SessionFactory { get; set; }
+        public PipelineExecutor PipelineExecutor { get; set; }
 
         /// <summary>
         /// Adds a new message.
@@ -31,7 +33,7 @@ namespace NServiceBus.GatewayPersister.NHibernate
         /// <returns><value>true</value> if successfully added.</returns>
         public bool InsertMessage(string clientId, DateTime timeReceived, Stream message, IDictionary<string, string> headers)
         {
-            using (var conn = SessionFactory.GetConnection())
+            using (var conn = SessionFactory.GetConnection(PipelineExecutor))
             using (var session = SessionFactory.OpenSessionEx(conn))
             using (var tx = session.BeginAmbientTransactionAware(IsolationLevel.ReadCommitted))
             {
@@ -81,7 +83,7 @@ namespace NServiceBus.GatewayPersister.NHibernate
             message = null;
             headers = null;
 
-            using (var conn = SessionFactory.GetConnection())
+            using (var conn = SessionFactory.GetConnection(PipelineExecutor))
             using (var session = SessionFactory.OpenSessionEx(conn))
             using (var tx = session.BeginAmbientTransactionAware(IsolationLevel.ReadCommitted))
             {
@@ -118,7 +120,7 @@ namespace NServiceBus.GatewayPersister.NHibernate
         /// <param name="newValue">New value.</param>
         public void UpdateHeader(string clientId, string headerKey, string newValue)
         {
-            using (var conn = SessionFactory.GetConnection())
+            using (var conn = SessionFactory.GetConnection(PipelineExecutor))
             using (var session = SessionFactory.OpenSessionEx(conn))
             using (var tx = session.BeginAmbientTransactionAware(IsolationLevel.ReadCommitted))
             {
