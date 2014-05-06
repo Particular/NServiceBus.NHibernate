@@ -93,7 +93,6 @@ namespace NServiceBus.TimeoutPersisters.NHibernate
                 session.Save(new TimeoutEntity
                 {
                     Id = timeoutId,
-                    CorrelationId = timeout.CorrelationId,
                     Destination = timeout.Destination,
                     SagaId = timeout.SagaId,
                     State = timeout.State,
@@ -133,7 +132,6 @@ namespace NServiceBus.TimeoutPersisters.NHibernate
 
                 timeoutData = new TimeoutData
                     {
-                        CorrelationId = te.CorrelationId,
                         Destination = te.Destination,
                         Id = te.Id.ToString(),
                         SagaId = te.SagaId,

@@ -20,7 +20,6 @@ namespace NServiceBus.TimeoutPersisters.NHibernate.Tests
                 persister.Add(new TimeoutData
                                   {
                                       Time = DateTime.UtcNow.AddHours(-1),
-                                      CorrelationId = "boo",
                                       Destination = new Address("timeouts", RuntimeEnvironment.MachineName),
                                       SagaId = Guid.NewGuid(),
                                       State = new byte[] { 0, 0, 133 },
@@ -40,7 +39,6 @@ namespace NServiceBus.TimeoutPersisters.NHibernate.Tests
             persister.Add(new TimeoutData
             {
                 Time = nextTime,
-                CorrelationId = "boo",
                 Destination = new Address("timeouts", RuntimeEnvironment.MachineName),
                 SagaId = Guid.NewGuid(),
                 State = new byte[] { 0, 0, 133 },
