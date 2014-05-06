@@ -49,7 +49,7 @@
 
     class WrappedIDbConnection : IDbConnection
     {
-        readonly IDbConnection connection;
+        IDbConnection connection;
 
         public WrappedIDbConnection(IDbConnection connection)
         {

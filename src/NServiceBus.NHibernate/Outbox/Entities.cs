@@ -16,6 +16,7 @@ namespace NServiceBus.Outbox.NHibernate
     class OutboxOperation
     {
         public virtual long Id { get; set; }
+        public virtual string MessageType { get; set; }
         public virtual MessageIntentEnum Intent { get; set; }
         public virtual Address Destination { get; set; }
         public virtual string CorrelationId { get; set; }

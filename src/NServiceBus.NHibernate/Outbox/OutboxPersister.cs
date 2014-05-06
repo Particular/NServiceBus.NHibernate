@@ -56,7 +56,7 @@
                     Intent = t.Intent,
                     ReplyToAddress = t.ReplyToAddress,
                 },
-                new TransportMessage(t.MessageId, ConvertStringToDictionary(t.Headers)))));
+                new TransportMessage(t.MessageId, ConvertStringToDictionary(t.Headers)),t.MessageType)));
             
             return true;
         }

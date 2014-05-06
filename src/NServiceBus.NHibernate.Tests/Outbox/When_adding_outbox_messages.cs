@@ -36,7 +36,7 @@ namespace NServiceBus.NHibernate.Tests.Outbox
                     }, new TransportMessage
                     {
                         Body = new byte[1024*5]
-                    }),
+                    },"MyMessage"),
                 });
 
             OutboxMessage result;
@@ -62,7 +62,7 @@ namespace NServiceBus.NHibernate.Tests.Outbox
                     }, new TransportMessage
                     {
                         Body = new byte[1024*5]
-                    }),
+                    },"MyMessage"),
                 });
 
             persister.SetAsDispatched(id);
@@ -91,7 +91,7 @@ namespace NServiceBus.NHibernate.Tests.Outbox
                     }, new TransportMessage
                     {
                         Body = new byte[1024*5]
-                    }),
+                    },"MyMessage"),
                 });
 
             persister.SetAsDispatched(id);

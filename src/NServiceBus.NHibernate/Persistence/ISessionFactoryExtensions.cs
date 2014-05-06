@@ -1,5 +1,6 @@
 namespace NServiceBus.Persistence.NHibernate
 {
+    using System;
     using System.Data;
     using global::NHibernate;
     using global::NHibernate.Impl;
@@ -9,20 +10,33 @@ namespace NServiceBus.Persistence.NHibernate
     {
         internal static IDbConnection GetConnection(this ISessionFactory sessionFactory, PipelineExecutor pipelineExecutor)
         {
-            var dbConnection = pipelineExecutor.CurrentContext.Get<IDbConnection>();
+            IDbConnection dbConnection;
 
-            if (dbConnection != null)
+            if (pipelineExecutor != null)
             {
-                return dbConnection;
+                dbConnection = pipelineExecutor.CurrentContext.Get<IDbConnection>();
+
+                if (dbConnection != null)
+                {
+                    return dbConnection;
+                }
+                
             }
 
             var sessionFactoryImpl = sessionFactory as SessionFactoryImpl;
 
-            if (sessionFactoryImpl != null)
+            if (sessionFactoryImpl == null)
             {
-                dbConnection = sessionFactoryImpl.ConnectionProvider.GetConnection();
-                pipelineExecutor.CurrentContext.Set(typeof(IDbConnection).FullName, dbConnection);
+                throw new Exception("Can't create a new connection");
             }
+
+            dbConnection = sessionFactoryImpl.ConnectionProvider.GetConnection();
+
+            if (pipelineExecutor != null)
+            {
+                pipelineExecutor.CurrentContext.Set(typeof(IDbConnection).FullName, dbConnection);    
+            }
+            
 
             return dbConnection;
         }
