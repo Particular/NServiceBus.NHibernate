@@ -27,79 +27,130 @@ namespace NServiceBus.UnitOfWork.NHibernate
 
         void IManageUnitsOfWork.Begin()
         {
-            session.Value = null;
-            connection.Value = null;
+            getCurrentSessionInitialized.Value = false;
         }
 
         void IManageUnitsOfWork.End(Exception ex)
         {
-            if (session.Value == null)
+            if (!getCurrentSessionInitialized.Value)
             {
                 return;
             }
 
             try
             {
-                using (session.Value)
+                var session = PipelineExecutor.CurrentContext.Get<ISession>();
+
+                try
                 {
                     if (ex == null)
                     {
-                        session.Value.Flush();
-                    } 
+                        session.Flush();
+                    }
 
                     if (Transaction.Current != null)
                     {
                         return;
                     }
 
-                    using (session.Value.Transaction)
+                    if (PipelineExecutor.CurrentContext.Get<bool>("NHibernate.UnitOfWorkManager.OutsideTransaction"))
                     {
-                        if (!session.Value.Transaction.IsActive)
+                        return;
+                    }
+
+                    using (var transaction = PipelineExecutor.CurrentContext.Get<ITransaction>())
+                    {
+                        if (!transaction.IsActive)
                         {
                             return;
                         }
 
-                        if (ex != null)
+                        // Due to a race condition in NH3.3, explicit rollback can cause exceptions and corrupt the connection pool. 
+                        // Especially if there are more than one NH session taking part in the DTC transaction.
+                        // Hence the reason we do not call transaction.Rollback() in this code.
+
+                        if (ex == null)
                         {
-                            // Due to a race condition in NH3.3, explicit rollback can cause exceptions and corrupt the connection pool. 
-                            // Especially if there are more than one NH session taking part in the DTC transaction
-                            //currentSession.Transaction.Rollback();
+                            transaction.Commit();
                         }
-                        else
-                        {
-                            session.Value.Transaction.Commit();
-                        }
+                    }
+
+                    PipelineExecutor.CurrentContext.Remove<ITransaction>();
+                }
+                finally
+                {
+                    if (!PipelineExecutor.CurrentContext.Get<bool>("NHibernate.UnitOfWorkManager.OutsideSession"))
+                    {
+                        session.Dispose();
+                        PipelineExecutor.CurrentContext.Remove<ISession>();
                     }
                 }
             }
             finally
             {
-                if (connection.Value != null)
+                if (!PipelineExecutor.CurrentContext.Get<bool>("NHibernate.UnitOfWorkManager.OutsideConnection"))
                 {
-                    connection.Value.Dispose();
+                    PipelineExecutor.CurrentContext.Get<IDbConnection>().Dispose();
+                    PipelineExecutor.CurrentContext.Remove<IDbConnection>();
                 }
             }
         }
 
         internal ISession GetCurrentSession()
         {
-            if (session.Value == null)
+            ISession sessiondb;
+
+            if (getCurrentSessionInitialized.Value)
             {
-                connection.Value = SessionFactory.GetConnection(PipelineExecutor);
-                session.Value = SessionFactory.OpenSessionEx(connection.Value);
-                
-                session.Value.FlushMode = FlushMode.Never;
+                sessiondb = PipelineExecutor.CurrentContext.Get<ISession>();
+            }
+            else
+            {
+                var dbConnection = PipelineExecutor.CurrentContext.Get<IDbConnection>();
+                if (dbConnection != null)
+                {
+                    PipelineExecutor.CurrentContext.Set("NHibernate.UnitOfWorkManager.OutsideConnection", true);
+                }
+                else
+                {
+                    dbConnection = SessionFactory.GetConnection();
+                    PipelineExecutor.CurrentContext.Set(typeof(IDbConnection).FullName, dbConnection);
+                }
+
+                sessiondb = PipelineExecutor.CurrentContext.Get<ISession>();
+                if (sessiondb != null)
+                {
+                    PipelineExecutor.CurrentContext.Set("NHibernate.UnitOfWorkManager.OutsideSession", true);
+                }
+                else
+                {
+                    sessiondb = SessionFactory.OpenSessionEx(dbConnection);
+                    PipelineExecutor.CurrentContext.Set(typeof(ISession).FullName, sessiondb);
+                }
+
+                sessiondb.FlushMode = FlushMode.Never;
 
                 if (Transaction.Current == null)
                 {
-                    session.Value.BeginTransaction(GetIsolationLevel());
+                    var transaction = PipelineExecutor.CurrentContext.Get<ITransaction>();
+                    if (transaction != null)
+                    {
+                        PipelineExecutor.CurrentContext.Set("NHibernate.UnitOfWorkManager.OutsideTransaction", true);
+                    }
+                    else
+                    {
+                        transaction = sessiondb.BeginTransaction(GetIsolationLevel());
+                        PipelineExecutor.CurrentContext.Set(typeof(ITransaction).FullName, transaction);
+                    }
                 }
+
+                getCurrentSessionInitialized.Value = true;
             }
 
-            return session.Value;
+            return sessiondb;
         }
 
-        IsolationLevel GetIsolationLevel()
+        static IsolationLevel GetIsolationLevel()
         {
             if (Transaction.Current == null)
             {
@@ -127,7 +178,6 @@ namespace NServiceBus.UnitOfWork.NHibernate
             }
         }
 
-        ThreadLocal<IDbConnection> connection = new ThreadLocal<IDbConnection>();
-        ThreadLocal<ISession> session = new ThreadLocal<ISession>();
+        ThreadLocal<bool> getCurrentSessionInitialized = new ThreadLocal<bool>();
     }
 }

@@ -34,11 +34,6 @@ namespace NServiceBus.TimeoutPersisters.NHibernate
         public virtual DateTime Time { get; set; }
 
         /// <summary>
-        /// We store the correlation id in order to preserve it across timeouts.
-        /// </summary>
-        public virtual string CorrelationId { get; set; }
-
-        /// <summary>
         /// Store the headers to preserve them across timeouts.
         /// </summary>
         public virtual string Headers { get; set; }

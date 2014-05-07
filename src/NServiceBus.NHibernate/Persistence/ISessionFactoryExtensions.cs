@@ -1,44 +1,16 @@
 namespace NServiceBus.Persistence.NHibernate
 {
-    using System;
     using System.Data;
     using global::NHibernate;
     using global::NHibernate.Impl;
-    using Pipeline;
 
     static class ISessionFactoryExtensions
     {
-        internal static IDbConnection GetConnection(this ISessionFactory sessionFactory, PipelineExecutor pipelineExecutor)
+        internal static IDbConnection GetConnection(this ISessionFactory sessionFactory)
         {
-            IDbConnection dbConnection;
-
-            if (pipelineExecutor != null)
-            {
-                dbConnection = pipelineExecutor.CurrentContext.Get<IDbConnection>();
-
-                if (dbConnection != null)
-                {
-                    return dbConnection;
-                }
-                
-            }
-
             var sessionFactoryImpl = sessionFactory as SessionFactoryImpl;
 
-            if (sessionFactoryImpl == null)
-            {
-                throw new Exception("Can't create a new connection");
-            }
-
-            dbConnection = sessionFactoryImpl.ConnectionProvider.GetConnection();
-
-            if (pipelineExecutor != null)
-            {
-                pipelineExecutor.CurrentContext.Set(typeof(IDbConnection).FullName, dbConnection);    
-            }
-            
-
-            return dbConnection;
+            return sessionFactoryImpl != null ? sessionFactoryImpl.ConnectionProvider.GetConnection() : null;
         }
 
         internal static IStatelessSession OpenStatelessSessionEx(this ISessionFactory sessionFactory, IDbConnection connection)

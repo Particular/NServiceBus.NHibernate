@@ -4,10 +4,9 @@
     using System.Collections;
     using System.Collections.Generic;
     using System.Data;
-    using System.Data.SqlClient;
     using System.Linq;
     using global::NHibernate;
-    using global::NHibernate.Exceptions;
+    using Janitor;
     using NHibernate;
     using Persistence;
     using Persistence.NHibernate;
@@ -21,6 +20,7 @@
         ///     Creates <c>ISession</c>s.
         /// </summary>
         public ISessionFactory SessionFactory { get; set; }
+
         public PipelineExecutor PipelineExecutor { get; set; }
 
         public bool TryGet(string messageId, out OutboxMessage message)
@@ -29,15 +29,19 @@
 
             message = null;
 
-            using (var conn = SessionFactory.GetConnection(PipelineExecutor))
-            using (var session = SessionFactory.OpenStatelessSessionEx(conn))
-            using (var tx = session.BeginTransaction(IsolationLevel.ReadCommitted))
+            using (var conn = SessionFactory.GetConnection())
             {
-                result = session.QueryOver<OutboxRecord>().Where(o => o.MessageId == messageId)
-                    .Fetch(entity => entity.TransportOperations).Eager
-                    .SingleOrDefault();
+                using (var session = SessionFactory.OpenStatelessSessionEx(conn))
+                {
+                    using (var tx = session.BeginTransaction(IsolationLevel.ReadCommitted))
+                    {
+                        result = session.QueryOver<OutboxRecord>().Where(o => o.MessageId == messageId)
+                            .Fetch(entity => entity.TransportOperations).Eager
+                            .SingleOrDefault();
 
-                tx.Commit();
+                        tx.Commit();
+                    }
+                }
             }
 
             if (result == null)
@@ -56,77 +60,67 @@
                     Intent = t.Intent,
                     ReplyToAddress = t.ReplyToAddress,
                 },
-                new TransportMessage(t.MessageId, ConvertStringToDictionary(t.Headers)),t.MessageType)));
-            
+                new TransportMessage(t.MessageId, ConvertStringToDictionary(t.Headers)), t.MessageType)));
+
             return true;
         }
 
         public IDisposable OpenSession()
         {
-            throw new NotImplementedException();
+            var conn = SessionFactory.GetConnection();
+            PipelineExecutor.CurrentContext.Set(typeof(IDbConnection).FullName, conn);
+            var session = SessionFactory.OpenSessionEx(conn);
+            PipelineExecutor.CurrentContext.Set(typeof(ISession).FullName, session);
+            var tx = session.BeginTransaction(IsolationLevel.ReadCommitted);
+            PipelineExecutor.CurrentContext.Set(typeof(ITransaction).FullName, tx);
+
+            return new ConnectionDisposer(conn, session, tx);
         }
 
         public void StoreAndCommit(string messageId, IEnumerable<TransportOperation> transportOperations)
         {
-            using (var conn = SessionFactory.GetConnection(PipelineExecutor))
-            using (var session = SessionFactory.OpenSessionEx(conn))
-            using (var tx = session.BeginTransaction(IsolationLevel.ReadCommitted))
+            var session = PipelineExecutor.CurrentContext.Get<ISession>();
+            session.Save(new OutboxRecord
             {
-                try
+                MessageId = messageId,
+                Dispatched = false,
+                TransportOperations = transportOperations.Select(t => new OutboxOperation
                 {
-                    session.Save(new OutboxRecord
-                    {
-                        MessageId = messageId,
-                        Dispatched = false,
-                        TransportOperations = transportOperations.Select(t => new OutboxOperation
-                        {
-                            Intent = t.SendOptions.Intent,
-                            Message = t.Message.Body,
-                            CorrelationId = t.SendOptions.CorrelationId,
-                            DelayDeliveryWith = t.SendOptions.DelayDeliveryWith,
-                            DeliverAt = t.SendOptions.DeliverAt,
-                            Destination = t.SendOptions.Destination,
-                            EnforceMessagingBestPractices = t.SendOptions.EnforceMessagingBestPractices,
-                            ReplyToAddress = t.SendOptions.ReplyToAddress,
-                            Headers = ConvertDictionaryToString(t.Message.Headers),
-                            MessageId = t.Message.Id,
-                        }).ToList()
-                    });
+                    Intent = t.SendOptions.Intent,
+                    Message = t.Message.Body,
+                    CorrelationId = t.SendOptions.CorrelationId,
+                    DelayDeliveryWith = t.SendOptions.DelayDeliveryWith,
+                    DeliverAt = t.SendOptions.DeliverAt,
+                    Destination = t.SendOptions.Destination,
+                    EnforceMessagingBestPractices = t.SendOptions.EnforceMessagingBestPractices,
+                    ReplyToAddress = t.SendOptions.ReplyToAddress,
+                    Headers = ConvertDictionaryToString(t.Message.Headers),
+                    MessageId = t.Message.Id,
+                }).ToList()
+            });
 
-                    tx.Commit();
-                }
-                catch (GenericADOException ex)
-                {
-                    var sqlException = ex.InnerException as SqlException;
-                    if (sqlException != null)
-                    {
-                        //Unique Key Constraint error code
-                        if (sqlException.Number == 2627)
-                        {
-                            throw new ConcurrencyException(string.Format("Outbox message with id '{0}' is already present in storage.", messageId));
-                        }
-                    }
-
-                    throw;
-                }
-            }
+            session.Transaction.Commit();
         }
 
         public void SetAsDispatched(string messageId)
         {
             int result;
-            using (var conn = SessionFactory.GetConnection(PipelineExecutor))
-            using (var session = SessionFactory.OpenStatelessSessionEx(conn))
-            using (var tx = session.BeginTransaction(IsolationLevel.ReadCommitted))
+            using (var conn = SessionFactory.GetConnection())
             {
-                var queryString = string.Format("update {0} set Dispatched = true, DispatchedAt = :date where MessageId = :messageid And Dispatched = false",
-                    typeof(OutboxRecord));
-                result = session.CreateQuery(queryString)
-                    .SetParameter("messageid", messageId)
-                    .SetParameter("date", DateTime.UtcNow)
-                    .ExecuteUpdate();
+                using (var session = SessionFactory.OpenStatelessSessionEx(conn))
+                {
+                    using (var tx = session.BeginTransaction(IsolationLevel.ReadCommitted))
+                    {
+                        var queryString = string.Format("update {0} set Dispatched = true, DispatchedAt = :date where MessageId = :messageid And Dispatched = false",
+                            typeof(OutboxRecord));
+                        result = session.CreateQuery(queryString)
+                            .SetParameter("messageid", messageId)
+                            .SetParameter("date", DateTime.UtcNow)
+                            .ExecuteUpdate();
 
-                tx.Commit();
+                        tx.Commit();
+                    }
+                }
             }
 
             if (result == 0)
@@ -156,5 +150,39 @@
         }
 
         static readonly JsonMessageSerializer serializer = new JsonMessageSerializer(null);
+
+        [SkipWeaving]
+        class ConnectionDisposer : IDisposable
+        {
+            public ConnectionDisposer(IDbConnection conn, ISession session, ITransaction tx)
+            {
+                this.conn = conn;
+                this.session = session;
+                this.tx = tx;
+            }
+
+            public void Dispose()
+            {
+                try
+                {
+                    tx.Dispose();
+                }
+                finally
+                {
+                    try
+                    {
+                        session.Dispose();
+                    }
+                    finally
+                    {
+                        conn.Dispose();
+                    }
+                }
+            }
+
+            readonly IDbConnection conn;
+            readonly ISession session;
+            readonly ITransaction tx;
+        }
     }
 }

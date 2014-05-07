@@ -53,16 +53,14 @@
     <Reference Include="NHibernate">
       <HintPath>..\packages\NHibernate\lib\Net35\NHibernate.dll</HintPath>
     </Reference>
-    <Reference Include="NServiceBus, Version=4.6.0.0, Culture=neutral, PublicKeyToken=9fc386479f8a226c, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\NServiceBus\binaries\NServiceBus.dll</HintPath>
-    </Reference>
-    <Reference Include="NServiceBus.Core, Version=4.6.0.0, Culture=neutral, PublicKeyToken=9fc386479f8a226c, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\NServiceBus\binaries\NServiceBus.Core.dll</HintPath>
-    </Reference>
     <Reference Include="Obsolete">
       <HintPath>..\packages\Obsolete.Fody\Lib\NET35\Obsolete.dll</HintPath>
+    </Reference>
+    <Reference Include="NServiceBus">
+      <HintPath>..\packages\NServiceBus.Interfaces\lib\net40\NServiceBus.dll</HintPath>
+    </Reference>
+    <Reference Include="NServiceBus.Core">
+      <HintPath>..\packages\NServiceBus\lib\net40\NServiceBus.Core.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.configuration" />
@@ -96,7 +94,6 @@
     <Compile Include="GatewayPersister\GatewayPersister.cs" />
     <Compile Include="GatewayPersister\Installer\Installer.cs" />
     <Compile Include="InternalsVisibleTo.cs" />
-    <Compile Include="Outbox\IDbConnectionBehavior.cs" />
     <Compile Include="Outbox\Installer.cs" />
     <Compile Include="Outbox\Entities.cs" />
     <Compile Include="Outbox\EntityMappings.cs" />
