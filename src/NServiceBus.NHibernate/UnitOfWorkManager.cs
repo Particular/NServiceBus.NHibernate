@@ -28,6 +28,7 @@ namespace NServiceBus.UnitOfWork.NHibernate
         void IManageUnitsOfWork.Begin()
         {
             getCurrentSessionInitialized.Value = false;
+            context.Value = PipelineExecutor.CurrentContext;
         }
 
         void IManageUnitsOfWork.End(Exception ex)
@@ -39,7 +40,7 @@ namespace NServiceBus.UnitOfWork.NHibernate
 
             try
             {
-                var session = PipelineExecutor.CurrentContext.Get<ISession>();
+                var session = context.Value.Get<ISession>();
 
                 try
                 {
@@ -53,12 +54,12 @@ namespace NServiceBus.UnitOfWork.NHibernate
                         return;
                     }
 
-                    if (PipelineExecutor.CurrentContext.Get<bool>("NHibernate.UnitOfWorkManager.OutsideTransaction"))
+                    if (context.Value.Get<bool>("NHibernate.UnitOfWorkManager.OutsideTransaction"))
                     {
                         return;
                     }
 
-                    using (var transaction = PipelineExecutor.CurrentContext.Get<ITransaction>())
+                    using (var transaction = context.Value.Get<ITransaction>())
                     {
                         if (!transaction.IsActive)
                         {
@@ -75,23 +76,23 @@ namespace NServiceBus.UnitOfWork.NHibernate
                         }
                     }
 
-                    PipelineExecutor.CurrentContext.Remove<ITransaction>();
+                    context.Value.Remove<ITransaction>();
                 }
                 finally
                 {
-                    if (!PipelineExecutor.CurrentContext.Get<bool>("NHibernate.UnitOfWorkManager.OutsideSession"))
+                    if (!context.Value.Get<bool>("NHibernate.UnitOfWorkManager.OutsideSession"))
                     {
                         session.Dispose();
-                        PipelineExecutor.CurrentContext.Remove<ISession>();
+                        context.Value.Remove<ISession>();
                     }
                 }
             }
             finally
             {
-                if (!PipelineExecutor.CurrentContext.Get<bool>("NHibernate.UnitOfWorkManager.OutsideConnection"))
+                if (!context.Value.Get<bool>("NHibernate.UnitOfWorkManager.OutsideConnection"))
                 {
-                    PipelineExecutor.CurrentContext.Get<IDbConnection>().Dispose();
-                    PipelineExecutor.CurrentContext.Remove<IDbConnection>();
+                    context.Value.Get<IDbConnection>().Dispose();
+                    context.Value.Remove<IDbConnection>();
                 }
             }
         }
@@ -102,29 +103,29 @@ namespace NServiceBus.UnitOfWork.NHibernate
 
             if (getCurrentSessionInitialized.Value)
             {
-                sessiondb = PipelineExecutor.CurrentContext.Get<ISession>();
+                sessiondb = context.Value.Get<ISession>();
             }
             else
             {
                 IDbConnection dbConnection;
-                if (PipelineExecutor.CurrentContext.TryGet(out dbConnection))
+                if (context.Value.TryGet(out dbConnection))
                 {
-                    PipelineExecutor.CurrentContext.Set("NHibernate.UnitOfWorkManager.OutsideConnection", true);
+                    context.Value.Set("NHibernate.UnitOfWorkManager.OutsideConnection", true);
                 }
                 else
                 {
                     dbConnection = SessionFactory.GetConnection();
-                    PipelineExecutor.CurrentContext.Set(typeof(IDbConnection).FullName, dbConnection);
+                    context.Value.Set(typeof(IDbConnection).FullName, dbConnection);
                 }
 
-                if (PipelineExecutor.CurrentContext.TryGet(out sessiondb))
+                if (context.Value.TryGet(out sessiondb))
                 {
-                    PipelineExecutor.CurrentContext.Set("NHibernate.UnitOfWorkManager.OutsideSession", true);
+                    context.Value.Set("NHibernate.UnitOfWorkManager.OutsideSession", true);
                 }
                 else
                 {
                     sessiondb = SessionFactory.OpenSessionEx(dbConnection);
-                    PipelineExecutor.CurrentContext.Set(typeof(ISession).FullName, sessiondb);
+                    context.Value.Set(typeof(ISession).FullName, sessiondb);
                 }
 
                 sessiondb.FlushMode = FlushMode.Never;
@@ -132,14 +133,14 @@ namespace NServiceBus.UnitOfWork.NHibernate
                 if (Transaction.Current == null)
                 {
                     ITransaction transaction;
-                    if (PipelineExecutor.CurrentContext.TryGet(out transaction))
+                    if (context.Value.TryGet(out transaction))
                     {
-                        PipelineExecutor.CurrentContext.Set("NHibernate.UnitOfWorkManager.OutsideTransaction", true);
+                        context.Value.Set("NHibernate.UnitOfWorkManager.OutsideTransaction", true);
                     }
                     else
                     {
                         transaction = sessiondb.BeginTransaction(GetIsolationLevel());
-                        PipelineExecutor.CurrentContext.Set(typeof(ITransaction).FullName, transaction);
+                        context.Value.Set(typeof(ITransaction).FullName, transaction);
                     }
                 }
 
@@ -178,5 +179,6 @@ namespace NServiceBus.UnitOfWork.NHibernate
         }
 
         ThreadLocal<bool> getCurrentSessionInitialized = new ThreadLocal<bool>();
+        ThreadLocal<BehaviorContext> context = new ThreadLocal<BehaviorContext>();
     }
 }
