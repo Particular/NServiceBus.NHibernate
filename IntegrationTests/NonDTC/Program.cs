@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Runtime.InteropServices;
 using NHibernate.Mapping.ByCode;
 using NServiceBus;
 using NServiceBus.Features;
+using NServiceBus.Transports;
 using Test.NHibernate.Entities;
 using Configuration = NHibernate.Cfg.Configuration;
 using Environment = NHibernate.Cfg.Environment;
@@ -12,7 +14,7 @@ namespace Test.NHibernate
 {
     public class Program
     {
-        private static ChaosMonkeyOutbox chaosMonkey;
+
         public static void Main()
         {
             var configuration = BuildConfiguration();
@@ -22,20 +24,20 @@ namespace Test.NHibernate
 
             var config = Configure.With()
                 .DefaultBuilder()
+                .UseTransport<ChaosMonkey>()
                 .UseNHibernateTimeoutPersister()
                 .UseNHibernateSagaPersister(configuration)
                 .UseNHibernateOutbox(configuration);
 
 
 
-            config.Configurer.ConfigureComponent<ChaosMonkeyOutbox>(DependencyLifecycle.SingleInstance);
-
-
+            Configure.Component<ChaosMonkeyOutbox>(DependencyLifecycle.SingleInstance);
+          
             var bus = config.UnicastBus()
                 .CreateBus()
                 .Start();
 
-            chaosMonkey = config.Builder.Build<ChaosMonkeyOutbox>();
+            chaosMonkeyOutbox = config.Builder.Build<ChaosMonkeyOutbox>();
 
 
             Guid duplicate = Guid.Parse("1aff989b-a8ec-49f7-85be-a39d54224180");
@@ -47,10 +49,16 @@ namespace Test.NHibernate
                 switch (s)
                 {
                     case "sgo":
-                        chaosMonkey.SkipGetOnce = true;
+                        chaosMonkeyOutbox.SkipGetOnce = true;
                         Console.Out.WriteLine("Monkey: Skip get is now armed");
                         break;
 
+                        
+                    case "bad":
+                        ChaosMonkeySender.BlowUpAfterDispatch = true;
+                        Console.Out.WriteLine("Monkey: BlowUpAfterDispatch is now armed");
+                        break;
+                        
                     case "dup":
                         bus.SendLocal<NewOrder>(m =>
                         {
@@ -70,7 +78,7 @@ namespace Test.NHibernate
 
         }
 
-
+       
         private static Configuration BuildConfiguration()
         {
             var configuration = new Configuration()
@@ -92,5 +100,37 @@ namespace Test.NHibernate
             configuration.AddMapping(mappings);
             return configuration;
         }
+
+        static ChaosMonkeyOutbox chaosMonkeyOutbox;
     }
+
+    public class ChaosMonkeyTransport : ConfigureTransport<ChaosMonkey>
+    {
+        protected override bool RequiresConnectionString
+        {
+            get { return false; }
+        }
+
+        protected override void InternalConfigure(Configure config)
+        {
+            Enable<MessageDrivenSubscriptions>();
+
+            new MsmqTransport().Initialize();
+
+            NServiceBus.Configure.Component<ChaosMonkeySender>(DependencyLifecycle.InstancePerCall);
+        }
+
+        protected override string ExampleConnectionStringForErrorMessage
+        {
+            get { return ""; }
+        }
+    }
+
+    public class ChaosMonkey : TransportDefinition
+    {
+        public ChaosMonkey()
+        {
+        }
+    }
+
 }

@@ -53,6 +53,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ChaosMonkeyOutbox.cs" />
+    <Compile Include="ChaosMonkeySender.cs" />
     <Compile Include="Entities\Order.cs" />
     <Compile Include="NewOrder.cs" />
     <Compile Include="OrderPlaced.cs" />

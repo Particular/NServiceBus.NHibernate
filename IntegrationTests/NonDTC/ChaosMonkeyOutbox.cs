@@ -9,6 +9,9 @@ namespace Test.NHibernate
         public OutboxPersister InnerPersister{ get; set; }
         public bool SkipGetOnce { get; set; }
 
+        public bool Verbose { get; set; }
+
+
         public bool TryGet(string messageId, out OutboxMessage message)
         {
             if (SkipGetOnce)
@@ -22,7 +25,8 @@ namespace Test.NHibernate
             }
             var found=  InnerPersister.TryGet(messageId, out message);
 
-            Console.Out.WriteLine("Monkey: Message {0} was {1} in outbox",messageId,found ? "found" : "not found");
+            if (Verbose) Console.Out.WriteLine("Monkey: Message {0} was {1} in outbox",messageId,found ? "found" : "not found");
+
             return found;
         }
 
