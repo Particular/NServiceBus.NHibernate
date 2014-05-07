@@ -19,7 +19,11 @@ namespace Test.NHibernate
         {
             var configuration = BuildConfiguration();
 
-            Configure.Transactions.Advanced(t => t.DisableDistributedTransactions());
+            Configure.Transactions.Advanced(t =>
+            {
+                t.DisableDistributedTransactions();
+                t.DoNotWrapHandlersExecutionInATransactionScope();
+            });
             Configure.Features.Enable<Sagas>();
 
             var config = Configure.With()
@@ -57,6 +61,11 @@ namespace Test.NHibernate
                     case "bad":
                         ChaosMonkeySender.BlowUpAfterDispatch = true;
                         Console.Out.WriteLine("Monkey: BlowUpAfterDispatch is now armed");
+                        break;
+
+                    case "fmd":
+                          chaosMonkeyOutbox.FailToMarkAsDispatched = true;
+                          Console.Out.WriteLine("Monkey: FailToMarkAsDispatched is now armed");
                         break;
                         
                     case "dup":
@@ -128,9 +137,6 @@ namespace Test.NHibernate
 
     public class ChaosMonkey : TransportDefinition
     {
-        public ChaosMonkey()
-        {
-        }
     }
 
 }

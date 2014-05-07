@@ -10,6 +10,7 @@ namespace Test.NHibernate
         public bool SkipGetOnce { get; set; }
 
         public bool Verbose { get; set; }
+        public bool FailToMarkAsDispatched { get; set; }
 
 
         public bool TryGet(string messageId, out OutboxMessage message)
@@ -52,6 +53,14 @@ namespace Test.NHibernate
 
         public void SetAsDispatched(string messageId)
         {
+            if (FailToMarkAsDispatched)
+            {
+                Console.Out.WriteLine("Monkey: Failing to mark message {0} as dispatched", messageId);
+
+                FailToMarkAsDispatched = false;
+                throw new Exception("FailToMarkAsDispatched");
+                
+            }
             InnerPersister.SetAsDispatched(messageId);
         }
     }
