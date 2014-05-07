@@ -106,8 +106,8 @@ namespace NServiceBus.UnitOfWork.NHibernate
             }
             else
             {
-                var dbConnection = PipelineExecutor.CurrentContext.Get<IDbConnection>();
-                if (dbConnection != null)
+                IDbConnection dbConnection;
+                if (PipelineExecutor.CurrentContext.TryGet(out dbConnection))
                 {
                     PipelineExecutor.CurrentContext.Set("NHibernate.UnitOfWorkManager.OutsideConnection", true);
                 }
@@ -117,8 +117,7 @@ namespace NServiceBus.UnitOfWork.NHibernate
                     PipelineExecutor.CurrentContext.Set(typeof(IDbConnection).FullName, dbConnection);
                 }
 
-                sessiondb = PipelineExecutor.CurrentContext.Get<ISession>();
-                if (sessiondb != null)
+                if (PipelineExecutor.CurrentContext.TryGet(out sessiondb))
                 {
                     PipelineExecutor.CurrentContext.Set("NHibernate.UnitOfWorkManager.OutsideSession", true);
                 }
@@ -132,8 +131,8 @@ namespace NServiceBus.UnitOfWork.NHibernate
 
                 if (Transaction.Current == null)
                 {
-                    var transaction = PipelineExecutor.CurrentContext.Get<ITransaction>();
-                    if (transaction != null)
+                    ITransaction transaction;
+                    if (PipelineExecutor.CurrentContext.TryGet(out transaction))
                     {
                         PipelineExecutor.CurrentContext.Set("NHibernate.UnitOfWorkManager.OutsideTransaction", true);
                     }

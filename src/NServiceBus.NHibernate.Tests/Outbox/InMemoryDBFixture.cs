@@ -5,6 +5,7 @@ namespace NServiceBus.NHibernate.Tests.Outbox
     using System;
     using System.Collections.Specialized;
     using System.Configuration;
+    using Pipeline;
 #if !USE_SQLSERVER
     using System.IO;
 #endif
@@ -52,6 +53,8 @@ namespace NServiceBus.NHibernate.Tests.Outbox
                 .UseNHibernateOutbox();
 
             persister = Configure.Instance.Builder.Build<OutboxPersister>();
+            persister.PipelineExecutor = new PipelineExecutor(Configure.Instance.Builder, new PipelineBuilder(Configure.Instance.Builder));
+
 
             new Installer().Install(WindowsIdentity.GetCurrent().Name);
         }

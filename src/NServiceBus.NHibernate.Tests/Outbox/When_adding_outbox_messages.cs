@@ -15,16 +15,20 @@ namespace NServiceBus.NHibernate.Tests.Outbox
         [ExpectedException]
         public void Should_throw_if__trying_to_insert_same_messageid()
         {
-            persister.StoreAndCommit("MySpecialId", Enumerable.Empty<TransportOperation>());
-            persister.StoreAndCommit("MySpecialId", Enumerable.Empty<TransportOperation>());
+            using (persister.OpenSession())
+            {
+                persister.StoreAndCommit("MySpecialId", Enumerable.Empty<TransportOperation>());
+                persister.StoreAndCommit("MySpecialId", Enumerable.Empty<TransportOperation>());
+            }
         }
 
         [Test]
         public void Should_save_with_not_dispatched()
         {
             var id = Guid.NewGuid().ToString("N");
-
-            persister.StoreAndCommit(id, new List<TransportOperation>
+            using (persister.OpenSession())
+            {
+                persister.StoreAndCommit(id, new List<TransportOperation>
                 {
                     new TransportOperation(new SendOptions("Foo@Machine")
                     {
@@ -32,12 +36,13 @@ namespace NServiceBus.NHibernate.Tests.Outbox
                         DelayDeliveryWith = TimeSpan.FromDays(34),
                         DeliverAt = DateTime.Now.AddHours(2),
                         Intent = MessageIntentEnum.Reply,
-                        ReplyToAddress = new Address("Foo2","Machine2"),
+                        ReplyToAddress = new Address("Foo2", "Machine2"),
                     }, new TransportMessage
                     {
                         Body = new byte[1024*5]
-                    },"MyMessage"),
+                    }, "MyMessage"),
                 });
+            }
 
             OutboxMessage result;
             persister.TryGet(id, out result);
@@ -50,7 +55,9 @@ namespace NServiceBus.NHibernate.Tests.Outbox
         {
             var id = Guid.NewGuid().ToString("N");
 
-            persister.StoreAndCommit(id, new List<TransportOperation>
+            using (persister.OpenSession())
+            {
+                persister.StoreAndCommit(id, new List<TransportOperation>
                 {
                     new TransportOperation(new SendOptions("Foo@Machine")
                     {
@@ -58,12 +65,13 @@ namespace NServiceBus.NHibernate.Tests.Outbox
                         DelayDeliveryWith = TimeSpan.FromDays(34),
                         DeliverAt = DateTime.Now.AddHours(2),
                         Intent = MessageIntentEnum.Reply,
-                        ReplyToAddress = new Address("Foo2","Machine2"),
+                        ReplyToAddress = new Address("Foo2", "Machine2"),
                     }, new TransportMessage
                     {
                         Body = new byte[1024*5]
-                    },"MyMessage"),
+                    }, "MyMessage"),
                 });
+            }
 
             persister.SetAsDispatched(id);
 
@@ -79,7 +87,9 @@ namespace NServiceBus.NHibernate.Tests.Outbox
         {
             var id = Guid.NewGuid().ToString("N");
 
-            persister.StoreAndCommit(id, new List<TransportOperation>
+            using (persister.OpenSession())
+            {
+                persister.StoreAndCommit(id, new List<TransportOperation>
                 {
                     new TransportOperation(new SendOptions("Foo@Machine")
                     {
@@ -87,12 +97,13 @@ namespace NServiceBus.NHibernate.Tests.Outbox
                         DelayDeliveryWith = TimeSpan.FromDays(34),
                         DeliverAt = DateTime.Now.AddHours(2),
                         Intent = MessageIntentEnum.Reply,
-                        ReplyToAddress = new Address("Foo2","Machine2"),
+                        ReplyToAddress = new Address("Foo2", "Machine2"),
                     }, new TransportMessage
                     {
                         Body = new byte[1024*5]
-                    },"MyMessage"),
+                    }, "MyMessage"),
                 });
+            }
 
             persister.SetAsDispatched(id);
             persister.SetAsDispatched(id);
