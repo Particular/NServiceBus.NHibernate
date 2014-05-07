@@ -101,6 +101,7 @@
             });
 
             session.Transaction.Commit();
+            session.Flush();
         }
 
         public void SetAsDispatched(string messageId)
