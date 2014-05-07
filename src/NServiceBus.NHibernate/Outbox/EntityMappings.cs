@@ -41,6 +41,7 @@ namespace NServiceBus.Outbox.NHibernate
             Property(p => p.Intent);
             Property(p => p.CorrelationId, pm => pm.Length(1024));
             Property(p => p.MessageId, pm => pm.Column(c => c.NotNullable(true)));
+            Property(p => p.MessageType, pm => pm.Column(c => c.NotNullable(true)));
             Property(p => p.Destination, pm =>
             {
                 pm.Type<AddressUserType>();

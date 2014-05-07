@@ -88,6 +88,7 @@
                 {
                     Intent = t.SendOptions.Intent,
                     Message = t.Message.Body,
+                    MessageType = t.MessageType,
                     CorrelationId = t.SendOptions.CorrelationId,
                     DelayDeliveryWith = t.SendOptions.DelayDeliveryWith,
                     DeliverAt = t.SendOptions.DeliverAt,

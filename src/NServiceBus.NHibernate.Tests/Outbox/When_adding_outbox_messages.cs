@@ -48,6 +48,11 @@ namespace NServiceBus.NHibernate.Tests.Outbox
             persister.TryGet(id, out result);
 
             Assert.IsFalse(result.Dispatched);
+
+            var operation = result.TransportOperations.Single();
+
+            
+            Assert.AreEqual("MyMessage", operation.MessageType);
         }
 
         [Test]

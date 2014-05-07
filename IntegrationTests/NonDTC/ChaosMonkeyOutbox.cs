@@ -26,7 +26,7 @@ namespace Test.NHibernate
             }
             var found=  InnerPersister.TryGet(messageId, out message);
 
-            if (Verbose) Console.Out.WriteLine("Monkey: Message {0} was {1} in outbox",messageId,found ? "found" : "not found");
+            Console.Out.WriteLine("Monkey: Message {0} was {1} in outbox",messageId,found ? "found" : "not found");
 
             return found;
         }
