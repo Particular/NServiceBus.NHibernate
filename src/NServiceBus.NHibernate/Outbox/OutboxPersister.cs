@@ -14,7 +14,7 @@
     using Serializers.Json;
     using Unicast;
 
-    internal class OutboxPersister : IOutboxStorage
+    class OutboxPersister : IOutboxStorage
     {
         /// <summary>
         ///     Creates <c>ISession</c>s.

@@ -72,6 +72,7 @@
     <Compile Include="TwoPhaseCommitEnlistment.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="TestSuites\Reset-Msmq.ps1" />
     <None Include="TestSuites\Sagas-Concurrency.ps1" />
     <None Include="TestSuites\TestSupport.ps1" />
   </ItemGroup>

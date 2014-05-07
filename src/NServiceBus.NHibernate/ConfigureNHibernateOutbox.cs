@@ -1,5 +1,6 @@
 ﻿namespace NServiceBus
 {
+    using Features;
     using Outbox.NHibernate;
     using Outbox;
 // ReSharper disable RedundantNameQualifier
@@ -78,6 +79,8 @@
 
             config.Configurer.ConfigureComponent<OutboxPersister>(DependencyLifecycle.SingleInstance)
                 .ConfigureProperty(p => p.SessionFactory, configuration.BuildSessionFactory());
+
+            Feature.Enable<Features.Outbox>();
 
             return config;
         }
