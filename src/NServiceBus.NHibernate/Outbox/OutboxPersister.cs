@@ -70,6 +70,7 @@
             var conn = SessionFactory.GetConnection();
             PipelineExecutor.CurrentContext.Set(typeof(IDbConnection).FullName, conn);
             var session = SessionFactory.OpenSessionEx(conn);
+            session.FlushMode = FlushMode.Never;
             PipelineExecutor.CurrentContext.Set(typeof(ISession).FullName, session);
             var tx = session.BeginTransaction(IsolationLevel.ReadCommitted);
             PipelineExecutor.CurrentContext.Set(typeof(ITransaction).FullName, tx);
@@ -100,8 +101,8 @@
                 }).ToList()
             });
 
-            session.Transaction.Commit();
             session.Flush();
+            session.Transaction.Commit();
         }
 
         public void SetAsDispatched(string messageId)
