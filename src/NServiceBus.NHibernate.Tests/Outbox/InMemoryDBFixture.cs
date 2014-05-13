@@ -55,7 +55,6 @@ namespace NServiceBus.NHibernate.Tests.Outbox
             persister = Configure.Instance.Builder.Build<OutboxPersister>();
             persister.PipelineExecutor = new PipelineExecutor(Configure.Instance.Builder, new PipelineBuilder(Configure.Instance.Builder));
 
-
             new Installer().Install(WindowsIdentity.GetCurrent().Name);
         }
     }

@@ -10,6 +10,7 @@ namespace NServiceBus.TimeoutPersisters.NHibernate.Tests
     using NServiceBus.Config.ConfigurationSource;
     using NUnit.Framework;
     using Persistence.NHibernate;
+    using Pipeline;
 
     public abstract class InMemoryDBFixture
     {
@@ -42,6 +43,7 @@ namespace NServiceBus.TimeoutPersisters.NHibernate.Tests
                 .UseNHibernateTimeoutPersister();
 
             persister = Configure.Instance.Builder.Build<TimeoutStorage>();
+            persister.PipelineExecutor = new PipelineExecutor(Configure.Instance.Builder, new PipelineBuilder(Configure.Instance.Builder));
             sessionFactory = persister.SessionFactory;
 
             new Installer.Installer().Install(WindowsIdentity.GetCurrent().Name);
