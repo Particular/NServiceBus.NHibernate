@@ -89,7 +89,6 @@
     <Compile Include="SagaPersister\When_configuring_the_saga_persister_from_appconfig.cs" />
     <Compile Include="SagaPersister\When_configuring_the_saga_persister_to_use_sqlite.cs" />
     <Compile Include="SagaPersister\When_persisting_a_saga_with_a_unique_property.cs" />
-    <Compile Include="SagaPersister\When_persisting_sagas_on_non_transactional_endpoints.cs" />
     <Compile Include="SagaPersister\When_persisting_sagas_on_transactional_endpoints.cs" />
     <Compile Include="SubscriptionStorage\Config\When_configuring_the_subscription_storage.cs" />
     <Compile Include="SubscriptionStorage\EnsuringBackwardsCompatability.cs" />

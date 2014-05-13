@@ -94,6 +94,7 @@
     <Compile Include="GatewayPersister\GatewayPersister.cs" />
     <Compile Include="GatewayPersister\Installer\Installer.cs" />
     <Compile Include="InternalsVisibleTo.cs" />
+    <Compile Include="IStorageSessionProvider.cs" />
     <Compile Include="Outbox\Installer.cs" />
     <Compile Include="Outbox\Entities.cs" />
     <Compile Include="Outbox\EntityMappings.cs" />
@@ -112,6 +113,7 @@
     <Compile Include="SagaPersisters\Config\Installer\Installer.cs" />
     <Compile Include="SagaPersisters\Config\Internal\SessionFactoryBuilder.cs" />
     <Compile Include="SagaPersisters\SagaPersister.cs" />
+    <Compile Include="StorageSessionProvider.cs" />
     <Compile Include="Subscriptions\CachedSubscriptionStorage.cs" />
     <Compile Include="TimeoutPersisters\Config\TimeoutEntityMap.cs" />
     <Compile Include="TimeoutPersisters\Installer\Installer.cs" />
@@ -124,6 +126,7 @@
     <Compile Include="Subscriptions\Subscription.cs" />
     <Compile Include="Subscriptions\SubscriptionStorage.cs" />
     <Compile Include="Subscriptions\SubscriptionStorageSessionProvider.cs" />
+    <Compile Include="UnitOfWorkBehavior.cs" />
     <Compile Include="UnitOfWorkManager.cs" />
   </ItemGroup>
   <ItemGroup>
