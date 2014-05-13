@@ -3,7 +3,6 @@ namespace NServiceBus.UnitOfWork.NHibernate
     using System;
     using System.Data;
     using System.Data.SqlClient;
-    using Features;
     using global::NHibernate;
     using Persistence.NHibernate;
     using Pipeline;
@@ -47,29 +46,13 @@ namespace NServiceBus.UnitOfWork.NHibernate
         {
             using (var session = SessionFactory.OpenSession(connection))
             {
+                session.FlushMode = FlushMode.Never;
+
                 context.Set(string.Format("NHibernateSession-{0}", ConnectionString), session);
+                
                 next();
-            }
-        }
-    }
 
-    class NHibernatePersistence:Feature
-    {
-        public override bool IsEnabledByDefault
-        {
-            get { return false; }
-        }
-
-        class PipelineConfig:PipelineOverride
-        {
-            public override void Override(BehaviorList<ReceivePhysicalMessageContext> behaviorList)
-            {
-                if (!IsEnabled<NHibernatePersistence>())
-                {
-                    return;
-                }
-
-                behaviorList.InnerList.Insert(0,typeof(UnitOfWorkBehavior));
+                session.Flush();
             }
         }
     }
