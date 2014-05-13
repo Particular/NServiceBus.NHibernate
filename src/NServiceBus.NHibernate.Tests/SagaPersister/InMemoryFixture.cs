@@ -10,22 +10,18 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
     using global::NHibernate;
     using NUnit.Framework;
     using Persistence.NHibernate;
-    using Pipeline;
-    using UnitOfWork;
     using UnitOfWork.NHibernate;
 
-    public class InMemoryFixture
+    class InMemoryFixture
     {
-        protected IManageUnitsOfWork UnitOfWork;
         protected SagaPersister SagaPersister;
         protected ISessionFactory SessionFactory;
 
-        private const string dialect = "NHibernate.Dialect.SQLiteDialect";
 
         [SetUp]
         public void SetUp()
         {
-            var connectionString = String.Format(@"Data Source={0};Version=3;New=True;", Path.GetTempFileName());
+          connectionString = String.Format(@"Data Source={0};Version=3;New=True;", Path.GetTempFileName());
 
             Configure.ConfigurationSource = new FakeConfigurationSource();
 
@@ -55,17 +51,45 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
 
             SessionFactory = builder.Build(ConfigureNHibernate.CreateConfigurationWith(properties));
 
-            UnitOfWork = new UnitOfWorkManager { SessionFactory = SessionFactory, PipelineExecutor = new PipelineExecutor(Configure.Instance.Builder, new PipelineBuilder(Configure.Instance.Builder)) };
+            session = SessionFactory.OpenSession();
 
-            SagaPersister = new SagaPersister { UnitOfWorkManager = (UnitOfWorkManager)UnitOfWork };
+            SagaPersister = new SagaPersister(new FakeSessionProvider(session));
 
             new Installer().Install(WindowsIdentity.GetCurrent().Name);
+        }
+
+        protected void FlushSession()
+        {
+            if (sessionFlushed)
+            {
+                return;
+            }
+
+            sessionFlushed = true;
+
+            session.Flush();
         }
 
         [TearDown]
         public void Cleanup()
         {
+            FlushSession();
             SessionFactory.Close();
         }
+
+        const string dialect = "NHibernate.Dialect.SQLiteDialect";
+        string connectionString;
+        ISession session;
+        bool sessionFlushed;
+    }
+
+    class FakeSessionProvider : IStorageSessionProvider
+    {
+        public FakeSessionProvider(ISession session)
+        {
+            Session = session;
+        }
+
+        public ISession Session { get; private set; }
     }
 }

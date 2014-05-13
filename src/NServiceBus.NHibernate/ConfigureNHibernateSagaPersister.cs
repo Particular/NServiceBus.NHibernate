@@ -3,6 +3,7 @@
     using System;
     using System.Collections.Generic;
     using Config;
+    using Features;
 // ReSharper disable RedundantNameQualifier
     using global::NHibernate;
     using Environment = global::NHibernate.Cfg.Environment;
@@ -163,11 +164,16 @@
                 }
             }
 
-            config.Configurer.ConfigureComponent<UnitOfWorkManager>(DependencyLifecycle.SingleInstance)
+            config.Configurer.ConfigureComponent<StorageSessionProvider>(DependencyLifecycle.InstancePerCall)
+                     .ConfigureProperty(p => p.ConnectionString, connString);
+
+            config.Configurer.ConfigureComponent<UnitOfWorkBehavior>(DependencyLifecycle.InstancePerCall)
                 .ConfigureProperty(p => p.SessionFactory, sessionFactory)
                 .ConfigureProperty(p => p.ConnectionString, connString);
 
+
             config.Configurer.ConfigureComponent<SagaPersister>(DependencyLifecycle.InstancePerCall);
+
 
             return config;
         }

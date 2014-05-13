@@ -10,8 +10,15 @@ namespace NServiceBus.SagaPersisters.NHibernate
     /// <summary>
     /// Saga persister implementation using NHibernate.
     /// </summary>
-    public class SagaPersister : ISagaPersister
+    class SagaPersister : ISagaPersister
     {
+        
+        public SagaPersister(IStorageSessionProvider storageSessionProvider)
+        {
+            this.storageSessionProvider = storageSessionProvider;
+        }
+
+      
         /// <summary>
         /// Saves the given saga entity using the current session of the
         /// injected session factory.
@@ -19,9 +26,10 @@ namespace NServiceBus.SagaPersisters.NHibernate
         /// <param name="saga">the saga entity that will be saved.</param>
         public void Save(IContainSagaData saga)
         {
-            UnitOfWorkManager.GetCurrentSession().Save(saga);
+            CurrentSession.Save(saga);
         }
 
+        
         /// <summary>
         /// Updates the given saga entity using the current session of the
         /// injected session factory.
@@ -29,7 +37,7 @@ namespace NServiceBus.SagaPersisters.NHibernate
         /// <param name="saga">the saga entity that will be updated.</param>
         public void Update(IContainSagaData saga)
         {
-            UnitOfWorkManager.GetCurrentSession().Update(saga);
+            CurrentSession.Update(saga);
         }
 
         /// <summary>
@@ -40,13 +48,12 @@ namespace NServiceBus.SagaPersisters.NHibernate
         /// <returns>The saga entity if found, otherwise null.</returns>
         public T Get<T>(Guid sagaId) where T : IContainSagaData
         {
-            return UnitOfWorkManager.GetCurrentSession()
-                .Get<T>(sagaId, GetLockModeForSaga<T>());
+            return CurrentSession.Get<T>(sagaId, GetLockModeForSaga<T>());
         }
 
         T ISagaPersister.Get<T>(string property, object value)
         {
-            return UnitOfWorkManager.GetCurrentSession().CreateCriteria(typeof(T))
+            return CurrentSession.CreateCriteria(typeof(T))
                  .SetLockMode(GetLockModeForSaga<T>())
                  .Add(Restrictions.Eq(property, value))
                 .UniqueResult<T>();
@@ -59,14 +66,8 @@ namespace NServiceBus.SagaPersisters.NHibernate
         /// <param name="saga">The saga entity that will be deleted.</param>
         public void Complete(IContainSagaData saga)
         {
-            UnitOfWorkManager.GetCurrentSession().Delete(saga);
+            CurrentSession.Delete(saga);
         }
-
-        /// <summary>
-        /// Injected unit of work manager.
-        /// </summary>
-        public UnitOfWorkManager UnitOfWorkManager { get; set; }
-
 
         LockMode GetLockModeForSaga<T>()
         {
@@ -97,5 +98,15 @@ namespace NServiceBus.SagaPersisters.NHibernate
 
             }
         }
+
+        readonly IStorageSessionProvider storageSessionProvider;
+        ISession CurrentSession
+        {
+            get
+            {
+                return storageSessionProvider.Session;
+            }
+        }
+
     }
 }

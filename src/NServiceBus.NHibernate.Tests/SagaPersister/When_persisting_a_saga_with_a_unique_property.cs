@@ -6,30 +6,29 @@
     using Saga;
 
     [TestFixture]
-    public class When_persisting_a_saga_with_a_unique_property : InMemoryFixture
+    class When_persisting_a_saga_with_a_unique_property : InMemoryFixture
     {
         [Test]
         public void The_database_should_enforce_the_uniqueness()
         {
-            UnitOfWork.Begin();
-            
+
             var id = Guid.NewGuid();
 
-            ((ISagaPersister)SagaPersister).Get<SagaWithUniqueProperty>("UniqueString","whatever");
+            ((ISagaPersister)SagaPersister).Get<SagaWithUniqueProperty>("UniqueString", "whatever");
 
             SagaPersister.Save(new SagaWithUniqueProperty
-                                   {
-                                       Id = id,
-                                       UniqueString = "whatever"
-                                   });
+            {
+                Id = id,
+                UniqueString = "whatever"
+            });
 
             SagaPersister.Save(new SagaWithUniqueProperty
-                                   {
-                                       Id = Guid.NewGuid(),
-                                       UniqueString = "whatever"
-                                   });
+            {
+                Id = Guid.NewGuid(),
+                UniqueString = "whatever"
+            });
 
-            Assert.Throws<GenericADOException>(() => UnitOfWork.End());
+            Assert.Throws<GenericADOException>(FlushSession);
         }
     }
 
@@ -46,5 +45,5 @@
         public virtual string UniqueString { get; set; }
     }
 
-    
+
 }
