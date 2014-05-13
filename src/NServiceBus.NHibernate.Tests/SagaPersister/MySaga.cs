@@ -5,7 +5,7 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
 
     public class MySaga : Saga<MySagaData>
     {
-     
+
     }
 
     public class MySagaData : IContainSagaData

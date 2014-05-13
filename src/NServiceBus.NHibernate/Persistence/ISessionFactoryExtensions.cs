@@ -27,7 +27,7 @@ namespace NServiceBus.Persistence.NHibernate
         {
             if (connection == null)
             {
-                return    sessionFactory.OpenSession();
+                return sessionFactory.OpenSession();
             }
 
             return sessionFactory.OpenSession(connection);

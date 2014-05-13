@@ -2,8 +2,10 @@ namespace NServiceBus
 {
     using System;
     using Config;
-// ReSharper disable once RedundantNameQualifier
+// ReSharper disable RedundantNameQualifier
     using global::NHibernate.Cfg;
+    using Environment = global::NHibernate.Cfg.Environment;
+// ReSharper restore RedundantNameQualifier
     using Persistence.NHibernate;
     using TimeoutPersisters.NHibernate;
     using TimeoutPersisters.NHibernate.Config;
@@ -103,8 +105,23 @@ namespace NServiceBus
             ConfigureNHibernate.AddMappings<TimeoutEntityMap>(configuration);
             TimeoutPersisters.NHibernate.Installer.Installer.configuration = configuration;
 
+            string connString;
+            if (!configuration.Properties.TryGetValue(Environment.ConnectionString, out connString))
+            {
+                string connStringName;
+
+                if (configuration.Properties.TryGetValue(Environment.ConnectionStringName, out connStringName))
+                {
+
+                    var connectionStringSettings = System.Configuration.ConfigurationManager.ConnectionStrings[connStringName];
+
+                    connString = connectionStringSettings.ConnectionString;
+                }
+            }
+
             config.Configurer.ConfigureComponent<TimeoutStorage>(DependencyLifecycle.SingleInstance)
-                .ConfigureProperty(p => p.SessionFactory, configuration.BuildSessionFactory());
+                .ConfigureProperty(p => p.SessionFactory, configuration.BuildSessionFactory())
+                .ConfigureProperty(p => p.ConnectionString, connString);
 
             return config;
         }

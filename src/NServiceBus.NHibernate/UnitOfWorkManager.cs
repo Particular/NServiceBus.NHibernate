@@ -6,6 +6,7 @@ namespace NServiceBus.UnitOfWork.NHibernate
     using System.Transactions;
     using global::NHibernate;
     using Persistence.NHibernate;
+    using Pipeline;
     using IsolationLevel = System.Data.IsolationLevel;
 
     /// <summary>
@@ -17,7 +18,10 @@ namespace NServiceBus.UnitOfWork.NHibernate
         ///     Injected NHibernate session factory.
         /// </summary>
         public ISessionFactory SessionFactory { get; set; }
+        public PipelineExecutor PipelineExecutor { get; set; }
 
+        public string ConnectionString { get; set; }
+        
         public void Dispose()
         {
             // Injected
@@ -25,79 +29,131 @@ namespace NServiceBus.UnitOfWork.NHibernate
 
         void IManageUnitsOfWork.Begin()
         {
-            session.Value = null;
-            connection.Value = null;
+            getCurrentSessionInitialized.Value = false;
+            context.Value = PipelineExecutor.CurrentContext;
         }
 
         void IManageUnitsOfWork.End(Exception ex)
         {
-            if (session.Value == null)
+            if (!getCurrentSessionInitialized.Value)
             {
                 return;
             }
 
             try
             {
-                using (session.Value)
+                var session = context.Value.Get<ISession>(string.Format("NHibernateSession-{0}", ConnectionString));
+
+                try
                 {
                     if (ex == null)
                     {
-                        session.Value.Flush();
-                    } 
+                        session.Flush();
+                    }
 
                     if (Transaction.Current != null)
                     {
                         return;
                     }
 
-                    using (session.Value.Transaction)
+                    if (context.Value.Get<bool>("NHibernate.UnitOfWorkManager.OutsideTransaction"))
                     {
-                        if (!session.Value.Transaction.IsActive)
+                        return;
+                    }
+
+                    using (var transaction = context.Value.Get<ITransaction>(string.Format("NHibernateTransaction-{0}", ConnectionString)))
+                    {
+                        if (!transaction.IsActive)
                         {
                             return;
                         }
 
-                        if (ex != null)
+                        // Due to a race condition in NH3.3, explicit rollback can cause exceptions and corrupt the connection pool. 
+                        // Especially if there are more than one NH session taking part in the DTC transaction.
+                        // Hence the reason we do not call transaction.Rollback() in this code.
+
+                        if (ex == null)
                         {
-                            // Due to a race condition in NH3.3, explicit rollback can cause exceptions and corrupt the connection pool. 
-                            // Especially if there are more than one NH session taking part in the DTC transaction
-                            //currentSession.Transaction.Rollback();
+                            transaction.Commit();
                         }
-                        else
-                        {
-                            session.Value.Transaction.Commit();
-                        }
+                    }
+
+                    context.Value.Remove(string.Format("NHibernateTransaction-{0}", ConnectionString));
+                }
+                finally
+                {
+                    if (!context.Value.Get<bool>("NHibernate.UnitOfWorkManager.OutsideSession"))
+                    {
+                        session.Dispose();
+                        context.Value.Remove(string.Format("NHibernateSession-{0}", ConnectionString));
                     }
                 }
             }
             finally
             {
-                if (connection.Value != null)
+                if (!context.Value.Get<bool>("NHibernate.UnitOfWorkManager.OutsideConnection"))
                 {
-                    connection.Value.Dispose();
+                    var connectionKey = string.Format("SqlConnection-{0}", ConnectionString);
+                    context.Value.Get<IDbConnection>(connectionKey).Dispose();
+                    context.Value.Remove(connectionKey);
                 }
             }
         }
 
         internal ISession GetCurrentSession()
         {
-            if (session.Value == null)
+            ISession sessiondb;
+
+            if (getCurrentSessionInitialized.Value)
             {
-                connection.Value = SessionFactory.GetConnection();
-                session.Value = SessionFactory.OpenSessionEx(connection.Value);
-                
-                session.Value.FlushMode = FlushMode.Never;
+                sessiondb = context.Value.Get<ISession>(string.Format("NHibernateSession-{0}", ConnectionString));
+            }
+            else
+            {
+                IDbConnection dbConnection;
+                if (context.Value.TryGet(string.Format("SqlConnection-{0}", ConnectionString), out dbConnection))
+                {
+                    context.Value.Set("NHibernate.UnitOfWorkManager.OutsideConnection", true);
+                }
+                else
+                {
+                    dbConnection = SessionFactory.GetConnection();
+                    context.Value.Set(string.Format("SqlConnection-{0}", ConnectionString), dbConnection);
+                }
+
+                if (context.Value.TryGet(string.Format("NHibernateSession-{0}", ConnectionString), out sessiondb))
+                {
+                    context.Value.Set("NHibernate.UnitOfWorkManager.OutsideSession", true);
+                }
+                else
+                {
+                    sessiondb = SessionFactory.OpenSessionEx(dbConnection);
+                    context.Value.Set(string.Format("NHibernateSession-{0}", ConnectionString), sessiondb);
+                }
+
+                sessiondb.FlushMode = FlushMode.Never;
 
                 if (Transaction.Current == null)
                 {
-                    session.Value.BeginTransaction(GetIsolationLevel());
+                    ITransaction transaction;
+                    if (context.Value.TryGet(string.Format("NHibernateTransaction-{0}", ConnectionString), out transaction))
+                    {
+                        context.Value.Set("NHibernate.UnitOfWorkManager.OutsideTransaction", true);
+                    }
+                    else
+                    {
+                        transaction = sessiondb.BeginTransaction(GetIsolationLevel());
+                        context.Value.Set(string.Format("NHibernateTransaction-{0}", ConnectionString), transaction);
+                    }
                 }
+
+                getCurrentSessionInitialized.Value = true;
             }
 
-            return session.Value;
+            return sessiondb;
         }
 
-        IsolationLevel GetIsolationLevel()
+        static IsolationLevel GetIsolationLevel()
         {
             if (Transaction.Current == null)
             {
@@ -125,7 +181,7 @@ namespace NServiceBus.UnitOfWork.NHibernate
             }
         }
 
-        ThreadLocal<IDbConnection> connection = new ThreadLocal<IDbConnection>();
-        ThreadLocal<ISession> session = new ThreadLocal<ISession>();
+        ThreadLocal<bool> getCurrentSessionInitialized = new ThreadLocal<bool>();
+        ThreadLocal<BehaviorContext> context = new ThreadLocal<BehaviorContext>();
     }
 }

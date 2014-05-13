@@ -10,6 +10,7 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
     using global::NHibernate;
     using NUnit.Framework;
     using Persistence.NHibernate;
+    using Pipeline;
     using UnitOfWork;
     using UnitOfWork.NHibernate;
 
@@ -54,7 +55,7 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
 
             SessionFactory = builder.Build(ConfigureNHibernate.CreateConfigurationWith(properties));
 
-            UnitOfWork = new UnitOfWorkManager { SessionFactory = SessionFactory };
+            UnitOfWork = new UnitOfWorkManager { SessionFactory = SessionFactory, PipelineExecutor = new PipelineExecutor(Configure.Instance.Builder, new PipelineBuilder(Configure.Instance.Builder)) };
 
             SagaPersister = new SagaPersister { UnitOfWorkManager = (UnitOfWorkManager)UnitOfWork };
 

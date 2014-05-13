@@ -3,26 +3,31 @@ namespace NServiceBus.TimeoutPersisters.NHibernate
     using System;
     using System.Collections;
     using System.Collections.Generic;
+    using System.Data;
     using System.Linq;
     using global::NHibernate;
     using IdGeneration;
     using Persistence.NHibernate;
+    using Pipeline;
     using Serializers.Json;
     using Timeout.Core;
-    using IsolationLevel = System.Data.IsolationLevel;
 
     /// <summary>
-    /// Timeout storage implementation for NHibernate.
+    ///     Timeout storage implementation for NHibernate.
     /// </summary>
     public class TimeoutStorage : IPersistTimeouts
     {
         /// <summary>
-        /// The current <see cref="ISessionFactory"/>.
+        ///     The current <see cref="ISessionFactory" />.
         /// </summary>
         public ISessionFactory SessionFactory { get; set; }
 
+        public string ConnectionString { get; set; }
+
+        public PipelineExecutor PipelineExecutor { get; set; }
+
         /// <summary>
-        /// Retrieves the next range of timeouts that are due.
+        ///     Retrieves the next range of timeouts that are due.
         /// </summary>
         /// <param name="startSlice">The time where to start retrieving the next slice, the slice should exclude this date.</param>
         /// <param name="nextTimeToRunQuery">Returns the next time we should query again.</param>
@@ -30,45 +35,50 @@ namespace NServiceBus.TimeoutPersisters.NHibernate
         public List<Tuple<string, DateTime>> GetNextChunk(DateTime startSlice, out DateTime nextTimeToRunQuery)
         {
             var now = DateTime.UtcNow;
-            
+
             using (var conn = SessionFactory.GetConnection())
-            using (var session = SessionFactory.OpenStatelessSessionEx(conn))
-            using (var tx = session.BeginAmbientTransactionAware(IsolationLevel.ReadCommitted))
             {
-                var results = session.QueryOver<TimeoutEntity>()
-                    .Where(x => x.Endpoint == Configure.EndpointName)
-                    .And(x => x.Time >= startSlice && x.Time <= now)
-                    .OrderBy(x => x.Time).Asc
-                    .Select(x => x.Id, x => x.Time)
-                    .List<object[]>()
-                    .Select(properties => new Tuple<string, DateTime>(((Guid) properties[0]).ToString(), (DateTime) properties[1]))
-                    .ToList();
-
-                //Retrieve next time we need to run query
-                var startOfNextChunk = session.QueryOver<TimeoutEntity>()
-                    .Where(x => x.Endpoint == Configure.EndpointName)
-                    .Where(x => x.Time > now)
-                    .OrderBy(x => x.Time).Asc
-                    .Take(1)
-                    .SingleOrDefault();
-
-                if (startOfNextChunk != null)
+                using (var session = SessionFactory.OpenStatelessSessionEx(conn))
                 {
-                    nextTimeToRunQuery = startOfNextChunk.Time;
-                }
-                else
-                {
-                    nextTimeToRunQuery = DateTime.UtcNow.AddMinutes(10);
-                }
+                    using (var tx = session.BeginAmbientTransactionAware(IsolationLevel.ReadCommitted))
+                    {
+                        var results = session.QueryOver<TimeoutEntity>()
+                            .Where(x => x.Endpoint == Configure.EndpointName)
+                            .And(x => x.Time >= startSlice && x.Time <= now)
+                            .OrderBy(x => x.Time).Asc
+                            .Select(x => x.Id, x => x.Time)
+                            .List<object[]>()
+                            .Select(properties => new Tuple<string, DateTime>(((Guid) properties[0]).ToString(), (DateTime) properties[1]))
+                            .ToList();
 
-                tx.Commit();
+                        //Retrieve next time we need to run query
+                        var startOfNextChunk = session.QueryOver<TimeoutEntity>()
+                            .Where(x => x.Endpoint == Configure.EndpointName)
+                            .Where(x => x.Time > now)
+                            .OrderBy(x => x.Time).Asc
+                            .Take(1)
+                            .SingleOrDefault();
 
-                return results;
+                        if (startOfNextChunk != null)
+                        {
+                            nextTimeToRunQuery = startOfNextChunk.Time;
+                        }
+                        else
+                        {
+                            nextTimeToRunQuery = DateTime.UtcNow.AddMinutes(10);
+                        }
+
+                        tx.Commit();
+
+                        return results;
+                    }
+                }
             }
         }
 
+
         /// <summary>
-        /// Adds a new timeout.
+        ///     Adds a new timeout.
         /// </summary>
         /// <param name="timeout">Timeout data.</param>
         public void Add(TimeoutData timeout)
@@ -86,29 +96,44 @@ namespace NServiceBus.TimeoutPersisters.NHibernate
                 timeoutId = CombGuid.Generate();
             }
 
-            using (var conn = SessionFactory.GetConnection())
-            using (var session = SessionFactory.OpenSessionEx(conn))
-            using (var tx = session.BeginAmbientTransactionAware(IsolationLevel.ReadCommitted))
-            {
-                session.Save(new TimeoutEntity
-                {
-                    Id = timeoutId,
-                    Destination = timeout.Destination,
-                    SagaId = timeout.SagaId,
-                    State = timeout.State,
-                    Time = timeout.Time,
-                    Headers = ConvertDictionaryToString(timeout.Headers),
-                    Endpoint = timeout.OwningTimeoutManager,
-                });
+            IDbConnection connection = null;
+            var disposeConnection = false;
 
-                tx.Commit();
+            try
+            {
+                disposeConnection = GetConnection(out connection);
+                using (var session = SessionFactory.OpenSessionEx(connection))
+                {
+                    using (var tx = session.BeginAmbientTransactionAware(IsolationLevel.ReadCommitted))
+                    {
+                        session.Save(new TimeoutEntity
+                        {
+                            Id = timeoutId,
+                            Destination = timeout.Destination,
+                            SagaId = timeout.SagaId,
+                            State = timeout.State,
+                            Time = timeout.Time,
+                            Headers = ConvertDictionaryToString(timeout.Headers),
+                            Endpoint = timeout.OwningTimeoutManager,
+                        });
+
+                        tx.Commit();
+                    }
+                }
+            }
+            finally
+            {
+                if (disposeConnection && connection != null)
+                {
+                    connection.Dispose();
+                }
             }
 
             timeout.Id = timeoutId.ToString();
         }
 
         /// <summary>
-        /// Removes the timeout if it hasn't been previously removed.
+        ///     Removes the timeout if it hasn't been previously removed.
         /// </summary>
         /// <param name="timeoutId">The timeout id to remove.</param>
         /// <param name="timeoutData">The timeout data of the removed timeout.</param>
@@ -117,36 +142,51 @@ namespace NServiceBus.TimeoutPersisters.NHibernate
         {
             int result;
 
-            using (var conn = SessionFactory.GetConnection())
-            using (var session = SessionFactory.OpenStatelessSessionEx(conn))
-            using (var tx = session.BeginAmbientTransactionAware(IsolationLevel.ReadCommitted))
+            IDbConnection connection = null;
+            var disposeConnection = false;
+
+            try
             {
-                var te = session.Get<TimeoutEntity>(new Guid(timeoutId));
-
-                if (te == null)
+                disposeConnection = GetConnection(out connection);
+                using (var session = SessionFactory.OpenStatelessSessionEx(connection))
                 {
-                    tx.Commit();
-                    timeoutData = null;
-                    return false;
-                }
-
-                timeoutData = new TimeoutData
+                    using (var tx = session.BeginAmbientTransactionAware(IsolationLevel.ReadCommitted))
                     {
-                        Destination = te.Destination,
-                        Id = te.Id.ToString(),
-                        SagaId = te.SagaId,
-                        State = te.State,
-                        Time = te.Time,
-                        Headers = ConvertStringToDictionary(te.Headers),
-                    };
+                        var te = session.Get<TimeoutEntity>(new Guid(timeoutId));
 
-                var queryString = string.Format("delete {0} where Id = :id",
-                                        typeof(TimeoutEntity));
-                result = session.CreateQuery(queryString)
-                       .SetParameter("id", new Guid(timeoutId))
-                       .ExecuteUpdate();
+                        if (te == null)
+                        {
+                            tx.Commit();
+                            timeoutData = null;
+                            return false;
+                        }
 
-                tx.Commit();
+                        timeoutData = new TimeoutData
+                        {
+                            Destination = te.Destination,
+                            Id = te.Id.ToString(),
+                            SagaId = te.SagaId,
+                            State = te.State,
+                            Time = te.Time,
+                            Headers = ConvertStringToDictionary(te.Headers),
+                        };
+
+                        var queryString = string.Format("delete {0} where Id = :id",
+                            typeof(TimeoutEntity));
+                        result = session.CreateQuery(queryString)
+                            .SetParameter("id", new Guid(timeoutId))
+                            .ExecuteUpdate();
+
+                        tx.Commit();
+                    }
+                }
+            }
+            finally
+            {
+                if (disposeConnection && connection != null)
+                {
+                    connection.Dispose();
+                }
             }
 
             if (result == 0)
@@ -159,26 +199,55 @@ namespace NServiceBus.TimeoutPersisters.NHibernate
         }
 
         /// <summary>
-        /// Removes the time by saga id.
+        ///     Removes the time by saga id.
         /// </summary>
         /// <param name="sagaId">The saga id of the timeouts to remove.</param>
         public void RemoveTimeoutBy(Guid sagaId)
         {
-            using (var conn = SessionFactory.GetConnection())
-            using (var session = SessionFactory.OpenStatelessSessionEx(conn))
-            using (var tx = session.BeginAmbientTransactionAware(IsolationLevel.ReadCommitted))
-            {
-                var queryString = string.Format("delete {0} where SagaId = :sagaid",
-                                        typeof(TimeoutEntity));
-                session.CreateQuery(queryString)
-                       .SetParameter("sagaid", sagaId)
-                       .ExecuteUpdate();
+            IDbConnection connection = null;
+            var disposeConnection = false;
 
-                tx.Commit();
+            try
+            {
+                disposeConnection = GetConnection(out connection);
+                using (var session = SessionFactory.OpenStatelessSessionEx(connection))
+                {
+                    using (var tx = session.BeginAmbientTransactionAware(IsolationLevel.ReadCommitted))
+                    {
+                        var queryString = string.Format("delete {0} where SagaId = :sagaid",
+                            typeof(TimeoutEntity));
+                        session.CreateQuery(queryString)
+                            .SetParameter("sagaid", sagaId)
+                            .ExecuteUpdate();
+
+                        tx.Commit();
+                    }
+                }
+            }
+            finally
+            {
+                if (disposeConnection && connection != null)
+                {
+                    connection.Dispose();
+                }
             }
         }
 
-        static Dictionary<string,string> ConvertStringToDictionary(string data)
+        bool GetConnection(out IDbConnection connection)
+        {
+            var disposeConnection = false;
+            var connectionKey = string.Format("SqlConnection-{0}", ConnectionString);
+
+            if (!PipelineExecutor.CurrentContext.TryGet(connectionKey, out connection))
+            {
+                connection = SessionFactory.GetConnection();
+                disposeConnection = true;
+            }
+
+            return disposeConnection;
+        }
+
+        static Dictionary<string, string> ConvertStringToDictionary(string data)
         {
             if (String.IsNullOrEmpty(data))
             {

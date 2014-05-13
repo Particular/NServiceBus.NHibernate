@@ -11,6 +11,8 @@
     <AssemblyName>NServiceBus.NHibernate.Tests</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <AssemblyOriginatorKeyFile>..\NServiceBus.snk</AssemblyOriginatorKeyFile>
+    <SignAssembly>true</SignAssembly>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -21,6 +23,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <PlatformTarget>x64</PlatformTarget>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -67,6 +70,8 @@
     <Compile Include="GatewayStorage\When_storing_a_duplicate_message.cs" />
     <Compile Include="GatewayStorage\When_storing_a_new_message.cs" />
     <Compile Include="GatewayStorage\When_updating_a_header_of_message.cs" />
+    <Compile Include="Outbox\InMemoryDBFixture.cs" />
+    <Compile Include="Outbox\When_adding_outbox_messages.cs" />
     <Compile Include="Persistence\ConfigureSqlLiteIfRunningInDebugModeAndNoConfigPropertiesSet.cs" />
     <Compile Include="Persistence\NHibernateProperties.cs" />
     <Compile Include="Persistence\ThrowIfRequiredPropertiesAreMissing.cs" />

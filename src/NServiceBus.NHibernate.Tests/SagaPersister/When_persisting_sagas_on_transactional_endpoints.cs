@@ -37,13 +37,14 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
                 UnitOfWork.Begin();
 
                 SagaPersister.Save(new TestSaga
-                    {
-                        Id = Guid.NewGuid()
-                    });
+                {
+                    Id = Guid.NewGuid()
+                });
+
+
+                UnitOfWork.End(new Exception());
             }
 
-            UnitOfWork.End(new Exception());
-       
             using (var session = SessionFactory.OpenSession())
             {
                 Assert.AreEqual(0, session.CreateCriteria(typeof(TestSaga)).List<TestSaga>().Count);
