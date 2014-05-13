@@ -14,7 +14,7 @@
     using Serializers.Json;
     using Unicast;
 
-    public class OutboxPersister : IOutboxStorage
+    class OutboxPersister : IOutboxStorage
     {
         /// <summary>
         ///     Creates <c>ISession</c>s.
@@ -23,15 +23,20 @@
 
         public PipelineExecutor PipelineExecutor { get; set; }
 
+        public string ConnectionString { get; set; }
+
         public bool TryGet(string messageId, out OutboxMessage message)
         {
             OutboxRecord result;
+            IDbConnection connection = null;
+            var disposeConnection = false;
 
             message = null;
 
-            using (var conn = SessionFactory.GetConnection())
+            try
             {
-                using (var session = SessionFactory.OpenStatelessSessionEx(conn))
+                disposeConnection = GetConnection(out connection);
+                using (var session = SessionFactory.OpenStatelessSessionEx(connection))
                 {
                     using (var tx = session.BeginTransaction(IsolationLevel.ReadCommitted))
                     {
@@ -41,6 +46,13 @@
 
                         tx.Commit();
                     }
+                }
+            }
+            finally
+            {
+                if (disposeConnection && connection != null)
+                {
+                    connection.Dispose();
                 }
             }
 
@@ -67,20 +79,28 @@
 
         public IDisposable OpenSession()
         {
-            var conn = SessionFactory.GetConnection();
-            PipelineExecutor.CurrentContext.Set(typeof(IDbConnection).FullName, conn);
-            var session = SessionFactory.OpenSessionEx(conn);
-            session.FlushMode = FlushMode.Never;
-            PipelineExecutor.CurrentContext.Set(typeof(ISession).FullName, session);
-            var tx = session.BeginTransaction(IsolationLevel.ReadCommitted);
-            PipelineExecutor.CurrentContext.Set(typeof(ITransaction).FullName, tx);
+            IDbConnection connection;
+            var disposeConnection = false;
 
-            return new ConnectionDisposer(conn, session, tx);
+            // Checking if SQL Transport has already opened an IDbConnection
+            if (!GetConnection(out connection))
+            {
+                disposeConnection = true;
+                PipelineExecutor.CurrentContext.Set(string.Format("SqlConnection-{0}", ConnectionString), connection);
+            }
+
+            var session = SessionFactory.OpenSessionEx(connection);
+            session.FlushMode = FlushMode.Never;
+            PipelineExecutor.CurrentContext.Set(string.Format("NHibernateSession-{0}", ConnectionString), session);
+            var tx = session.BeginTransaction(IsolationLevel.ReadCommitted);
+            PipelineExecutor.CurrentContext.Set(string.Format("NHibernateTransaction-{0}", ConnectionString), tx);
+
+            return new DisposerWrapper(disposeConnection ? connection : null, session, tx);
         }
 
         public void StoreAndCommit(string messageId, IEnumerable<TransportOperation> transportOperations)
         {
-            var session = PipelineExecutor.CurrentContext.Get<ISession>();
+            var session = PipelineExecutor.CurrentContext.Get<ISession>(string.Format("NHibernateSession-{0}", ConnectionString));
             session.Save(new OutboxRecord
             {
                 MessageId = messageId,
@@ -108,9 +128,15 @@
         public void SetAsDispatched(string messageId)
         {
             int result;
-            using (var conn = SessionFactory.GetConnection())
+            IDbConnection connection = null;
+
+            var disposeConnection = false;
+
+            try
             {
-                using (var session = SessionFactory.OpenStatelessSessionEx(conn))
+                disposeConnection = GetConnection(out connection);
+
+                using (var session = SessionFactory.OpenStatelessSessionEx(connection))
                 {
                     using (var tx = session.BeginTransaction(IsolationLevel.ReadCommitted))
                     {
@@ -125,11 +151,32 @@
                     }
                 }
             }
+            finally
+            {
+                if (disposeConnection && connection != null)
+                {
+                    connection.Dispose();
+                }
+            }
 
             if (result == 0)
             {
                 throw new ConcurrencyException(string.Format("Outbox message with id '{0}' is has already been updated by another thread.", messageId));
             }
+        }
+
+        bool GetConnection(out IDbConnection connection)
+        {
+            var disposeConnection = false;
+            var connectionKey = string.Format("SqlConnection-{0}", ConnectionString);
+
+            if (!PipelineExecutor.CurrentContext.TryGet(connectionKey, out connection))
+            {
+                connection = SessionFactory.GetConnection();
+                disposeConnection = true;
+            }
+
+            return disposeConnection;
         }
 
         static Dictionary<string, string> ConvertStringToDictionary(string data)
@@ -155,11 +202,11 @@
         static readonly JsonMessageSerializer serializer = new JsonMessageSerializer(null);
 
         [SkipWeaving]
-        class ConnectionDisposer : IDisposable
+        class DisposerWrapper : IDisposable
         {
-            public ConnectionDisposer(IDbConnection conn, ISession session, ITransaction tx)
+            public DisposerWrapper(IDbConnection connection, ISession session, ITransaction tx)
             {
-                this.conn = conn;
+                this.connection = connection;
                 this.session = session;
                 this.tx = tx;
             }
@@ -178,12 +225,15 @@
                     }
                     finally
                     {
-                        conn.Dispose();
+                        if (connection != null)
+                        {
+                            connection.Dispose();
+                        }
                     }
                 }
             }
 
-            readonly IDbConnection conn;
+            readonly IDbConnection connection;
             readonly ISession session;
             readonly ITransaction tx;
         }

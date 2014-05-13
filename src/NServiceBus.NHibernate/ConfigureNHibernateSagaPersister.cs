@@ -3,9 +3,10 @@
     using System;
     using System.Collections.Generic;
     using Config;
-    // ReSharper disable RedundantNameQualifier
+// ReSharper disable RedundantNameQualifier
     using global::NHibernate;
-    using global::NHibernate.Cfg;
+    using Environment = global::NHibernate.Cfg.Environment;
+    using Configuration = global::NHibernate.Cfg.Configuration;
 // ReSharper restore RedundantNameQualifier
     using Persistence.NHibernate;
     using SagaPersisters.NHibernate;
@@ -148,8 +149,23 @@
                 throw new InvalidOperationException("Could not create session factory for saga persistence.");
             }
 
+            string connString;
+            if (!configuration.Properties.TryGetValue(Environment.ConnectionString, out connString))
+            {
+                string connStringName;
+
+                if (configuration.Properties.TryGetValue(Environment.ConnectionStringName, out connStringName))
+                {
+
+                    var connectionStringSettings = System.Configuration.ConfigurationManager.ConnectionStrings[connStringName];
+
+                    connString = connectionStringSettings.ConnectionString;
+                }
+            }
+
             config.Configurer.ConfigureComponent<UnitOfWorkManager>(DependencyLifecycle.SingleInstance)
-                .ConfigureProperty(p => p.SessionFactory, sessionFactory);
+                .ConfigureProperty(p => p.SessionFactory, sessionFactory)
+                .ConfigureProperty(p => p.ConnectionString, connString);
 
             config.Configurer.ConfigureComponent<SagaPersister>(DependencyLifecycle.InstancePerCall);
 

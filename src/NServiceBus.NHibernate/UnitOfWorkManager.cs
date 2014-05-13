@@ -20,6 +20,8 @@ namespace NServiceBus.UnitOfWork.NHibernate
         public ISessionFactory SessionFactory { get; set; }
         public PipelineExecutor PipelineExecutor { get; set; }
 
+        public string ConnectionString { get; set; }
+        
         public void Dispose()
         {
             // Injected
@@ -40,7 +42,7 @@ namespace NServiceBus.UnitOfWork.NHibernate
 
             try
             {
-                var session = context.Value.Get<ISession>();
+                var session = context.Value.Get<ISession>(string.Format("NHibernateSession-{0}", ConnectionString));
 
                 try
                 {
@@ -59,7 +61,7 @@ namespace NServiceBus.UnitOfWork.NHibernate
                         return;
                     }
 
-                    using (var transaction = context.Value.Get<ITransaction>())
+                    using (var transaction = context.Value.Get<ITransaction>(string.Format("NHibernateTransaction-{0}", ConnectionString)))
                     {
                         if (!transaction.IsActive)
                         {
@@ -76,14 +78,14 @@ namespace NServiceBus.UnitOfWork.NHibernate
                         }
                     }
 
-                    context.Value.Remove<ITransaction>();
+                    context.Value.Remove(string.Format("NHibernateTransaction-{0}", ConnectionString));
                 }
                 finally
                 {
                     if (!context.Value.Get<bool>("NHibernate.UnitOfWorkManager.OutsideSession"))
                     {
                         session.Dispose();
-                        context.Value.Remove<ISession>();
+                        context.Value.Remove(string.Format("NHibernateSession-{0}", ConnectionString));
                     }
                 }
             }
@@ -91,8 +93,9 @@ namespace NServiceBus.UnitOfWork.NHibernate
             {
                 if (!context.Value.Get<bool>("NHibernate.UnitOfWorkManager.OutsideConnection"))
                 {
-                    context.Value.Get<IDbConnection>().Dispose();
-                    context.Value.Remove<IDbConnection>();
+                    var connectionKey = string.Format("SqlConnection-{0}", ConnectionString);
+                    context.Value.Get<IDbConnection>(connectionKey).Dispose();
+                    context.Value.Remove(connectionKey);
                 }
             }
         }
@@ -103,29 +106,29 @@ namespace NServiceBus.UnitOfWork.NHibernate
 
             if (getCurrentSessionInitialized.Value)
             {
-                sessiondb = context.Value.Get<ISession>();
+                sessiondb = context.Value.Get<ISession>(string.Format("NHibernateSession-{0}", ConnectionString));
             }
             else
             {
                 IDbConnection dbConnection;
-                if (context.Value.TryGet(out dbConnection))
+                if (context.Value.TryGet(string.Format("SqlConnection-{0}", ConnectionString), out dbConnection))
                 {
                     context.Value.Set("NHibernate.UnitOfWorkManager.OutsideConnection", true);
                 }
                 else
                 {
                     dbConnection = SessionFactory.GetConnection();
-                    context.Value.Set(typeof(IDbConnection).FullName, dbConnection);
+                    context.Value.Set(string.Format("SqlConnection-{0}", ConnectionString), dbConnection);
                 }
 
-                if (context.Value.TryGet(out sessiondb))
+                if (context.Value.TryGet(string.Format("NHibernateSession-{0}", ConnectionString), out sessiondb))
                 {
                     context.Value.Set("NHibernate.UnitOfWorkManager.OutsideSession", true);
                 }
                 else
                 {
                     sessiondb = SessionFactory.OpenSessionEx(dbConnection);
-                    context.Value.Set(typeof(ISession).FullName, sessiondb);
+                    context.Value.Set(string.Format("NHibernateSession-{0}", ConnectionString), sessiondb);
                 }
 
                 sessiondb.FlushMode = FlushMode.Never;
@@ -133,14 +136,14 @@ namespace NServiceBus.UnitOfWork.NHibernate
                 if (Transaction.Current == null)
                 {
                     ITransaction transaction;
-                    if (context.Value.TryGet(out transaction))
+                    if (context.Value.TryGet(string.Format("NHibernateTransaction-{0}", ConnectionString), out transaction))
                     {
                         context.Value.Set("NHibernate.UnitOfWorkManager.OutsideTransaction", true);
                     }
                     else
                     {
                         transaction = sessiondb.BeginTransaction(GetIsolationLevel());
-                        context.Value.Set(typeof(ITransaction).FullName, transaction);
+                        context.Value.Set(string.Format("NHibernateTransaction-{0}", ConnectionString), transaction);
                     }
                 }
 

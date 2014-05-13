@@ -4,10 +4,11 @@
     using Outbox.NHibernate;
     using Outbox;
 // ReSharper disable RedundantNameQualifier
+    using Configuration = global::NHibernate.Cfg.Configuration;
     using global::NHibernate.Cfg;
 // ReSharper restore RedundantNameQualifier
     using Persistence.NHibernate;
-
+    
     /// <summary>
     /// Configuration extensions for the NHibernate Outbox
     /// </summary>
@@ -77,8 +78,23 @@
 
             Installer.configuration = configuration;
 
+            string connString;
+            if (!configuration.Properties.TryGetValue(Environment.ConnectionString, out connString))
+            {
+                string connStringName;
+
+                if (configuration.Properties.TryGetValue(Environment.ConnectionStringName, out connStringName))
+                {
+
+                    var connectionStringSettings = System.Configuration.ConfigurationManager.ConnectionStrings[connStringName];
+
+                    connString = connectionStringSettings.ConnectionString;
+                }
+            }
+
             config.Configurer.ConfigureComponent<OutboxPersister>(DependencyLifecycle.SingleInstance)
-                .ConfigureProperty(p => p.SessionFactory, configuration.BuildSessionFactory());
+                .ConfigureProperty(p => p.SessionFactory, configuration.BuildSessionFactory())
+                .ConfigureProperty(p => p.ConnectionString, connString);
 
             Feature.Enable<Features.Outbox>();
 
