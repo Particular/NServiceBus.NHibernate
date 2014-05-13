@@ -8,7 +8,7 @@ namespace NServiceBus.UnitOfWork.NHibernate
     using Pipeline;
     using Pipeline.Contexts;
 
-    class UnitOfWorkBehavior : IBehavior<ReceivePhysicalMessageContext>
+    class OpenSessionBehavior : IBehavior<ReceivePhysicalMessageContext>
     {
         public ISessionFactory SessionFactory { get; set; }
 
@@ -49,7 +49,7 @@ namespace NServiceBus.UnitOfWork.NHibernate
                 session.FlushMode = FlushMode.Never;
 
                 context.Set(string.Format("NHibernateSession-{0}", ConnectionString), session);
-                
+
                 next();
 
                 session.Flush();

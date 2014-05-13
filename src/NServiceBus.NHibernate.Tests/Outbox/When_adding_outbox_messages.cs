@@ -6,6 +6,7 @@ namespace NServiceBus.NHibernate.Tests.Outbox
     using NServiceBus.Outbox;
     using NUnit.Framework;
     using Persistence;
+    using SagaPersisters.NHibernate.Tests;
     using Unicast;
 
     [TestFixture]
@@ -15,10 +16,13 @@ namespace NServiceBus.NHibernate.Tests.Outbox
         [ExpectedException]
         public void Should_throw_if__trying_to_insert_same_messageid()
         {
-            using (persister.OpenSession())
+            using (var session = SessionFactory.OpenSession())
             {
-                persister.StoreAndCommit("MySpecialId", Enumerable.Empty<TransportOperation>());
-                persister.StoreAndCommit("MySpecialId", Enumerable.Empty<TransportOperation>());
+                persister.StorageSessionProvider = new FakeSessionProvider(session);
+                persister.Store("MySpecialId", Enumerable.Empty<TransportOperation>());
+                persister.Store("MySpecialId", Enumerable.Empty<TransportOperation>());
+
+                session.Flush();
             }
         }
 
@@ -26,9 +30,10 @@ namespace NServiceBus.NHibernate.Tests.Outbox
         public void Should_save_with_not_dispatched()
         {
             var id = Guid.NewGuid().ToString("N");
-            using (persister.OpenSession())
+            using (var session = SessionFactory.OpenSession())
             {
-                persister.StoreAndCommit(id, new List<TransportOperation>
+                persister.StorageSessionProvider = new FakeSessionProvider(session);
+                persister.Store(id, new List<TransportOperation>
                 {
                     new TransportOperation(new SendOptions("Foo@Machine")
                     {
@@ -42,6 +47,8 @@ namespace NServiceBus.NHibernate.Tests.Outbox
                         Body = new byte[1024*5]
                     }, "MyMessage"),
                 });
+
+                session.Flush();
             }
 
             OutboxMessage result;
@@ -51,7 +58,7 @@ namespace NServiceBus.NHibernate.Tests.Outbox
 
             var operation = result.TransportOperations.Single();
 
-            
+
             Assert.AreEqual("MyMessage", operation.MessageType);
         }
 
@@ -60,9 +67,10 @@ namespace NServiceBus.NHibernate.Tests.Outbox
         {
             var id = Guid.NewGuid().ToString("N");
 
-            using (persister.OpenSession())
+            using (var session = SessionFactory.OpenSession())
             {
-                persister.StoreAndCommit(id, new List<TransportOperation>
+                persister.StorageSessionProvider = new FakeSessionProvider(session);
+                persister.Store(id, new List<TransportOperation>
                 {
                     new TransportOperation(new SendOptions("Foo@Machine")
                     {
@@ -76,6 +84,8 @@ namespace NServiceBus.NHibernate.Tests.Outbox
                         Body = new byte[1024*5]
                     }, "MyMessage"),
                 });
+
+                session.Flush();
             }
 
             persister.SetAsDispatched(id);
@@ -92,9 +102,10 @@ namespace NServiceBus.NHibernate.Tests.Outbox
         {
             var id = Guid.NewGuid().ToString("N");
 
-            using (persister.OpenSession())
+            using (var session = SessionFactory.OpenSession())
             {
-                persister.StoreAndCommit(id, new List<TransportOperation>
+                persister.StorageSessionProvider = new FakeSessionProvider(session);
+                persister.Store(id, new List<TransportOperation>
                 {
                     new TransportOperation(new SendOptions("Foo@Machine")
                     {
@@ -108,6 +119,8 @@ namespace NServiceBus.NHibernate.Tests.Outbox
                         Body = new byte[1024*5]
                     }, "MyMessage"),
                 });
+
+                session.Flush();
             }
 
             persister.SetAsDispatched(id);

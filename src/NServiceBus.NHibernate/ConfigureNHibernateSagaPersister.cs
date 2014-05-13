@@ -4,11 +4,11 @@
     using System.Collections.Generic;
     using Config;
     using Features;
-// ReSharper disable RedundantNameQualifier
+    // ReSharper disable RedundantNameQualifier
     using global::NHibernate;
     using Environment = global::NHibernate.Cfg.Environment;
     using Configuration = global::NHibernate.Cfg.Configuration;
-// ReSharper restore RedundantNameQualifier
+    // ReSharper restore RedundantNameQualifier
     using Persistence.NHibernate;
     using SagaPersisters.NHibernate;
     using SagaPersisters.NHibernate.Config.Internal;
@@ -48,7 +48,7 @@
         /// <returns>The configuration object.</returns>
         public static Configure UseNHibernateSagaPersister(this Configure config)
         {
-            return config.UseNHibernateSagaPersister((Func<Type, string>) null);
+            return config.UseNHibernateSagaPersister((Func<Type, string>)null);
         }
 
         /// <summary>
@@ -164,12 +164,21 @@
                 }
             }
 
-            config.Configurer.ConfigureComponent<StorageSessionProvider>(DependencyLifecycle.InstancePerCall)
-                     .ConfigureProperty(p => p.ConnectionString, connString);
 
-            config.Configurer.ConfigureComponent<UnitOfWorkBehavior>(DependencyLifecycle.InstancePerCall)
+            config.Configurer.ConfigureComponent<OpenSqlConnectionBehavior>(DependencyLifecycle.InstancePerCall)
                 .ConfigureProperty(p => p.SessionFactory, sessionFactory)
                 .ConfigureProperty(p => p.ConnectionString, connString);
+
+            config.Configurer.ConfigureComponent<OpenSessionBehavior>(DependencyLifecycle.InstancePerCall)
+                 .ConfigureProperty(p => p.SessionFactory, sessionFactory)
+                    .ConfigureProperty(p => p.ConnectionString, connString);
+
+            config.Configurer.ConfigureComponent<OpenNativeTransactionBehavior>(DependencyLifecycle.InstancePerCall)
+                    .ConfigureProperty(p => p.ConnectionString, connString);
+
+
+            config.Configurer.ConfigureComponent<StorageSessionProvider>(DependencyLifecycle.InstancePerCall)
+                     .ConfigureProperty(p => p.ConnectionString, connString);
 
 
             config.Configurer.ConfigureComponent<SagaPersister>(DependencyLifecycle.InstancePerCall);
@@ -183,7 +192,7 @@
         /// Be aware that this implementation deletes sagas that complete so as not to have the database fill up.
         /// SagaData classes are automatically mapped using Fluent NHibernate Conventions.
         /// </summary>
-        [ObsoleteEx(Replacement = "UseNHibernateSagaPersister()", TreatAsErrorFromVersion = "5.0", RemoveInVersion = "6.0")]                                
+        [ObsoleteEx(Replacement = "UseNHibernateSagaPersister()", TreatAsErrorFromVersion = "5.0", RemoveInVersion = "6.0")]
         public static Configure NHibernateSagaPersister(this Configure config)
         {
             return config.UseNHibernateSagaPersister();
@@ -194,7 +203,7 @@
         /// SagaData classes are automatically mapped using Fluent NHibernate conventions
         /// and there persistence schema is also automatically generated.
         /// </summary>
-        [ObsoleteEx(Replacement = "UseNHibernateSagaPersister()", TreatAsErrorFromVersion = "5.0", RemoveInVersion = "6.0")]                                
+        [ObsoleteEx(Replacement = "UseNHibernateSagaPersister()", TreatAsErrorFromVersion = "5.0", RemoveInVersion = "6.0")]
         public static Configure NHibernateSagaPersisterWithSQLiteAndAutomaticSchemaGeneration(this Configure config)
         {
             ConfigureNHibernate.SagaPersisterProperties["dialect"] = "NHibernate.Dialect.SQLiteDialect";
@@ -211,8 +220,8 @@
         /// SagaData classes are automatically mapped using Fluent NHibernate conventions
         /// and there persistence schema is automatically generated if requested.
         /// </summary>
-        [ObsoleteEx(Replacement = "UseNHibernateSagaPersister(Configuration)", TreatAsErrorFromVersion = "5.0", RemoveInVersion = "6.0")]                        
-        public static Configure NHibernateSagaPersister(this Configure config, IDictionary<string,string> nhibernateProperties,
+        [ObsoleteEx(Replacement = "UseNHibernateSagaPersister(Configuration)", TreatAsErrorFromVersion = "5.0", RemoveInVersion = "6.0")]
+        public static Configure NHibernateSagaPersister(this Configure config, IDictionary<string, string> nhibernateProperties,
             bool autoUpdateSchema)
         {
             foreach (var property in nhibernateProperties)

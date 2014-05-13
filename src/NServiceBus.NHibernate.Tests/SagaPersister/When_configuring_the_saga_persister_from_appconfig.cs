@@ -37,26 +37,5 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
                 session.CreateCriteria(typeof(MySaga)).List<MySaga>();
             }
         }
-
-        [Test]
-        public void UnitOfWork_Should_be_configured()
-        {
-            var uow = config.Builder.Build<UnitOfWorkManager>();
-
-            Assert.IsNotNull(uow);
-        }
-
-#pragma warning disable 0618
-        [Test]
-        public void Handles_Multiple_registrations_of_UnitOfWork()
-        {
-            config.NHibernateUnitOfWork();
-
-            var uow = config.Builder.BuildAll<UnitOfWorkManager>().ToList();
-
-            Assert.IsNotNull(uow);
-            Assert.That(uow, Has.Count.EqualTo(1));
-        }
-#pragma warning restore 0618
     }
 }

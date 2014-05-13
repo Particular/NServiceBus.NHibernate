@@ -95,8 +95,9 @@
     <Compile Include="GatewayPersister\Installer\Installer.cs" />
     <Compile Include="InternalsVisibleTo.cs" />
     <Compile Include="IStorageSessionProvider.cs" />
-    <Compile Include="NativeTransactionBehavior.cs" />
+    <Compile Include="OpenNativeTransactionBehavior.cs" />
     <Compile Include="NHibernatePersistence.cs" />
+    <Compile Include="OpenSessionBehavior.cs" />
     <Compile Include="Outbox\Installer.cs" />
     <Compile Include="Outbox\Entities.cs" />
     <Compile Include="Outbox\EntityMappings.cs" />
@@ -127,7 +128,7 @@
     <Compile Include="Subscriptions\Subscription.cs" />
     <Compile Include="Subscriptions\SubscriptionStorage.cs" />
     <Compile Include="Subscriptions\SubscriptionStorageSessionProvider.cs" />
-    <Compile Include="UnitOfWorkBehavior.cs" />
+    <Compile Include="OpenSqlConnectionBehavior.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ripple.dependencies.config">
