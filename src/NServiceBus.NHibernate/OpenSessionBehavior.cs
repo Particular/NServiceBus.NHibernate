@@ -25,7 +25,7 @@ namespace NServiceBus.UnitOfWork.NHibernate
                 return;
             }
 
-            SqlConnection existingConnection;
+            IDbConnection existingConnection;
 
             if (context.TryGet(string.Format("SqlConnection-{0}", ConnectionString), out existingConnection))
             {
