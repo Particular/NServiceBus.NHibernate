@@ -5,6 +5,7 @@ namespace NServiceBus.NHibernate.Tests.Outbox
     using System;
     using System.Collections.Specialized;
     using System.Configuration;
+    using Features;
     using global::NHibernate;
     using Pipeline;
 #if !USE_SQLSERVER
@@ -48,21 +49,21 @@ namespace NServiceBus.NHibernate.Tests.Outbox
 
             ConfigureNHibernate.Init();
 
+            Feature.Enable<Outbox>();
+
             Configure.With(Enumerable.Empty<Type>())
                 .DefineEndpointName("Foo")
-                .DefaultBuilder()
-                .UseNHibernateOutbox();
+                .DefaultBuilder();
 
             persister = Configure.Instance.Builder.Build<OutboxPersister>();
             SessionFactory = persister.SessionFactory;
 
-            persister.PipelineExecutor = new PipelineExecutor(Configure.Instance.Builder, new PipelineBuilder(Configure.Instance.Builder));
-
+            
 
             var connection = SessionFactory.GetConnection();
 
-            persister.PipelineExecutor.CurrentContext.Set("SqlConnection-" + connectionString, connection);
-
+            persister.DbConnectionProvider = new FakeDbConnectionProvider(connection);
+            
             new Installer().Install(WindowsIdentity.GetCurrent().Name);
         }
 

@@ -103,7 +103,7 @@
             if (outbox)
             {
                 Configure.Transactions.Advanced(settings => settings.DisableDistributedTransactions().DoNotWrapHandlersExecutionInATransactionScope());
-                config.UseNHibernateOutbox();
+                Feature.Enable<Outbox>();
             }
 
             using (var startableBus = config.InMemoryFaultManagement().UnicastBus().CreateBus())

@@ -101,15 +101,15 @@ Here is an example of what is required:
             SubscriptionStorageProperties = OverrideConnectionStringSettingIfNotNull(configurationProperties,
                 "NServiceBus/Persistence/NHibernate/Subscription");
             SagaPersisterProperties = OverrideConnectionStringSettingIfNotNull(configurationProperties,
-                "NServiceBus/Persistence/NHibernate/Saga");
+                "NServiceBus/Persistence/NHibernate/Saga"); //todo, obsolete
             GatewayPersisterProperties = OverrideConnectionStringSettingIfNotNull(configurationProperties,
                 "NServiceBus/Persistence/NHibernate/Gateway");
             GatewayDeduplicationProperties = OverrideConnectionStringSettingIfNotNull(configurationProperties,
                 "NServiceBus/Persistence/NHibernate/Deduplication");
             DistributorPersisterProperties = OverrideConnectionStringSettingIfNotNull(configurationProperties,
                 "NServiceBus/Persistence/NHibernate/Distributor");
-            OutboxPersisterProperties = OverrideConnectionStringSettingIfNotNull(configurationProperties,
-                "NServiceBus/Persistence/NHibernate/Outbox");
+            StorageProperties = OverrideConnectionStringSettingIfNotNull(configurationProperties,
+                "NServiceBus/Persistence/NHibernate/Storage");
         }
 
         /// <summary>
@@ -145,7 +145,7 @@ Here is an example of what is required:
         /// <summary>
         /// Outbox persister NHibernate properties.
         /// </summary>
-        public static IDictionary<string, string> OutboxPersisterProperties { get; private set; }
+        public static IDictionary<string, string> StorageProperties { get; private set; }
 
         /// <summary>
         /// Adds T mapping to <paramref name="configuration"/> .

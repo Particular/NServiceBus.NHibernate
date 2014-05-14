@@ -9,34 +9,25 @@
     using NHibernate;
     using Persistence;
     using Persistence.NHibernate;
-    using Pipeline;
     using Serializers.Json;
     using Unicast;
     using UnitOfWork.NHibernate;
 
     class OutboxPersister : IOutboxStorage
     {
-        /// <summary>
-        ///     Creates <c>ISession</c>s.
-        /// </summary>
         public ISessionFactory SessionFactory { get; set; }
 
         public IStorageSessionProvider StorageSessionProvider { get; set; }
 
-
-        public PipelineExecutor PipelineExecutor { get; set; }
-
-        public string ConnectionString { get; set; }
+        public IDbConnectionProvider DbConnectionProvider { get; set; }
 
         public bool TryGet(string messageId, out OutboxMessage message)
         {
             OutboxRecord result;
 
-            var connection = PipelineExecutor.CurrentContext.Get<IDbConnection>(string.Format("SqlConnection-{0}", ConnectionString));
-
             message = null;
 
-            using (var session = SessionFactory.OpenStatelessSessionEx(connection))
+            using (var session = SessionFactory.OpenStatelessSessionEx(DbConnectionProvider.Connection))
             {
                 using (var tx = session.BeginTransaction(IsolationLevel.ReadCommitted))
                 {
@@ -95,9 +86,8 @@
         public void SetAsDispatched(string messageId)
         {
             int result;
-            var connection = PipelineExecutor.CurrentContext.Get<IDbConnection>(string.Format("SqlConnection-{0}", ConnectionString));
-
-            using (var session = SessionFactory.OpenStatelessSessionEx(connection))
+         
+            using (var session = SessionFactory.OpenStatelessSessionEx(DbConnectionProvider.Connection))
             {
                 using (var tx = session.BeginTransaction(IsolationLevel.ReadCommitted))
                 {

@@ -79,7 +79,6 @@
   <ItemGroup>
     <Compile Include="ConfigureNHibernateGatewayDeduplication.cs" />
     <Compile Include="ConfigureNHibernateGatewayPersister.cs" />
-    <Compile Include="ConfigureNHibernateOutbox.cs" />
     <Compile Include="ConfigureNHibernateSagaPersister.cs" />
     <Compile Include="ConfigureNHibernateSubscriptionStorage.cs" />
     <Compile Include="ConfigureNHibernateTimeoutPersister.cs" />
@@ -89,6 +88,7 @@
     <Compile Include="Config\NHibernatePropertyCollection.cs" />
     <Compile Include="Config\NHibernateSagaPersisterConfig.cs" />
     <Compile Include="Config\TimeoutPersisterConfig.cs" />
+    <Compile Include="DbConnectionProvider.cs" />
     <Compile Include="Deduplication\Config\DeduplicationMessage.cs" />
     <Compile Include="Deduplication\Config\DeduplicationMessageMap.cs" />
     <Compile Include="Deduplication\GatewayDeduplication.cs" />
@@ -100,8 +100,9 @@
     <Compile Include="InternalsVisibleTo.cs" />
     <Compile Include="IStorageSessionProvider.cs" />
     <Compile Include="OpenNativeTransactionBehavior.cs" />
-    <Compile Include="NHibernatePersistence.cs" />
+    <Compile Include="NHibernateSessionManagement.cs" />
     <Compile Include="OpenSessionBehavior.cs" />
+    <Compile Include="Outbox\IDbConnectionProvider.cs" />
     <Compile Include="Outbox\Installer.cs" />
     <Compile Include="Outbox\Entities.cs" />
     <Compile Include="Outbox\EntityMappings.cs" />
