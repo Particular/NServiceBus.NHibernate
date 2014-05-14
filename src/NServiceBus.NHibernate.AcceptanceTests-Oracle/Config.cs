@@ -84,3 +84,11 @@ public class ConfigureSagaPersister : ConfigurePersistences
         return type.DeclaringType.Name + "_" + type.Name;
     }
 }
+
+public class ConfigureOutboxPersister : ConfigurePersistences
+{
+    public void Configure(Configure config)
+    {
+        config.UseNHibernateOutbox();
+    }
+}

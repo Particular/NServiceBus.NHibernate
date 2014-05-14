@@ -36,3 +36,11 @@ public class ConfigureSagaPersister : ConfigurePersistences
         config.UseNHibernateSagaPersister();
     }
 }
+
+public class ConfigureOutboxPersister : ConfigurePersistences
+{
+    public void Configure(Configure config)
+    {
+        config.UseNHibernateOutbox();
+    }
+}
