@@ -1,7 +1,7 @@
 namespace NServiceBus.UnitOfWork.NHibernate
 {
     using System;
-    using System.Data.SqlClient;
+    using System.Data;
     using global::NHibernate;
     using Persistence.NHibernate;
     using Pipeline;
@@ -15,7 +15,7 @@ namespace NServiceBus.UnitOfWork.NHibernate
 
         public void Invoke(ReceivePhysicalMessageContext context, Action next)
         {
-            SqlConnection existingConnection;
+            IDbConnection existingConnection;
 
             if (context.TryGet(string.Format("SqlConnection-{0}", ConnectionString), out existingConnection))
             {
