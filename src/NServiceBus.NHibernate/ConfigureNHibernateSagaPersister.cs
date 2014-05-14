@@ -1,17 +1,14 @@
 ﻿namespace NServiceBus
 {
     using System;
-    using System.Collections.Generic;
     using Config;
     // ReSharper disable RedundantNameQualifier
     using global::NHibernate;
-    using Environment = global::NHibernate.Cfg.Environment;
     using Configuration = global::NHibernate.Cfg.Configuration;
     // ReSharper restore RedundantNameQualifier
     using Persistence.NHibernate;
     using SagaPersisters.NHibernate;
     using SagaPersisters.NHibernate.Config.Internal;
-    using UnitOfWork.NHibernate;
 
     /// <summary>
     /// Contains extension methods to NServiceBus.Configure for the NHibernate saga persister.
@@ -149,58 +146,11 @@
                 throw new InvalidOperationException("Could not create session factory for saga persistence.");
             }
 
-          
-          
-
             config.Configurer.ConfigureComponent<SagaPersister>(DependencyLifecycle.InstancePerCall);
 
 
             return config;
         }
 
-        /// <summary>
-        /// Use the NHibernate backed saga persister implementation.
-        /// Be aware that this implementation deletes sagas that complete so as not to have the database fill up.
-        /// SagaData classes are automatically mapped using Fluent NHibernate Conventions.
-        /// </summary>
-        [ObsoleteEx(Replacement = "UseNHibernateSagaPersister()", TreatAsErrorFromVersion = "5.0", RemoveInVersion = "6.0")]
-        public static Configure NHibernateSagaPersister(this Configure config)
-        {
-            return config.UseNHibernateSagaPersister();
-        }
-
-        /// <summary>
-        /// Use the NHibernate backed saga persister implementation on top of SQLite.
-        /// SagaData classes are automatically mapped using Fluent NHibernate conventions
-        /// and there persistence schema is also automatically generated.
-        /// </summary>
-        [ObsoleteEx(Replacement = "UseNHibernateSagaPersister()", TreatAsErrorFromVersion = "5.0", RemoveInVersion = "6.0")]
-        public static Configure NHibernateSagaPersisterWithSQLiteAndAutomaticSchemaGeneration(this Configure config)
-        {
-            ConfigureNHibernate.SagaPersisterProperties["dialect"] = "NHibernate.Dialect.SQLiteDialect";
-            ConfigureNHibernate.SagaPersisterProperties["connection.connection_string"] = "Data Source=.\\NServiceBus.Sagas.sqlite;Version=3;New=True;";
-
-            var configuration = ConfigureNHibernate.CreateConfigurationWith(ConfigureNHibernate.SagaPersisterProperties);
-
-            return config.UseNHibernateSagaPersisterInternal(configuration, true);
-        }
-
-
-        /// <summary>
-        /// Use the NHibernate backed saga persister implementation.
-        /// SagaData classes are automatically mapped using Fluent NHibernate conventions
-        /// and there persistence schema is automatically generated if requested.
-        /// </summary>
-        [ObsoleteEx(Replacement = "UseNHibernateSagaPersister(Configuration)", TreatAsErrorFromVersion = "5.0", RemoveInVersion = "6.0")]
-        public static Configure NHibernateSagaPersister(this Configure config, IDictionary<string, string> nhibernateProperties,
-            bool autoUpdateSchema)
-        {
-            foreach (var property in nhibernateProperties)
-            {
-                ConfigureNHibernate.SagaPersisterProperties[property.Key] = property.Value;
-            }
-
-            return config.UseNHibernateSagaPersisterInternal(ConfigureNHibernate.CreateConfigurationWith(ConfigureNHibernate.SagaPersisterProperties), autoUpdateSchema);
-        }
     }
 }
