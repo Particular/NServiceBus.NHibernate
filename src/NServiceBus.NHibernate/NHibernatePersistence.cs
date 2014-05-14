@@ -14,7 +14,7 @@ namespace NServiceBus.UnitOfWork.NHibernate
 
         class PipelineConfig:PipelineOverride
         {
-            public override void Override(BehaviorList<ReceivePhysicalMessageContext> behaviorList)
+            public override void Override(BehaviorList<IncomingContext> behaviorList)
             {
                 if (!IsEnabled<NHibernatePersistence>())
                 {

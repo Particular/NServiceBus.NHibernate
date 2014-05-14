@@ -8,13 +8,13 @@ namespace NServiceBus.UnitOfWork.NHibernate
     using Pipeline;
     using Pipeline.Contexts;
 
-    class OpenSessionBehavior : IBehavior<ReceivePhysicalMessageContext>
+    class OpenSessionBehavior : IBehavior<IncomingContext>
     {
         public ISessionFactory SessionFactory { get; set; }
 
         public string ConnectionString { get; set; }
 
-        public void Invoke(ReceivePhysicalMessageContext context, Action next)
+        public void Invoke(IncomingContext context, Action next)
         {
             ISession existingSession;
 
@@ -42,7 +42,7 @@ namespace NServiceBus.UnitOfWork.NHibernate
             }
         }
 
-        void InnerInvoke(ReceivePhysicalMessageContext context, Action next, IDbConnection connection)
+        void InnerInvoke(IncomingContext context, Action next, IDbConnection connection)
         {
             using (var session = SessionFactory.OpenSession(connection))
             {

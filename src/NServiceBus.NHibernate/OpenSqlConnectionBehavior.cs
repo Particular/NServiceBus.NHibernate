@@ -7,13 +7,13 @@ namespace NServiceBus.UnitOfWork.NHibernate
     using Pipeline;
     using Pipeline.Contexts;
 
-    class OpenSqlConnectionBehavior : IBehavior<ReceivePhysicalMessageContext>
+    class OpenSqlConnectionBehavior : IBehavior<IncomingContext>
     {
         public ISessionFactory SessionFactory { get; set; }
 
         public string ConnectionString { get; set; }
 
-        public void Invoke(ReceivePhysicalMessageContext context, Action next)
+        public void Invoke(IncomingContext context, Action next)
         {
             IDbConnection existingConnection;
 

@@ -5,13 +5,13 @@ namespace NServiceBus.UnitOfWork.NHibernate
     using Pipeline;
     using Pipeline.Contexts;
 
-    class OpenNativeTransactionBehavior : IBehavior<ReceivePhysicalMessageContext>
+    class OpenNativeTransactionBehavior : IBehavior<IncomingContext>
     {
         public IStorageSessionProvider StorageSessionProvider { get; set; }
 
         public string ConnectionString { get; set; }
 
-        public void Invoke(ReceivePhysicalMessageContext context, Action next)
+        public void Invoke(IncomingContext context, Action next)
         {
             if (Transaction.Current != null)
             {
