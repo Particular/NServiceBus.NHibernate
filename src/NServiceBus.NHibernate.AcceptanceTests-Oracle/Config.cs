@@ -13,7 +13,7 @@ public abstract class ConfigurePersistences
     {
         NHibernateSettingRetriever.ConnectionStrings = () => new ConnectionStringSettingsCollection
         {
-            new ConnectionStringSettings("NServiceBus/Persistence", @"Data Source=XE;User Id=john;Password=Welcome1")
+            new ConnectionStringSettings("NServiceBus/Persistence", @"Data Source=XE;User Id=particular;Password=Welcome1")
         };
 
         NHibernateSettingRetriever.AppSettings = () => new NameValueCollection
