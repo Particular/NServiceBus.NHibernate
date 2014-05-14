@@ -1,16 +1,12 @@
 namespace NServiceBus.SagaPersisters.NHibernate.Tests
 {
-    using System.Linq;
     using Config.Internal;
     using NUnit.Framework;
     using Persistence.NHibernate;
-    using UnitOfWork.NHibernate;
 
     [TestFixture]
     public class When_configuring_the_saga_persister_from_appconfig
     {
-        private Configure config;
-
         [SetUp]
         public void SetUp()
         {
@@ -18,7 +14,7 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
 
             var types = SessionFactoryHelper.Types();
 
-            config = Configure.With(types)
+            Configure.With(types)
                 .DefineEndpointName("xyz")
                 .DefaultBuilder()
                 .UseNHibernateSagaPersister();

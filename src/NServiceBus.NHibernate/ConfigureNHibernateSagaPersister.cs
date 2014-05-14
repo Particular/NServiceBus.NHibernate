@@ -3,7 +3,6 @@
     using System;
     using System.Collections.Generic;
     using Config;
-    using Features;
     // ReSharper disable RedundantNameQualifier
     using global::NHibernate;
     using Environment = global::NHibernate.Cfg.Environment;
