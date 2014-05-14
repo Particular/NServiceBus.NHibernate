@@ -44,7 +44,7 @@
         /// <returns>The configuration object.</returns>
         public static Configure UseNHibernateSagaPersister(this Configure config)
         {
-            return config.UseNHibernateSagaPersister((Func<Type, string>)null);
+            return config;//.UseNHibernateSagaPersister((Func<Type, string>)null);
         }
 
         /// <summary>
@@ -77,27 +77,27 @@
         /// <returns>The configuration object.</returns>
         public static Configure UseNHibernateSagaPersister(this Configure config, Func<Type, string> tableNamingConvention)
         {
-            var configSection = Configure.GetConfigSection<NHibernateSagaPersisterConfig>();
+            //var configSection = Configure.GetConfigSection<NHibernateSagaPersisterConfig>();
 
-            if (configSection != null)
-            {
-                if (configSection.NHibernateProperties.Count == 0)
-                {
-                    throw new InvalidOperationException(
-                        "No NHibernate properties found. Please specify NHibernateProperties in your NHibernateSagaPersisterConfig section");
-                }
+            //if (configSection != null)
+            //{
+            //    if (configSection.NHibernateProperties.Count == 0)
+            //    {
+            //        throw new InvalidOperationException(
+            //            "No NHibernate properties found. Please specify NHibernateProperties in your NHibernateSagaPersisterConfig section");
+            //    }
 
-                foreach (var property in configSection.NHibernateProperties.ToProperties())
-                {
-                    ConfigureNHibernate.SagaPersisterProperties[property.Key] = property.Value;
-                }
-            }
+            //    foreach (var property in configSection.NHibernateProperties.ToProperties())
+            //    {
+            //        ConfigureNHibernate.SagaPersisterProperties[property.Key] = property.Value;
+            //    }
+            //}
 
-            ConfigureNHibernate.ConfigureSqlLiteIfRunningInDebugModeAndNoConfigPropertiesSet(ConfigureNHibernate.SagaPersisterProperties);
+            //ConfigureNHibernate.ConfigureSqlLiteIfRunningInDebugModeAndNoConfigPropertiesSet(ConfigureNHibernate.SagaPersisterProperties);
 
-            var properties = ConfigureNHibernate.SagaPersisterProperties;
+            //var properties = ConfigureNHibernate.SagaPersisterProperties;
 
-            return config.UseNHibernateSagaPersisterInternal(ConfigureNHibernate.CreateConfigurationWith(properties), configSection == null || configSection.UpdateSchema, tableNamingConvention);
+            return config;//.UseNHibernateSagaPersisterInternal(ConfigureNHibernate.CreateConfigurationWith(properties), configSection == null || configSection.UpdateSchema, tableNamingConvention);
         }
 
         /// <summary>
@@ -109,7 +109,7 @@
         /// <returns>The <see cref="Configure" /> object.</returns>
         public static Configure UseNHibernateSagaPersister(this Configure config, Configuration configuration)
         {
-            return config.UseNHibernateSagaPersister(configuration, null);
+            return config;//.UseNHibernateSagaPersister(configuration, null);
         }
 
         /// <summary>
@@ -127,26 +127,26 @@
                 ConfigureNHibernate.SagaPersisterProperties[property.Key] = property.Value;
             }
 
-            return config.UseNHibernateSagaPersisterInternal(configuration, true, tableNamingConvention);
+            return config;//.UseNHibernateSagaPersisterInternal(configuration, true, tableNamingConvention);
         }
 
         static Configure UseNHibernateSagaPersisterInternal(this Configure config, Configuration configuration, bool autoUpdateSchema, Func<Type, string> tableNamingConvention = null)
         {
-            ConfigureNHibernate.ThrowIfRequiredPropertiesAreMissing(ConfigureNHibernate.SagaPersisterProperties);
+            //ConfigureNHibernate.ThrowIfRequiredPropertiesAreMissing(ConfigureNHibernate.SagaPersisterProperties);
 
-            SagaPersisters.NHibernate.Config.Installer.Installer.RunInstaller = autoUpdateSchema;
+            //SagaPersisters.NHibernate.Config.Installer.Installer.RunInstaller = autoUpdateSchema;
 
-            var builder = new SessionFactoryBuilder(Configure.TypesToScan, tableNamingConvention);
-            var sessionFactory = builder.Build(configuration);
+            //var builder = new SessionFactoryBuilder(Configure.TypesToScan, tableNamingConvention);
+            //var sessionFactory = builder.Build(configuration);
 
-            SagaPersisters.NHibernate.Config.Installer.Installer.configuration = configuration;
+            //SagaPersisters.NHibernate.Config.Installer.Installer.configuration = configuration;
 
-            if (sessionFactory == null)
-            {
-                throw new InvalidOperationException("Could not create session factory for saga persistence.");
-            }
+            //if (sessionFactory == null)
+            //{
+            //    throw new InvalidOperationException("Could not create session factory for saga persistence.");
+            //}
 
-            config.Configurer.ConfigureComponent<SagaPersister>(DependencyLifecycle.InstancePerCall);
+            //config.Configurer.ConfigureComponent<SagaPersister>(DependencyLifecycle.InstancePerCall);
 
 
             return config;

@@ -1,12 +1,12 @@
 namespace NServiceBus.Features
 {
+    using System;
     using System.Collections.Generic;
-    using System.Linq;
+// ReSharper disable RedundantNameQualifier
     using global::NHibernate.Cfg;
-    using global::NHibernate.Cfg.MappingSchema;
-    using global::NHibernate.Mapping.ByCode;
     using global::NHibernate;
-    using NServiceBus.Outbox;
+    using Environment = global::NHibernate.Cfg.Environment;
+// ReSharper restore RedundantNameQualifier
     using NServiceBus.Outbox.NHibernate;
     using ObjectBuilder;
     using Persistence.NHibernate;
@@ -16,7 +16,7 @@ namespace NServiceBus.Features
     using UnitOfWork;
     using UnitOfWork.NHibernate;
 
-    class NHibernateSessionManagement : Feature
+    public class NHibernateSessionManagement : Feature
     {
         public override bool IsEnabledByDefault
         {
@@ -48,9 +48,9 @@ namespace NServiceBus.Features
 
                 configuration = new Configuration().SetProperties(properties);
 
-                foreach (var mapping in SettingsHolder.Get<List<HbmMapping>>("StorageMappings"))
+                foreach (var modification in SettingsHolder.Get<List<Action<Configuration>>>("StorageConfigurationModifications"))
                 {
-                    configuration.AddMapping(mapping);
+                    modification(configuration);
                 }
             }
 
@@ -95,7 +95,7 @@ namespace NServiceBus.Features
         {
             public Defaults()
             {
-                SettingsHolder.SetDefault("StorageMappings", new List<HbmMapping>());
+                SettingsHolder.SetDefault("StorageConfigurationModifications", new List<Action<Configuration>>());
             }
         }
 
@@ -118,57 +118,5 @@ namespace NServiceBus.Features
                 behaviorList.InsertAfter<OpenSessionBehavior, OpenNativeTransactionBehavior>();
             }
         }
-    }
-
-    public class NHibernateOutbox : Feature
-    {
-        public override bool IsEnabledByDefault
-        {
-            get { return true; }
-        }
-
-        public override bool ShouldBeEnabled()
-        {
-            var enabled = IsEnabled<Outbox>();
-
-            if (!enabled)
-            {
-                return false;
-            }
-
-            var mapper = new ModelMapper();
-            mapper.AddMapping<OutboxEntityMap>();
-            mapper.AddMapping<TransportOperationEntityMap>();
-
-            SettingsHolder.Get<List<HbmMapping>>("StorageMappings")
-                .Add(mapper.CompileMappingForAllExplicitlyAddedEntities());
-
-
-            return true;
-        }
-
-        public override void Initialize()
-        {
-            InitializeInner(Configure.Instance.Configurer);
-        }
-
-        void InitializeInner(IConfigureComponents config)
-        {
-            config.ConfigureComponent<OutboxPersister>(DependencyLifecycle.SingleInstance);
-        }
-    }
-
-    public class NHibernateSagaPersistence : Feature
-    {
-        public override bool IsEnabledByDefault
-        {
-            get { return true; }
-        }
-
-        public override bool ShouldBeEnabled()
-        {
-            return IsEnabled<Sagas>();
-        }
-
     }
 }

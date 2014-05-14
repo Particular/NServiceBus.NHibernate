@@ -99,6 +99,8 @@
     <Compile Include="GatewayPersister\Installer\Installer.cs" />
     <Compile Include="InternalsVisibleTo.cs" />
     <Compile Include="IStorageSessionProvider.cs" />
+    <Compile Include="NHibernateOutbox.cs" />
+    <Compile Include="NHibernateSagaPersistence.cs" />
     <Compile Include="OpenNativeTransactionBehavior.cs" />
     <Compile Include="NHibernateSessionManagement.cs" />
     <Compile Include="OpenSessionBehavior.cs" />

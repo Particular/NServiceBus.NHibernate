@@ -33,6 +33,10 @@ public class ConfigureSagaPersister : ConfigurePersistences
 {
     public void Configure(Configure config)
     {
-        config.UseNHibernateSagaPersister();
+        NHibernateSettingRetriever.ConnectionStrings = () => new ConnectionStringSettingsCollection
+        {
+            new ConnectionStringSettings("NServiceBus/Persistence", @"Server=localhost\sqlexpress;Database=nservicebus;Trusted_Connection=True;")
+        };
+
     }
 }
