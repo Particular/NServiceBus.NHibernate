@@ -4,6 +4,7 @@ using System.Configuration;
 using System.Security.Cryptography;
 using System.Text;
 using NServiceBus;
+using NServiceBus.NHibernate;
 using NServiceBus.NHibernate.Internal;
 using NServiceBus.Saga;
 
@@ -44,7 +45,7 @@ public class ConfigureSagaPersister : ConfigurePersistences
 {
     public void Configure(Configure config)
     {
-        config.UseNHibernateSagaPersister(type =>
+        config.UsePersistence<NServiceBus.Persistence.NHibernate>(c=>c.SagaTableNamingConvention(type =>
         {
             var tablename = DefaultTableNameConvention(type);
 
@@ -54,7 +55,7 @@ public class ConfigureSagaPersister : ConfigurePersistences
             }
 
             return tablename;
-        });
+        }));
     }
     
     static string Create(params object[] data)
@@ -82,5 +83,13 @@ public class ConfigureSagaPersister : ConfigurePersistences
         }
 
         return type.DeclaringType.Name + "_" + type.Name;
+    }
+}
+
+public class ConfigureOutboxPersister : ConfigurePersistences
+{
+    public void Configure(Configure config)
+    {
+        config.UsePersistence<NServiceBus.Persistence.NHibernate>();
     }
 }
