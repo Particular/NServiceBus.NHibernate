@@ -44,28 +44,11 @@ namespace NServiceBus
         /// <returns>The configuration object.</returns>
         public static Configure UseNHibernateTimeoutPersister(this Configure config)
         {
-            var configSection = Configure.GetConfigSection<TimeoutPersisterConfig>();
-
-            if (configSection != null)
-            {
-                if (configSection.NHibernateProperties.Count == 0)
-                {
-                    throw new InvalidOperationException(
-                        "No NHibernate properties found. Please specify NHibernateProperties in your TimeoutPersisterConfig section");
-                }
-
-                foreach (var property in configSection.NHibernateProperties.ToProperties())
-                {
-                    ConfigureNHibernate.TimeoutPersisterProperties[property.Key] = property.Value;
-                }
-            }
-
             ConfigureNHibernate.ConfigureSqlLiteIfRunningInDebugModeAndNoConfigPropertiesSet(ConfigureNHibernate.TimeoutPersisterProperties);
 
             var properties = ConfigureNHibernate.TimeoutPersisterProperties;
 
-            return config.UseNHibernateTimeoutPersisterInternal(ConfigureNHibernate.CreateConfigurationWith(properties),
-                                                                configSection == null || configSection.UpdateSchema);
+            return config.UseNHibernateTimeoutPersisterInternal(ConfigureNHibernate.CreateConfigurationWith(properties),true);
         }
 
         /// <summary>
