@@ -12,6 +12,11 @@ namespace NServiceBus.Features
 
     public class NHibernateOutbox : Feature
     {
+        public override bool IsEnabledByDefault
+        {
+            get { return true; }
+        }
+
         public override bool ShouldBeEnabled()
         {
             if (!IsEnabled<Outbox>())

@@ -1,7 +1,5 @@
 ﻿namespace NServiceBus.Persistence
 {
-    using Features;
-
     public class NHibernate:PersistenceDefinition
     {
          
@@ -11,9 +9,10 @@
     {
         public void Configure()
         {
-            Feature.EnableByDefault<NHibernateSessionManagement>();
-            Feature.EnableByDefault<NHibernateOutbox>();
-            Feature.EnableByDefault<NHibernateSagaPersistence>();
+            //until we have a better hook in the feature base class
+            //Feature.Enable<NHibernateSessionManagement>();
+            //Feature.Enable<NHibernateOutbox>();
+            //Feature.Enable<NHibernateSagaPersistence>();
         }
     }
 }

@@ -14,6 +14,11 @@ namespace NServiceBus.Features
 
     public class NHibernateSessionManagement : Feature
     {
+        public override bool IsEnabledByDefault
+        {
+            get { return true; }
+        }
+
         public override bool ShouldBeEnabled()
         {
             return IsEnabled<NHibernateSagaPersistence>() || IsEnabled<NHibernateOutbox>();

@@ -24,7 +24,7 @@ namespace NServiceBus.Features
                 return false;
             }
 
-            Func<Type,string> tableNamingConvention = null;
+            var tableNamingConvention = SettingsHolder.GetOrDefault<Func<Type, string>>("NHibernate.Sagas.TableNamingConvention");
 
             SettingsHolder.Get<List<Action<Configuration>>>("StorageConfigurationModifications")
                 .Add(c =>

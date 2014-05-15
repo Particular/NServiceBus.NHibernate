@@ -37,3 +37,11 @@ public class ConfigureSagaPersister
         config.UsePersistence<NServiceBus.Persistence.NHibernate>(c => c.ConnectionString(@"Server=localhost\sqlexpress;Database=nservicebus;Trusted_Connection=True;"));
     }
 }
+
+public class ConfigureOutboxPersister
+{
+    public void Configure(Configure config)
+    {
+        config.UsePersistence<NServiceBus.Persistence.NHibernate>(c => c.ConnectionString(@"Server=localhost\sqlexpress;Database=nservicebus;Trusted_Connection=True;"));
+    }
+}

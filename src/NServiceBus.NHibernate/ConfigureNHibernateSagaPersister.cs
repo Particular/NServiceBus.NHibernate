@@ -1,14 +1,9 @@
 ﻿namespace NServiceBus
 {
     using System;
-    using Config;
-    using NHibernate.Internal;
-// ReSharper disable RedundantNameQualifier
+    using NHibernate;
     using global::NHibernate;
     using Configuration = global::NHibernate.Cfg.Configuration;
-    // ReSharper restore RedundantNameQualifier
-    using SagaPersisters.NHibernate;
-    using SagaPersisters.NHibernate.Config.Internal;
 
     /// <summary>
     /// Contains extension methods to NServiceBus.Configure for the NHibernate saga persister.
@@ -42,9 +37,10 @@
         /// </example>
         /// <param name="config">The configuration object.</param>
         /// <returns>The configuration object.</returns>
+        [ObsoleteEx(RemoveInVersion = "6", TreatAsErrorFromVersion = "5.1", Replacement = "config.UsePersistence<Persistence.NHibernate>()")]
         public static Configure UseNHibernateSagaPersister(this Configure config)
         {
-            return config;//.UseNHibernateSagaPersister((Func<Type, string>)null);
+            return config.UsePersistence<Persistence.NHibernate>();
         }
 
         /// <summary>
@@ -75,29 +71,10 @@
         /// <param name="config">The configuration object.</param>
         /// <param name="tableNamingConvention">Convention to use for naming tables.</param>
         /// <returns>The configuration object.</returns>
+        [ObsoleteEx(RemoveInVersion = "6", TreatAsErrorFromVersion = "5.1", Replacement = "config.UsePersistence<Persistence.NHibernate>(c => c.TableNamingConvention(tableNamingConvention))")]
         public static Configure UseNHibernateSagaPersister(this Configure config, Func<Type, string> tableNamingConvention)
         {
-            //var configSection = Configure.GetConfigSection<NHibernateSagaPersisterConfig>();
-
-            //if (configSection != null)
-            //{
-            //    if (configSection.NHibernateProperties.Count == 0)
-            //    {
-            //        throw new InvalidOperationException(
-            //            "No NHibernate properties found. Please specify NHibernateProperties in your NHibernateSagaPersisterConfig section");
-            //    }
-
-            //    foreach (var property in configSection.NHibernateProperties.ToProperties())
-            //    {
-            //        ConfigureNHibernate.SagaPersisterProperties[property.Key] = property.Value;
-            //    }
-            //}
-
-            //ConfigureNHibernate.ConfigureSqlLiteIfRunningInDebugModeAndNoConfigPropertiesSet(ConfigureNHibernate.SagaPersisterProperties);
-
-            //var properties = ConfigureNHibernate.SagaPersisterProperties;
-
-            return config;//.UseNHibernateSagaPersisterInternal(ConfigureNHibernate.CreateConfigurationWith(properties), configSection == null || configSection.UpdateSchema, tableNamingConvention);
+            return config.UsePersistence<Persistence.NHibernate>(c => c.TableNamingConvention(tableNamingConvention));
         }
 
         /// <summary>
@@ -107,9 +84,10 @@
         /// <param name="config">The <see cref="Configure" /> object.</param>
         /// <param name="configuration">The <see cref="Configuration" /> allows the application to specify properties and mapping documents to be used when creating a <see cref="ISessionFactory" />.</param>
         /// <returns>The <see cref="Configure" /> object.</returns>
+        [ObsoleteEx(RemoveInVersion = "6", TreatAsErrorFromVersion = "5.1", Replacement = "config.UsePersistence<Persistence.NHibernate>(c => c.UseConfiguration(configuration))")]
         public static Configure UseNHibernateSagaPersister(this Configure config, Configuration configuration)
         {
-            return config;//.UseNHibernateSagaPersister(configuration, null);
+            return config.UsePersistence<Persistence.NHibernate>(c => c.UseConfiguration(configuration));
         }
 
         /// <summary>
@@ -120,37 +98,14 @@
         /// <param name="configuration">The <see cref="Configuration" /> allows the application to specify properties and mapping documents to be used when creating a <see cref="ISessionFactory" />.</param>
         /// <param name="tableNamingConvention">Convention to use for naming tables.</param>
         /// <returns>The <see cref="Configure" /> object.</returns>
+        [ObsoleteEx(RemoveInVersion = "6", TreatAsErrorFromVersion = "5.1", Replacement = "config.UsePersistence<Persistence.NHibernate>(c =>{c.UseConfiguration(configuration);c.TableNamingConvention(tableNamingConvention);})")]
         public static Configure UseNHibernateSagaPersister(this Configure config, Configuration configuration, Func<Type, string> tableNamingConvention)
         {
-            foreach (var property in configuration.Properties)
+            return config.UsePersistence<Persistence.NHibernate>(c =>
             {
-                ConfigureNHibernate.SagaPersisterProperties[property.Key] = property.Value;
-            }
-
-            return config;//.UseNHibernateSagaPersisterInternal(configuration, true, tableNamingConvention);
+                c.UseConfiguration(configuration);
+                c.TableNamingConvention(tableNamingConvention);
+            });
         }
-
-        static Configure UseNHibernateSagaPersisterInternal(this Configure config, Configuration configuration, bool autoUpdateSchema, Func<Type, string> tableNamingConvention = null)
-        {
-            //ConfigureNHibernate.ThrowIfRequiredPropertiesAreMissing(ConfigureNHibernate.SagaPersisterProperties);
-
-            //SagaPersisters.NHibernate.Config.Installer.Installer.RunInstaller = autoUpdateSchema;
-
-            //var builder = new SessionFactoryBuilder(Configure.TypesToScan, tableNamingConvention);
-            //var sessionFactory = builder.Build(configuration);
-
-            //SagaPersisters.NHibernate.Config.Installer.Installer.configuration = configuration;
-
-            //if (sessionFactory == null)
-            //{
-            //    throw new InvalidOperationException("Could not create session factory for saga persistence.");
-            //}
-
-            //config.Configurer.ConfigureComponent<SagaPersister>(DependencyLifecycle.InstancePerCall);
-
-
-            return config;
-        }
-
     }
 }

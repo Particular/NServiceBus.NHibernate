@@ -1,5 +1,7 @@
 ﻿namespace NServiceBus.NHibernate
 {
+    using System;
+    using global::NHibernate.Cfg;
     using Settings;
 
     public static class SharedConfig
@@ -12,6 +14,10 @@
         public static void DisableSchemaUpdate(this PersistenceConfiguration config)
         {
             SettingsHolder.Set("NHibernate.Common.AutoUpdateSchema", false);
+        }
+        public static void UseConfiguration(this PersistenceConfiguration config, Configuration configuration)
+        {
+            SettingsHolder.Set("StorageConfiguration",configuration);
         }
 
 

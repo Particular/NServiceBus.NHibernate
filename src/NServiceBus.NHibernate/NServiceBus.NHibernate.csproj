@@ -84,6 +84,7 @@
     <Compile Include="ConfigureNHibernateTimeoutPersister.cs" />
     <Compile Include="ConfigureNHibernateUnitOfWork.cs" />
     <Compile Include="NHibernate.cs" />
+    <Compile Include="SagaPersisters\SagaConfig.cs" />
     <Compile Include="SagaPersisters\SagaModelMapper.cs" />
     <Compile Include="SharedConfig.cs" />
     <Compile Include="SharedSession\DbConnectionProvider.cs" />
