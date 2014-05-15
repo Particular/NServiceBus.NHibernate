@@ -83,6 +83,9 @@
     <Compile Include="ConfigureNHibernateSubscriptionStorage.cs" />
     <Compile Include="ConfigureNHibernateTimeoutPersister.cs" />
     <Compile Include="ConfigureNHibernateUnitOfWork.cs" />
+    <Compile Include="NHibernate.cs" />
+    <Compile Include="SagaPersisters\SagaModelMapper.cs" />
+    <Compile Include="SharedConfig.cs" />
     <Compile Include="SharedSession\DbConnectionProvider.cs" />
     <Compile Include="Deduplication\Config\DeduplicationMessage.cs" />
     <Compile Include="Deduplication\Config\DeduplicationMessageMap.cs" />
@@ -103,16 +106,15 @@
     <Compile Include="Outbox\Entities.cs" />
     <Compile Include="Outbox\EntityMappings.cs" />
     <Compile Include="Outbox\OutboxPersister.cs" />
-    <Compile Include="Persistence\AmbientTransactionAwareWrapper.cs" />
-    <Compile Include="Persistence\ISessionExtensions.cs" />
-    <Compile Include="Persistence\AddressUserType.cs" />
-    <Compile Include="Persistence\ConfigureNHibernate.cs" />
-    <Compile Include="Persistence\NHibernateSettingRetriever.cs" />
+    <Compile Include="Internal\AmbientTransactionAwareWrapper.cs" />
+    <Compile Include="Internal\ISessionExtensions.cs" />
+    <Compile Include="Internal\AddressUserType.cs" />
+    <Compile Include="Internal\ConfigureNHibernate.cs" />
+    <Compile Include="Internal\NHibernateSettingRetriever.cs" />
     <Compile Include="AssemblyInfo.cs" />
-    <Compile Include="Persistence\ISessionFactoryExtensions.cs" />
-    <Compile Include="SagaPersisters\AutoPersistence\Attributes\LockModeAttribute.cs" />
-    <Compile Include="SagaPersisters\AutoPersistence\Attributes\TableNameAttribute.cs" />
-    <Compile Include="SagaPersisters\AutoPersistence\SagaModelMapper.cs" />
+    <Compile Include="Internal\ISessionFactoryExtensions.cs" />
+    <Compile Include="SagaPersisters\LockModeAttribute.cs" />
+    <Compile Include="SagaPersisters\TableNameAttribute.cs" />
     <Compile Include="SharedSession\Installer.cs" />
     <Compile Include="SagaPersisters\SessionFactoryBuilder.cs" />
     <Compile Include="SagaPersisters\SagaPersister.cs" />
@@ -130,6 +132,7 @@
     <Compile Include="Subscriptions\SubscriptionStorage.cs" />
     <Compile Include="Subscriptions\SubscriptionStorageSessionProvider.cs" />
     <Compile Include="SharedSession\OpenSqlConnectionBehavior.cs" />
+    <Compile Include="ToBeMovedIntoTheCore.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ripple.dependencies.config">

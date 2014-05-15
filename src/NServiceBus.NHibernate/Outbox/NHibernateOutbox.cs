@@ -4,19 +4,14 @@ namespace NServiceBus.Features
     using System.Collections.Generic;
     using global::NHibernate.Cfg;
     using global::NHibernate.Mapping.ByCode;
+    using NHibernate.Internal;
     using NServiceBus.Outbox;
     using NServiceBus.Outbox.NHibernate;
     using ObjectBuilder;
-    using Persistence.NHibernate;
     using Settings;
 
     public class NHibernateOutbox : Feature
     {
-        public override bool IsEnabledByDefault
-        {
-            get { return true; }
-        }
-
         public override bool ShouldBeEnabled()
         {
             if (!IsEnabled<Outbox>())

@@ -12,7 +12,7 @@ namespace NServiceBus.SagaPersisters.NHibernate.AutoPersistence
     using global::NHibernate.Type;
     using Saga;
 
-    public class SagaModelMapper
+    class SagaModelMapper
     {
         readonly Func<Type, string> tableNamingConvention;
 

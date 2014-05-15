@@ -6,7 +6,7 @@
     using Gateway.Deduplication;
     using global::NHibernate;
     using global::NHibernate.Exceptions;
-    using Persistence.NHibernate;
+    using NServiceBus.NHibernate.Internal;
 
     /// <summary>
     /// NHibernate Gateway deduplication

@@ -1,6 +1,7 @@
 namespace NServiceBus.SagaPersisters.NHibernate.Tests
 {
     using Config.Internal;
+    using NServiceBus.NHibernate.Internal;
     using NUnit.Framework;
     using Persistence.NHibernate;
 

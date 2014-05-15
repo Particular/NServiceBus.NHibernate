@@ -7,9 +7,9 @@
     using System.Linq;
     using global::NHibernate;
     using NHibernate;
+    using NServiceBus.NHibernate.Internal;
     using NServiceBus.NHibernate.SharedSession;
     using Persistence;
-    using Persistence.NHibernate;
     using Serializers.Json;
     using Unicast;
 

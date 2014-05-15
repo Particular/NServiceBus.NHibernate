@@ -1,4 +1,4 @@
-namespace NServiceBus.Persistence.NHibernate
+namespace NServiceBus.NHibernate.Internal
 {
     using System;
     using System.Transactions;

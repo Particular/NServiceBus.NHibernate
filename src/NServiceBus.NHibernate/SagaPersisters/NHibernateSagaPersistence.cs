@@ -4,8 +4,8 @@ namespace NServiceBus.Features
     using System.Collections.Generic;
     using System.Linq;
     using global::NHibernate.Cfg;
+    using NHibernate.Internal;
     using ObjectBuilder;
-    using Persistence.NHibernate;
     using SagaPersisters.NHibernate;
     using SagaPersisters.NHibernate.AutoPersistence;
     using Settings;

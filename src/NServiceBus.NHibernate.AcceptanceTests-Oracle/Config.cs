@@ -4,7 +4,7 @@ using System.Configuration;
 using System.Security.Cryptography;
 using System.Text;
 using NServiceBus;
-using NServiceBus.Persistence.NHibernate;
+using NServiceBus.NHibernate.Internal;
 using NServiceBus.Saga;
 
 public abstract class ConfigurePersistences

@@ -2,11 +2,11 @@
 {
     using System;
     using Config;
-    // ReSharper disable RedundantNameQualifier
+    using NHibernate.Internal;
+// ReSharper disable RedundantNameQualifier
     using global::NHibernate;
     using Configuration = global::NHibernate.Cfg.Configuration;
     // ReSharper restore RedundantNameQualifier
-    using Persistence.NHibernate;
     using SagaPersisters.NHibernate;
     using SagaPersisters.NHibernate.Config.Internal;
 

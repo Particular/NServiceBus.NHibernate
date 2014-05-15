@@ -11,7 +11,7 @@ namespace NServiceBus.SagaPersisters.NHibernate.Config.Internal
     /// <summary>
     /// Builder class for the NHibernate Session Factory
     /// </summary>
-    public class SessionFactoryBuilder
+    class SessionFactoryBuilder
     {
         private readonly IEnumerable<Type> typesToScan;
         readonly Func<Type, string> tableNamingConvention;

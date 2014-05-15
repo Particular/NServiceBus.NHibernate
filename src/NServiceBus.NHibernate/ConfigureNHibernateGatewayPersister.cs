@@ -1,9 +1,9 @@
 namespace NServiceBus
 {
     using GatewayPersister.NHibernate.Config;
-    // ReSharper disable once RedundantNameQualifier
+    using NHibernate.Internal;
+// ReSharper disable once RedundantNameQualifier
     using global::NHibernate.Cfg;
-    using Persistence.NHibernate;
 
     /// <summary>
     /// Configuration extensions for the NHibernate Gateway persister

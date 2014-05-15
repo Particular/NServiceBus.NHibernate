@@ -7,7 +7,7 @@ namespace NServiceBus.TimeoutPersisters.NHibernate
     using System.Linq;
     using global::NHibernate;
     using IdGeneration;
-    using Persistence.NHibernate;
+    using NServiceBus.NHibernate.Internal;
     using Pipeline;
     using Serializers.Json;
     using Timeout.Core;

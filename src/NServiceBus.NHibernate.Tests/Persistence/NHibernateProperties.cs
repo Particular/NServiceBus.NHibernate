@@ -5,6 +5,7 @@ namespace NServiceBus.Persistence.NHibernate.Tests
     using System.Collections.Specialized;
     using System.Configuration;
     using System.Reflection;
+    using NServiceBus.NHibernate.Internal;
     using NUnit.Framework;
 
     [TestFixture]

@@ -2,11 +2,11 @@ namespace NServiceBus
 {
     using System;
     using Config;
+    using NHibernate.Internal;
 // ReSharper disable RedundantNameQualifier
     using global::NHibernate.Cfg;
     using Environment = global::NHibernate.Cfg.Environment;
 // ReSharper restore RedundantNameQualifier
-    using Persistence.NHibernate;
     using TimeoutPersisters.NHibernate;
     using TimeoutPersisters.NHibernate.Config;
 

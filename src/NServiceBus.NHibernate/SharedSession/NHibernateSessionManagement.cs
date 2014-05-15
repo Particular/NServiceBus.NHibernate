@@ -3,12 +3,9 @@ namespace NServiceBus.Features
     using System;
     using System.Collections.Generic;
     using NHibernate.SharedSession;
-// ReSharper disable RedundantNameQualifier
     using global::NHibernate.Cfg;
     using global::NHibernate;
     using Environment = global::NHibernate.Cfg.Environment;
-// ReSharper restore RedundantNameQualifier
-    using NServiceBus.Outbox.NHibernate;
     using ObjectBuilder;
     using Pipeline;
     using Pipeline.Contexts;
@@ -17,11 +14,6 @@ namespace NServiceBus.Features
 
     public class NHibernateSessionManagement : Feature
     {
-        public override bool IsEnabledByDefault
-        {
-            get { return true; }
-        }
-
         public override bool ShouldBeEnabled()
         {
             return IsEnabled<NHibernateSagaPersistence>() || IsEnabled<NHibernateOutbox>();
@@ -80,7 +72,7 @@ namespace NServiceBus.Features
             config.ConfigureComponent<OpenNativeTransactionBehavior>(DependencyLifecycle.InstancePerCall)
                     .ConfigureProperty(p => p.ConnectionString, connString);
 
-            Installer.RunInstaller = SettingsHolder.GetOrDefault<bool>("Storage.AutoUpdateSchema");
+            Installer.RunInstaller = SettingsHolder.Get<bool>("NHibernate.Common.AutoUpdateSchema");
 
             Installer.configuration = configuration;
         }

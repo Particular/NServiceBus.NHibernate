@@ -7,6 +7,7 @@ namespace NServiceBus.NHibernate.Tests.Outbox
     using global::NHibernate;
     using global::NHibernate.Mapping.ByCode;
     using global::NHibernate.Tool.hbm2ddl;
+    using Internal;
     using NServiceBus.Outbox.NHibernate;
     using SagaPersisters.NHibernate.Tests;
 #if !USE_SQLSERVER

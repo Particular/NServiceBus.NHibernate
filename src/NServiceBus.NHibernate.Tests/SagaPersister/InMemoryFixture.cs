@@ -7,6 +7,7 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
     using System.Security.Principal;
     using Config.Internal;
     using global::NHibernate;
+    using NServiceBus.NHibernate.Internal;
     using NServiceBus.NHibernate.SharedSession;
     using NUnit.Framework;
     using Persistence.NHibernate;

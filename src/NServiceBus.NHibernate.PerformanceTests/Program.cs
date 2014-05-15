@@ -9,7 +9,7 @@
     using NServiceBus;
     using NServiceBus.Features;
     using NServiceBus.Installation.Environments;
-    using NServiceBus.Persistence.NHibernate;
+    using NServiceBus.NHibernate.Internal;
     using Saga;
 
     internal class Program

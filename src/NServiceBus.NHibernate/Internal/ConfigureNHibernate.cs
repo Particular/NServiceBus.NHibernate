@@ -1,4 +1,4 @@
-namespace NServiceBus.Persistence.NHibernate
+namespace NServiceBus.NHibernate.Internal
 {
     using System;
     using System.Collections.Generic;
@@ -11,6 +11,7 @@ namespace NServiceBus.Persistence.NHibernate
     using global::NHibernate.Cfg.ConfigurationSchema;
     using global::NHibernate.Mapping.ByCode;
     using Logging;
+    using Settings;
     using Configuration = global::NHibernate.Cfg.Configuration;
     using Environment = global::NHibernate.Cfg.Environment;
 
@@ -74,7 +75,7 @@ Here is an example of what is required:
 
             var configuration = CreateNHibernateConfiguration();
 
-            var defaultConnectionString = GetConnectionStringOrNull("NServiceBus/Persistence");
+            var defaultConnectionString = SettingsHolder.GetOrDefault<string>("NHibernate.Common.ConnectionString") ?? GetConnectionStringOrNull("NServiceBus/Persistence");
             var configurationProperties = configuration.Properties;
 
             var appSettingsSection = NHibernateSettingRetriever.AppSettings() ?? new NameValueCollection();
@@ -101,7 +102,7 @@ Here is an example of what is required:
             SubscriptionStorageProperties = OverrideConnectionStringSettingIfNotNull(configurationProperties,
                 "NServiceBus/Persistence/NHibernate/Subscription");
             SagaPersisterProperties = OverrideConnectionStringSettingIfNotNull(configurationProperties,
-                "NServiceBus/Persistence/NHibernate/Saga"); //todo, obsolete
+                "NServiceBus/Persistence/NHibernate/Saga");
             GatewayPersisterProperties = OverrideConnectionStringSettingIfNotNull(configurationProperties,
                 "NServiceBus/Persistence/NHibernate/Gateway");
             GatewayDeduplicationProperties = OverrideConnectionStringSettingIfNotNull(configurationProperties,

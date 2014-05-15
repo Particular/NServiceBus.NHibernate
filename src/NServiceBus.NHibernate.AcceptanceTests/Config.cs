@@ -1,6 +1,7 @@
 ﻿using System.Configuration;
 using NServiceBus;
-using NServiceBus.Persistence.NHibernate;
+using NServiceBus.NHibernate;
+using NServiceBus.NHibernate.Internal;
 
 public abstract class ConfigurePersistences
 {
@@ -29,14 +30,10 @@ public class ConfigureSubscriptionStorage : ConfigurePersistences
     }
 }
 
-public class ConfigureSagaPersister : ConfigurePersistences
+public class ConfigureSagaPersister
 {
     public void Configure(Configure config)
     {
-        NHibernateSettingRetriever.ConnectionStrings = () => new ConnectionStringSettingsCollection
-        {
-            new ConnectionStringSettings("NServiceBus/Persistence", @"Server=localhost\sqlexpress;Database=nservicebus;Trusted_Connection=True;")
-        };
-
+        config.UsePersistence<NServiceBus.Persistence.NHibernate>(c => c.ConnectionString(@"Server=localhost\sqlexpress;Database=nservicebus;Trusted_Connection=True;"));
     }
 }

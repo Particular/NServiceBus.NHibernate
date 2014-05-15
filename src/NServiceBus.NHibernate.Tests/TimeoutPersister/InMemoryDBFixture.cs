@@ -8,6 +8,7 @@ namespace NServiceBus.TimeoutPersisters.NHibernate.Tests
     using System.Security.Principal;
     using global::NHibernate;
     using NServiceBus.Config.ConfigurationSource;
+    using NServiceBus.NHibernate.Internal;
     using NUnit.Framework;
     using Persistence.NHibernate;
     using Pipeline;

@@ -7,6 +7,7 @@ namespace NServiceBus.Unicast.Subscriptions.NHibernate.Tests
     using System.Linq;
     using NServiceBus.Config;
     using NServiceBus.Config.ConfigurationSource;
+    using NServiceBus.NHibernate.Internal;
     using NUnit.Framework;
     using Persistence.NHibernate;
 
