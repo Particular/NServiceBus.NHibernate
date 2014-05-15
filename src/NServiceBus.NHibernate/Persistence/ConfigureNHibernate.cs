@@ -108,8 +108,8 @@ Here is an example of what is required:
                 "NServiceBus/Persistence/NHibernate/Deduplication");
             DistributorPersisterProperties = OverrideConnectionStringSettingIfNotNull(configurationProperties,
                 "NServiceBus/Persistence/NHibernate/Distributor");
-            StorageProperties = OverrideConnectionStringSettingIfNotNull(configurationProperties,
-                "NServiceBus/Persistence/NHibernate/Storage");
+            OutboxProperties = OverrideConnectionStringSettingIfNotNull(configurationProperties,
+                "NServiceBus/Persistence/NHibernate/Outbox");
         }
 
         /// <summary>
@@ -145,7 +145,7 @@ Here is an example of what is required:
         /// <summary>
         /// Outbox persister NHibernate properties.
         /// </summary>
-        public static IDictionary<string, string> StorageProperties { get; private set; }
+        public static IDictionary<string, string> OutboxProperties { get; private set; }
 
         /// <summary>
         /// Adds T mapping to <paramref name="configuration"/> .

@@ -7,6 +7,7 @@ namespace NServiceBus.Features
     using NServiceBus.Outbox;
     using NServiceBus.Outbox.NHibernate;
     using ObjectBuilder;
+    using Persistence.NHibernate;
     using Settings;
 
     public class NHibernateOutbox : Feature
@@ -29,6 +30,12 @@ namespace NServiceBus.Features
 
             SettingsHolder.Get<List<Action<Configuration>>>("StorageConfigurationModifications")
                 .Add(c => c.AddMapping(mapper.CompileMappingForAllExplicitlyAddedEntities()));
+
+            foreach (var kvp in ConfigureNHibernate.OutboxProperties)
+            {
+                SettingsHolder.Get<Dictionary<string, string>>("StorageProperties")[kvp.Key] = kvp.Value;
+
+            }
 
             return true;
         }

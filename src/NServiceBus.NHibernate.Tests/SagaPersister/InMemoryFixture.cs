@@ -5,12 +5,11 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
     using System.Configuration;
     using System.IO;
     using System.Security.Principal;
-    using Config.Installer;
     using Config.Internal;
     using global::NHibernate;
+    using NServiceBus.NHibernate.SharedSession;
     using NUnit.Framework;
     using Persistence.NHibernate;
-    using UnitOfWork.NHibernate;
 
     class InMemoryFixture
     {

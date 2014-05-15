@@ -1,19 +1,20 @@
-﻿namespace NServiceBus.Outbox.NHibernate
+namespace NServiceBus.NHibernate.SharedSession
 {
     using global::NHibernate.Cfg;
     using global::NHibernate.Tool.hbm2ddl;
     using Installation;
     using Installation.Environments;
+    using SagaPersisters.NHibernate;
 
     /// <summary>
-    /// Installer for <see cref="OutboxPersister"/>
+    /// Installer for <see cref="SagaPersister"/>
     /// </summary>
-    class Installer : INeedToInstallSomething<Windows>
+    public class Installer : INeedToInstallSomething<Windows>
     {
         /// <summary>
         /// <value>true</value> to run installer.
         /// </summary>
-        internal static bool RunInstaller { get; set; }
+        public static bool RunInstaller { get; set; }
 
         internal static Configuration configuration;
 

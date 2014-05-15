@@ -2,6 +2,7 @@ namespace NServiceBus.Features
 {
     using System;
     using System.Collections.Generic;
+    using NHibernate.SharedSession;
 // ReSharper disable RedundantNameQualifier
     using global::NHibernate.Cfg;
     using global::NHibernate;
@@ -9,12 +10,10 @@ namespace NServiceBus.Features
 // ReSharper restore RedundantNameQualifier
     using NServiceBus.Outbox.NHibernate;
     using ObjectBuilder;
-    using Persistence.NHibernate;
     using Pipeline;
     using Pipeline.Contexts;
     using Settings;
     using UnitOfWork;
-    using UnitOfWork.NHibernate;
 
     public class NHibernateSessionManagement : Feature
     {
@@ -39,12 +38,7 @@ namespace NServiceBus.Features
 
             if (configuration == null)
             {
-                var properties = SettingsHolder.GetOrDefault<IDictionary<string, string>>("StorageProperties");
-
-                if (properties == null)
-                {
-                    properties = ConfigureNHibernate.StorageProperties;
-                }
+                var properties = SettingsHolder.Get<IDictionary<string, string>>("StorageProperties");
 
                 configuration = new Configuration().SetProperties(properties);
 
@@ -86,7 +80,7 @@ namespace NServiceBus.Features
             config.ConfigureComponent<OpenNativeTransactionBehavior>(DependencyLifecycle.InstancePerCall)
                     .ConfigureProperty(p => p.ConnectionString, connString);
 
-            Installer.RunInstaller = true;
+            Installer.RunInstaller = SettingsHolder.GetOrDefault<bool>("Storage.AutoUpdateSchema");
 
             Installer.configuration = configuration;
         }
@@ -95,6 +89,8 @@ namespace NServiceBus.Features
         {
             public Defaults()
             {
+                SettingsHolder.SetDefault("AutoUpdateSchema", true);
+                SettingsHolder.SetDefault("StorageProperties", new Dictionary<string,string>());
                 SettingsHolder.SetDefault("StorageConfigurationModifications", new List<Action<Configuration>>());
             }
         }

@@ -7,11 +7,11 @@
     using System.Linq;
     using global::NHibernate;
     using NHibernate;
+    using NServiceBus.NHibernate.SharedSession;
     using Persistence;
     using Persistence.NHibernate;
     using Serializers.Json;
     using Unicast;
-    using UnitOfWork.NHibernate;
 
     class OutboxPersister : IOutboxStorage
     {

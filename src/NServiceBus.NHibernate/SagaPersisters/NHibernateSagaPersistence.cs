@@ -5,6 +5,7 @@ namespace NServiceBus.Features
     using System.Linq;
     using global::NHibernate.Cfg;
     using ObjectBuilder;
+    using Persistence.NHibernate;
     using SagaPersisters.NHibernate;
     using SagaPersisters.NHibernate.AutoPersistence;
     using Settings;
@@ -51,6 +52,10 @@ namespace NServiceBus.Features
                     
                 });
 
+            foreach (var kvp in ConfigureNHibernate.SagaPersisterProperties)
+            {
+                SettingsHolder.Get<Dictionary<string, string>>("StorageProperties")[kvp.Key] = kvp.Value;
+            }
 
             return true;
         }

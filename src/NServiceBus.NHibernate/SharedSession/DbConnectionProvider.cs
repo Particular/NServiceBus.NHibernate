@@ -1,4 +1,4 @@
-namespace NServiceBus.Features
+namespace NServiceBus.NHibernate.SharedSession
 {
     using System;
     using System.Data;
