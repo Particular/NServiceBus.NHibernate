@@ -5,10 +5,9 @@ namespace NServiceBus.NHibernate
 
     public static class SagaConfig
     {
-        public static void TableNamingConvention(this PersistenceConfiguration config, Func<Type, string> tableNamingConvention)
+        public static void SagaTableNamingConvention(this PersistenceConfiguration config, Func<Type, string> tableNamingConvention)
         {
             SettingsHolder.Set("NHibernate.Sagas.TableNamingConvention", tableNamingConvention);
         }
-
     }
 }

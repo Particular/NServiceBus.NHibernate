@@ -77,12 +77,11 @@
     <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ConfigureNHibernateGatewayDeduplication.cs" />
-    <Compile Include="ConfigureNHibernateGatewayPersister.cs" />
-    <Compile Include="ConfigureNHibernateSagaPersister.cs" />
-    <Compile Include="ConfigureNHibernateSubscriptionStorage.cs" />
-    <Compile Include="ConfigureNHibernateTimeoutPersister.cs" />
-    <Compile Include="ConfigureNHibernateUnitOfWork.cs" />
+    <Compile Include="Obsoletes\ConfigureNHibernateGatewayDeduplication.cs" />
+    <Compile Include="Obsoletes\ConfigureNHibernateGatewayPersister.cs" />
+    <Compile Include="Obsoletes\ConfigureNHibernateSagaPersister.cs" />
+    <Compile Include="Obsoletes\ConfigureNHibernateSubscriptionStorage.cs" />
+    <Compile Include="Obsoletes\ConfigureNHibernateTimeoutPersister.cs" />
     <Compile Include="NHibernate.cs" />
     <Compile Include="SagaPersisters\SagaConfig.cs" />
     <Compile Include="SagaPersisters\SagaModelMapper.cs" />

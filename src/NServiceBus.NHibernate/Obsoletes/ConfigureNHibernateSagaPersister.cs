@@ -71,10 +71,10 @@
         /// <param name="config">The configuration object.</param>
         /// <param name="tableNamingConvention">Convention to use for naming tables.</param>
         /// <returns>The configuration object.</returns>
-        [ObsoleteEx(RemoveInVersion = "6", TreatAsErrorFromVersion = "5.1", Replacement = "config.UsePersistence<Persistence.NHibernate>(c => c.TableNamingConvention(tableNamingConvention))")]
+        [ObsoleteEx(RemoveInVersion = "6", TreatAsErrorFromVersion = "5.1", Replacement = "config.UsePersistence<Persistence.NHibernate>(c => c.SagaTableNamingConvention(tableNamingConvention))")]
         public static Configure UseNHibernateSagaPersister(this Configure config, Func<Type, string> tableNamingConvention)
         {
-            return config.UsePersistence<Persistence.NHibernate>(c => c.TableNamingConvention(tableNamingConvention));
+            return config.UsePersistence<Persistence.NHibernate>(c => c.SagaTableNamingConvention(tableNamingConvention));
         }
 
         /// <summary>
@@ -98,13 +98,13 @@
         /// <param name="configuration">The <see cref="Configuration" /> allows the application to specify properties and mapping documents to be used when creating a <see cref="ISessionFactory" />.</param>
         /// <param name="tableNamingConvention">Convention to use for naming tables.</param>
         /// <returns>The <see cref="Configure" /> object.</returns>
-        [ObsoleteEx(RemoveInVersion = "6", TreatAsErrorFromVersion = "5.1", Replacement = "config.UsePersistence<Persistence.NHibernate>(c =>{c.UseConfiguration(configuration);c.TableNamingConvention(tableNamingConvention);})")]
+        [ObsoleteEx(RemoveInVersion = "6", TreatAsErrorFromVersion = "5.1", Replacement = "config.UsePersistence<Persistence.NHibernate>(c =>{c.UseConfiguration(configuration);c.SagaTableNamingConvention(tableNamingConvention);})")]
         public static Configure UseNHibernateSagaPersister(this Configure config, Configuration configuration, Func<Type, string> tableNamingConvention)
         {
             return config.UsePersistence<Persistence.NHibernate>(c =>
             {
                 c.UseConfiguration(configuration);
-                c.TableNamingConvention(tableNamingConvention);
+                c.SagaTableNamingConvention(tableNamingConvention);
             });
         }
     }
