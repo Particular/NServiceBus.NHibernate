@@ -15,7 +15,6 @@ namespace NServiceBus.NHibernate.Tests.Outbox
 #endif
     using NServiceBus.Outbox;
     using NUnit.Framework;
-    using Persistence.NHibernate;
 
 
     abstract class InMemoryDBFixture

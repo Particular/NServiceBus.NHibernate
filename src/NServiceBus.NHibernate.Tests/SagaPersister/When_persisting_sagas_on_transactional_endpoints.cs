@@ -5,7 +5,7 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
     using NUnit.Framework;
 
     [TestFixture]
-    class When_persisting_sagas_on_transactional_endpoints : InMemoryFixture
+    class When_persisting_sagas_on_transactional_endpoints : InMemoryFixture<TestSaga>
     {
         [Test]
         public void Ambient_transaction_should_commit_saga()

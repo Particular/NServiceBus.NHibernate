@@ -6,7 +6,7 @@
     using Saga;
 
     [TestFixture]
-    class When_persisting_a_saga_with_a_unique_property : InMemoryFixture
+    class When_persisting_a_saga_with_a_unique_property : InMemoryFixture<SagaWithUniqueProperty>
     {
         [Test]
         public void The_database_should_enforce_the_uniqueness()
