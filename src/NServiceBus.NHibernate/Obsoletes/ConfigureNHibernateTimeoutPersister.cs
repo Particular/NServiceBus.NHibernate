@@ -1,14 +1,9 @@
 namespace NServiceBus
 {
-    using System;
-    using Config;
-    using NHibernate.Internal;
+    using NHibernate;
 // ReSharper disable RedundantNameQualifier
     using global::NHibernate.Cfg;
-    using Environment = global::NHibernate.Cfg.Environment;
 // ReSharper restore RedundantNameQualifier
-    using TimeoutPersisters.NHibernate;
-    using TimeoutPersisters.NHibernate.Config;
 
     /// <summary>
     /// Configuration extensions for the NHibernate Timeouts persister
@@ -42,13 +37,11 @@ namespace NServiceBus
         /// </example>
         /// <param name="config">The configuration object.</param>
         /// <returns>The configuration object.</returns>
+
+        [ObsoleteEx(RemoveInVersion = "6", TreatAsErrorFromVersion = "5.1", Replacement = "config.UsePersistence<Persistence.NHibernate>()")]
         public static Configure UseNHibernateTimeoutPersister(this Configure config)
         {
-            ConfigureNHibernate.ConfigureSqlLiteIfRunningInDebugModeAndNoConfigPropertiesSet(ConfigureNHibernate.TimeoutPersisterProperties);
-
-            var properties = ConfigureNHibernate.TimeoutPersisterProperties;
-
-            return config.UseNHibernateTimeoutPersisterInternal(ConfigureNHibernate.CreateConfigurationWith(properties),true);
+            return config.UsePersistence<Persistence.NHibernate>();
         }
 
         /// <summary>
@@ -59,14 +52,17 @@ namespace NServiceBus
         /// <param name="configuration">The <see cref="Configuration"/> object.</param>
         /// <param name="autoUpdateSchema"><value>true</value> to auto update schema</param>
         /// <returns>The configuration object</returns>
+        [ObsoleteEx(RemoveInVersion = "6", TreatAsErrorFromVersion = "5.1", Replacement = "config.UsePersistence<Persistence.NHibernate>(c =>{c.UseTimeoutStorageConfiguration(configuration);if (!autoUpdateSchema){c.DisableTimeoutStorageSchemaUpdate();}});")]
         public static Configure UseNHibernateTimeoutPersister(this Configure config, Configuration configuration, bool autoUpdateSchema)
         {
-            foreach (var property in configuration.Properties)
+            return config.UsePersistence<Persistence.NHibernate>(c =>
             {
-                ConfigureNHibernate.TimeoutPersisterProperties[property.Key] = property.Value;
-            }
-
-            return config.UseNHibernateTimeoutPersisterInternal(configuration, autoUpdateSchema);
+                c.UseTimeoutStorageConfiguration(configuration);
+                if (!autoUpdateSchema)
+                {
+                    c.DisableTimeoutStorageSchemaUpdate();   
+                }
+            });
         }
 
         /// <summary>
@@ -74,55 +70,10 @@ namespace NServiceBus
         /// </summary>
         /// <param name="config">The configuration object.</param>
         /// <returns>The configuration object.</returns>
+        [ObsoleteEx(RemoveInVersion = "6", TreatAsErrorFromVersion = "5.1", Replacement = "config.UsePersistence<Persistence.NHibernate>(c=>c.DisableTimeoutStorageSchemaUpdate())")]
         public static Configure DisableNHibernateTimeoutPersisterInstall(this Configure config)
         {
-            TimeoutPersisters.NHibernate.Installer.Installer.RunInstaller = false;
-            return config;
-        }
-
-        static Configure UseNHibernateTimeoutPersisterInternal(this Configure config, Configuration configuration, bool autoUpdateSchema)
-        {
-            ConfigureNHibernate.ThrowIfRequiredPropertiesAreMissing(ConfigureNHibernate.TimeoutPersisterProperties);
-
-            TimeoutPersisters.NHibernate.Installer.Installer.RunInstaller = autoUpdateSchema;
-            ConfigureNHibernate.AddMappings<TimeoutEntityMap>(configuration);
-            TimeoutPersisters.NHibernate.Installer.Installer.configuration = configuration;
-
-            string connString;
-            if (!configuration.Properties.TryGetValue(Environment.ConnectionString, out connString))
-            {
-                string connStringName;
-
-                if (configuration.Properties.TryGetValue(Environment.ConnectionStringName, out connStringName))
-                {
-
-                    var connectionStringSettings = System.Configuration.ConfigurationManager.ConnectionStrings[connStringName];
-
-                    connString = connectionStringSettings.ConnectionString;
-                }
-            }
-
-            config.Configurer.ConfigureComponent<TimeoutStorage>(DependencyLifecycle.SingleInstance)
-                .ConfigureProperty(p => p.SessionFactory, configuration.BuildSessionFactory())
-                .ConfigureProperty(p => p.ConnectionString, connString);
-
-            return config;
-        }
-
-        /// <summary>
-        /// Configures the persister with Sqlite as its database and auto generates schema on startup.
-        /// </summary>
-        /// <param name="config">The configuration object.</param>
-        /// <returns>The configuration object.</returns>
-        [ObsoleteEx(Replacement = "UseNHibernateTimeoutPersister()", TreatAsErrorFromVersion = "5.0", RemoveInVersion = "6.0")]                        
-        public static Configure UseNHibernateTimeoutPersisterWithSQLiteAndAutomaticSchemaGeneration(this Configure config)
-        {
-            ConfigureNHibernate.TimeoutPersisterProperties["dialect"] = "NHibernate.Dialect.SQLiteDialect";
-            ConfigureNHibernate.TimeoutPersisterProperties["connection.connection_string"] = "Data Source=.\\NServiceBus.Timeouts.sqlite;Version=3;New=True;";
-
-            var configuration = ConfigureNHibernate.CreateConfigurationWith(ConfigureNHibernate.TimeoutPersisterProperties);
-
-            return config.UseNHibernateTimeoutPersisterInternal(configuration, true);
+            return config.UsePersistence<Persistence.NHibernate>(c=>c.DisableTimeoutStorageSchemaUpdate());
         }
     }
 }

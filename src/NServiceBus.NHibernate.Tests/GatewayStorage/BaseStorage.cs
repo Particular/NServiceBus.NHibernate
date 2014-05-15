@@ -11,7 +11,6 @@
     using Config;
     using NServiceBus.NHibernate.Internal;
     using NUnit.Framework;
-    using Persistence.NHibernate;
     using Serializers.Json;
 
     public abstract class BaseStorage

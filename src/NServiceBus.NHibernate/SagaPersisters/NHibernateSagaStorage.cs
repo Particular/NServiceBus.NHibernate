@@ -10,20 +10,20 @@ namespace NServiceBus.Features
     using SagaPersisters.NHibernate.AutoPersistence;
     using Settings;
 
-    public class NHibernateSagaPersistence : Feature
+    public class NHibernateSagaStorage : Feature
     {
-        public override bool IsEnabledByDefault
-        {
-            get { return true; }
-        }
-
         public override bool ShouldBeEnabled()
         {
-            if(!IsEnabled<Sagas>())
-            {
-                return false;
-            }
+            return IsEnabled<Sagas>();
+        }
 
+        public override void Initialize()
+        {
+            InitializeInner(Configure.Instance.Configurer);
+        }
+
+        void InitializeInner(IConfigureComponents config)
+        {
             var tableNamingConvention = SettingsHolder.GetOrDefault<Func<Type, string>>("NHibernate.Sagas.TableNamingConvention");
 
             SettingsHolder.Get<List<Action<Configuration>>>("StorageConfigurationModifications")
@@ -49,7 +49,7 @@ namespace NServiceBus.Features
 
                     c.AddMapping(modelMapper.Compile());
 
-                    
+
                 });
 
             foreach (var kvp in ConfigureNHibernate.SagaPersisterProperties)
@@ -57,16 +57,6 @@ namespace NServiceBus.Features
                 SettingsHolder.Get<Dictionary<string, string>>("StorageProperties")[kvp.Key] = kvp.Value;
             }
 
-            return true;
-        }
-
-        public override void Initialize()
-        {
-            InitializeInner(Configure.Instance.Configurer);
-        }
-
-        void InitializeInner(IConfigureComponents config)
-        {
             config.ConfigureComponent<SagaPersister>(DependencyLifecycle.InstancePerCall);
         }
     }

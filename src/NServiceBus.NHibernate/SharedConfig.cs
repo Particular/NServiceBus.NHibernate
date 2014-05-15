@@ -1,6 +1,5 @@
 ﻿namespace NServiceBus.NHibernate
 {
-    using System;
     using global::NHibernate.Cfg;
     using Settings;
 

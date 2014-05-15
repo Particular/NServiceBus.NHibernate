@@ -11,7 +11,7 @@ namespace NServiceBus.TimeoutPersisters.NHibernate.Installer
     using global::NHibernate.Util;
     using Environment = global::NHibernate.Cfg.Environment;
 
-    internal class OptimizedSchemaUpdate
+    class OptimizedSchemaUpdate
     {
         public OptimizedSchemaUpdate(Configuration cfg) : this(cfg, cfg.Properties)
         {

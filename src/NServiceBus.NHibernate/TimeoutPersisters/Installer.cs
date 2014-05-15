@@ -7,7 +7,7 @@ namespace NServiceBus.TimeoutPersisters.NHibernate.Installer
     /// <summary>
     /// Installer for <see cref="TimeoutStorage"/>
     /// </summary>
-    public class Installer : INeedToInstallSomething<Windows>
+    class Installer : INeedToInstallSomething<Windows>
     {
         /// <summary>
         /// <value>true</value> to run installer.

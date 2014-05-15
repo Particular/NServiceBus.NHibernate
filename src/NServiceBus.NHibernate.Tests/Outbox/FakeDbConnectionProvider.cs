@@ -12,5 +12,11 @@ namespace NServiceBus.NHibernate.Tests.Outbox
         }
 
         public IDbConnection Connection { get; private set; }
+        public bool TryGetConnection(out IDbConnection connection)
+        {
+            connection = Connection;
+
+            return Connection != null;
+        }
     }
 }

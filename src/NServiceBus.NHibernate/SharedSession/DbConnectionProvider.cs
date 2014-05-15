@@ -2,7 +2,7 @@ namespace NServiceBus.NHibernate.SharedSession
 {
     using System;
     using System.Data;
-    using NServiceBus.Outbox;
+    using Outbox;
     using Pipeline;
 
     class DbConnectionProvider:IDbConnectionProvider
@@ -24,6 +24,11 @@ namespace NServiceBus.NHibernate.SharedSession
 
                 return existingConnection;
             }
+        }
+
+        public bool TryGetConnection(out IDbConnection connection)
+        {
+            return PipelineExecutor.CurrentContext.TryGet(string.Format("SqlConnection-{0}", ConnectionString), out connection);
         }
     }
 }

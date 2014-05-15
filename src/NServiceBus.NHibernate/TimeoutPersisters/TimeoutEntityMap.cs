@@ -8,7 +8,7 @@ namespace NServiceBus.TimeoutPersisters.NHibernate.Config
     /// <summary>
     /// Timeout entity map class
     /// </summary>
-    public class TimeoutEntityMap : ClassMapping<TimeoutEntity>
+    class TimeoutEntityMap : ClassMapping<TimeoutEntity>
     {
         /// <summary>
         /// Default constructor

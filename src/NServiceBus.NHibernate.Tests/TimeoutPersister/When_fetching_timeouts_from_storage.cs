@@ -8,7 +8,7 @@ namespace NServiceBus.TimeoutPersisters.NHibernate.Tests
     using Timeout.Core;
 
     [TestFixture]
-    public class When_fetching_timeouts_from_storage : InMemoryDBFixture
+    class When_fetching_timeouts_from_storage : InMemoryDBFixture
     {
         [Test]
         public void Should_return_the_complete_list_of_timeouts()

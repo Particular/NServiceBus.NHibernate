@@ -10,20 +10,20 @@ namespace NServiceBus.Features
     using ObjectBuilder;
     using Settings;
 
-    public class NHibernateOutbox : Feature
+    public class NHibernateOutboxStorage : Feature
     {
-        public override bool IsEnabledByDefault
-        {
-            get { return true; }
-        }
-
         public override bool ShouldBeEnabled()
         {
-            if (!IsEnabled<Outbox>())
-            {
-                return false;
-            }
+            return IsEnabled<Outbox>();
+        }
 
+        public override void Initialize()
+        {
+            InitializeInner(Configure.Instance.Configurer);
+        }
+
+        void InitializeInner(IConfigureComponents config)
+        {
             var mapper = new ModelMapper();
             mapper.AddMapping<OutboxEntityMap>();
             mapper.AddMapping<TransportOperationEntityMap>();
@@ -37,16 +37,6 @@ namespace NServiceBus.Features
 
             }
 
-            return true;
-        }
-
-        public override void Initialize()
-        {
-            InitializeInner(Configure.Instance.Configurer);
-        }
-
-        void InitializeInner(IConfigureComponents config)
-        {
             config.ConfigureComponent<OutboxPersister>(DependencyLifecycle.SingleInstance);
         }
     }

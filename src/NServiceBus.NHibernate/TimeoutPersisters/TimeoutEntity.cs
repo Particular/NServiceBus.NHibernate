@@ -6,7 +6,7 @@ namespace NServiceBus.TimeoutPersisters.NHibernate
     /// <summary>
     /// NHibernate wrapper class for <see cref="TimeoutData"/>
     /// </summary>
-    public class TimeoutEntity
+    class TimeoutEntity
     {
         /// <summary>
         /// Id of this timeout.

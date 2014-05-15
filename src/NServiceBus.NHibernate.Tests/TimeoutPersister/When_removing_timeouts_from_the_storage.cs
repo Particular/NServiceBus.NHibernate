@@ -7,7 +7,7 @@ namespace NServiceBus.TimeoutPersisters.NHibernate.Tests
     using Timeout.Core;
 
     [TestFixture]
-    public class When_removing_timeouts_from_the_storage : InMemoryDBFixture
+    class When_removing_timeouts_from_the_storage : InMemoryDBFixture
     {
         [Test]
         public void Should_return_the_correct_headers()

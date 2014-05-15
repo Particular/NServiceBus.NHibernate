@@ -12,16 +12,11 @@ namespace NServiceBus.Features
     using Settings;
     using UnitOfWork;
 
-    public class NHibernateSessionManagement : Feature
+    public class NHibernateStorageSession : Feature
     {
-        public override bool IsEnabledByDefault
-        {
-            get { return true; }
-        }
-
         public override bool ShouldBeEnabled()
         {
-            return IsEnabled<NHibernateSagaPersistence>() || IsEnabled<NHibernateOutbox>();
+            return IsEnabled<NHibernateSagaStorage>() || IsEnabled<NHibernateOutboxStorage>();
         }
 
         public override void Initialize()
@@ -96,7 +91,7 @@ namespace NServiceBus.Features
         {
             public override void Override(BehaviorList<IncomingContext> behaviorList)
             {
-                if (!IsEnabled<NHibernateSessionManagement>())
+                if (!IsEnabled<NHibernateStorageSession>())
                 {
                     return;
                 }
