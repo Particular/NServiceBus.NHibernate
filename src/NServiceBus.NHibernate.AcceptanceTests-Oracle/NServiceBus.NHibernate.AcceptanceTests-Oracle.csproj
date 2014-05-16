@@ -79,7 +79,11 @@
       <Link>When_saga_contains_nested_collection_with_row_version.cs</Link>
     </Compile>
     <Compile Include="App_Packages\NServiceBus.AcceptanceTests\**\*.cs" />
-    <Compile Include="Config.cs" />
+    <Compile Include="ConfigureOutboxPersister.cs" />
+    <Compile Include="ConfigurePersistences.cs" />
+    <Compile Include="ConfigureSagaPersister.cs" />
+    <Compile Include="ConfigureSubscriptionStorage.cs" />
+    <Compile Include="ConfigureTimeoutStorage.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ripple.dependencies.config">

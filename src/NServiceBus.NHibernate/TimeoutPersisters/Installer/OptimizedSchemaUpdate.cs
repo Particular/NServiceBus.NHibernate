@@ -86,10 +86,10 @@ namespace NServiceBus.TimeoutPersisters.NHibernate.Installer
                     meta = new DatabaseMetadata(connection, dialect);
                     stmt = connection.CreateCommand();
                 }
-                catch (Exception sqle)
+                catch (Exception sqlException)
                 {
-                    exceptions.Add(sqle);
-                    log.Error("could not get database metadata", sqle);
+                    exceptions.Add(sqlException);
+                    log.Error("could not get database metadata", sqlException);
                     throw;
                 }
 

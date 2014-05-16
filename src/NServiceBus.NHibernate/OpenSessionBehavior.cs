@@ -2,7 +2,6 @@ namespace NServiceBus.UnitOfWork.NHibernate
 {
     using System;
     using System.Data;
-    using System.Data.SqlClient;
     using global::NHibernate;
     using Persistence.NHibernate;
     using Pipeline;
