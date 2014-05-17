@@ -75,7 +75,7 @@ Here is an example of what is required:
 
             var configuration = CreateNHibernateConfiguration();
 
-            var defaultConnectionString = SettingsHolder.GetOrDefault<string>("NHibernate.Common.ConnectionString") ?? GetConnectionStringOrNull("NServiceBus/Persistence");
+            var defaultConnectionString = SettingsHolder.Instance.GetOrDefault<string>("NHibernate.Common.ConnectionString") ?? GetConnectionStringOrNull("NServiceBus/Persistence");
             var configurationProperties = configuration.Properties;
 
             var appSettingsSection = NHibernateSettingRetriever.AppSettings() ?? new NameValueCollection();

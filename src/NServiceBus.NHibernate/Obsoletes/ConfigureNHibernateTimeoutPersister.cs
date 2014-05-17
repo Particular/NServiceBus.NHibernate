@@ -1,6 +1,7 @@
 namespace NServiceBus
 {
     using NHibernate;
+    using Persistence;
 // ReSharper disable RedundantNameQualifier
     using global::NHibernate.Cfg;
 // ReSharper restore RedundantNameQualifier

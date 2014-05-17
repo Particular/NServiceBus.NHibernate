@@ -11,10 +11,15 @@
     {
         public void Configure()
         {
-            //until we have a better hook in the feature base class
+         
+        }
+
+        public void Enable(Configure config)
+        {
             Feature.EnableByDefault<NHibernateStorageSession>();
             Feature.EnableByDefault<NHibernateOutboxStorage>();
             Feature.EnableByDefault<NHibernateSagaStorage>();
+            Feature.EnableByDefault<NHibernateTimeoutStorage>();
         }
     }
 }

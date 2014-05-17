@@ -1,6 +1,6 @@
 ﻿using System.Collections.Specialized;
 using System.Configuration;
-using NServiceBus.Persistence.NHibernate;
+using NServiceBus.NHibernate.Internal;
 
 public abstract class ConfigurePersistences
 {

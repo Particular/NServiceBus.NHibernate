@@ -1,22 +1,23 @@
 ﻿namespace NServiceBus.NHibernate
 {
     using global::NHibernate.Cfg;
+    using Persistence;
     using Settings;
 
     public static class SharedConfig
     {
         public static void ConnectionString(this PersistenceConfiguration config, string connectionString) 
         {
-            SettingsHolder.Set("NHibernate.Common.ConnectionString",connectionString);
+            SettingsHolder.Instance.Set("NHibernate.Common.ConnectionString",connectionString);
         }
 
         public static void DisableSchemaUpdate(this PersistenceConfiguration config)
         {
-            SettingsHolder.Set("NHibernate.Common.AutoUpdateSchema", false);
+            SettingsHolder.Instance.Set("NHibernate.Common.AutoUpdateSchema", false);
         }
         public static void UseConfiguration(this PersistenceConfiguration config, Configuration configuration)
         {
-            SettingsHolder.Set("StorageConfiguration",configuration);
+            SettingsHolder.Instance.Set("StorageConfiguration", configuration);
         }
 
 
@@ -25,7 +26,7 @@
         {
             public Defaults()
             {
-                SettingsHolder.SetDefault("NHibernate.Common.AutoUpdateSchema", true);
+                SettingsHolder.Instance.SetDefault("NHibernate.Common.AutoUpdateSchema", true);
             }
         }
     }

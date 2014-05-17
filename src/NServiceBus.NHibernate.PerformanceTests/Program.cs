@@ -10,6 +10,7 @@
     using NServiceBus.Features;
     using NServiceBus.Installation.Environments;
     using NServiceBus.NHibernate.Internal;
+    using NServiceBus.Persistence;
     using Saga;
 
     internal class Program
@@ -73,7 +74,7 @@
                     throw new InvalidOperationException("Illegal serialization format " + args[2]);
             }
 
-            Configure.Features.Disable<Audit>();
+            config.Features.Disable<Audit>();
 
             //Configure.Instance.UnicastBus().IsolationLevel(IsolationLevel.Snapshot);
             //Console.Out.WriteLine("Snapshot");
@@ -83,17 +84,8 @@
                     new ConnectionStringSettings("NServiceBus/Persistence", SqlServerConnectionString)
                 };
 
-            if (saga)
-            {
-                Configure.Features.Enable<Sagas>();
 
-                config.UseNHibernateSagaPersister();
-            }
-            else if (publish)
-            {
-                
-                config.UseNHibernateSubscriptionPersister(TimeSpan.FromSeconds(1));
-            }
+            config.UsePersistence<NHibernate>();
 
             if (suppressDTC)
             {

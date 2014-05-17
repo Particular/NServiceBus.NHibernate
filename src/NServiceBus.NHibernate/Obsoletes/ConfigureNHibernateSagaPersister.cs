@@ -3,6 +3,7 @@
     using System;
     using NHibernate;
     using global::NHibernate;
+    using Persistence;
     using Configuration = global::NHibernate.Cfg.Configuration;
 
     /// <summary>

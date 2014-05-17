@@ -134,7 +134,6 @@
     <Compile Include="Subscriptions\SubscriptionStorage.cs" />
     <Compile Include="Subscriptions\SubscriptionStorageSessionProvider.cs" />
     <Compile Include="SharedSession\OpenSqlConnectionBehavior.cs" />
-    <Compile Include="ToBeMovedIntoTheCore.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ripple.dependencies.config">

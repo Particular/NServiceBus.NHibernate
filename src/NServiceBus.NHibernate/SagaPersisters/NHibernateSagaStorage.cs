@@ -5,28 +5,21 @@ namespace NServiceBus.Features
     using System.Linq;
     using global::NHibernate.Cfg;
     using NHibernate.Internal;
-    using ObjectBuilder;
     using SagaPersisters.NHibernate;
     using SagaPersisters.NHibernate.AutoPersistence;
-    using Settings;
 
     public class NHibernateSagaStorage : Feature
     {
-        public override bool ShouldBeEnabled()
+        public NHibernateSagaStorage()
         {
-            return IsEnabled<Sagas>();
+            DependsOn<Sagas>();
         }
 
-        public override void Initialize()
+        public override void Initialize(Configure config)
         {
-            InitializeInner(Configure.Instance.Configurer);
-        }
+            var tableNamingConvention = config.Settings.GetOrDefault<Func<Type, string>>("NHibernate.Sagas.TableNamingConvention");
 
-        void InitializeInner(IConfigureComponents config)
-        {
-            var tableNamingConvention = SettingsHolder.GetOrDefault<Func<Type, string>>("NHibernate.Sagas.TableNamingConvention");
-
-            SettingsHolder.Get<List<Action<Configuration>>>("StorageConfigurationModifications")
+            config.Settings.Get<List<Action<Configuration>>>("StorageConfigurationModifications")
                 .Add(c =>
                 {
                     var scannedAssemblies = Configure.TypesToScan.Select(t => t.Assembly).Distinct();
@@ -54,10 +47,10 @@ namespace NServiceBus.Features
 
             foreach (var kvp in ConfigureNHibernate.SagaPersisterProperties)
             {
-                SettingsHolder.Get<Dictionary<string, string>>("StorageProperties")[kvp.Key] = kvp.Value;
+                config.Settings.Get<Dictionary<string, string>>("StorageProperties")[kvp.Key] = kvp.Value;
             }
 
-            config.ConfigureComponent<SagaPersister>(DependencyLifecycle.InstancePerCall);
+            config.Configurer.ConfigureComponent<SagaPersister>(DependencyLifecycle.InstancePerCall);
         }
     }
 }

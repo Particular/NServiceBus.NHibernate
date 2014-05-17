@@ -19,22 +19,17 @@ namespace NServiceBus.Features
             return IsEnabled<NHibernateSagaStorage>() || IsEnabled<NHibernateOutboxStorage>();
         }
 
-        public override void Initialize()
+        public override void Initialize(Configure config)
         {
-            InitializeInner(Configure.Instance.Configurer);
-        }
-
-        void InitializeInner(IConfigureComponents config)
-        {
-            var configuration = SettingsHolder.GetOrDefault<Configuration>("StorageConfiguration");
+            var configuration = config.Settings.GetOrDefault<Configuration>("StorageConfiguration");
 
             if (configuration == null)
             {
-                var properties = SettingsHolder.Get<IDictionary<string, string>>("StorageProperties");
+                var properties = config.Settings.Get<IDictionary<string, string>>("StorageProperties");
 
                 configuration = new Configuration().SetProperties(properties);
 
-                foreach (var modification in SettingsHolder.Get<List<Action<Configuration>>>("StorageConfigurationModifications"))
+                foreach (var modification in config.Settings.Get<List<Action<Configuration>>>("StorageConfigurationModifications"))
                 {
                     modification(configuration);
                 }
@@ -55,24 +50,24 @@ namespace NServiceBus.Features
                 }
             }
 
-            config.RegisterSingleton<ISessionFactory>(configuration.BuildSessionFactory());
+            config.Configurer.RegisterSingleton<ISessionFactory>(configuration.BuildSessionFactory());
 
-            config.ConfigureComponent<StorageSessionProvider>(DependencyLifecycle.InstancePerCall)
+            config.Configurer.ConfigureComponent<StorageSessionProvider>(DependencyLifecycle.InstancePerCall)
                      .ConfigureProperty(p => p.ConnectionString, connString);
 
-            config.ConfigureComponent<DbConnectionProvider>(DependencyLifecycle.InstancePerCall)
+            config.Configurer.ConfigureComponent<DbConnectionProvider>(DependencyLifecycle.InstancePerCall)
                      .ConfigureProperty(p => p.ConnectionString, connString);
 
-            config.ConfigureComponent<OpenSqlConnectionBehavior>(DependencyLifecycle.InstancePerCall)
+            config.Configurer.ConfigureComponent<OpenSqlConnectionBehavior>(DependencyLifecycle.InstancePerCall)
                     .ConfigureProperty(p => p.ConnectionString, connString);
 
-            config.ConfigureComponent<OpenSessionBehavior>(DependencyLifecycle.InstancePerCall)
+            config.Configurer.ConfigureComponent<OpenSessionBehavior>(DependencyLifecycle.InstancePerCall)
                     .ConfigureProperty(p => p.ConnectionString, connString);
 
-            config.ConfigureComponent<OpenNativeTransactionBehavior>(DependencyLifecycle.InstancePerCall)
+            config.Configurer.ConfigureComponent<OpenNativeTransactionBehavior>(DependencyLifecycle.InstancePerCall)
                     .ConfigureProperty(p => p.ConnectionString, connString);
 
-            Installer.RunInstaller = SettingsHolder.Get<bool>("NHibernate.Common.AutoUpdateSchema");
+            Installer.RunInstaller = config.Settings.Get<bool>("NHibernate.Common.AutoUpdateSchema");
 
             Installer.configuration = configuration;
         }
@@ -81,9 +76,9 @@ namespace NServiceBus.Features
         {
             public Defaults()
             {
-                SettingsHolder.SetDefault("AutoUpdateSchema", true);
-                SettingsHolder.SetDefault("StorageProperties", new Dictionary<string,string>());
-                SettingsHolder.SetDefault("StorageConfigurationModifications", new List<Action<Configuration>>());
+                SettingsHolder.Instance.SetDefault("AutoUpdateSchema", true);
+                SettingsHolder.Instance.SetDefault("StorageProperties", new Dictionary<string, string>());
+                SettingsHolder.Instance.SetDefault("StorageConfigurationModifications", new List<Action<Configuration>>());
             }
         }
 

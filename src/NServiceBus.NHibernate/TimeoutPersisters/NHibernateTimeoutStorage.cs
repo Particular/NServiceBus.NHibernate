@@ -1,40 +1,23 @@
 namespace NServiceBus.Features
 {
-    using System;
-    using System.Collections.Generic;
     using global::NHibernate.Cfg;
-    using global::NHibernate.Mapping.ByCode;
     using NHibernate.Internal;
-    using NServiceBus.Outbox;
-    using NServiceBus.Outbox.NHibernate;
-    using ObjectBuilder;
-    using Settings;
     using TimeoutPersisters.NHibernate;
     using TimeoutPersisters.NHibernate.Config;
 
     public class NHibernateTimeoutStorage : Feature
     {
-        public override bool IsEnabledByDefault
+        public NHibernateTimeoutStorage()
         {
-            get { return true; }
+            DependsOn<TimeoutManager>();
         }
 
-        public override bool ShouldBeEnabled()
-        {
-            return IsEnabled<TimeoutManager>();
-        }
-
-        public override void Initialize()
-        {
-            InitializeInner(Configure.Instance.Configurer);
-        }
-
-        void InitializeInner(IConfigureComponents config)
+        public override void Initialize(Configure config)
         {
             var properties = ConfigureNHibernate.TimeoutPersisterProperties;
             ConfigureNHibernate.ThrowIfRequiredPropertiesAreMissing(properties);
 
-            var configuration = SettingsHolder.GetOrDefault<Configuration>("NHibernate.Timeouts.Configuration");
+            var configuration = config.Settings.GetOrDefault<Configuration>("NHibernate.Timeouts.Configuration");
 
             if (configuration == null)
             {
@@ -46,18 +29,18 @@ namespace NServiceBus.Features
 
             TimeoutPersisters.NHibernate.Installer.Installer.configuration = configuration;
 
-            TimeoutPersisters.NHibernate.Installer.Installer.RunInstaller = SettingsHolder.Get<bool>("NHibernate.Common.AutoUpdateSchema");
+            TimeoutPersisters.NHibernate.Installer.Installer.RunInstaller = config.Settings.Get<bool>("NHibernate.Common.AutoUpdateSchema");
 
-            if (SettingsHolder.HasSetting("NHibernate.Timeouts.AutoUpdateSchema"))
+            if (config.Settings.HasSetting("NHibernate.Timeouts.AutoUpdateSchema"))
             {
-                TimeoutPersisters.NHibernate.Installer.Installer.RunInstaller = SettingsHolder.Get<bool>("NHibernate.Timeouts.AutoUpdateSchema");
+                TimeoutPersisters.NHibernate.Installer.Installer.RunInstaller = config.Settings.Get<bool>("NHibernate.Timeouts.AutoUpdateSchema");
             }
             else
             {
-                TimeoutPersisters.NHibernate.Installer.Installer.RunInstaller = SettingsHolder.Get<bool>("NHibernate.Common.AutoUpdateSchema");
+                TimeoutPersisters.NHibernate.Installer.Installer.RunInstaller = config.Settings.Get<bool>("NHibernate.Common.AutoUpdateSchema");
             }
 
-            config.ConfigureComponent<TimeoutStorage>(DependencyLifecycle.SingleInstance)
+            config.Configurer.ConfigureComponent<TimeoutStorage>(DependencyLifecycle.SingleInstance)
                 .ConfigureProperty(p => p.SessionFactory, configuration.BuildSessionFactory());
         }
 
