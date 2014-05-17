@@ -1,12 +1,9 @@
 namespace NServiceBus
 {
     using System;
-    using Config;
     using NHibernate.Internal;
-// ReSharper disable RedundantNameQualifier
     using global::NHibernate;
     using global::NHibernate.Cfg;
-    // ReSharper restore RedundantNameQualifier
     using Unicast.Subscriptions.MessageDrivenSubscriptions;
     using Unicast.Subscriptions.NHibernate;
     using Unicast.Subscriptions.NHibernate.Config;

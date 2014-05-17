@@ -6,7 +6,6 @@ namespace NServiceBus.Features
     using global::NHibernate.Cfg;
     using global::NHibernate;
     using Environment = global::NHibernate.Cfg.Environment;
-    using ObjectBuilder;
     using Pipeline;
     using Pipeline.Contexts;
     using Settings;
