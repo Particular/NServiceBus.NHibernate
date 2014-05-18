@@ -7,24 +7,16 @@ namespace NServiceBus.TimeoutPersisters.NHibernate
     using System.Linq;
     using global::NHibernate;
     using IdGeneration;
-    using Persistence.NHibernate;
-    using Pipeline;
+    using NServiceBus.NHibernate.Internal;
+    using Outbox;
     using Serializers.Json;
     using Timeout.Core;
 
-    /// <summary>
-    ///     Timeout storage implementation for NHibernate.
-    /// </summary>
-    public class TimeoutStorage : IPersistTimeouts
+    class TimeoutStorage : IPersistTimeouts
     {
-        /// <summary>
-        ///     The current <see cref="ISessionFactory" />.
-        /// </summary>
         public ISessionFactory SessionFactory { get; set; }
 
-        public string ConnectionString { get; set; }
-
-        public PipelineExecutor PipelineExecutor { get; set; }
+        public IDbConnectionProvider DbConnectionProvider { get; set; }
 
         /// <summary>
         ///     Retrieves the next range of timeouts that are due.
@@ -236,9 +228,8 @@ namespace NServiceBus.TimeoutPersisters.NHibernate
         bool GetConnection(out IDbConnection connection)
         {
             var disposeConnection = false;
-            var connectionKey = string.Format("SqlConnection-{0}", ConnectionString);
 
-            if (!PipelineExecutor.CurrentContext.TryGet(connectionKey, out connection))
+            if (!DbConnectionProvider.TryGetConnection(out connection))
             {
                 connection = SessionFactory.GetConnection();
                 disposeConnection = true;

@@ -3,7 +3,7 @@ namespace NServiceBus.Outbox.NHibernate
     using global::NHibernate;
     using global::NHibernate.Mapping.ByCode;
     using global::NHibernate.Mapping.ByCode.Conformist;
-    using Persistence.NHibernate;
+    using NServiceBus.NHibernate.Internal;
 
     class OutboxEntityMap : ClassMapping<OutboxRecord>
     {

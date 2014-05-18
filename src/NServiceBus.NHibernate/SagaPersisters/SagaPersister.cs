@@ -4,8 +4,8 @@ namespace NServiceBus.SagaPersisters.NHibernate
     using System.Linq;
     using global::NHibernate;
     using global::NHibernate.Criterion;
+    using NServiceBus.NHibernate.SharedSession;
     using Saga;
-    using UnitOfWork.NHibernate;
 
     /// <summary>
     /// Saga persister implementation using NHibernate.

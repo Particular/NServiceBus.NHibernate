@@ -8,7 +8,7 @@ namespace NServiceBus.GatewayPersister.NHibernate
     using Gateway.Persistence;
     using global::NHibernate;
     using global::NHibernate.Exceptions;
-    using Persistence.NHibernate;
+    using NServiceBus.NHibernate.Internal;
     using Serializers.Json;
 
     /// <summary>

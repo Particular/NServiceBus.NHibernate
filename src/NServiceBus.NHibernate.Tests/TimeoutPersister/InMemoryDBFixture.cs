@@ -1,18 +1,17 @@
 namespace NServiceBus.TimeoutPersisters.NHibernate.Tests
 {
     using System;
-    using System.Collections.Specialized;
-    using System.Configuration;
+    using System.Collections.Generic;
     using System.IO;
-    using System.Linq;
-    using System.Security.Principal;
+    using Config;
     using global::NHibernate;
-    using NServiceBus.Config.ConfigurationSource;
+    using global::NHibernate.Mapping.ByCode;
+    using global::NHibernate.Tool.hbm2ddl;
+    using NServiceBus.NHibernate.Internal;
+    using NServiceBus.NHibernate.Tests.Outbox;
     using NUnit.Framework;
-    using Persistence.NHibernate;
-    using Pipeline;
 
-    public abstract class InMemoryDBFixture
+    abstract class InMemoryDBFixture
     {
         protected TimeoutStorage persister;
         protected ISessionFactory sessionFactory;
@@ -23,30 +22,27 @@ namespace NServiceBus.TimeoutPersisters.NHibernate.Tests
         [SetUp]
         public void Setup()
         {
-            Configure.ConfigurationSource = new DefaultConfigurationSource();
+            var configuration = new global::NHibernate.Cfg.Configuration()
+              .AddProperties(new Dictionary<string, string>
+                {
+                    { "dialect", dialect },
+                    { global::NHibernate.Cfg.Environment.ConnectionString,connectionString }
+                });
+            var mapper = new ModelMapper();
+            mapper.AddMapping<TimeoutEntityMap>();
 
-            NHibernateSettingRetriever.AppSettings = () => new NameValueCollection
-                                                               {
-                                                                   {"NServiceBus/Persistence/NHibernate/dialect", dialect}
-                                                               };
+            configuration.AddMapping(mapper.CompileMappingForAllExplicitlyAddedEntities());
 
-            NHibernateSettingRetriever.ConnectionStrings = () => new ConnectionStringSettingsCollection
-                                                                     {
-                                                                         new ConnectionStringSettings("NServiceBus/Persistence/NHibernate/Timeout", connectionString)
-                                                                     };
+            new SchemaExport(configuration).Create(false, true);
 
-            ConfigureNHibernate.Init();
 
-            Configure.With(Enumerable.Empty<Type>())
-                .DefineEndpointName("Foo")
-                .DefaultBuilder()
-                .UseNHibernateTimeoutPersister();
+            sessionFactory = configuration.BuildSessionFactory();
 
-            persister = Configure.Instance.Builder.Build<TimeoutStorage>();
-            persister.PipelineExecutor = new PipelineExecutor(Configure.Instance.Builder, new PipelineBuilder(Configure.Instance.Builder));
-            sessionFactory = persister.SessionFactory;
-
-            new Installer.Installer().Install(WindowsIdentity.GetCurrent().Name);
+            persister = new TimeoutStorage
+            {
+                SessionFactory = sessionFactory,
+                DbConnectionProvider = new FakeDbConnectionProvider(sessionFactory.GetConnection())
+            };
         }
     }
 }

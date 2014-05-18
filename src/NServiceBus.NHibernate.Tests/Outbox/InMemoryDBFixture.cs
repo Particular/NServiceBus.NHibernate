@@ -3,20 +3,18 @@
 namespace NServiceBus.NHibernate.Tests.Outbox
 {
     using System;
-    using System.Collections.Specialized;
-    using System.Configuration;
+    using System.Collections.Generic;
     using global::NHibernate;
-    using Pipeline;
+    using global::NHibernate.Mapping.ByCode;
+    using global::NHibernate.Tool.hbm2ddl;
+    using Internal;
+    using NServiceBus.Outbox.NHibernate;
+    using SagaPersisters.NHibernate.Tests;
 #if !USE_SQLSERVER
     using System.IO;
 #endif
-    using System.Linq;
-    using System.Security.Principal;
-    using Config.ConfigurationSource;
     using NServiceBus.Outbox;
-    using NServiceBus.Outbox.NHibernate;
     using NUnit.Framework;
-    using Persistence.NHibernate;
 
 
     abstract class InMemoryDBFixture
@@ -34,38 +32,47 @@ namespace NServiceBus.NHibernate.Tests.Outbox
         [SetUp]
         public void Setup()
         {
-            Configure.ConfigurationSource = new DefaultConfigurationSource();
+            var mapper = new ModelMapper();
+            mapper.AddMapping<OutboxEntityMap>();
+            mapper.AddMapping<TransportOperationEntityMap>();
 
-            NHibernateSettingRetriever.AppSettings = () => new NameValueCollection
-                                                               {
-                                                                   {"NServiceBus/Persistence/NHibernate/dialect", dialect}
-                                                               };
+            var configuration = new global::NHibernate.Cfg.Configuration()
+                .AddProperties(new Dictionary<string, string>
+                {
+                    { "dialect", dialect },
+                    { global::NHibernate.Cfg.Environment.ConnectionString,connectionString }
+                });
 
-            NHibernateSettingRetriever.ConnectionStrings = () => new ConnectionStringSettingsCollection
-                                                                     {
-                                                                         new ConnectionStringSettings("NServiceBus/Persistence/NHibernate/Outbox", connectionString)
-                                                                     };
+            configuration.AddMapping(mapper.CompileMappingForAllExplicitlyAddedEntities());
 
-            ConfigureNHibernate.Init();
 
-            Configure.With(Enumerable.Empty<Type>())
-                .DefineEndpointName("Foo")
-                .DefaultBuilder()
-                .UseNHibernateOutbox();
+            new SchemaUpdate(configuration).Execute(false, true);
 
-            persister = Configure.Instance.Builder.Build<OutboxPersister>();
-            SessionFactory = persister.SessionFactory;
-
-            persister.PipelineExecutor = new PipelineExecutor(Configure.Instance.Builder, new PipelineBuilder(Configure.Instance.Builder));
+            SessionFactory = configuration.BuildSessionFactory();
 
 
             var connection = SessionFactory.GetConnection();
 
-            persister.PipelineExecutor.CurrentContext.Set("SqlConnection-" + connectionString, connection);
+            Session = SessionFactory.OpenSession();
 
-            new Installer().Install(WindowsIdentity.GetCurrent().Name);
+
+            persister = new OutboxPersister
+            {
+                DbConnectionProvider = new FakeDbConnectionProvider(connection),
+                SessionFactory = SessionFactory,
+                StorageSessionProvider = new FakeSessionProvider(SessionFactory.OpenSession())
+            };
+         
         }
 
+        [TearDown]
+        public void TearDown()
+        {
+            Session.Close();
+            SessionFactory.Close();
+        }
+
+        protected ISession Session;
         protected ISessionFactory SessionFactory;
     }
 }

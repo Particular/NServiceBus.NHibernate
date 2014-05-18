@@ -7,7 +7,7 @@
     <ProjectGuid>{281646E3-32E0-4F4D-BCF6-1DC5EFC6C268}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>NServiceBus</RootNamespace>
+    <RootNamespace>NServiceBus.NHibernate</RootNamespace>
     <AssemblyName>NServiceBus.NHibernate</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
@@ -77,18 +77,16 @@
     <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ConfigureNHibernateGatewayDeduplication.cs" />
-    <Compile Include="ConfigureNHibernateGatewayPersister.cs" />
-    <Compile Include="ConfigureNHibernateOutbox.cs" />
-    <Compile Include="ConfigureNHibernateSagaPersister.cs" />
-    <Compile Include="ConfigureNHibernateSubscriptionStorage.cs" />
-    <Compile Include="ConfigureNHibernateTimeoutPersister.cs" />
-    <Compile Include="ConfigureNHibernateUnitOfWork.cs" />
-    <Compile Include="Config\DBSubscriptionStorageConfig.cs" />
-    <Compile Include="Config\NHibernateProperty.cs" />
-    <Compile Include="Config\NHibernatePropertyCollection.cs" />
-    <Compile Include="Config\NHibernateSagaPersisterConfig.cs" />
-    <Compile Include="Config\TimeoutPersisterConfig.cs" />
+    <Compile Include="Obsoletes\ConfigureNHibernateGatewayDeduplication.cs" />
+    <Compile Include="Obsoletes\ConfigureNHibernateGatewayPersister.cs" />
+    <Compile Include="Obsoletes\ConfigureNHibernateSagaPersister.cs" />
+    <Compile Include="Obsoletes\ConfigureNHibernateSubscriptionStorage.cs" />
+    <Compile Include="Obsoletes\ConfigureNHibernateTimeoutPersister.cs" />
+    <Compile Include="NHibernate.cs" />
+    <Compile Include="SagaPersisters\SagaConfig.cs" />
+    <Compile Include="SagaPersisters\SagaModelMapper.cs" />
+    <Compile Include="SharedConfig.cs" />
+    <Compile Include="SharedSession\DbConnectionProvider.cs" />
     <Compile Include="Deduplication\Config\DeduplicationMessage.cs" />
     <Compile Include="Deduplication\Config\DeduplicationMessageMap.cs" />
     <Compile Include="Deduplication\GatewayDeduplication.cs" />
@@ -98,32 +96,35 @@
     <Compile Include="GatewayPersister\GatewayPersister.cs" />
     <Compile Include="GatewayPersister\Installer\Installer.cs" />
     <Compile Include="InternalsVisibleTo.cs" />
-    <Compile Include="IStorageSessionProvider.cs" />
-    <Compile Include="OpenNativeTransactionBehavior.cs" />
-    <Compile Include="NHibernatePersistence.cs" />
-    <Compile Include="OpenSessionBehavior.cs" />
-    <Compile Include="Outbox\Installer.cs" />
+    <Compile Include="SharedSession\IStorageSessionProvider.cs" />
+    <Compile Include="Outbox\NHibernateOutboxStorage.cs" />
+    <Compile Include="SagaPersisters\NHibernateSagaStorage.cs" />
+    <Compile Include="SharedSession\OpenNativeTransactionBehavior.cs" />
+    <Compile Include="SharedSession\NHibernateStorageSession.cs" />
+    <Compile Include="SharedSession\OpenSessionBehavior.cs" />
+    <Compile Include="Outbox\IDbConnectionProvider.cs" />
     <Compile Include="Outbox\Entities.cs" />
     <Compile Include="Outbox\EntityMappings.cs" />
     <Compile Include="Outbox\OutboxPersister.cs" />
-    <Compile Include="Persistence\AmbientTransactionAwareWrapper.cs" />
-    <Compile Include="Persistence\ISessionExtensions.cs" />
-    <Compile Include="Persistence\AddressUserType.cs" />
-    <Compile Include="Persistence\ConfigureNHibernate.cs" />
-    <Compile Include="Persistence\NHibernateSettingRetriever.cs" />
+    <Compile Include="Internal\AmbientTransactionAwareWrapper.cs" />
+    <Compile Include="Internal\ISessionExtensions.cs" />
+    <Compile Include="Internal\AddressUserType.cs" />
+    <Compile Include="Internal\ConfigureNHibernate.cs" />
+    <Compile Include="Internal\NHibernateSettingRetriever.cs" />
     <Compile Include="AssemblyInfo.cs" />
-    <Compile Include="Persistence\ISessionFactoryExtensions.cs" />
-    <Compile Include="SagaPersisters\AutoPersistence\Attributes\LockModeAttribute.cs" />
-    <Compile Include="SagaPersisters\AutoPersistence\Attributes\TableNameAttribute.cs" />
-    <Compile Include="SagaPersisters\AutoPersistence\SagaModelMapper.cs" />
-    <Compile Include="SagaPersisters\Config\Installer\Installer.cs" />
-    <Compile Include="SagaPersisters\Config\Internal\SessionFactoryBuilder.cs" />
+    <Compile Include="Internal\ISessionFactoryExtensions.cs" />
+    <Compile Include="SagaPersisters\LockModeAttribute.cs" />
+    <Compile Include="SagaPersisters\TableNameAttribute.cs" />
+    <Compile Include="SharedSession\Installer.cs" />
+    <Compile Include="SagaPersisters\SessionFactoryBuilder.cs" />
     <Compile Include="SagaPersisters\SagaPersister.cs" />
-    <Compile Include="StorageSessionProvider.cs" />
+    <Compile Include="SharedSession\StorageSessionProvider.cs" />
     <Compile Include="Subscriptions\CachedSubscriptionStorage.cs" />
-    <Compile Include="TimeoutPersisters\Config\TimeoutEntityMap.cs" />
-    <Compile Include="TimeoutPersisters\Installer\Installer.cs" />
-    <Compile Include="TimeoutPersisters\Installer\OptimizedSchemaUpdate.cs" />
+    <Compile Include="TimeoutPersisters\TimeoutEntityMap.cs" />
+    <Compile Include="TimeoutPersisters\Installer.cs" />
+    <Compile Include="TimeoutPersisters\OptimizedSchemaUpdate.cs" />
+    <Compile Include="TimeoutPersisters\NHibernateTimeoutStorage.cs" />
+    <Compile Include="TimeoutPersisters\TimeoutConfig.cs" />
     <Compile Include="TimeoutPersisters\TimeoutEntity.cs" />
     <Compile Include="TimeoutPersisters\TimeoutStorage.cs" />
     <Compile Include="Subscriptions\Config\SubscriptionMap.cs" />
@@ -132,7 +133,7 @@
     <Compile Include="Subscriptions\Subscription.cs" />
     <Compile Include="Subscriptions\SubscriptionStorage.cs" />
     <Compile Include="Subscriptions\SubscriptionStorageSessionProvider.cs" />
-    <Compile Include="OpenSqlConnectionBehavior.cs" />
+    <Compile Include="SharedSession\OpenSqlConnectionBehavior.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ripple.dependencies.config">
