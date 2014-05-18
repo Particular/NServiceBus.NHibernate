@@ -1,9 +1,10 @@
 ﻿using NServiceBus;
+using NServiceBus.Persistence;
 
 public class ConfigureSagaPersister : ConfigurePersistences
 {
     public void Configure(Configure config)
     {
-        config.UseNHibernateSagaPersister();
+        config.UsePersistence<NServiceBus.Persistence.NHibernate>();
     }
 }

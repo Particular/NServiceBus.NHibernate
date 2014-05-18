@@ -49,6 +49,10 @@ namespace NServiceBus.Features
                 }
             }
 
+            Configure.Pipeline.Register<OpenSqlConnectionBehavior.Registration>();
+            Configure.Pipeline.Register<OpenSessionBehavior.Registration>();
+
+
             config.Configurer.RegisterSingleton<ISessionFactory>(configuration.BuildSessionFactory());
 
             config.Configurer.ConfigureComponent<StorageSessionProvider>(DependencyLifecycle.InstancePerCall)
@@ -78,26 +82,6 @@ namespace NServiceBus.Features
                 SettingsHolder.Instance.SetDefault("AutoUpdateSchema", true);
                 SettingsHolder.Instance.SetDefault("StorageProperties", new Dictionary<string, string>());
                 SettingsHolder.Instance.SetDefault("StorageConfigurationModifications", new List<Action<Configuration>>());
-            }
-        }
-
-        class PipelineConfig : PipelineOverride
-        {
-            public override void Override(BehaviorList<IncomingContext> behaviorList)
-            {
-                if (!IsEnabled<NHibernateStorageSession>())
-                {
-                    return;
-                }
-
-                //this one needs to go first to make sure that the outbox have a connection
-                behaviorList.InnerList.Insert(0, typeof(OpenSqlConnectionBehavior));
-
-                behaviorList.InsertBefore<UnitOfWorkBehavior, OpenSessionBehavior>();
-
-
-                //we open a native NH tx if needed right after the session has been created
-                behaviorList.InsertAfter<OpenSessionBehavior, OpenNativeTransactionBehavior>();
             }
         }
     }

@@ -30,5 +30,14 @@ namespace NServiceBus.NHibernate.SharedSession
                 next();
             }
         }
+
+        public class Registration : RegisterBehavior
+        {
+            public Registration(): base("OpenSqlConnection", typeof(OpenSqlConnectionBehavior), "Makes sure that there is a IDbConnection available on the pipeline")
+            {
+                InsertAfter(WellKnownBehavior.ChildContainer);
+                InsertBefore("OutboxDeduplication");
+            }
+        }
     }
 }

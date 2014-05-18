@@ -54,5 +54,15 @@ namespace NServiceBus.NHibernate.SharedSession
                 session.Flush();
             }
         }
+
+        public class Registration : RegisterBehavior
+        {
+            public Registration()
+                : base("OpenNHibernateSession", typeof(OpenSessionBehavior), "Makes sure that there is a NHibernate ISession available on the pipeline")
+            {
+                InsertAfter(WellKnownBehavior.UnitOfWork);
+                InsertAfter("OutboxDeduplication");
+            }
+        }
     }
 }

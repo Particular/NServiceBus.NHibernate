@@ -31,5 +31,14 @@ namespace NServiceBus.NHibernate.SharedSession
                 }
             }
         }
+
+        public class Registration : RegisterBehavior
+        {
+            public Registration()
+                : base("OpenNHibernateTransaction", typeof(OpenNativeTransactionBehavior), "Makes sure that there is a NHibernate Transaction wrapping the pipeline")
+            {
+                InsertAfter("OpenNHibernateSession");
+            }
+        }
     }
 }
