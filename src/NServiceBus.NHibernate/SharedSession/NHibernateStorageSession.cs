@@ -6,14 +6,11 @@ namespace NServiceBus.Features
     using global::NHibernate.Cfg;
     using global::NHibernate;
     using Environment = global::NHibernate.Cfg.Environment;
-    using Pipeline;
-    using Pipeline.Contexts;
     using Settings;
-    using UnitOfWork;
 
     public class NHibernateStorageSession : Feature
     {
-        public override bool ShouldBeEnabled()
+        public override bool ShouldBeEnabled(Configure config)
         {
             return IsEnabled<NHibernateSagaStorage>() || IsEnabled<NHibernateOutboxStorage>();
         }
@@ -49,8 +46,8 @@ namespace NServiceBus.Features
                 }
             }
 
-            Configure.Pipeline.Register<OpenSqlConnectionBehavior.Registration>();
-            Configure.Pipeline.Register<OpenSessionBehavior.Registration>();
+            config.Pipeline.Register<OpenSqlConnectionBehavior.Registration>();
+            config.Pipeline.Register<OpenSessionBehavior.Registration>();
 
 
             config.Configurer.RegisterSingleton<ISessionFactory>(configuration.BuildSessionFactory());
