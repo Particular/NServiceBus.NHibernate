@@ -41,7 +41,8 @@ namespace NServiceBus.TimeoutPersisters.NHibernate.Tests
             persister = new TimeoutStorage
             {
                 SessionFactory = sessionFactory,
-                DbConnectionProvider = new FakeDbConnectionProvider(sessionFactory.GetConnection())
+                DbConnectionProvider = new FakeDbConnectionProvider(sessionFactory.GetConnection()),
+                EndpointName = "MyTestEndpoint"
             };
         }
     }

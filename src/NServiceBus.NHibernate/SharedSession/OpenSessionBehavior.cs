@@ -61,7 +61,7 @@ namespace NServiceBus.NHibernate.SharedSession
                 : base("OpenNHibernateSession", typeof(OpenSessionBehavior), "Makes sure that there is a NHibernate ISession available on the pipeline")
             {
                 InsertAfter(WellKnownBehavior.UnitOfWork);
-                InsertAfter("OutboxDeduplication");
+                InsertAfter("OutboxDeduplication",true);
             }
         }
     }

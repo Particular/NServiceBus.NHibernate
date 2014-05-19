@@ -41,7 +41,8 @@ namespace NServiceBus.Features
             }
 
             config.Configurer.ConfigureComponent<TimeoutStorage>(DependencyLifecycle.SingleInstance)
-                .ConfigureProperty(p => p.SessionFactory, configuration.BuildSessionFactory());
+                .ConfigureProperty(p => p.SessionFactory, configuration.BuildSessionFactory())
+                .ConfigureProperty(p=>p.EndpointName,config.EndpointName);
         }
 
     }

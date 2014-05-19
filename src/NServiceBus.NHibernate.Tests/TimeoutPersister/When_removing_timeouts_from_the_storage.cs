@@ -26,7 +26,7 @@ namespace NServiceBus.TimeoutPersisters.NHibernate.Tests
                               SagaId = Guid.NewGuid(),
                               State = new byte[] {1, 1, 133, 200},
                               Headers = headers,
-                              OwningTimeoutManager = Configure.EndpointName,
+                              OwningTimeoutManager = "MyTestEndpoint",
                           };
             persister.Add(timeout);
 
@@ -42,7 +42,7 @@ namespace NServiceBus.TimeoutPersisters.NHibernate.Tests
             var t1 = new TimeoutData
                      {
                          Time = DateTime.Now.AddYears(-1),
-                         OwningTimeoutManager = Configure.EndpointName,
+                         OwningTimeoutManager = "MyTestEndpoint",
                          Headers = new Dictionary<string, string>
                                    {
                                        {"Header1", "Value1"}
@@ -51,7 +51,7 @@ namespace NServiceBus.TimeoutPersisters.NHibernate.Tests
             var t2 = new TimeoutData
                      {
                          Time = DateTime.Now.AddYears(-1),
-                         OwningTimeoutManager = Configure.EndpointName,
+                         OwningTimeoutManager = "MyTestEndpoint",
                          Headers = new Dictionary<string, string>
                                    {
                                        {"Header1", "Value1"}
@@ -86,7 +86,7 @@ namespace NServiceBus.TimeoutPersisters.NHibernate.Tests
                      {
                          SagaId = sagaId1,
                          Time = DateTime.Now.AddYears(1),
-                         OwningTimeoutManager = Configure.EndpointName,
+                         OwningTimeoutManager = "MyTestEndpoint",
                          Headers = new Dictionary<string, string>
                                    {
                                        {"Header1", "Value1"}
@@ -96,7 +96,7 @@ namespace NServiceBus.TimeoutPersisters.NHibernate.Tests
                      {
                          SagaId = sagaId2,
                          Time = DateTime.Now.AddYears(1),
-                         OwningTimeoutManager = Configure.EndpointName,
+                         OwningTimeoutManager = "MyTestEndpoint",
                          Headers = new Dictionary<string, string>
                                    {
                                        {"Header1", "Value1"}

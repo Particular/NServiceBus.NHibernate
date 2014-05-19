@@ -16,6 +16,7 @@ namespace NServiceBus.TimeoutPersisters.NHibernate
         public ISessionFactory SessionFactory { get; set; }
 
         public IDbConnectionProvider DbConnectionProvider { get; set; }
+        public string EndpointName { get; set; }
 
         /// <summary>
         ///     Retrieves the next range of timeouts that are due.
@@ -34,7 +35,7 @@ namespace NServiceBus.TimeoutPersisters.NHibernate
                     using (var tx = session.BeginAmbientTransactionAware(IsolationLevel.ReadCommitted))
                     {
                         var results = session.QueryOver<TimeoutEntity>()
-                            .Where(x => x.Endpoint == Configure.EndpointName)
+                            .Where(x => x.Endpoint == EndpointName)
                             .And(x => x.Time >= startSlice && x.Time <= now)
                             .OrderBy(x => x.Time).Asc
                             .Select(x => x.Id, x => x.Time)
@@ -44,7 +45,7 @@ namespace NServiceBus.TimeoutPersisters.NHibernate
 
                         //Retrieve next time we need to run query
                         var startOfNextChunk = session.QueryOver<TimeoutEntity>()
-                            .Where(x => x.Endpoint == Configure.EndpointName)
+                            .Where(x => x.Endpoint == EndpointName)
                             .Where(x => x.Time > now)
                             .OrderBy(x => x.Time).Asc
                             .Take(1)

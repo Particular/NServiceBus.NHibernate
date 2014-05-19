@@ -24,7 +24,7 @@ namespace NServiceBus.TimeoutPersisters.NHibernate.Tests
                                       SagaId = Guid.NewGuid(),
                                       State = new byte[] { 0, 0, 133 },
                                       Headers = new Dictionary<string, string> { { "Bar", "34234" }, { "Foo", "aString1" }, { "Super", "aString2" } },
-                                      OwningTimeoutManager = Configure.EndpointName,
+                                      OwningTimeoutManager = "MyTestEndpoint",
                                   });
             }
             DateTime nextTimeToRunQuery;
@@ -43,7 +43,7 @@ namespace NServiceBus.TimeoutPersisters.NHibernate.Tests
                 SagaId = Guid.NewGuid(),
                 State = new byte[] { 0, 0, 133 },
                 Headers = new Dictionary<string, string> { { "Bar", "34234" }, { "Foo", "aString1" }, { "Super", "aString2" } },
-                OwningTimeoutManager = Configure.EndpointName,
+                OwningTimeoutManager = "MyTestEndpoint",
             });
             
 
