@@ -39,7 +39,6 @@ namespace NServiceBus.Features
 
                 if (configuration.Properties.TryGetValue(Environment.ConnectionStringName, out connStringName))
                 {
-
                     var connectionStringSettings = System.Configuration.ConfigurationManager.ConnectionStrings[connStringName];
 
                     connString = connectionStringSettings.ConnectionString;

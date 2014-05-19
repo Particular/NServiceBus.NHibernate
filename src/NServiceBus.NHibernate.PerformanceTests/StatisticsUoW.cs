@@ -52,9 +52,9 @@
                 RecordSuccess();
         }
 
-        public void Init()
+        public void Init(Configure config)
         {
-            Configure.Component<StatisticsUoW>(DependencyLifecycle.InstancePerUnitOfWork);
+            config.Configurer.ConfigureComponent<StatisticsUoW>(DependencyLifecycle.InstancePerUnitOfWork);
         }
     }
 }
