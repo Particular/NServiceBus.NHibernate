@@ -1,6 +1,5 @@
 namespace NServiceBus.SagaPersisters.NHibernate.Tests
 {
-    using AutoPersistence.Attributes;
     using Config.Internal;
     using global::NHibernate;
     using global::NHibernate.Cfg;

@@ -1,4 +1,4 @@
-namespace NServiceBus.SagaPersisters.NHibernate.AutoPersistence.Attributes
+namespace NServiceBus.SagaPersisters.NHibernate
 {
     using System;
 

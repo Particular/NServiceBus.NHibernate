@@ -5,7 +5,6 @@ namespace NServiceBus.SagaPersisters.NHibernate.AutoPersistence
     using System.Collections.Generic;
     using System.Linq;
     using System.Reflection;
-    using Attributes;
     using global::NHibernate;
     using global::NHibernate.Cfg.MappingSchema;
     using global::NHibernate.Mapping.ByCode;

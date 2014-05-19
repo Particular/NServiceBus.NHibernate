@@ -6,7 +6,7 @@
     using AcceptanceTesting;
     using NUnit.Framework;
     using Saga;
-    using SagaPersisters.NHibernate.AutoPersistence.Attributes;
+    using SagaPersisters.NHibernate;
     using ScenarioDescriptors;
 
     public class When_saga_contains_nested_collection_with_row_version : NServiceBusAcceptanceTest
