@@ -2,18 +2,17 @@ namespace NServiceBus.NHibernate
 {
     using global::NHibernate.Cfg;
     using Persistence;
-    using Settings;
 
     public static class TimeoutConfig
     {
-        public static void DisableTimeoutStorageSchemaUpdate(this PersistenceConfiguration config)
+        public static void DisableTimeoutStorageSchemaUpdate(this PersistenceConfiguration persistenceConfiguration)
         {
-            SettingsHolder.Instance.Set("NHibernate.Timeouts.AutoUpdateSchema", false);
+            persistenceConfiguration.Config.Settings.Set("NHibernate.Timeouts.AutoUpdateSchema", false);
         }
 
-        public static void UseTimeoutStorageConfiguration(this PersistenceConfiguration config, Configuration configuration)
+        public static void UseTimeoutStorageConfiguration(this PersistenceConfiguration persistenceConfiguration, Configuration configuration)
         {
-            SettingsHolder.Instance.Set("NHibernate.Timeouts.Configuration", configuration);
+            persistenceConfiguration.Config.Settings.Set("NHibernate.Timeouts.Configuration", configuration);
         }
 
     }

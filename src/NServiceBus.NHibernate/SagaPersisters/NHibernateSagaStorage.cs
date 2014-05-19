@@ -22,14 +22,14 @@ namespace NServiceBus.Features
             config.Settings.Get<List<Action<Configuration>>>("StorageConfigurationModifications")
                 .Add(c =>
                 {
-                    var scannedAssemblies = Configure.TypesToScan.Select(t => t.Assembly).Distinct();
+                    var scannedAssemblies = config.TypesToScan.Select(t => t.Assembly).Distinct();
 
                     foreach (var assembly in scannedAssemblies)
                     {
                         c.AddAssembly(assembly);
                     }
 
-                    var types = Configure.TypesToScan.Except(c.ClassMappings.Select(x => x.MappedClass));
+                    var types = config.TypesToScan.Except(c.ClassMappings.Select(x => x.MappedClass));
                     SagaModelMapper modelMapper;
                     if (tableNamingConvention == null)
                     {
@@ -45,7 +45,7 @@ namespace NServiceBus.Features
 
                 });
 
-            foreach (var kvp in ConfigureNHibernate.SagaPersisterProperties)
+            foreach (var kvp in new ConfigureNHibernate(config.Settings).SagaPersisterProperties)
             {
                 config.Settings.Get<Dictionary<string, string>>("StorageProperties")[kvp.Key] = kvp.Value;
             }

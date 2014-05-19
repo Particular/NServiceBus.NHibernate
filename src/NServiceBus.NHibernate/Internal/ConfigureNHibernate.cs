@@ -18,8 +18,10 @@ namespace NServiceBus.NHibernate.Internal
     /// <summary>
     /// Helper class to configure NHibernate persisters.
     /// </summary>
-    public static class ConfigureNHibernate
+    public class ConfigureNHibernate
     {
+        readonly SettingsHolder settings;
+
         private const string Message =
             @"
 To run NServiceBus with NHibernate you need to at least specify the database connectionstring.
@@ -54,8 +56,9 @@ Here is an example of what is required:
         public static string DefaultDialect = "NHibernate.Dialect.MsSql2008Dialect";
 
 
-        static ConfigureNHibernate()
+        public ConfigureNHibernate(SettingsHolder settings)
         {
+            this.settings = settings;
             Init();
         }
 
@@ -68,14 +71,14 @@ Here is an example of what is required:
         /// <c>&lt;hibernate-configuration&gt;</c> section not include the session-factory configuration.
         /// However those settings can be overwritten by our own configuration settings if specified.
         /// </remarks>
-        public static void Init()
+        public void Init()
         {
             connectionStringSettingsCollection = NHibernateSettingRetriever.ConnectionStrings() ??
                                                  new ConnectionStringSettingsCollection();
 
             var configuration = CreateNHibernateConfiguration();
 
-            var defaultConnectionString = SettingsHolder.Instance.GetOrDefault<string>("NHibernate.Common.ConnectionString") ?? GetConnectionStringOrNull("NServiceBus/Persistence");
+            var defaultConnectionString = settings.GetOrDefault<string>("NHibernate.Common.ConnectionString") ?? GetConnectionStringOrNull("NServiceBus/Persistence");
             var configurationProperties = configuration.Properties;
 
             var appSettingsSection = NHibernateSettingRetriever.AppSettings() ?? new NameValueCollection();
@@ -116,37 +119,37 @@ Here is an example of what is required:
         /// <summary>
         /// Timeout persister NHibernate properties.
         /// </summary>
-        public static IDictionary<string, string> TimeoutPersisterProperties { get; private set; }
+        public IDictionary<string, string> TimeoutPersisterProperties { get; private set; }
 
         /// <summary>
         /// Subscription persister NHibernate properties.
         /// </summary>
-        public static IDictionary<string, string> SubscriptionStorageProperties { get; private set; }
+        public IDictionary<string, string> SubscriptionStorageProperties { get; private set; }
 
         /// <summary>
         /// Saga persister NHibernate properties.
         /// </summary>
-        public static IDictionary<string, string> SagaPersisterProperties { get; private set; }
+        public IDictionary<string, string> SagaPersisterProperties { get; private set; }
 
         /// <summary>
         /// Gateway persister NHibernate properties.
         /// </summary>
-        public static IDictionary<string, string> GatewayPersisterProperties { get; private set; }
+        public IDictionary<string, string> GatewayPersisterProperties { get; private set; }
 
         /// <summary>
         /// Gateway deduplication NHibernate properties.
         /// </summary>
-        public static IDictionary<string, string> GatewayDeduplicationProperties { get; private set; }
+        public IDictionary<string, string> GatewayDeduplicationProperties { get; private set; }
 
         /// <summary>
         /// Distributor persister NHibernate properties.
         /// </summary>
-        public static IDictionary<string, string> DistributorPersisterProperties { get; private set; }
+        public IDictionary<string, string> DistributorPersisterProperties { get; private set; }
 
         /// <summary>
         /// Outbox persister NHibernate properties.
         /// </summary>
-        public static IDictionary<string, string> OutboxProperties { get; private set; }
+        public IDictionary<string, string> OutboxProperties { get; private set; }
 
         /// <summary>
         /// Adds T mapping to <paramref name="configuration"/> .

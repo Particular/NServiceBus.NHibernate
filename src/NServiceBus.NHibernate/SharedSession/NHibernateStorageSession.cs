@@ -71,13 +71,13 @@ namespace NServiceBus.Features
             Installer.configuration = configuration;
         }
 
-        class Defaults : ISetDefaultSettings
+        class Defaults : IWantToRunBeforeConfiguration
         {
-            public Defaults()
+            public void Init(Configure configure)
             {
-                SettingsHolder.Instance.SetDefault("AutoUpdateSchema", true);
-                SettingsHolder.Instance.SetDefault("StorageProperties", new Dictionary<string, string>());
-                SettingsHolder.Instance.SetDefault("StorageConfigurationModifications", new List<Action<Configuration>>());
+                configure.Settings.SetDefault("AutoUpdateSchema", true);
+                configure.Settings.SetDefault("StorageProperties", new Dictionary<string, string>());
+                configure.Settings.SetDefault("StorageConfigurationModifications", new List<Action<Configuration>>());
             }
         }
     }

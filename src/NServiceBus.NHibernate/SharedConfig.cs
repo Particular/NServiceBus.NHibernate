@@ -6,27 +6,27 @@
 
     public static class SharedConfig
     {
-        public static void ConnectionString(this PersistenceConfiguration config, string connectionString) 
+        public static void ConnectionString(this PersistenceConfiguration persistenceConfiguration, string connectionString) 
         {
-            SettingsHolder.Instance.Set("NHibernate.Common.ConnectionString",connectionString);
+            persistenceConfiguration.Config.Settings.Set("NHibernate.Common.ConnectionString", connectionString);
         }
 
-        public static void DisableSchemaUpdate(this PersistenceConfiguration config)
+        public static void DisableSchemaUpdate(this PersistenceConfiguration persistenceConfiguration)
         {
-            SettingsHolder.Instance.Set("NHibernate.Common.AutoUpdateSchema", false);
+            persistenceConfiguration.Config.Settings.Set("NHibernate.Common.AutoUpdateSchema", false);
         }
-        public static void UseConfiguration(this PersistenceConfiguration config, Configuration configuration)
+        public static void UseConfiguration(this PersistenceConfiguration persistenceConfiguration, Configuration configuration)
         {
-            SettingsHolder.Instance.Set("StorageConfiguration", configuration);
+            persistenceConfiguration.Config.Settings.Set("StorageConfiguration", configuration);
         }
 
 
 
-        class Defaults : ISetDefaultSettings
+        class Defaults : IWantToRunBeforeConfiguration
         {
-            public Defaults()
+            public void Init(Configure configure)
             {
-                SettingsHolder.Instance.SetDefault("NHibernate.Common.AutoUpdateSchema", true);
+                configure.Settings.SetDefault("NHibernate.Common.AutoUpdateSchema", true);
             }
         }
     }

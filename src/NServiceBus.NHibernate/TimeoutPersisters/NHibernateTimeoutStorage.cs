@@ -14,7 +14,9 @@ namespace NServiceBus.Features
 
         public override void Initialize(Configure config)
         {
-            var properties = ConfigureNHibernate.TimeoutPersisterProperties;
+            var properties = new ConfigureNHibernate(config.Settings)
+                .TimeoutPersisterProperties;
+
             ConfigureNHibernate.ThrowIfRequiredPropertiesAreMissing(properties);
 
             var configuration = config.Settings.GetOrDefault<Configuration>("NHibernate.Timeouts.Configuration");
@@ -28,8 +30,6 @@ namespace NServiceBus.Features
             ConfigureNHibernate.AddMappings<TimeoutEntityMap>(configuration);
 
             TimeoutPersisters.NHibernate.Installer.Installer.configuration = configuration;
-
-            TimeoutPersisters.NHibernate.Installer.Installer.RunInstaller = config.Settings.Get<bool>("NHibernate.Common.AutoUpdateSchema");
 
             if (config.Settings.HasSetting("NHibernate.Timeouts.AutoUpdateSchema"))
             {

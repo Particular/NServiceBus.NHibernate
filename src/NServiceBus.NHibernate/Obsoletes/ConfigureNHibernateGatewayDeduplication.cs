@@ -2,6 +2,7 @@
 {
     using Deduplication.NHibernate.Config;
     using NHibernate.Internal;
+    using Persistence;
 // ReSharper disable once RedundantNameQualifier
     using global::NHibernate.Cfg;
 
@@ -39,12 +40,7 @@
         /// <returns>The configuration object.</returns>
         public static Configure UseNHibernateGatewayDeduplication(this Configure config)
         {
-            ConfigureNHibernate.ConfigureSqlLiteIfRunningInDebugModeAndNoConfigPropertiesSet(ConfigureNHibernate.GatewayDeduplicationProperties);
-
-            var properties = ConfigureNHibernate.GatewayDeduplicationProperties;
-            var configuration = ConfigureNHibernate.CreateConfigurationWith(properties);
-
-            return config.UseNHibernateGatewayDeduplicationInternal(configuration);
+            return config.UsePersistence<Persistence.NHibernate>();
         }
 
         /// <summary>
@@ -55,12 +51,7 @@
         /// <returns>The configuration object</returns>
         public static Configure UseNHibernateGatewayDeduplication(this Configure config, Configuration configuration)
         {
-            foreach (var property in configuration.Properties)
-            {
-                ConfigureNHibernate.GatewayDeduplicationProperties[property.Key] = property.Value;
-            }
-
-            return config.UseNHibernateGatewayDeduplicationInternal(configuration);
+            return config.UsePersistence<Persistence.NHibernate>();
         }
 
         /// <summary>
@@ -70,25 +61,24 @@
         /// <returns>The configuration object.</returns>
         public static Configure DisableNHibernateGatewayDeduplicationInstall(this Configure config)
         {
-            Deduplication.NHibernate.Installer.Installer.RunInstaller = false;
-            return config;
+            return config.UsePersistence<Persistence.NHibernate>();
         }
 
-        private static Configure UseNHibernateGatewayDeduplicationInternal(this Configure config, Configuration configuration)
-        {
-            ConfigureNHibernate.ThrowIfRequiredPropertiesAreMissing(configuration.Properties);
+        //static Configure UseNHibernateGatewayDeduplicationInternal(this Configure config, Configuration configuration)
+        //{
+        //    ConfigureNHibernate.ThrowIfRequiredPropertiesAreMissing(configuration.Properties);
 
-            Deduplication.NHibernate.Installer.Installer.RunInstaller = true;
+        //    Deduplication.NHibernate.Installer.Installer.RunInstaller = true;
 
-            ConfigureNHibernate.AddMappings<DeduplicationMessageMap>(configuration);
+        //    ConfigureNHibernate.AddMappings<DeduplicationMessageMap>(configuration);
 
-            Deduplication.NHibernate.Installer.Installer.configuration = configuration;
+        //    Deduplication.NHibernate.Installer.Installer.configuration = configuration;
 
-            config.Configurer.ConfigureComponent<Deduplication.NHibernate.GatewayDeduplication>(
-                DependencyLifecycle.SingleInstance)
-                .ConfigureProperty(p => p.SessionFactory, configuration.BuildSessionFactory());
+        //    config.Configurer.ConfigureComponent<Deduplication.NHibernate.GatewayDeduplication>(
+        //        DependencyLifecycle.SingleInstance)
+        //        .ConfigureProperty(p => p.SessionFactory, configuration.BuildSessionFactory());
 
-            return config.RunGateway();
-        }
+        //    return config.RunGateway();
+        //}
     }
 }

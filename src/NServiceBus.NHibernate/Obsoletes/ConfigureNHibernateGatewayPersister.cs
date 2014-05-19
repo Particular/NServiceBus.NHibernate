@@ -2,6 +2,7 @@ namespace NServiceBus
 {
     using GatewayPersister.NHibernate.Config;
     using NHibernate.Internal;
+    using Persistence;
 // ReSharper disable once RedundantNameQualifier
     using global::NHibernate.Cfg;
 
@@ -39,12 +40,7 @@ namespace NServiceBus
         /// <returns>The configuration object.</returns>
         public static Configure UseNHibernateGatewayPersister(this Configure config)
         {
-            ConfigureNHibernate.ConfigureSqlLiteIfRunningInDebugModeAndNoConfigPropertiesSet(ConfigureNHibernate.GatewayPersisterProperties);
-
-            var properties = ConfigureNHibernate.GatewayPersisterProperties;
-            var configuration = ConfigureNHibernate.CreateConfigurationWith(properties);
-
-            return config.UseNHibernateGatewayPersisterInternal(configuration);
+            return config.UsePersistence<Persistence.NHibernate>();
         }
 
         /// <summary>
@@ -55,12 +51,7 @@ namespace NServiceBus
         /// <returns>The configuration object</returns>
         public static Configure UseNHibernateGatewayPersister(this Configure config, Configuration configuration)
         {
-            foreach (var property in configuration.Properties)
-            {
-                ConfigureNHibernate.GatewayPersisterProperties[property.Key] = property.Value;
-            }
-
-            return config.UseNHibernateGatewayPersisterInternal(configuration);
+            return config.UsePersistence<Persistence.NHibernate>();
         }
 
         /// <summary>
@@ -70,25 +61,24 @@ namespace NServiceBus
         /// <returns>The configuration object.</returns>
         public static Configure DisableNHibernateGatewayPersisterInstall(this Configure config)
         {
-            GatewayPersister.NHibernate.Installer.Installer.RunInstaller = false;
-            return config;
+            return config.UsePersistence<Persistence.NHibernate>();
         }
 
-        private static Configure UseNHibernateGatewayPersisterInternal(this Configure config, Configuration configuration)
-        {
-            ConfigureNHibernate.ThrowIfRequiredPropertiesAreMissing(configuration.Properties);
+        //static Configure UseNHibernateGatewayPersisterInternal(this Configure config, Configuration configuration)
+        //{
+        //    ConfigureNHibernate.ThrowIfRequiredPropertiesAreMissing(configuration.Properties);
 
-            GatewayPersister.NHibernate.Installer.Installer.RunInstaller = true;
+        //    GatewayPersister.NHibernate.Installer.Installer.RunInstaller = true;
 
-            ConfigureNHibernate.AddMappings<GatewayMessageMap>(configuration);
+        //    ConfigureNHibernate.AddMappings<GatewayMessageMap>(configuration);
 
-            GatewayPersister.NHibernate.Installer.Installer.configuration = configuration;
+        //    GatewayPersister.NHibernate.Installer.Installer.configuration = configuration;
 
-            config.Configurer.ConfigureComponent<GatewayPersister.NHibernate.GatewayPersister>(
-                DependencyLifecycle.SingleInstance)
-                .ConfigureProperty(p => p.SessionFactory, configuration.BuildSessionFactory());
+        //    config.Configurer.ConfigureComponent<GatewayPersister.NHibernate.GatewayPersister>(
+        //        DependencyLifecycle.SingleInstance)
+        //        .ConfigureProperty(p => p.SessionFactory, configuration.BuildSessionFactory());
 
-            return config.RunGateway();
-        }
+        //    return config.RunGateway();
+        //}
     }
 }
