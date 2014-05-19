@@ -45,11 +45,6 @@ namespace NServiceBus.Features
 
                 });
 
-            foreach (var kvp in new ConfigureNHibernate(config.Settings).SagaPersisterProperties)
-            {
-                config.Settings.Get<Dictionary<string, string>>("StorageProperties")[kvp.Key] = kvp.Value;
-            }
-
             config.Configurer.ConfigureComponent<SagaPersister>(DependencyLifecycle.InstancePerCall);
         }
     }

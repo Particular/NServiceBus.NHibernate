@@ -2,6 +2,7 @@ namespace NServiceBus.Features
 {
     using System;
     using System.Collections.Generic;
+    using NHibernate.Internal;
     using NHibernate.SharedSession;
     using global::NHibernate.Cfg;
     using global::NHibernate;
@@ -21,9 +22,10 @@ namespace NServiceBus.Features
 
             if (configuration == null)
             {
-                var properties = config.Settings.Get<IDictionary<string, string>>("StorageProperties");
+                var properties = new ConfigureNHibernate(config.Settings).SagaPersisterProperties;
 
-                configuration = new Configuration().SetProperties(properties);
+                configuration = new Configuration()
+                    .SetProperties(properties);
 
                 foreach (var modification in config.Settings.Get<List<Action<Configuration>>>("StorageConfigurationModifications"))
                 {
@@ -76,7 +78,6 @@ namespace NServiceBus.Features
             public void Init(Configure configure)
             {
                 configure.Settings.SetDefault("AutoUpdateSchema", true);
-                configure.Settings.SetDefault("StorageProperties", new Dictionary<string, string>());
                 configure.Settings.SetDefault("StorageConfigurationModifications", new List<Action<Configuration>>());
             }
         }

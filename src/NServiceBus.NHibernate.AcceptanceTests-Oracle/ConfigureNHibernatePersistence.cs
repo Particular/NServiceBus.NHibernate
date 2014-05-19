@@ -1,20 +1,18 @@
 ﻿using System.Collections.Specialized;
-using System.Configuration;
+using NServiceBus;
+using NServiceBus.NHibernate;
 using NServiceBus.NHibernate.Internal;
+using NServiceBus.Persistence;
 
-public abstract class ConfigurePersistences
+public class ConfigureNHibernatePersistence
 {
-    protected ConfigurePersistences()
+    public void Configure(Configure config)
     {
-        NHibernateSettingRetriever.ConnectionStrings = () => new ConnectionStringSettingsCollection
-        {
-            new ConnectionStringSettings("NServiceBus/Persistence", @"Data Source=XE;User Id=particular;Password=Welcome1")
-        };
-
         NHibernateSettingRetriever.AppSettings = () => new NameValueCollection
         {
             {"NServiceBus/Persistence/NHibernate/connection.driver_class", "NHibernate.Driver.OracleDataClientDriver"},
             {"NServiceBus/Persistence/NHibernate/dialect", "NHibernate.Dialect.Oracle10gDialect"}
         };
+        config.UsePersistence<NServiceBus.Persistence.NHibernate>(c => c.ConnectionString(@"Data Source=XE;User Id=particular;Password=Welcome1"));
     }
 }

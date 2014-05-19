@@ -9,16 +9,12 @@
 
     class NHibernateConfigurer : IConfigurePersistence<NHibernate>
     {
-        public void Configure()
-        {
-         
-        }
-
         public void Enable(Configure config)
         {
             Feature.EnableByDefault<NHibernateStorageSession>();
             Feature.EnableByDefault<NHibernateOutboxStorage>();
             Feature.EnableByDefault<NHibernateSagaStorage>();
+            Feature.EnableByDefault<NHibernateSubscriptionStorage>();
             Feature.EnableByDefault<NHibernateTimeoutStorage>();
         }
     }
