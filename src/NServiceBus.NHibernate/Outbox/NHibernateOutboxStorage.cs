@@ -16,14 +16,20 @@ namespace NServiceBus.Features
 
         public override void Initialize(Configure config)
         {
-            var mapper = new ModelMapper();
-            mapper.AddMapping<OutboxEntityMap>();
-            mapper.AddMapping<TransportOperationEntityMap>();
-
-            config.Settings.Get<List<Action<Configuration>>>("StorageConfigurationModifications")
-                .Add(c => c.AddMapping(mapper.CompileMappingForAllExplicitlyAddedEntities()));
-
             config.Configurer.ConfigureComponent<OutboxPersister>(DependencyLifecycle.SingleInstance);
+        }
+
+        class RegisterMappings : INeedInitialization
+        {
+            public void Init(Configure config)
+            {
+                var mapper = new ModelMapper();
+                mapper.AddMapping<OutboxEntityMap>();
+                mapper.AddMapping<TransportOperationEntityMap>();
+
+                config.Settings.Get<List<Action<Configuration>>>("StorageConfigurationModifications")
+                    .Add(c => c.AddMapping(mapper.CompileMappingForAllExplicitlyAddedEntities()));
+            }
         }
     }
 }
