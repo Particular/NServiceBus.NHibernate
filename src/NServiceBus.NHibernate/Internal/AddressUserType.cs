@@ -6,9 +6,9 @@ namespace NServiceBus.NHibernate.Internal
     using global::NHibernate.SqlTypes;
     using global::NHibernate.UserTypes;
 
-    public class AddressUserType : IUserType
+    class AddressUserType : IUserType
     {
-        private static readonly SqlType[] sqlTypes = new[] {NHibernateUtil.String.SqlType};
+        private static readonly SqlType[] sqlTypes = {NHibernateUtil.String.SqlType};
 
         public new bool Equals(object x, object y)
         {

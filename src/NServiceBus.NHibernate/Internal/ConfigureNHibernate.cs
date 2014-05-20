@@ -18,7 +18,7 @@ namespace NServiceBus.NHibernate.Internal
     /// <summary>
     /// Helper class to configure NHibernate persisters.
     /// </summary>
-    public class ConfigureNHibernate
+    class ConfigureNHibernate
     {
         readonly SettingsHolder settings;
 
@@ -52,7 +52,7 @@ Here is an example of what is required:
         static readonly Regex PropertyRetrievalRegex = new Regex(@"NServiceBus/Persistence/NHibernate/([\W\w]+)$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
         private static ConnectionStringSettingsCollection connectionStringSettingsCollection;
 
-        public static string DefaultDialect = "NHibernate.Dialect.MsSql2008Dialect";
+        public const string DefaultDialect = "NHibernate.Dialect.MsSql2008Dialect";
 
 
         public ConfigureNHibernate(SettingsHolder settings)
