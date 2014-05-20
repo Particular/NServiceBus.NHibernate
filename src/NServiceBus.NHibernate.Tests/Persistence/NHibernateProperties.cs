@@ -33,7 +33,8 @@ namespace NServiceBus.Persistence.NHibernate.Tests
                 };
 
             CollectionAssert.IsSubsetOf(expected, config.DistributorPersisterProperties);
-            CollectionAssert.IsSubsetOf(expected, config.GatewayPersisterProperties);
+            CollectionAssert.IsSubsetOf(expected, config.GatewayDeduplicationProperties);
+            CollectionAssert.IsSubsetOf(expected, config.OutboxProperties);
             CollectionAssert.IsSubsetOf(expected, config.SagaPersisterProperties);
             CollectionAssert.IsSubsetOf(expected, config.SubscriptionStorageProperties);
             CollectionAssert.IsSubsetOf(expected, config.TimeoutPersisterProperties);
@@ -63,7 +64,8 @@ namespace NServiceBus.Persistence.NHibernate.Tests
                 };
 
             CollectionAssert.IsSubsetOf(expectedDefault, config.DistributorPersisterProperties);
-            CollectionAssert.IsSubsetOf(expectedDefault, config.GatewayPersisterProperties);
+            CollectionAssert.IsSubsetOf(expectedDefault, config.GatewayDeduplicationProperties);
+            CollectionAssert.IsSubsetOf(expectedDefault, config.OutboxProperties);
             CollectionAssert.IsSubsetOf(expectedDefault, config.SagaPersisterProperties);
             CollectionAssert.IsSubsetOf(expectedDefault, config.SubscriptionStorageProperties);
             CollectionAssert.IsSubsetOf(expectedForTimeout, config.TimeoutPersisterProperties);
@@ -93,7 +95,8 @@ namespace NServiceBus.Persistence.NHibernate.Tests
                 };
 
             CollectionAssert.IsSubsetOf(expected, config.DistributorPersisterProperties);
-            CollectionAssert.IsSubsetOf(expected, config.GatewayPersisterProperties);
+            CollectionAssert.IsSubsetOf(expected, config.GatewayDeduplicationProperties);
+            CollectionAssert.IsSubsetOf(expected, config.OutboxProperties);
             CollectionAssert.IsSubsetOf(expected, config.SagaPersisterProperties);
             CollectionAssert.IsSubsetOf(expected, config.SubscriptionStorageProperties);
             CollectionAssert.IsSubsetOf(expected, config.TimeoutPersisterProperties);
@@ -120,7 +123,8 @@ namespace NServiceBus.Persistence.NHibernate.Tests
                 };
 
             CollectionAssert.IsSubsetOf(expected, config.DistributorPersisterProperties);
-            CollectionAssert.IsSubsetOf(expected, config.GatewayPersisterProperties);
+            CollectionAssert.IsSubsetOf(expected, config.GatewayDeduplicationProperties);
+            CollectionAssert.IsSubsetOf(expected, config.OutboxProperties);
             CollectionAssert.IsSubsetOf(expected, config.SagaPersisterProperties);
             CollectionAssert.IsSubsetOf(expected, config.SubscriptionStorageProperties);
             CollectionAssert.IsSubsetOf(expected, config.TimeoutPersisterProperties);

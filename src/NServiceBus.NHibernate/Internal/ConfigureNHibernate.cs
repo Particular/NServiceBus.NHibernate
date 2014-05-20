@@ -44,7 +44,6 @@ Here is an example of what is required:
     <add name=""NServiceBus/Persistence/NHibernate/Timeout"" connectionString=""Data Source=.\SQLEXPRESS;Initial Catalog=timeout;Integrated Security=True"" />
     <add name=""NServiceBus/Persistence/NHibernate/Saga"" connectionString=""Data Source=.\SQLEXPRESS;Initial Catalog=sagas;Integrated Security=True"" />
     <add name=""NServiceBus/Persistence/NHibernate/Subscription"" connectionString=""Data Source=.\SQLEXPRESS;Initial Catalog=subscription;Integrated Security=True"" />
-    <add name=""NServiceBus/Persistence/NHibernate/Gateway"" connectionString=""Data Source=.\SQLEXPRESS;Initial Catalog=gateway;Integrated Security=True"" />
     <add name=""NServiceBus/Persistence/NHibernate/Deduplication"" connectionString=""Data Source=.\SQLEXPRESS;Initial Catalog=gateway;Integrated Security=True"" />
     <add name=""NServiceBus/Persistence/NHibernate/Distributor"" connectionString=""Data Source=.\SQLEXPRESS;Initial Catalog=distributor;Integrated Security=True"" />
   </connectionStrings>";
@@ -106,8 +105,6 @@ Here is an example of what is required:
                 "NServiceBus/Persistence/NHibernate/Subscription");
             SagaPersisterProperties = OverrideConnectionStringSettingIfNotNull(configurationProperties,
                 "NServiceBus/Persistence/NHibernate/Saga");
-            GatewayPersisterProperties = OverrideConnectionStringSettingIfNotNull(configurationProperties,
-                "NServiceBus/Persistence/NHibernate/Gateway");
             GatewayDeduplicationProperties = OverrideConnectionStringSettingIfNotNull(configurationProperties,
                 "NServiceBus/Persistence/NHibernate/Deduplication");
             DistributorPersisterProperties = OverrideConnectionStringSettingIfNotNull(configurationProperties,
@@ -130,11 +127,6 @@ Here is an example of what is required:
         /// Saga persister NHibernate properties.
         /// </summary>
         public IDictionary<string, string> SagaPersisterProperties { get; private set; }
-
-        /// <summary>
-        /// Gateway persister NHibernate properties.
-        /// </summary>
-        public IDictionary<string, string> GatewayPersisterProperties { get; private set; }
 
         /// <summary>
         /// Gateway deduplication NHibernate properties.
