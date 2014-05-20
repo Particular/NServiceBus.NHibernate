@@ -37,6 +37,7 @@ namespace NServiceBus.NHibernate.SharedSession
             {
                 InsertAfter(WellKnownBehavior.ChildContainer);
                 InsertBeforeIfExists("OutboxDeduplication");
+                InsertBefore(WellKnownBehavior.UnitOfWork);
             }
         }
     }

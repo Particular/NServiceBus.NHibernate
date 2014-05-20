@@ -37,7 +37,9 @@ namespace NServiceBus.NHibernate.SharedSession
             public Registration()
                 : base("OpenNHibernateTransaction", typeof(OpenNativeTransactionBehavior), "Makes sure that there is a NHibernate Transaction wrapping the pipeline")
             {
-                InsertAfter("OpenNHibernateSession");
+                InsertAfter(WellKnownBehavior.UnitOfWork);
+                InsertBefore(WellKnownBehavior.InvokeSaga);
+                InsertBeforeIfExists("OutboxRecorder");  
             }
         }
     }

@@ -51,6 +51,7 @@ namespace NServiceBus.Features
 
             config.Pipeline.Register<OpenSqlConnectionBehavior.Registration>();
             config.Pipeline.Register<OpenSessionBehavior.Registration>();
+            config.Pipeline.Register<OpenNativeTransactionBehavior.Registration>();
 
             config.Configurer.RegisterSingleton<ISessionFactory>(configuration.BuildSessionFactory());
 
