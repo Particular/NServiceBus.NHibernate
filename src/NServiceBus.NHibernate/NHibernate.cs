@@ -11,11 +11,12 @@
     {
         public void Enable(Configure config)
         {
-            Feature.EnableByDefault<NHibernateStorageSession>();
-            Feature.EnableByDefault<NHibernateOutboxStorage>();
-            Feature.EnableByDefault<NHibernateSagaStorage>();
-            Feature.EnableByDefault<NHibernateSubscriptionStorage>();
-            Feature.EnableByDefault<NHibernateTimeoutStorage>();
+            config.Features.EnableByDefault<NHibernateStorageSession>();
+            config.Features.EnableByDefault<NHibernateOutboxStorage>();
+            config.Features.EnableByDefault<NHibernateSagaStorage>();
+            config.Features.EnableByDefault<NHibernateSubscriptionStorage>();
+            config.Features.EnableByDefault<NHibernateTimeoutStorage>();
+            config.Features.EnableByDefault<NHibernateGatewayDeduplication>();
         }
     }
 }

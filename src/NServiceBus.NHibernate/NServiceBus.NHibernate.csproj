@@ -74,8 +74,8 @@
     <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Deduplication\DedupplicationConfig.cs" />
-    <Compile Include="Deduplication\NHibernateGatewayDedupplication.cs" />
+    <Compile Include="Deduplication\DeduplicationConfig.cs" />
+    <Compile Include="Deduplication\NHibernateGatewayDeduplication.cs" />
     <Compile Include="Obsoletes\ConfigureNHibernateGatewayDeduplication.cs" />
     <Compile Include="Obsoletes\ConfigureNHibernateSagaPersister.cs" />
     <Compile Include="Obsoletes\ConfigureNHibernateSubscriptionStorage.cs" />

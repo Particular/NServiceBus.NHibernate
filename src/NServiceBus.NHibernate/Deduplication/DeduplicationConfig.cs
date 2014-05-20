@@ -3,7 +3,7 @@ namespace NServiceBus.NHibernate
     using global::NHibernate.Cfg;
     using Persistence;
 
-    public static class DedupplicationConfig
+    public static class DeduplicationConfig
     {
         public static void DisableGatewayDeduplicationSchemaUpdate(this PersistenceConfiguration persistenceConfiguration)
         {

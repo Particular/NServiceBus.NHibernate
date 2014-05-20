@@ -4,9 +4,9 @@ namespace NServiceBus.Features
     using global::NHibernate.Cfg;
     using NHibernate.Internal;
 
-    public class NHibernateGatewayDedupplication : Feature
+    public class NHibernateGatewayDeduplication : Feature
     {
-        public NHibernateGatewayDedupplication()
+        public NHibernateGatewayDeduplication()
         {
             DependsOn<Gateway>();
         }
