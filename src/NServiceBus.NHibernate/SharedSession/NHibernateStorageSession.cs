@@ -1,7 +1,5 @@
 namespace NServiceBus.Features
 {
-    using System;
-    using System.Collections.Generic;
     using NHibernate.Internal;
     using NHibernate.SharedSession;
     using global::NHibernate.Cfg;
@@ -27,9 +25,14 @@ namespace NServiceBus.Features
                     .SetProperties(properties);
             }
 
-            foreach (var modification in config.Settings.Get<List<Action<Configuration>>>("StorageConfigurationModifications"))
+            if (IsEnabled<NHibernateOutboxStorage>())
             {
-                modification(configuration);
+                NHibernateOutboxStorage.ApplyMappings(configuration);
+            }
+
+            if (IsEnabled<NHibernateSagaStorage>())
+            {
+                NHibernateSagaStorage.ApplyMappings(config, configuration);
             }
 
             string connString;
@@ -69,14 +72,6 @@ namespace NServiceBus.Features
             Installer.RunInstaller = config.Settings.Get<bool>("NHibernate.Common.AutoUpdateSchema");
 
             Installer.configuration = configuration;
-        }
-
-        class Defaults : IWantToRunBeforeConfiguration
-        {
-            public void Init(Configure configure)
-            {
-                configure.Settings.SetDefault("StorageConfigurationModifications", new List<Action<Configuration>>());
-            }
         }
     }
 }

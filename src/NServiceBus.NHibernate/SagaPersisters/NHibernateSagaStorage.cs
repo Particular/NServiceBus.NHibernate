@@ -1,7 +1,6 @@
 namespace NServiceBus.Features
 {
     using System;
-    using System.Collections.Generic;
     using System.Linq;
     using global::NHibernate.Cfg;
     using SagaPersisters.NHibernate;
@@ -16,41 +15,32 @@ namespace NServiceBus.Features
 
         public override void Initialize(Configure config)
         {
-            
-
             config.Configurer.ConfigureComponent<SagaPersister>(DependencyLifecycle.InstancePerCall);
         }
 
-        class RegisterMappings : INeedInitialization
+        internal static void ApplyMappings(Configure config, Configuration configuration)
         {
-            public void Init(Configure config)
+            var tableNamingConvention = config.Settings.GetOrDefault<Func<Type, string>>("NHibernate.Sagas.TableNamingConvention");
+
+            var scannedAssemblies = config.TypesToScan.Select(t => t.Assembly).Distinct();
+
+            foreach (var assembly in scannedAssemblies)
             {
-                var tableNamingConvention = config.Settings.GetOrDefault<Func<Type, string>>("NHibernate.Sagas.TableNamingConvention");
-
-                config.Settings.Get<List<Action<Configuration>>>("StorageConfigurationModifications")
-                    .Add(c =>
-                    {
-                        var scannedAssemblies = config.TypesToScan.Select(t => t.Assembly).Distinct();
-
-                        foreach (var assembly in scannedAssemblies)
-                        {
-                            c.AddAssembly(assembly);
-                        }
-
-                        var types = config.TypesToScan.Except(c.ClassMappings.Select(x => x.MappedClass));
-                        SagaModelMapper modelMapper;
-                        if (tableNamingConvention == null)
-                        {
-                            modelMapper = new SagaModelMapper(types);
-                        }
-                        else
-                        {
-                            modelMapper = new SagaModelMapper(types, tableNamingConvention);
-                        }
-
-                        c.AddMapping(modelMapper.Compile());
-                    });
+                configuration.AddAssembly(assembly);
             }
+
+            var types = config.TypesToScan.Except(configuration.ClassMappings.Select(x => x.MappedClass));
+            SagaModelMapper modelMapper;
+            if (tableNamingConvention == null)
+            {
+                modelMapper = new SagaModelMapper(types);
+            }
+            else
+            {
+                modelMapper = new SagaModelMapper(types, tableNamingConvention);
+            }
+
+            configuration.AddMapping(modelMapper.Compile());
         }
     }
 }

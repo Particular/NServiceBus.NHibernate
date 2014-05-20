@@ -1,7 +1,5 @@
 namespace NServiceBus.Features
 {
-    using System;
-    using System.Collections.Generic;
     using global::NHibernate.Cfg;
     using global::NHibernate.Mapping.ByCode;
     using NServiceBus.Outbox;
@@ -19,17 +17,13 @@ namespace NServiceBus.Features
             config.Configurer.ConfigureComponent<OutboxPersister>(DependencyLifecycle.SingleInstance);
         }
 
-        class RegisterMappings : INeedInitialization
+        internal static void ApplyMappings(Configuration config)
         {
-            public void Init(Configure config)
-            {
-                var mapper = new ModelMapper();
-                mapper.AddMapping<OutboxEntityMap>();
-                mapper.AddMapping<TransportOperationEntityMap>();
+            var mapper = new ModelMapper();
+            mapper.AddMapping<OutboxEntityMap>();
+            mapper.AddMapping<TransportOperationEntityMap>();
 
-                config.Settings.Get<List<Action<Configuration>>>("StorageConfigurationModifications")
-                    .Add(c => c.AddMapping(mapper.CompileMappingForAllExplicitlyAddedEntities()));
-            }
+            config.AddMapping(mapper.CompileMappingForAllExplicitlyAddedEntities());
         }
     }
 }
