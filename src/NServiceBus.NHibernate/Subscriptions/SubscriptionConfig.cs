@@ -17,7 +17,7 @@ namespace NServiceBus.NHibernate
         }
 
 
-        public static void EnableCaching(this PersistenceConfiguration persistenceConfiguration, TimeSpan expiration)
+        public static void EnableCachingForSubscriptionStorage(this PersistenceConfiguration persistenceConfiguration, TimeSpan expiration)
         {
             persistenceConfiguration.Config.Settings.Set("NHibernate.Subscriptions.CacheExpiration", expiration);
         }

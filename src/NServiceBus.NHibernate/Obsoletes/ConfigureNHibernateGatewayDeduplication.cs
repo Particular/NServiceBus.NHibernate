@@ -36,6 +36,7 @@
         /// </example>
         /// <param name="config">The configuration object.</param>
         /// <returns>The configuration object.</returns>
+        [ObsoleteEx(RemoveInVersion = "6", TreatAsErrorFromVersion = "5.1", Replacement = "config.UsePersistence<Persistence.NHibernate>()")]
         public static Configure UseNHibernateGatewayDeduplication(this Configure config)
         {
             return config.UsePersistence<Persistence.NHibernate>();
@@ -47,6 +48,7 @@
         /// <param name="config">The configuration object.</param>
         /// <param name="configuration">The <see cref="Configuration"/> object.</param>
         /// <returns>The configuration object</returns>
+        [ObsoleteEx(RemoveInVersion = "6", TreatAsErrorFromVersion = "5.1", Replacement = "config.UsePersistence<Persistence.NHibernate>(c => c.UseGatewayDeduplicationConfiguration(configuration));")]
         public static Configure UseNHibernateGatewayDeduplication(this Configure config, Configuration configuration)
         {
             return config.UsePersistence<Persistence.NHibernate>();
@@ -57,6 +59,7 @@
         /// </summary>
         /// <param name="config">The configuration object.</param>
         /// <returns>The configuration object.</returns>
+        [ObsoleteEx(RemoveInVersion = "6", TreatAsErrorFromVersion = "5.1", Replacement = "config.UsePersistence<Persistence.NHibernate>(c=>c.DisableGatewayDeduplicationSchemaUpdate())")]
         public static Configure DisableNHibernateGatewayDeduplicationInstall(this Configure config)
         {
             return config.UsePersistence<Persistence.NHibernate>();
