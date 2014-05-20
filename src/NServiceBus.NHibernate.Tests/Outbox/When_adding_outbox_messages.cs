@@ -4,6 +4,7 @@ namespace NServiceBus.NHibernate.Tests.Outbox
     using System.Collections.Generic;
     using System.Linq;
     using NServiceBus.Outbox;
+    using NServiceBus.Outbox.NHibernate;
     using NUnit.Framework;
     using Persistence;
     using SagaPersisters.NHibernate.Tests;
@@ -54,7 +55,6 @@ namespace NServiceBus.NHibernate.Tests.Outbox
             OutboxMessage result;
             persister.TryGet(id, out result);
 
-            Assert.IsFalse(result.Dispatched);
 
             var operation = result.TransportOperations.Single();
 
@@ -90,10 +90,15 @@ namespace NServiceBus.NHibernate.Tests.Outbox
 
             persister.SetAsDispatched(id);
 
-            OutboxMessage result;
-            persister.TryGet(id, out result);
 
-            Assert.IsTrue(result.Dispatched);
+            using (var session = SessionFactory.OpenSession())
+            {
+                var result = session.QueryOver<OutboxRecord>().Where(o => o.MessageId == id)
+                    .SingleOrDefault();
+
+
+                Assert.True(result.Dispatched);
+            }
         }
 
         [Test]

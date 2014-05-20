@@ -44,7 +44,7 @@
                 return false;
             }
 
-            message = new OutboxMessage(result.MessageId, result.Dispatched);
+            message = new OutboxMessage(result.MessageId);
             message.TransportOperations.AddRange(result.TransportOperations.Select(t => new TransportOperation(
                 new SendOptions(t.Destination)
                 {
