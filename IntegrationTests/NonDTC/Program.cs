@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Configuration;
-using System.Runtime.InteropServices;
 using NHibernate.Mapping.ByCode;
 using NServiceBus;
 using NServiceBus.Features;
@@ -14,26 +13,22 @@ namespace Test.NHibernate
 {
     public class Program
     {
-
         public static void Main()
         {
             var configuration = BuildConfiguration();
-
-            Configure.Transactions.Advanced(t =>
-            {
-                t.DisableDistributedTransactions();
-                t.DoNotWrapHandlersExecutionInATransactionScope();
-            });
-            Configure.Features.Enable<Sagas>();
 
             var config = Configure.With()
                 .DefaultBuilder()
                 .UseTransport<ChaosMonkey>()
                 .UseNHibernateTimeoutPersister()
-                .UseNHibernateSagaPersister(configuration)
-                .UseNHibernateOutbox(configuration);
+                .UseNHibernateSagaPersister(configuration);
 
-
+            config.Features.Enable<Sagas>();
+            config.Transactions.Advanced(t =>
+            {
+                t.DisableDistributedTransactions();
+                t.DoNotWrapHandlersExecutionInATransactionScope();
+            });
 
             Configure.Component<ChaosMonkeyOutbox>(DependencyLifecycle.SingleInstance);
           
@@ -124,7 +119,7 @@ namespace Test.NHibernate
         {
             Enable<MessageDrivenSubscriptions>();
 
-            new MsmqTransport().Initialize();
+            new MsmqTransport().Initialize(config);
 
             NServiceBus.Configure.Component<ChaosMonkeySender>(DependencyLifecycle.InstancePerCall);
         }
