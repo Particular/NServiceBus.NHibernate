@@ -31,9 +31,7 @@ namespace NServiceBus.Features
 
             ConfigureNHibernate.AddMappings<SubscriptionMap>(configuration);
 
-            
             Unicast.Subscriptions.NHibernate.Installer.Installer.configuration = configuration;
-
 
             if (config.Settings.HasSetting("NHibernate.Subscriptions.AutoUpdateSchema"))
             {

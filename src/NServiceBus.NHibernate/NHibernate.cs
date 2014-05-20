@@ -2,9 +2,9 @@
 {
     using Features;
 
-    public class NHibernate:PersistenceDefinition
+    public class NHibernate : PersistenceDefinition
     {
-         
+
     }
 
     class NHibernateConfigurer : IConfigurePersistence<NHibernate>
