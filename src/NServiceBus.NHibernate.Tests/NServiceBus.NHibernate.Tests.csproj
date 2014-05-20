@@ -64,13 +64,6 @@
     <Reference Include="System.Transactions" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="GatewayStorage\BaseStorage.cs" />
-    <Compile Include="GatewayStorage\TestMessage.cs" />
-    <Compile Include="GatewayStorage\When_acking_an_already_acked_message.cs" />
-    <Compile Include="GatewayStorage\When_acking_an_existing_message.cs" />
-    <Compile Include="GatewayStorage\When_storing_a_duplicate_message.cs" />
-    <Compile Include="GatewayStorage\When_storing_a_new_message.cs" />
-    <Compile Include="GatewayStorage\When_updating_a_header_of_message.cs" />
     <Compile Include="Outbox\FakeDbConnectionProvider.cs" />
     <Compile Include="Outbox\InMemoryDBFixture.cs" />
     <Compile Include="Outbox\When_adding_outbox_messages.cs" />
@@ -111,7 +104,9 @@
     <None Include="Testing.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="ripple.dependencies.config" />
+    <None Include="ripple.dependencies.config">
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\NServiceBus.NHibernate\NServiceBus.NHibernate.csproj">

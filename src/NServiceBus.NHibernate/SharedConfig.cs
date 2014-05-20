@@ -2,7 +2,6 @@
 {
     using global::NHibernate.Cfg;
     using Persistence;
-    using Settings;
 
     public static class SharedConfig
     {
@@ -19,8 +18,6 @@
         {
             persistenceConfiguration.Config.Settings.Set("StorageConfiguration", configuration);
         }
-
-
 
         class Defaults : IWantToRunBeforeConfiguration
         {

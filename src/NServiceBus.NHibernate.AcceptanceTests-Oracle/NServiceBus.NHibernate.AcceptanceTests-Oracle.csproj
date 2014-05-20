@@ -39,9 +39,6 @@
     <Reference Include="Iesi.Collections">
       <HintPath>..\packages\Iesi.Collections\lib\Net35\Iesi.Collections.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.CompilerServices.AsyncTargetingPack.Net4">
-      <HintPath>..\packages\Microsoft.CompilerServices.AsyncTargetingPack\lib\net40\Microsoft.CompilerServices.AsyncTargetingPack.Net4.dll</HintPath>
-    </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="NHibernate">
       <HintPath>..\packages\NHibernate\lib\Net35\NHibernate.dll</HintPath>

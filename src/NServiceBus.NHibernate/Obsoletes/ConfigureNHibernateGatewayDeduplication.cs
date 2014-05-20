@@ -1,7 +1,5 @@
 ﻿namespace NServiceBus
 {
-    using Deduplication.NHibernate.Config;
-    using NHibernate.Internal;
     using Persistence;
 // ReSharper disable once RedundantNameQualifier
     using global::NHibernate.Cfg;
@@ -63,22 +61,5 @@
         {
             return config.UsePersistence<Persistence.NHibernate>();
         }
-
-        //static Configure UseNHibernateGatewayDeduplicationInternal(this Configure config, Configuration configuration)
-        //{
-        //    ConfigureNHibernate.ThrowIfRequiredPropertiesAreMissing(configuration.Properties);
-
-        //    Deduplication.NHibernate.Installer.Installer.RunInstaller = true;
-
-        //    ConfigureNHibernate.AddMappings<DeduplicationMessageMap>(configuration);
-
-        //    Deduplication.NHibernate.Installer.Installer.configuration = configuration;
-
-        //    config.Configurer.ConfigureComponent<Deduplication.NHibernate.GatewayDeduplication>(
-        //        DependencyLifecycle.SingleInstance)
-        //        .ConfigureProperty(p => p.SessionFactory, configuration.BuildSessionFactory());
-
-        //    return config.RunGateway();
-        //}
     }
 }

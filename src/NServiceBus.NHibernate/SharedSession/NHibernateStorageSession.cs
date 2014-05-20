@@ -7,7 +7,6 @@ namespace NServiceBus.Features
     using global::NHibernate.Cfg;
     using global::NHibernate;
     using Environment = global::NHibernate.Cfg.Environment;
-    using Settings;
 
     public class NHibernateStorageSession : Feature
     {

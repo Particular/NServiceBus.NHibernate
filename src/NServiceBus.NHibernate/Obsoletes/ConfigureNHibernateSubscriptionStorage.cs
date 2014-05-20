@@ -2,13 +2,9 @@ namespace NServiceBus
 {
     using System;
     using NHibernate;
-    using NHibernate.Internal;
     using global::NHibernate;
     using global::NHibernate.Cfg;
     using Persistence;
-    using Unicast.Subscriptions.MessageDrivenSubscriptions;
-    using Unicast.Subscriptions.NHibernate;
-    using Unicast.Subscriptions.NHibernate.Config;
 
     /// <summary>
     /// Configuration extensions for the NHibernate subscription storage

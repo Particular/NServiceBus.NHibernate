@@ -75,7 +75,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Obsoletes\ConfigureNHibernateGatewayDeduplication.cs" />
-    <Compile Include="Obsoletes\ConfigureNHibernateGatewayPersister.cs" />
     <Compile Include="Obsoletes\ConfigureNHibernateSagaPersister.cs" />
     <Compile Include="Obsoletes\ConfigureNHibernateSubscriptionStorage.cs" />
     <Compile Include="Obsoletes\ConfigureNHibernateTimeoutPersister.cs" />
@@ -88,10 +87,6 @@
     <Compile Include="Deduplication\Config\DeduplicationMessageMap.cs" />
     <Compile Include="Deduplication\GatewayDeduplication.cs" />
     <Compile Include="Deduplication\Installer\Installer.cs" />
-    <Compile Include="GatewayPersister\Config\GatewayMessage.cs" />
-    <Compile Include="GatewayPersister\Config\GatewayMessageMap.cs" />
-    <Compile Include="GatewayPersister\GatewayPersister.cs" />
-    <Compile Include="GatewayPersister\Installer\Installer.cs" />
     <Compile Include="InternalsVisibleTo.cs" />
     <Compile Include="SharedSession\IStorageSessionProvider.cs" />
     <Compile Include="Outbox\NHibernateOutboxStorage.cs" />
