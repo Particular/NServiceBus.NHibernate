@@ -25,11 +25,11 @@ namespace NServiceBus.Features
 
                 configuration = new Configuration()
                     .SetProperties(properties);
+            }
 
-                foreach (var modification in config.Settings.Get<List<Action<Configuration>>>("StorageConfigurationModifications"))
-                {
-                    modification(configuration);
-                }
+            foreach (var modification in config.Settings.Get<List<Action<Configuration>>>("StorageConfigurationModifications"))
+            {
+                modification(configuration);
             }
 
             string connString;
@@ -48,7 +48,6 @@ namespace NServiceBus.Features
 
             config.Pipeline.Register<OpenSqlConnectionBehavior.Registration>();
             config.Pipeline.Register<OpenSessionBehavior.Registration>();
-
 
             config.Configurer.RegisterSingleton<ISessionFactory>(configuration.BuildSessionFactory());
 
@@ -76,7 +75,6 @@ namespace NServiceBus.Features
         {
             public void Init(Configure configure)
             {
-                configure.Settings.SetDefault("AutoUpdateSchema", true);
                 configure.Settings.SetDefault("StorageConfigurationModifications", new List<Action<Configuration>>());
             }
         }
