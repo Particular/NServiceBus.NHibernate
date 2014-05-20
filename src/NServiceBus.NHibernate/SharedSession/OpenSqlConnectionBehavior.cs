@@ -33,7 +33,7 @@ namespace NServiceBus.NHibernate.SharedSession
 
         public class Registration : RegisterBehavior
         {
-            public Registration(): base("OpenSqlConnection", typeof(OpenSqlConnectionBehavior), "Makes sure that there is a IDbConnection available on the pipeline")
+            public Registration(): base("OpenSqlConnection", typeof(OpenSqlConnectionBehavior), "Makes sure that there is an IDbConnection available on the pipeline")
             {
                 InsertAfter(WellKnownBehavior.ChildContainer);
                 InsertBeforeIfExists("OutboxDeduplication");
