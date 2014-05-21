@@ -35,7 +35,6 @@ namespace NServiceBus.TimeoutPersisters.NHibernate.Tests
 
             new SchemaExport(configuration).Create(false, true);
 
-
             sessionFactory = configuration.BuildSessionFactory();
 
             persister = new TimeoutStorage

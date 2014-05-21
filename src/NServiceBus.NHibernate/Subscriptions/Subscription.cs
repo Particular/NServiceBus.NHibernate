@@ -8,7 +8,6 @@ namespace NServiceBus.Unicast.Subscriptions.NHibernate
         public virtual string SubscriberEndpoint { get; set; }
         public virtual string MessageType { get; set; }
         public virtual string Version { get; set; }
-
         public virtual string TypeName { get; set; }
 
         public override bool Equals(object obj)

@@ -16,24 +16,23 @@ namespace NServiceBus.Unicast.Subscriptions.NHibernate.Tests
         [SetUp]
         public void SetupContext()
         {
-          var cfg = new Configuration()
-            .DataBaseIntegration(x =>
-            {
-              x.Dialect<SQLiteDialect>();
-              x.ConnectionString = string.Format(@"Data Source={0};Version=3;New=True;", Path.GetTempFileName());
-            });
+            var cfg = new Configuration()
+                .DataBaseIntegration(x =>
+                {
+                    x.Dialect<SQLiteDialect>();
+                    x.ConnectionString = string.Format(@"Data Source={0};Version=3;New=True;", Path.GetTempFileName());
+                });
 
-          var mapper = new ModelMapper();
-          mapper.AddMappings(typeof(Config.SubscriptionMap).Assembly.GetExportedTypes());
-          var faultMappings = mapper.CompileMappingForAllExplicitlyAddedEntities();
+            var mapper = new ModelMapper();
+            mapper.AddMapping<Config.SubscriptionMap>();
 
-          cfg.AddMapping(faultMappings);
+            cfg.AddMapping(mapper.CompileMappingForAllExplicitlyAddedEntities());
 
-          new SchemaExport(cfg).Create(false, true);
+            new SchemaExport(cfg).Create(false, true);
 
-           subscriptionStorageSessionProvider = new SubscriptionStorageSessionProvider(cfg.BuildSessionFactory());
+            subscriptionStorageSessionProvider = new SubscriptionStorageSessionProvider(cfg.BuildSessionFactory());
 
-           storage = new SubscriptionStorage(subscriptionStorageSessionProvider);
+            storage = new SubscriptionStorage(subscriptionStorageSessionProvider);
         }
     }
 }
