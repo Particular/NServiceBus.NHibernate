@@ -160,9 +160,10 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
     {
         public static void ShouldContainMappingsFor<T>(this IEntityPersister persister)
         {
-            Assert.True(persister.EntityMetamodel.Properties
-                            .Any(x => x.Type.ReturnedClass == typeof (T)));
+            var result = persister.EntityMetamodel.Properties
+                .Any(x => x.Type.ReturnedClass == typeof (T));
 
+            Assert.True(result);
         }
     }
 }

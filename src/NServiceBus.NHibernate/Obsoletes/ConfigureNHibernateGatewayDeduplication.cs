@@ -1,5 +1,6 @@
 ﻿namespace NServiceBus
 {
+    using NHibernate;
     using Persistence;
 // ReSharper disable once RedundantNameQualifier
     using global::NHibernate.Cfg;
@@ -51,7 +52,7 @@
         [ObsoleteEx(RemoveInVersion = "6", TreatAsErrorFromVersion = "5.1", Replacement = "config.UsePersistence<Persistence.NHibernate>(c => c.UseGatewayDeduplicationConfiguration(configuration));")]
         public static Configure UseNHibernateGatewayDeduplication(this Configure config, Configuration configuration)
         {
-            return config.UsePersistence<Persistence.NHibernate>();
+            return config.UsePersistence<Persistence.NHibernate>(c=> c.UseGatewayDeduplicationConfiguration(configuration));
         }
 
         /// <summary>

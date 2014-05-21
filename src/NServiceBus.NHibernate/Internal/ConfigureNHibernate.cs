@@ -70,7 +70,7 @@ Here is an example of what is required:
         /// <c>&lt;hibernate-configuration&gt;</c> section not include the session-factory configuration.
         /// However those settings can be overwritten by our own configuration settings if specified.
         /// </remarks>
-        public void Init()
+        void Init()
         {
             connectionStringSettingsCollection = NHibernateSettingRetriever.ConnectionStrings() ??
                                                  new ConnectionStringSettingsCollection();
@@ -168,8 +168,7 @@ Here is an example of what is required:
                 return;
             }
 
-            var errorMsg =
-                @"No NHibernate properties found in your config file ({0}).
+            const string errorMsg = @"No NHibernate properties found in your config file ({0}).
 {1}";
             throw new InvalidOperationException(String.Format(errorMsg, GetConfigFileIfExists(), Message));
         }
@@ -183,8 +182,7 @@ Here is an example of what is required:
             if (!System.Diagnostics.Debugger.IsAttached || properties.Count != 0) 
                 return;
 
-            var warningMsg =
-                @"No NHibernate properties found in your config file ({0}). 
+            const string warningMsg = @"No NHibernate properties found in your config file ({0}). 
 We have automatically fallen back to use SQLite. However, this only happens while you are running in Visual Studio.
 To run in this mode you need to reference the SQLite assembly, here is the NuGet package you need to install:
 PM> Install-Package System.Data.SQLite.{1}
