@@ -4,7 +4,7 @@ namespace NServiceBus.Unicast.Subscriptions.NHibernate.Tests
     using NUnit.Framework;
 
     [TestFixture]
-    public class When_initializing_the_storage_with_existing_v2X_subscriptions : InMemoryDBFixture
+    class When_initializing_the_storage_with_existing_v2X_subscriptions : InMemoryDBFixture
     {
         [Test]
         public void Should_automatically_update_them_to_the_30_format()

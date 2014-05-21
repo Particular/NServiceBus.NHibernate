@@ -11,9 +11,9 @@ namespace NServiceBus.Unicast.Subscriptions.NHibernate
     /// <summary>
     ///     Subscription storage using NHibernate for persistence
     /// </summary>
-    public class SubscriptionStorage : ISubscriptionStorage
+    class SubscriptionStorage : ISubscriptionStorage
     {
-        public SubscriptionStorage(ISubscriptionStorageSessionProvider subscriptionStorageSessionProvider)
+        public SubscriptionStorage(SubscriptionStorageSessionProvider subscriptionStorageSessionProvider)
         {
             this.subscriptionStorageSessionProvider = subscriptionStorageSessionProvider;
         }
@@ -142,6 +142,6 @@ namespace NServiceBus.Unicast.Subscriptions.NHibernate
         }
 
         static readonly ILog Logger = LogManager.GetLogger(typeof(ISubscriptionStorage));
-        readonly ISubscriptionStorageSessionProvider subscriptionStorageSessionProvider;
+        readonly SubscriptionStorageSessionProvider subscriptionStorageSessionProvider;
     }
 }

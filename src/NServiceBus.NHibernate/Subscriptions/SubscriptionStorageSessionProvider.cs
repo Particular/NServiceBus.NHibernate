@@ -2,7 +2,7 @@ namespace NServiceBus.Unicast.Subscriptions.NHibernate
 {
     using global::NHibernate;
 
-    public class SubscriptionStorageSessionProvider:ISubscriptionStorageSessionProvider
+    class SubscriptionStorageSessionProvider
     {
         readonly ISessionFactory sessionFactory;
 

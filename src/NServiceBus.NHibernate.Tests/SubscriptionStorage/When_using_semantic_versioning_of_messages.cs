@@ -4,7 +4,7 @@ namespace NServiceBus.Unicast.Subscriptions.NHibernate.Tests
     using NUnit.Framework;
 
     [TestFixture]
-    public class When_using_semantic_versioning_of_messages : InMemoryDBFixture
+    class When_using_semantic_versioning_of_messages : InMemoryDBFixture
     {
         [Test]
         public void Only_changes_in_major_version_should_effect_subscribers()

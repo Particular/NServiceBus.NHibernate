@@ -6,7 +6,7 @@
     /// <summary>
     /// Deduplication message mapping class.
     /// </summary>
-    public class DeduplicationMessageMap : ClassMapping<DeduplicationMessage>
+    class DeduplicationMessageMap : ClassMapping<DeduplicationMessage>
     {
         /// <summary>
         /// Default constructor

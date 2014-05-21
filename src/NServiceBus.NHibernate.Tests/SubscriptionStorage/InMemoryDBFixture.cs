@@ -8,10 +8,10 @@ namespace NServiceBus.Unicast.Subscriptions.NHibernate.Tests
     using MessageDrivenSubscriptions;
     using NUnit.Framework;
 
-    public class InMemoryDBFixture
+    class InMemoryDBFixture
     {
         protected ISubscriptionStorage storage;
-        protected ISubscriptionStorageSessionProvider subscriptionStorageSessionProvider;
+        protected SubscriptionStorageSessionProvider subscriptionStorageSessionProvider;
 
         [SetUp]
         public void SetupContext()

@@ -3,7 +3,7 @@ namespace NServiceBus.Unicast.Subscriptions.NHibernate
     /// <summary>
     /// Entity containing subscription data
     /// </summary>
-    public class Subscription
+    class Subscription
     {
         public virtual string SubscriberEndpoint { get; set; }
         public virtual string MessageType { get; set; }

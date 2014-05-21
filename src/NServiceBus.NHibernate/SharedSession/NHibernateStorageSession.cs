@@ -6,13 +6,23 @@ namespace NServiceBus.Features
     using global::NHibernate;
     using Environment = global::NHibernate.Cfg.Environment;
 
+    /// <summary>
+    /// NHibernate Storage Session.
+    /// </summary>
     public class NHibernateStorageSession : Feature
     {
+        /// <summary>
+        /// Returns true if the feature should be enable. This method wont be called if the feature is explicitly disabled
+        /// </summary>
+        /// <param name="config"/>
         public override bool ShouldBeEnabled(Configure config)
         {
             return IsEnabled<NHibernateSagaStorage>() || IsEnabled<NHibernateOutboxStorage>();
         }
 
+        /// <summary>
+        /// Called when the feature should perform its initialization. This call will only happen if the feature is enabled.
+        /// </summary>
         public override void Initialize(Configure config)
         {
             var configuration = config.Settings.GetOrDefault<Configuration>("StorageConfiguration");

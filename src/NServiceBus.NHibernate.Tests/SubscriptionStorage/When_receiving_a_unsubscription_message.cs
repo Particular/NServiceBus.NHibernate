@@ -4,7 +4,7 @@ namespace NServiceBus.Unicast.Subscriptions.NHibernate.Tests
     using NUnit.Framework;
 
     [TestFixture]
-    public class When_receiving_a_unsubscribe_message : InMemoryDBFixture
+    class When_receiving_a_unsubscribe_message : InMemoryDBFixture
     {
         [Test]
         public void All_subscription_entries_for_specified_message_types_should_be_removed()

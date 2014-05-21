@@ -11,7 +11,7 @@
     /// <summary>
     /// NHibernate Gateway deduplication
     /// </summary>
-    public class GatewayDeduplication : IDeduplicateMessages
+    class GatewayDeduplication : IDeduplicateMessages
     {
         /// <summary>
         /// Creates <c>ISession</c>s.

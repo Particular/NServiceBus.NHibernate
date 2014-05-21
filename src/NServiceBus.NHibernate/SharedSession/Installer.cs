@@ -9,7 +9,7 @@ namespace NServiceBus.NHibernate.SharedSession
     /// <summary>
     /// Installer for <see cref="SagaPersister"/>
     /// </summary>
-    public class Installer : INeedToInstallSomething<Windows>
+    class Installer : INeedToInstallSomething<Windows>
     {
         /// <summary>
         /// <value>true</value> to run installer.

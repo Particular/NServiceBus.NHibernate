@@ -5,7 +5,7 @@ namespace NServiceBus.NHibernate.SharedSession
     using Outbox;
     using Pipeline;
 
-    class DbConnectionProvider:IDbConnectionProvider
+    class DbConnectionProvider : IDbConnectionProvider
     {
         public PipelineExecutor PipelineExecutor { get; set; }
 

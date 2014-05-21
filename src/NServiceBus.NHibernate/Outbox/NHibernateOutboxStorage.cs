@@ -5,13 +5,22 @@ namespace NServiceBus.Features
     using NServiceBus.Outbox;
     using NServiceBus.Outbox.NHibernate;
 
+    /// <summary>
+    /// NHibernate Outbox Storage.
+    /// </summary>
     public class NHibernateOutboxStorage : Feature
     {
+        /// <summary>
+        /// Creates an instance of <see cref="NHibernateOutboxStorage"/>.
+        /// </summary>
         public NHibernateOutboxStorage()
         {
             DependsOn<Outbox>();
         }
 
+        /// <summary>
+        /// Called when the feature should perform its initialization. This call will only happen if the feature is enabled.
+        /// </summary>
         public override void Initialize(Configure config)
         {
             config.Configurer.ConfigureComponent<OutboxPersister>(DependencyLifecycle.SingleInstance);

@@ -7,19 +7,27 @@ namespace NServiceBus.Features
     using Unicast.Subscriptions.NHibernate;
     using Unicast.Subscriptions.NHibernate.Config;
 
+    /// <summary>
+    /// NHibernate Subscription Storage
+    /// </summary>
     public class NHibernateSubscriptionStorage : Feature
     {
+        /// <summary>
+        /// Creates an instance of <see cref="NHibernateSubscriptionStorage"/>.
+        /// </summary>
         public NHibernateSubscriptionStorage()
         {
             DependsOn<StorageDrivenPublisher>();
         }
 
+        /// <summary>
+        /// Called when the feature should perform its initialization. This call will only happen if the feature is enabled.
+        /// </summary>
         public override void Initialize(Configure config)
         {
             var properties = new ConfigureNHibernate(config.Settings).SubscriptionStorageProperties;
 
             ConfigureNHibernate.ThrowIfRequiredPropertiesAreMissing(properties);
-
 
             var configuration = config.Settings.GetOrDefault<Configuration>("NHibernate.Subscriptions.Configuration");
 
@@ -43,7 +51,7 @@ namespace NServiceBus.Features
             }
             var sessionSource = new SubscriptionStorageSessionProvider(configuration.BuildSessionFactory());
 
-            config.Configurer.RegisterSingleton<ISubscriptionStorageSessionProvider>(sessionSource);
+            config.Configurer.RegisterSingleton<SubscriptionStorageSessionProvider>(sessionSource);
           
             if (config.Settings.HasSetting("NHibernate.Subscriptions.CacheExpiration"))
             {

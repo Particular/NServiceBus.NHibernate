@@ -8,7 +8,7 @@
     /// <summary>
     /// Installer for <see cref="Deduplication"/>
     /// </summary>
-    public class Installer : INeedToInstallSomething<Windows>
+    class Installer : INeedToInstallSomething<Windows>
     {
         /// <summary>
         /// <value>true</value> to run installer.

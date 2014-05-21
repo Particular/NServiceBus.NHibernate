@@ -5,7 +5,7 @@
     /// <summary>
     /// The Gateway message
     /// </summary>
-    public class DeduplicationMessage
+    class DeduplicationMessage
     {
         /// <summary>
         /// Id of this message.

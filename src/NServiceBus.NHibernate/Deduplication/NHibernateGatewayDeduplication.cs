@@ -4,13 +4,22 @@ namespace NServiceBus.Features
     using global::NHibernate.Cfg;
     using NHibernate.Internal;
 
+    /// <summary>
+    /// NHibernate Gateway Deduplication.
+    /// </summary>
     public class NHibernateGatewayDeduplication : Feature
     {
+        /// <summary>
+        /// Creates an instance of <see cref="NHibernateGatewayDeduplication"/>.
+        /// </summary>
         public NHibernateGatewayDeduplication()
         {
             DependsOn<Gateway>();
         }
 
+        /// <summary>
+        /// Called when the feature should perform its initialization. This call will only happen if the feature is enabled.
+        /// </summary>
         public override void Initialize(Configure config)
         {
             var properties = new ConfigureNHibernate(config.Settings).GatewayDeduplicationProperties;

@@ -6,13 +6,22 @@ namespace NServiceBus.Features
     using SagaPersisters.NHibernate;
     using SagaPersisters.NHibernate.AutoPersistence;
 
+    /// <summary>
+    /// NHibernate Saga Storage.
+    /// </summary>
     public class NHibernateSagaStorage : Feature
     {
+        /// <summary>
+        /// Creates an instance of <see cref="NHibernateSagaStorage"/>.
+        /// </summary>
         public NHibernateSagaStorage()
         {
             DependsOn<Sagas>();
         }
 
+        /// <summary>
+        /// Called when the feature should perform its initialization. This call will only happen if the feature is enabled.
+        /// </summary>
         public override void Initialize(Configure config)
         {
             config.Configurer.ConfigureComponent<SagaPersister>(DependencyLifecycle.InstancePerCall);

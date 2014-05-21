@@ -8,7 +8,7 @@ namespace NServiceBus.Unicast.Subscriptions.NHibernate.Installer
     /// <summary>
     /// Installer for <see cref="SubscriptionStorage"/>
     /// </summary>
-    public class Installer : INeedToInstallSomething<Windows>
+    class Installer : INeedToInstallSomething<Windows>
     {
         /// <summary>
         /// <value>true</value> to run installer.

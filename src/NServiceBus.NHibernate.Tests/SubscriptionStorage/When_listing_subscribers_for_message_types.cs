@@ -4,7 +4,7 @@ namespace NServiceBus.Unicast.Subscriptions.NHibernate.Tests
     using NUnit.Framework;
 
     [TestFixture]
-    public class When_listing_subscribers_for_message_types : InMemoryDBFixture
+    class When_listing_subscribers_for_message_types : InMemoryDBFixture
     {
         [Test]
         public void The_names_of_all_subscribers_should_be_returned()
