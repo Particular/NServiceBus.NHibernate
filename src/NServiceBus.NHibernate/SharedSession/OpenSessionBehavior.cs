@@ -35,8 +35,14 @@ namespace NServiceBus.NHibernate.SharedSession
                 using (var connection = SessionFactory.GetConnection())
                 {
                     context.Set(string.Format("SqlConnection-{0}", ConnectionString), connection);
-
-                    InnerInvoke(context, next, connection);
+                    try
+                    {
+                        InnerInvoke(context, next, connection);
+                    }
+                    finally
+                    {
+                        context.Remove(string.Format("SqlConnection-{0}", ConnectionString));
+                    }
                 }
             }
         }
@@ -48,10 +54,15 @@ namespace NServiceBus.NHibernate.SharedSession
                 session.FlushMode = FlushMode.Never;
 
                 context.Set(string.Format("NHibernateSession-{0}", ConnectionString), session);
-
-                next();
-
-                session.Flush();
+                try
+                {
+                    next();
+                    session.Flush();
+                }
+                finally
+                {
+                    context.Remove(string.Format("NHibernateSession-{0}", ConnectionString));
+                }
             }
         }
 

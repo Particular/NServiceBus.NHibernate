@@ -23,11 +23,18 @@ namespace NServiceBus.NHibernate.SharedSession
             {
                 context.Set(string.Format("NHibernateTransaction-{0}", ConnectionString), transaction);
 
-                next();
-
-                if (transaction.IsActive)
+                try
                 {
-                    transaction.Commit();
+                    next();
+
+                    if (transaction.IsActive)
+                    {
+                        transaction.Commit();
+                    }
+                }
+                finally
+                {
+                    context.Remove(string.Format("NHibernateTransaction-{0}", ConnectionString));
                 }
             }
         }

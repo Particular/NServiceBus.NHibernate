@@ -26,8 +26,14 @@ namespace NServiceBus.NHibernate.SharedSession
             using (var connection = SessionFactory.GetConnection())
             {
                 context.Set(string.Format("SqlConnection-{0}", ConnectionString), connection);
-
-                next();
+                try
+                {
+                    next();
+                }
+                finally
+                {
+                    context.Remove(string.Format("SqlConnection-{0}", ConnectionString));
+                }
             }
         }
 
