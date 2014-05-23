@@ -2,6 +2,7 @@ namespace NServiceBus.NHibernate.SharedSession
 {
     using System;
     using System.Transactions;
+    using global::NHibernate;
     using Pipeline;
     using Pipeline.Contexts;
 
@@ -19,23 +20,24 @@ namespace NServiceBus.NHibernate.SharedSession
                 return;
             }
 
-            using (var transaction = StorageSessionProvider.Session.BeginTransaction())
+            var lazyTransaction = new Lazy<ITransaction>(() => StorageSessionProvider.Session.BeginTransaction());
+            context.Set(string.Format("LazyNHibernateTransaction-{0}", ConnectionString), lazyTransaction);
+
+            try
             {
-                context.Set(string.Format("NHibernateTransaction-{0}", ConnectionString), transaction);
+                next();
 
-                try
+                if (lazyTransaction.IsValueCreated)
                 {
-                    next();
-
-                    if (transaction.IsActive)
+                    if (lazyTransaction.Value.IsActive)
                     {
-                        transaction.Commit();
+                        lazyTransaction.Value.Commit();
                     }
                 }
-                finally
-                {
-                    context.Remove(string.Format("NHibernateTransaction-{0}", ConnectionString));
-                }
+            }
+            finally
+            {
+                context.Remove(string.Format("LazyNHibernateTransaction-{0}", ConnectionString));
             }
         }
 
@@ -46,7 +48,7 @@ namespace NServiceBus.NHibernate.SharedSession
             {
                 InsertAfter(WellKnownBehavior.UnitOfWork);
                 InsertBefore(WellKnownBehavior.InvokeSaga);
-                InsertBeforeIfExists("OutboxRecorder");  
+                InsertBeforeIfExists("OutboxRecorder");
             }
         }
     }

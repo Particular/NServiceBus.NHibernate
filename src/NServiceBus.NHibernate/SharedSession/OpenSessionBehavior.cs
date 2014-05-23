@@ -18,51 +18,72 @@ namespace NServiceBus.NHibernate.SharedSession
             ISession existingSession;
 
             //if we already have a session don't interfer
-            if (context.TryGet(string.Format("NHibernateSession-{0}", ConnectionString), out existingSession))
+            if (context.TryGet(string.Format("LazyNHibernateSession-{0}", ConnectionString), out existingSession))
             {
                 next();
                 return;
             }
 
             IDbConnection existingConnection;
+            Lazy<IDbConnection> lazyExistingConnection;
 
             if (context.TryGet(string.Format("SqlConnection-{0}", ConnectionString), out existingConnection))
             {
-                InnerInvoke(context, next, existingConnection);
+                InnerInvoke(context, next, () => existingConnection);
+            }
+            else if (context.TryGet(string.Format("LazySqlConnection-{0}", ConnectionString), out lazyExistingConnection))
+            {
+                InnerInvoke(context, next, () => lazyExistingConnection.Value);
             }
             else
             {
-                using (var connection = SessionFactory.GetConnection())
+                var lazyConnection = new Lazy<IDbConnection>(() => SessionFactory.GetConnection());
+
+                context.Set(string.Format("LazySqlConnection-{0}", ConnectionString), lazyConnection);
+                try
                 {
-                    context.Set(string.Format("SqlConnection-{0}", ConnectionString), connection);
-                    try
+                    InnerInvoke(context, next, () => lazyConnection.Value);
+                }
+                finally
+                {
+                    if (lazyConnection.IsValueCreated)
                     {
-                        InnerInvoke(context, next, connection);
+                        lazyConnection.Value.Dispose();
                     }
-                    finally
-                    {
-                        context.Remove(string.Format("SqlConnection-{0}", ConnectionString));
-                    }
+
+                    context.Remove(string.Format("LazySqlConnection-{0}", ConnectionString));
                 }
             }
         }
 
-        void InnerInvoke(IncomingContext context, Action next, IDbConnection connection)
+        void InnerInvoke(BehaviorContext context, Action next, Func<IDbConnection> connectionRetriever)
         {
-            using (var session = SessionFactory.OpenSession(connection))
+            var lazySession = new Lazy<ISession>(() =>
             {
+                var session = SessionFactory.OpenSession(connectionRetriever());
                 session.FlushMode = FlushMode.Never;
 
-                context.Set(string.Format("NHibernateSession-{0}", ConnectionString), session);
-                try
+                return session;
+            });
+
+            context.Set(string.Format("LazyNHibernateSession-{0}", ConnectionString), lazySession);
+            try
+            {
+                next();
+
+                if (lazySession.IsValueCreated)
                 {
-                    next();
-                    session.Flush();
+                    lazySession.Value.Flush();
                 }
-                finally
+            }
+            finally
+            {
+                if (lazySession.IsValueCreated)
                 {
-                    context.Remove(string.Format("NHibernateSession-{0}", ConnectionString));
+                    lazySession.Value.Dispose();
                 }
+
+                context.Remove(string.Format("LazyNHibernateSession-{0}", ConnectionString));
             }
         }
 

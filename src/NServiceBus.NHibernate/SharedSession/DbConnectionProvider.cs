@@ -16,19 +16,39 @@ namespace NServiceBus.NHibernate.SharedSession
             get
             {
                 IDbConnection existingConnection;
+                Lazy<IDbConnection> lazyExistingConnection;
 
-                if (!PipelineExecutor.CurrentContext.TryGet(string.Format("SqlConnection-{0}", ConnectionString), out existingConnection))
+                if (PipelineExecutor.CurrentContext.TryGet(string.Format("SqlConnection-{0}", ConnectionString), out existingConnection))
+                {
+                    return existingConnection;
+                }
+
+                if (!PipelineExecutor.CurrentContext.TryGet(string.Format("LazySqlConnection-{0}", ConnectionString), out lazyExistingConnection))
                 {
                     throw new Exception("No active sql connection found");
                 }
 
-                return existingConnection;
+                return lazyExistingConnection.Value;
             }
         }
 
         public bool TryGetConnection(out IDbConnection connection)
         {
-            return PipelineExecutor.CurrentContext.TryGet(string.Format("SqlConnection-{0}", ConnectionString), out connection);
+            var result = PipelineExecutor.CurrentContext.TryGet(string.Format("SqlConnection-{0}", ConnectionString), out connection);
+
+            if (result == false)
+            {
+                Lazy<IDbConnection> lazyConnection;
+                
+                result = PipelineExecutor.CurrentContext.TryGet(string.Format("LazySqlConnection-{0}", ConnectionString), out lazyConnection);
+                
+                if (result)
+                {
+                    connection = lazyConnection.Value;
+                }
+            }
+
+            return result;
         }
     }
 }

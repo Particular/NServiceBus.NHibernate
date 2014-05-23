@@ -14,14 +14,14 @@ namespace NServiceBus.NHibernate.SharedSession
         {
             get
             {
-                ISession existingSession;
+                Lazy<ISession> existingSession;
 
-                if (!PipelineExecutor.CurrentContext.TryGet(string.Format("NHibernateSession-{0}", ConnectionString), out existingSession))
+                if (!PipelineExecutor.CurrentContext.TryGet(string.Format("LazyNHibernateSession-{0}", ConnectionString), out existingSession))
                 {
                     throw new Exception("No active storage session found in context");
                 }
 
-                return existingSession;
+                return existingSession.Value;
             }
         }
     }

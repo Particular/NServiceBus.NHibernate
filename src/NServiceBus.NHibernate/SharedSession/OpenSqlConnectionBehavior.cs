@@ -23,17 +23,21 @@ namespace NServiceBus.NHibernate.SharedSession
                 return;
             }
 
-            using (var connection = SessionFactory.GetConnection())
+            var lazyConnection = new Lazy<IDbConnection>(() => SessionFactory.GetConnection());
+
+            context.Set(string.Format("LazySqlConnection-{0}", ConnectionString), lazyConnection);
+            try
             {
-                context.Set(string.Format("SqlConnection-{0}", ConnectionString), connection);
-                try
+                next();
+            }
+            finally
+            {
+                if (lazyConnection.IsValueCreated)
                 {
-                    next();
+                    lazyConnection.Value.Dispose();
                 }
-                finally
-                {
-                    context.Remove(string.Format("SqlConnection-{0}", ConnectionString));
-                }
+
+                context.Remove(string.Format("LazySqlConnection-{0}", ConnectionString));
             }
         }
 
