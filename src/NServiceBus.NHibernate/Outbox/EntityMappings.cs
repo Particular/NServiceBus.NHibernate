@@ -3,7 +3,6 @@ namespace NServiceBus.Outbox.NHibernate
     using global::NHibernate;
     using global::NHibernate.Mapping.ByCode;
     using global::NHibernate.Mapping.ByCode.Conformist;
-    using NServiceBus.NHibernate.Internal;
 
     class OutboxEntityMap : ClassMapping<OutboxRecord>
     {
@@ -38,25 +37,10 @@ namespace NServiceBus.Outbox.NHibernate
         public TransportOperationEntityMap()
         {
             Id(x => x.Id, m => m.Generator(Generators.Native));
-            Property(p => p.Intent);
-            Property(p => p.CorrelationId, pm => pm.Length(1024));
             Property(p => p.MessageId, pm => pm.Column(c => c.NotNullable(true)));
-            Property(p => p.MessageType, pm => pm.Column(c => c.NotNullable(true)));
-            Property(p => p.Destination, pm =>
-            {
-                pm.Type<AddressUserType>();
-                pm.Length(1024);
-            });
-            Property(p => p.ReplyToAddress, pm =>
-            {
-                pm.Type<AddressUserType>();
-                pm.Length(1024);
-            });
-            Property(p => p.DeliverAt);
-            Property(p => p.DelayDeliveryWith);
-            Property(p => p.EnforceMessagingBestPractices);
             Property(p => p.Message, pm => pm.Type(NHibernateUtil.BinaryBlob));
             Property(p => p.Headers, pm => pm.Type(NHibernateUtil.StringClob));
+            Property(p => p.Options, pm => pm.Type(NHibernateUtil.StringClob));
         }
     }
 }

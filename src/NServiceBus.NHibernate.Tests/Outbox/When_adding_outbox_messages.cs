@@ -8,7 +8,6 @@ namespace NServiceBus.NHibernate.Tests.Outbox
     using NUnit.Framework;
     using Persistence;
     using SagaPersisters.NHibernate.Tests;
-    using Unicast;
 
     [TestFixture]
     class When_adding_outbox_messages : InMemoryDBFixture
@@ -36,17 +35,7 @@ namespace NServiceBus.NHibernate.Tests.Outbox
                 persister.StorageSessionProvider = new FakeSessionProvider(session);
                 persister.Store(id, new List<TransportOperation>
                 {
-                    new TransportOperation(new SendOptions("Foo@Machine")
-                    {
-                        CorrelationId = "MySpecialId3",
-                        DelayDeliveryWith = TimeSpan.FromDays(34),
-                        DeliverAt = DateTime.Now.AddHours(2),
-                        Intent = MessageIntentEnum.Reply,
-                        ReplyToAddress = new Address("Foo2", "Machine2"),
-                    }, new TransportMessage
-                    {
-                        Body = new byte[1024*5]
-                    }, "MyMessage"),
+                    new TransportOperation("MyMessage", new Dictionary<string, string>(), new byte[1024*5], new Dictionary<string, string>()),
                 });
 
                 session.Flush();
@@ -59,7 +48,7 @@ namespace NServiceBus.NHibernate.Tests.Outbox
             var operation = result.TransportOperations.Single();
 
 
-            Assert.AreEqual("MyMessage", operation.MessageType);
+            Assert.AreEqual("MyMessage", operation.MessageId);
         }
 
         [Test]
@@ -72,24 +61,13 @@ namespace NServiceBus.NHibernate.Tests.Outbox
                 persister.StorageSessionProvider = new FakeSessionProvider(session);
                 persister.Store(id, new List<TransportOperation>
                 {
-                    new TransportOperation(new SendOptions("Foo@Machine")
-                    {
-                        CorrelationId = "MySpecialId3",
-                        DelayDeliveryWith = TimeSpan.FromDays(34),
-                        DeliverAt = DateTime.Now.AddHours(2),
-                        Intent = MessageIntentEnum.Reply,
-                        ReplyToAddress = new Address("Foo2", "Machine2"),
-                    }, new TransportMessage
-                    {
-                        Body = new byte[1024*5]
-                    }, "MyMessage"),
+                    new TransportOperation("MyMessage", new Dictionary<string, string>(), new byte[1024*5], new Dictionary<string, string>()),
                 });
 
                 session.Flush();
             }
 
             persister.SetAsDispatched(id);
-
 
             using (var session = SessionFactory.OpenSession())
             {
@@ -112,17 +90,7 @@ namespace NServiceBus.NHibernate.Tests.Outbox
                 persister.StorageSessionProvider = new FakeSessionProvider(session);
                 persister.Store(id, new List<TransportOperation>
                 {
-                    new TransportOperation(new SendOptions("Foo@Machine")
-                    {
-                        CorrelationId = "MySpecialId3",
-                        DelayDeliveryWith = TimeSpan.FromDays(34),
-                        DeliverAt = DateTime.Now.AddHours(2),
-                        Intent = MessageIntentEnum.Reply,
-                        ReplyToAddress = new Address("Foo2", "Machine2"),
-                    }, new TransportMessage
-                    {
-                        Body = new byte[1024*5]
-                    }, "MyMessage"),
+                    new TransportOperation("MyMessage", new Dictionary<string, string>(), new byte[1024*5], new Dictionary<string, string>()),
                 });
 
                 session.Flush();

@@ -11,7 +11,6 @@
     using NServiceBus.NHibernate.SharedSession;
     using Persistence;
     using Serializers.Json;
-    using Unicast;
 
     class OutboxPersister : IOutboxStorage
     {
@@ -45,17 +44,8 @@
             }
 
             message = new OutboxMessage(result.MessageId);
-            message.TransportOperations.AddRange(result.TransportOperations.Select(t => new TransportOperation(
-                new SendOptions(t.Destination)
-                {
-                    CorrelationId = t.CorrelationId,
-                    DelayDeliveryWith = t.DelayDeliveryWith,
-                    DeliverAt = t.DeliverAt,
-                    EnforceMessagingBestPractices = t.EnforceMessagingBestPractices,
-                    Intent = t.Intent,
-                    ReplyToAddress = t.ReplyToAddress,
-                },
-                new TransportMessage(t.MessageId, ConvertStringToDictionary(t.Headers)), t.MessageType)));
+            message.TransportOperations.AddRange(result.TransportOperations.Select(t => new TransportOperation(t.MessageId, 
+                ConvertStringToDictionary(t.Options), t.Message, ConvertStringToDictionary(t.Headers))));
 
             return true;
         }
@@ -68,17 +58,10 @@
                 Dispatched = false,
                 TransportOperations = transportOperations.Select(t => new OutboxOperation
                 {
-                    Intent = t.SendOptions.Intent,
-                    Message = t.Message.Body,
-                    MessageType = t.MessageType,
-                    CorrelationId = t.SendOptions.CorrelationId,
-                    DelayDeliveryWith = t.SendOptions.DelayDeliveryWith,
-                    DeliverAt = t.SendOptions.DeliverAt,
-                    Destination = t.SendOptions.Destination,
-                    EnforceMessagingBestPractices = t.SendOptions.EnforceMessagingBestPractices,
-                    ReplyToAddress = t.SendOptions.ReplyToAddress,
-                    Headers = ConvertDictionaryToString(t.Message.Headers),
-                    MessageId = t.Message.Id,
+                    Message = t.Body,
+                    Headers = ConvertDictionaryToString(t.Headers),
+                    MessageId = t.MessageId,
+                    Options = ConvertDictionaryToString(t.Options),
                 }).ToList()
             });
         }
