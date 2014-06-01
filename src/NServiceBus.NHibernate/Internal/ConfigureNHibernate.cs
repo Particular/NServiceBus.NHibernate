@@ -20,7 +20,7 @@ namespace NServiceBus.NHibernate.Internal
     /// </summary>
     class ConfigureNHibernate
     {
-        readonly SettingsHolder settings;
+        readonly ReadOnlySettings settings;
 
         private const string Message =
             @"
@@ -55,7 +55,7 @@ Here is an example of what is required:
         public const string DefaultDialect = "NHibernate.Dialect.MsSql2008Dialect";
 
 
-        public ConfigureNHibernate(SettingsHolder settings)
+        public ConfigureNHibernate(ReadOnlySettings settings)
         {
             this.settings = settings;
             Init();
