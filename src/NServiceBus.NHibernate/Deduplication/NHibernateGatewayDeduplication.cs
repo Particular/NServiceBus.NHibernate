@@ -20,13 +20,13 @@ namespace NServiceBus.Features
         /// <summary>
         /// Called when the feature should perform its initialization. This call will only happen if the feature is enabled.
         /// </summary>
-        public override void Initialize(Configure config)
+        protected override void Setup(FeatureConfigurationContext context)
         {
-            var properties = new ConfigureNHibernate(config.Settings).GatewayDeduplicationProperties;
+            var properties = new ConfigureNHibernate(context.Settings).GatewayDeduplicationProperties;
 
             ConfigureNHibernate.ThrowIfRequiredPropertiesAreMissing(properties);
 
-            var configuration = config.Settings.GetOrDefault<Configuration>("NHibernate.GatewayDeduplication.Configuration");
+            var configuration = context.Settings.GetOrDefault<Configuration>("NHibernate.GatewayDeduplication.Configuration");
 
             if (configuration == null)
             {
@@ -38,16 +38,16 @@ namespace NServiceBus.Features
 
             Deduplication.NHibernate.Installer.Installer.configuration = configuration;
 
-            if (config.Settings.HasSetting("NHibernate.GatewayDeduplication.AutoUpdateSchema"))
+            if (context.Settings.HasSetting("NHibernate.GatewayDeduplication.AutoUpdateSchema"))
             {
-                Deduplication.NHibernate.Installer.Installer.RunInstaller = config.Settings.Get<bool>("NHibernate.GatewayDeduplication.AutoUpdateSchema");
+                Deduplication.NHibernate.Installer.Installer.RunInstaller = context.Settings.Get<bool>("NHibernate.GatewayDeduplication.AutoUpdateSchema");
             }
             else
             {
-                Deduplication.NHibernate.Installer.Installer.RunInstaller = config.Settings.Get<bool>("NHibernate.Common.AutoUpdateSchema");
+                Deduplication.NHibernate.Installer.Installer.RunInstaller = context.Settings.Get<bool>("NHibernate.Common.AutoUpdateSchema");
             }
 
-            config.Configurer.ConfigureComponent<Deduplication.NHibernate.GatewayDeduplication>(
+            context.Container.ConfigureComponent<Deduplication.NHibernate.GatewayDeduplication>(
                 DependencyLifecycle.SingleInstance)
                 .ConfigureProperty(p => p.SessionFactory, configuration.BuildSessionFactory());
         }

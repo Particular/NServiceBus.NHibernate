@@ -42,7 +42,7 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
 
             SagaPersister = new SagaPersister(new FakeSessionProvider(session));
 
-            new Installer().Install(WindowsIdentity.GetCurrent().Name);
+            new Installer().Install(WindowsIdentity.GetCurrent().Name, null);
         }
 
         protected void FlushSession()

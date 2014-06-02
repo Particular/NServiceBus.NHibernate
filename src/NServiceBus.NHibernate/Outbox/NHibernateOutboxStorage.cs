@@ -21,9 +21,9 @@ namespace NServiceBus.Features
         /// <summary>
         /// Called when the feature should perform its initialization. This call will only happen if the feature is enabled.
         /// </summary>
-        public override void Initialize(Configure config)
+        protected override void Setup(FeatureConfigurationContext context)
         {
-            config.Configurer.ConfigureComponent<OutboxPersister>(DependencyLifecycle.SingleInstance);
+            context.Container.ConfigureComponent<OutboxPersister>(DependencyLifecycle.SingleInstance);
         }
 
         internal static void ApplyMappings(Configuration config)
