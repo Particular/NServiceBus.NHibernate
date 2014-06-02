@@ -52,7 +52,7 @@ namespace NServiceBus.Features
 
             context.Container.ConfigureComponent<TimeoutStorage>(DependencyLifecycle.SingleInstance)
                 .ConfigureProperty(p => p.SessionFactory, configuration.BuildSessionFactory())
-                .ConfigureProperty(p=>p.EndpointName,config.EndpointName);
+                .ConfigureProperty(p=>p.EndpointName, context.Settings.EndpointName());
         }
 
     }
