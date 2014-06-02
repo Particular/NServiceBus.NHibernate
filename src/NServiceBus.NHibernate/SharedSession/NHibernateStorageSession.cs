@@ -15,7 +15,7 @@ namespace NServiceBus.Features
         /// Returns true if the feature should be enable. This method wont be called if the feature is explicitly disabled
         /// </summary>
         /// <param name="config"/>
-        public override bool ShouldBeEnabled(Configure config)
+        public bool ShouldBeEnabled(Configure config)
         {
             return IsEnabled<NHibernateSagaStorage>() || IsEnabled<NHibernateOutboxStorage>();
         }
@@ -23,18 +23,18 @@ namespace NServiceBus.Features
         /// <summary>
         /// Called when the feature should perform its initialization. This call will only happen if the feature is enabled.
         /// </summary>
-        public override void Initialize(Configure config)
+        protected override void Setup(FeatureConfigurationContext context)
         {
-            var configuration = config.Settings.GetOrDefault<Configuration>("StorageConfiguration");
+            var configuration = context.Settings.GetOrDefault<Configuration>("StorageConfiguration");
 
             if (configuration == null)
             {
-                var properties = new ConfigureNHibernate(config.Settings).SagaPersisterProperties;
+                var properties = new ConfigureNHibernate(context.Settings).SagaPersisterProperties;
 
                 configuration = new Configuration()
                     .SetProperties(properties);
             }
-
+            
             if (IsEnabled<NHibernateOutboxStorage>())
             {
                 NHibernateOutboxStorage.ApplyMappings(configuration);
@@ -59,28 +59,28 @@ namespace NServiceBus.Features
                 }
             }
 
-            config.Pipeline.Register<OpenSqlConnectionBehavior.Registration>();
-            config.Pipeline.Register<OpenSessionBehavior.Registration>();
-            config.Pipeline.Register<OpenNativeTransactionBehavior.Registration>();
+            context.Pipeline.Register<OpenSqlConnectionBehavior.Registration>();
+            context.Pipeline.Register<OpenSessionBehavior.Registration>();
+            context.Pipeline.Register<OpenNativeTransactionBehavior.Registration>();
 
-            config.Configurer.RegisterSingleton<ISessionFactory>(configuration.BuildSessionFactory());
+            context.Container.RegisterSingleton<ISessionFactory>(configuration.BuildSessionFactory());
 
-            config.Configurer.ConfigureComponent<StorageSessionProvider>(DependencyLifecycle.InstancePerCall)
+            context.Container.ConfigureComponent<StorageSessionProvider>(DependencyLifecycle.InstancePerCall)
                      .ConfigureProperty(p => p.ConnectionString, connString);
 
-            config.Configurer.ConfigureComponent<DbConnectionProvider>(DependencyLifecycle.InstancePerCall)
+            context.Container.ConfigureComponent<DbConnectionProvider>(DependencyLifecycle.InstancePerCall)
                      .ConfigureProperty(p => p.ConnectionString, connString);
 
-            config.Configurer.ConfigureComponent<OpenSqlConnectionBehavior>(DependencyLifecycle.InstancePerCall)
+            context.Container.ConfigureComponent<OpenSqlConnectionBehavior>(DependencyLifecycle.InstancePerCall)
                     .ConfigureProperty(p => p.ConnectionString, connString);
 
-            config.Configurer.ConfigureComponent<OpenSessionBehavior>(DependencyLifecycle.InstancePerCall)
+            context.Container.ConfigureComponent<OpenSessionBehavior>(DependencyLifecycle.InstancePerCall)
                     .ConfigureProperty(p => p.ConnectionString, connString);
 
-            config.Configurer.ConfigureComponent<OpenNativeTransactionBehavior>(DependencyLifecycle.InstancePerCall)
+            context.Container.ConfigureComponent<OpenNativeTransactionBehavior>(DependencyLifecycle.InstancePerCall)
                     .ConfigureProperty(p => p.ConnectionString, connString);
 
-            Installer.RunInstaller = config.Settings.Get<bool>("NHibernate.Common.AutoUpdateSchema");
+            Installer.RunInstaller = context.Settings.Get<bool>("NHibernate.Common.AutoUpdateSchema");
 
             Installer.configuration = configuration;
         }

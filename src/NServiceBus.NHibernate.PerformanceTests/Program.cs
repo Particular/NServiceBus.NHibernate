@@ -8,7 +8,6 @@
     using System.Transactions;
     using NServiceBus;
     using NServiceBus.Features;
-    using NServiceBus.Installation.Environments;
     using NServiceBus.NHibernate.Internal;
     using NServiceBus.Persistence;
     using Saga;
@@ -47,8 +46,7 @@
                 endpointName += ".outbox";
             }
 
-            var config = Configure.With()
-                .DefineEndpointName(endpointName)
+            var config = Configure.With(b => b.EndpointName(endpointName))
                 .DefaultBuilder()
                 .UseTransport<Msmq>();
 
@@ -74,10 +72,7 @@
                     throw new InvalidOperationException("Illegal serialization format " + args[2]);
             }
 
-            config.Features.Disable<Audit>();
-
-            //Configure.Instance.UnicastBus().IsolationLevel(IsolationLevel.Snapshot);
-            //Console.Out.WriteLine("Snapshot");
+            config.Features(f => f.Disable<Audit>());
 
             NHibernateSettingRetriever.ConnectionStrings = () => new ConnectionStringSettingsCollection
                 {
@@ -89,7 +84,7 @@
 
             if (suppressDTC)
             {
-                config.Transactions.Advanced(settings => settings.DisableDistributedTransactions());
+                config.Transactions(ts=> ts.Advanced(settings => settings.DisableDistributedTransactions()));
             }
 
             if (outbox)
@@ -97,9 +92,9 @@
                 config.EnableOutbox();
             }
 
-            using (var startableBus = config.InMemoryFaultManagement().UnicastBus().CreateBus())
+            using (var startableBus = config.InMemoryFaultManagement().CreateBus())
             {
-                Configure.Instance.ForInstallationOn<Windows>().Install();
+                Configure.Instance.ForInstallationOn().Install();
 
                 if (saga)
                 {

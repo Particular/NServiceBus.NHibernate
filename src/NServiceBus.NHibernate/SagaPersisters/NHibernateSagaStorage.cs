@@ -22,9 +22,9 @@ namespace NServiceBus.Features
         /// <summary>
         /// Called when the feature should perform its initialization. This call will only happen if the feature is enabled.
         /// </summary>
-        public override void Initialize(Configure config)
+        protected override void Setup(FeatureConfigurationContext context)
         {
-            config.Configurer.ConfigureComponent<SagaPersister>(DependencyLifecycle.InstancePerCall);
+            context.Container.ConfigureComponent<SagaPersister>(DependencyLifecycle.InstancePerCall);
         }
 
         internal static void ApplyMappings(Configure config, Configuration configuration)

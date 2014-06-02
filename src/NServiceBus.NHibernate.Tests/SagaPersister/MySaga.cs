@@ -5,7 +5,10 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
 
     public class MySaga : Saga<MySagaData>
     {
-
+        protected override void ConfigureHowToFindSaga(SagaPropertyMapper<MySagaData> mapper)
+        {
+            
+        }
     }
 
     public class MySagaData : IContainSagaData
