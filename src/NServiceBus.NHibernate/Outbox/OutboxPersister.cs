@@ -9,7 +9,6 @@
     using NHibernate;
     using NServiceBus.NHibernate.Internal;
     using NServiceBus.NHibernate.SharedSession;
-    using Persistence;
     using Serializers.Json;
 
     class OutboxPersister : IOutboxStorage
@@ -88,7 +87,7 @@
 
             if (result == 0)
             {
-                throw new ConcurrencyException(string.Format("Outbox message with id '{0}' is has already been updated by another thread.", messageId));
+                throw new Exception(string.Format("Outbox message with id '{0}' is has already been updated by another thread.", messageId));
             }
         }
 

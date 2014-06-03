@@ -31,7 +31,6 @@ namespace NServiceBus.Features
                     .SetProperties(properties);
             }
             
-
             if (IsEnabled<NHibernateOutboxStorage>())
             {
                 NHibernateOutboxStorage.ApplyMappings(configuration);

@@ -6,7 +6,6 @@ namespace NServiceBus.NHibernate.Tests.Outbox
     using NServiceBus.Outbox;
     using NServiceBus.Outbox.NHibernate;
     using NUnit.Framework;
-    using Persistence;
     using SagaPersisters.NHibernate.Tests;
 
     [TestFixture]
@@ -80,7 +79,7 @@ namespace NServiceBus.NHibernate.Tests.Outbox
         }
 
         [Test]
-        [ExpectedException(typeof(ConcurrencyException))]
+        [ExpectedException(typeof(Exception))]
         public void Should_throw_concurrency_exception_if_dispatched_flag_has_already_been_set()
         {
             var id = Guid.NewGuid().ToString("N");
