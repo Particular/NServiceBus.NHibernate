@@ -5,6 +5,7 @@ namespace NServiceBus.Features
     using global::NHibernate.Cfg;
     using SagaPersisters.NHibernate;
     using SagaPersisters.NHibernate.AutoPersistence;
+    using Settings;
 
     /// <summary>
     /// NHibernate Saga Storage.
@@ -24,21 +25,24 @@ namespace NServiceBus.Features
         /// </summary>
         protected override void Setup(FeatureConfigurationContext context)
         {
+            context.Settings.Get<SharedMappings>()
+                .AddMapping(c => ApplyMappings(context.Settings,c));
+
             context.Container.ConfigureComponent<SagaPersister>(DependencyLifecycle.InstancePerCall);
         }
 
-        internal static void ApplyMappings(Configure config, Configuration configuration)
+        void ApplyMappings(ReadOnlySettings settings, Configuration configuration)
         {
-            var tableNamingConvention = config.Settings.GetOrDefault<Func<Type, string>>("NHibernate.Sagas.TableNamingConvention");
+            var tableNamingConvention = settings.GetOrDefault<Func<Type, string>>("NHibernate.Sagas.TableNamingConvention");
 
-            var scannedAssemblies = config.TypesToScan.Select(t => t.Assembly).Distinct();
+            var scannedAssemblies = settings.GetAvailableTypes().Select(t => t.Assembly).Distinct();
 
             foreach (var assembly in scannedAssemblies)
             {
                 configuration.AddAssembly(assembly);
             }
 
-            var types = config.TypesToScan.Except(configuration.ClassMappings.Select(x => x.MappedClass));
+            var types = settings.GetAvailableTypes().Except(configuration.ClassMappings.Select(x => x.MappedClass));
             SagaModelMapper modelMapper;
             if (tableNamingConvention == null)
             {

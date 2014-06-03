@@ -117,6 +117,7 @@
     <Compile Include="SharedSession\Installer.cs" />
     <Compile Include="SagaPersisters\SessionFactoryBuilder.cs" />
     <Compile Include="SagaPersisters\SagaPersister.cs" />
+    <Compile Include="SharedSession\SharedMappings.cs" />
     <Compile Include="SharedSession\StorageSessionProvider.cs" />
     <Compile Include="Subscriptions\CachedSubscriptionStorage.cs" />
     <Compile Include="Subscriptions\NHibernateSubscriptionStorage.cs" />

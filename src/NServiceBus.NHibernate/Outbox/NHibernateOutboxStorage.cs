@@ -23,10 +23,13 @@ namespace NServiceBus.Features
         /// </summary>
         protected override void Setup(FeatureConfigurationContext context)
         {
+            context.Settings.Get<SharedMappings>()
+                .AddMapping(ApplyMappings);
+
             context.Container.ConfigureComponent<OutboxPersister>(DependencyLifecycle.SingleInstance);
         }
 
-        internal static void ApplyMappings(Configuration config)
+        void ApplyMappings(Configuration config)
         {
             var mapper = new ModelMapper();
             mapper.AddMapping<OutboxEntityMap>();

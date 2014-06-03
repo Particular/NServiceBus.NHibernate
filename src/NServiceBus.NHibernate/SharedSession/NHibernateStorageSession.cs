@@ -13,6 +13,8 @@ namespace NServiceBus.Features
     {
         internal NHibernateStorageSession()
         {
+            Defaults(s => s.SetDefault<SharedMappings>(new SharedMappings()));
+
             DependsOnAtLeastOne(typeof(NHibernateSagaStorage), typeof(NHibernateOutboxStorage));
         }
 
@@ -31,15 +33,8 @@ namespace NServiceBus.Features
                     .SetProperties(properties);
             }
             
-            if (IsEnabled<NHibernateOutboxStorage>())
-            {
-                NHibernateOutboxStorage.ApplyMappings(configuration);
-            }
-
-            if (IsEnabled<NHibernateSagaStorage>())
-            {
-                NHibernateSagaStorage.ApplyMappings(config, configuration);
-            }
+            context.Settings.Get<SharedMappings>()
+                .ApplyTo(configuration);
 
             string connString;
 
