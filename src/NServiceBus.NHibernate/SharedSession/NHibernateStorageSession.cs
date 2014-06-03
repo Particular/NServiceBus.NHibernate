@@ -11,13 +11,9 @@ namespace NServiceBus.Features
     /// </summary>
     public class NHibernateStorageSession : Feature
     {
-        /// <summary>
-        /// Returns true if the feature should be enable. This method wont be called if the feature is explicitly disabled
-        /// </summary>
-        /// <param name="config"/>
-        public bool ShouldBeEnabled(Configure config)
+        internal NHibernateStorageSession()
         {
-            return IsEnabled<NHibernateSagaStorage>() || IsEnabled<NHibernateOutboxStorage>();
+            DependsOnAtLeastOne(typeof(NHibernateSagaStorage), typeof(NHibernateOutboxStorage));
         }
 
         /// <summary>
@@ -35,6 +31,7 @@ namespace NServiceBus.Features
                     .SetProperties(properties);
             }
             
+
             if (IsEnabled<NHibernateOutboxStorage>())
             {
                 NHibernateOutboxStorage.ApplyMappings(configuration);
