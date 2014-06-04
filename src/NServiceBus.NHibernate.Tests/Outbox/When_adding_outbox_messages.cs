@@ -77,26 +77,5 @@ namespace NServiceBus.NHibernate.Tests.Outbox
                 Assert.True(result.Dispatched);
             }
         }
-
-        [Test]
-        [ExpectedException(typeof(Exception))]
-        public void Should_throw_concurrency_exception_if_dispatched_flag_has_already_been_set()
-        {
-            var id = Guid.NewGuid().ToString("N");
-
-            using (var session = SessionFactory.OpenSession())
-            {
-                persister.StorageSessionProvider = new FakeSessionProvider(session);
-                persister.Store(id, new List<TransportOperation>
-                {
-                    new TransportOperation("MyMessage", new Dictionary<string, string>(), new byte[1024*5], new Dictionary<string, string>()),
-                });
-
-                session.Flush();
-            }
-
-            persister.SetAsDispatched(id);
-            persister.SetAsDispatched(id);
-        }
     }
 }

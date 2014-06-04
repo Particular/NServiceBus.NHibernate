@@ -67,15 +67,13 @@
 
         public void SetAsDispatched(string messageId)
         {
-            int result;
-         
             using (var session = SessionFactory.OpenStatelessSessionEx(DbConnectionProvider.Connection))
             {
                 using (var tx = session.BeginTransaction(IsolationLevel.ReadCommitted))
                 {
                     var queryString = string.Format("update {0} set Dispatched = true, DispatchedAt = :date where MessageId = :messageid And Dispatched = false",
                         typeof(OutboxRecord));
-                    result = session.CreateQuery(queryString)
+                    session.CreateQuery(queryString)
                         .SetParameter("messageid", messageId)
                         .SetParameter("date", DateTime.UtcNow)
                         .ExecuteUpdate();
@@ -89,14 +87,7 @@
                     tx.Commit();
                 }
             }
-
-            if (result == 0)
-            {
-                throw new Exception(string.Format("Outbox message with id '{0}' is has already been updated by another thread.", messageId));
-            }
         }
-
-
 
         static Dictionary<string, string> ConvertStringToDictionary(string data)
         {
