@@ -80,10 +80,15 @@
                         .SetParameter("date", DateTime.UtcNow)
                         .ExecuteUpdate();
 
+                    queryString = string.Format("delete from {0} where MessageId = :messageid",
+                        typeof(OutboxOperation));
+                    session.CreateQuery(queryString)
+                        .SetParameter("messageid", messageId)
+                        .ExecuteUpdate();
+
                     tx.Commit();
                 }
             }
-
 
             if (result == 0)
             {
