@@ -27,7 +27,7 @@ namespace NServiceBus.Outbox.NHibernate
             Bag(p=>p.TransportOperations, b =>
             {
                 b.Cascade(Cascade.All | Cascade.DeleteOrphans);
-                b.Key(km => km.Column("OutboxOperation_id"));
+                b.Key(km => km.Column("OutboxRecord_id"));
             }, r=> r.OneToMany());
         }
     }

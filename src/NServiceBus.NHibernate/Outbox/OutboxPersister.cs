@@ -79,13 +79,13 @@
                         .SetParameter("messageid", messageId)
                         .SetParameter("date", DateTime.UtcNow)
                         .ExecuteUpdate();
-
+                    
                     queryString = string.Format("delete from {0} where MessageId = :messageid",
                         typeof(OutboxOperation));
                     session.CreateQuery(queryString)
                         .SetParameter("messageid", messageId)
                         .ExecuteUpdate();
-
+                    
                     tx.Commit();
                 }
             }
@@ -96,6 +96,22 @@
             }
         }
 
+        public void RemoveEntriesOlderThan(DateTime dateTime)
+        {
+            using (var session = SessionFactory.OpenStatelessSessionEx(DbConnectionProvider.Connection))
+            {
+                using (var tx = session.BeginTransaction(IsolationLevel.ReadCommitted))
+                {
+                    var queryString = string.Format("delete from {0} where DispatchedAt < :date And Dispatched = true",
+                        typeof(OutboxRecord));
+                    session.CreateQuery(queryString)
+                        .SetParameter("date", dateTime)
+                        .ExecuteUpdate();
+                    
+                    tx.Commit();
+                }
+            }
+        }
 
 
         static Dictionary<string, string> ConvertStringToDictionary(string data)

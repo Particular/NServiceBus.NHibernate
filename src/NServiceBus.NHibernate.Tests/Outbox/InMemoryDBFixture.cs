@@ -10,9 +10,7 @@ namespace NServiceBus.NHibernate.Tests.Outbox
     using Internal;
     using NServiceBus.Outbox.NHibernate;
     using SagaPersisters.NHibernate.Tests;
-#if !USE_SQLSERVER
     using System.IO;
-#endif
     using NServiceBus.Outbox;
     using NUnit.Framework;
 
@@ -40,21 +38,18 @@ namespace NServiceBus.NHibernate.Tests.Outbox
                 .AddProperties(new Dictionary<string, string>
                 {
                     { "dialect", dialect },
-                    { global::NHibernate.Cfg.Environment.ConnectionString,connectionString }
+                    { global::NHibernate.Cfg.Environment.ConnectionString, connectionString }
                 });
 
             configuration.AddMapping(mapper.CompileMappingForAllExplicitlyAddedEntities());
-
 
             new SchemaUpdate(configuration).Execute(false, true);
 
             SessionFactory = configuration.BuildSessionFactory();
 
-
             var connection = SessionFactory.GetConnection();
 
             Session = SessionFactory.OpenSession();
-
 
             persister = new OutboxPersister
             {
