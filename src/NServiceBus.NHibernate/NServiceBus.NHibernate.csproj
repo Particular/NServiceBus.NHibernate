@@ -119,7 +119,7 @@
     <Compile Include="SagaPersisters\SagaPersister.cs" />
     <Compile Include="SharedSession\SharedMappings.cs" />
     <Compile Include="SharedSession\StorageSessionProvider.cs" />
-    <Compile Include="Subscriptions\CachedSubscriptionStorage.cs" />
+    <Compile Include="Subscriptions\CachedSubscriptionPersister.cs" />
     <Compile Include="Subscriptions\NHibernateSubscriptionStorage.cs" />
     <Compile Include="Subscriptions\SubscriptionConfig.cs" />
     <Compile Include="TimeoutPersisters\TimeoutEntityMap.cs" />
@@ -128,11 +128,11 @@
     <Compile Include="TimeoutPersisters\NHibernateTimeoutStorage.cs" />
     <Compile Include="TimeoutPersisters\TimeoutConfig.cs" />
     <Compile Include="TimeoutPersisters\TimeoutEntity.cs" />
-    <Compile Include="TimeoutPersisters\TimeoutStorage.cs" />
+    <Compile Include="TimeoutPersisters\TimeoutPersister.cs" />
     <Compile Include="Subscriptions\Config\SubscriptionMap.cs" />
     <Compile Include="Subscriptions\Installer\Installer.cs" />
     <Compile Include="Subscriptions\Subscription.cs" />
-    <Compile Include="Subscriptions\SubscriptionStorage.cs" />
+    <Compile Include="Subscriptions\SubscriptionPersister.cs" />
     <Compile Include="Subscriptions\SubscriptionStorageSessionProvider.cs" />
     <Compile Include="SharedSession\OpenSqlConnectionBehavior.cs" />
   </ItemGroup>

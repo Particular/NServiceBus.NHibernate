@@ -5,9 +5,9 @@ namespace NServiceBus.Unicast.Subscriptions.NHibernate
     using System.Collections.Generic;
     using System.Linq;
 
-    class CachedSubscriptionStorage : SubscriptionStorage
+    class CachedSubscriptionPersister : SubscriptionPersister
     {
-        public CachedSubscriptionStorage(SubscriptionStorageSessionProvider subscriptionStorageSessionProvider, TimeSpan expiration) : base(subscriptionStorageSessionProvider)
+        public CachedSubscriptionPersister(SubscriptionStorageSessionProvider subscriptionStorageSessionProvider, TimeSpan expiration) : base(subscriptionStorageSessionProvider)
         {
             this.expiration = expiration;
         }

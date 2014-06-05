@@ -13,7 +13,7 @@ namespace NServiceBus.TimeoutPersisters.NHibernate.Tests
 
     abstract class InMemoryDBFixture
     {
-        protected TimeoutStorage persister;
+        protected TimeoutPersister persister;
         protected ISessionFactory sessionFactory;
 
         private readonly string connectionString = String.Format(@"Data Source={0};Version=3;New=True;", Path.GetTempFileName());
@@ -37,7 +37,7 @@ namespace NServiceBus.TimeoutPersisters.NHibernate.Tests
 
             sessionFactory = configuration.BuildSessionFactory();
 
-            persister = new TimeoutStorage
+            persister = new TimeoutPersister
             {
                 SessionFactory = sessionFactory,
                 DbConnectionProvider = new FakeDbConnectionProvider(sessionFactory.GetConnection()),

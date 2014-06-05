@@ -11,7 +11,7 @@ namespace NServiceBus.TimeoutPersisters.NHibernate
     using Serializers.Json;
     using Timeout.Core;
 
-    class TimeoutStorage : IPersistTimeouts
+    class TimeoutPersister : IPersistTimeouts
     {
         public ISessionFactory SessionFactory { get; set; }
 
