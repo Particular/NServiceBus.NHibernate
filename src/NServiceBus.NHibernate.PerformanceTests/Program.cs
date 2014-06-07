@@ -48,7 +48,8 @@
 
             var config = Configure.With(b => b.EndpointName(endpointName))
                 .DefaultBuilder()
-                .UseTransport<Msmq>();
+                .UseTransport<Msmq>()
+                .EnableInstallers();
 
             switch (args[2].ToLower())
             {
@@ -92,23 +93,22 @@
                 config.EnableOutbox();
             }
 
+
             using (var startableBus = config.InMemoryFaultManagement().CreateBus())
             {
-                Configure.Instance.ForInstallationOn().Install();
-
                 if (saga)
                 {
-                    SeedSagaMessages(numberOfMessages, endpointName, concurrency);
+                    SeedSagaMessages(startableBus,numberOfMessages, endpointName, concurrency);
                 }
                 else if (publish)
                 {
-                    Statistics.PublishTimeNoTx = PublishEvents(numberOfMessages/2, numberOfThreads, false);
-                    Statistics.PublishTimeWithTx = PublishEvents(numberOfMessages/2, numberOfThreads, !outbox);
+                    Statistics.PublishTimeNoTx = PublishEvents(startableBus,numberOfMessages / 2, numberOfThreads, false);
+                    Statistics.PublishTimeWithTx = PublishEvents(startableBus,numberOfMessages / 2, numberOfThreads, !outbox);
                 }
                 else
                 {
-                    Statistics.SendTimeNoTx = SeedInputQueue(numberOfMessages/2, endpointName, numberOfThreads, false, twoPhaseCommit);
-                    Statistics.SendTimeWithTx = SeedInputQueue(numberOfMessages/2, endpointName, numberOfThreads, !outbox, twoPhaseCommit);
+                    Statistics.SendTimeNoTx = SeedInputQueue(startableBus,numberOfMessages / 2, endpointName, numberOfThreads, false, twoPhaseCommit);
+                    Statistics.SendTimeWithTx = SeedInputQueue(startableBus,numberOfMessages / 2, endpointName, numberOfThreads, !outbox, twoPhaseCommit);
                 }
 
                 Statistics.StartTime = DateTime.Now;
@@ -136,10 +136,8 @@
                 args[5]);
         }
 
-        static void SeedSagaMessages(int numberOfMessages, string inputQueue, int concurrency)
+        static void SeedSagaMessages(IBus bus, int numberOfMessages, string inputQueue, int concurrency)
         {
-            var bus = Configure.Instance.Builder.Build<IBus>();
-
             for (var i = 0; i < numberOfMessages/concurrency; i++)
             {
                 for (var j = 0; j < concurrency; j++)
@@ -152,11 +150,10 @@
             }
         }
 
-        static TimeSpan SeedInputQueue(int numberOfMessages, string inputQueue, int numberOfThreads, bool createTransaction, bool twoPhaseCommit)
+        static TimeSpan SeedInputQueue(IBus bus,int numberOfMessages, string inputQueue, int numberOfThreads, bool createTransaction, bool twoPhaseCommit)
         {
             var sw = new Stopwatch();
-            var bus = Configure.Instance.Builder.Build<IBus>();
-
+           
             sw.Start();
             Parallel.For(
                 0,
@@ -189,11 +186,10 @@
             return sw.Elapsed;
         }
 
-        static TimeSpan PublishEvents(int numberOfMessages, int numberOfThreads, bool createTransaction)
+        static TimeSpan PublishEvents(IBus bus, int numberOfMessages, int numberOfThreads, bool createTransaction)
         {
             var sw = new Stopwatch();
-            var bus = Configure.Instance.Builder.Build<IBus>();
-
+            
             sw.Start();
             Parallel.For(
                 0,
