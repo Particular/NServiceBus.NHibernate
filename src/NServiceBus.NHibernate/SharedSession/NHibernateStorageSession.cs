@@ -3,7 +3,6 @@ namespace NServiceBus.Features
     using NHibernate.Internal;
     using NHibernate.SharedSession;
     using global::NHibernate.Cfg;
-    using global::NHibernate;
     using Environment = global::NHibernate.Cfg.Environment;
 
     /// <summary>
@@ -15,6 +14,7 @@ namespace NServiceBus.Features
         {
             Defaults(s => s.SetDefault<SharedMappings>(new SharedMappings()));
 
+            DependsOn<NHibernateDBConnectionProvider>();
             DependsOnAtLeastOne(typeof(NHibernateSagaStorage), typeof(NHibernateOutboxStorage));
         }
 
@@ -50,23 +50,22 @@ namespace NServiceBus.Features
                 }
             }
 
+            context.Container.RegisterSingleton<ISessionFactoryProvider>(new SessionFactoryProvider(configuration.BuildSessionFactory()));
+
             context.Pipeline.Register<OpenSqlConnectionBehavior.Registration>();
             context.Pipeline.Register<OpenSessionBehavior.Registration>();
             context.Pipeline.Register<OpenNativeTransactionBehavior.Registration>();
 
-            context.Container.RegisterSingleton<ISessionFactory>(configuration.BuildSessionFactory());
-
             context.Container.ConfigureComponent<StorageSessionProvider>(DependencyLifecycle.InstancePerCall)
-                     .ConfigureProperty(p => p.ConnectionString, connString);
+                .ConfigureProperty(p => p.ConnectionString, connString);
 
-            context.Container.ConfigureComponent<DbConnectionProvider>(DependencyLifecycle.InstancePerCall)
-                     .ConfigureProperty(p => p.ConnectionString, connString);
+            context.Container.ConfigureProperty<DbConnectionProvider>(p => p.DefaultConnectionString, connString);
 
             context.Container.ConfigureComponent<OpenSqlConnectionBehavior>(DependencyLifecycle.InstancePerCall)
                     .ConfigureProperty(p => p.ConnectionString, connString);
 
             context.Container.ConfigureComponent<OpenSessionBehavior>(DependencyLifecycle.InstancePerCall)
-                    .ConfigureProperty(p => p.ConnectionString, connString);
+                .ConfigureProperty(p => p.ConnectionString, connString);
 
             context.Container.ConfigureComponent<OpenNativeTransactionBehavior>(DependencyLifecycle.InstancePerCall)
                     .ConfigureProperty(p => p.ConnectionString, connString);

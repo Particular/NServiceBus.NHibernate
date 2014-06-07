@@ -78,6 +78,7 @@
   <ItemGroup>
     <Compile Include="Deduplication\DeduplicationConfig.cs" />
     <Compile Include="Deduplication\NHibernateGatewayDeduplication.cs" />
+    <Compile Include="Internal\NHibernateDBConnectionProvider.cs" />
     <Compile Include="NHibernateConfigurer.cs" />
     <Compile Include="Obsoletes\ConfigureNHibernateGatewayDeduplication.cs" />
     <Compile Include="Obsoletes\ConfigureNHibernateSagaPersister.cs" />
@@ -95,6 +96,7 @@
     <Compile Include="Deduplication\GatewayDeduplication.cs" />
     <Compile Include="Deduplication\Installer\Installer.cs" />
     <Compile Include="InternalsVisibleTo.cs" />
+    <Compile Include="SharedSession\ISessionFactoryProvider.cs" />
     <Compile Include="SharedSession\IStorageSessionProvider.cs" />
     <Compile Include="Outbox\NHibernateOutboxStorage.cs" />
     <Compile Include="SagaPersisters\NHibernateSagaStorage.cs" />
@@ -117,6 +119,7 @@
     <Compile Include="SharedSession\Installer.cs" />
     <Compile Include="SagaPersisters\SessionFactoryBuilder.cs" />
     <Compile Include="SagaPersisters\SagaPersister.cs" />
+    <Compile Include="SharedSession\SessionFactoryProvider.cs" />
     <Compile Include="SharedSession\SharedMappings.cs" />
     <Compile Include="SharedSession\StorageSessionProvider.cs" />
     <Compile Include="Subscriptions\CachedSubscriptionPersister.cs" />

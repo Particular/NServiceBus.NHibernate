@@ -5,19 +5,13 @@
     using System.Collections.Generic;
     using System.Data;
     using System.Linq;
-    using global::NHibernate;
     using NHibernate;
-    using NServiceBus.NHibernate.Internal;
     using NServiceBus.NHibernate.SharedSession;
     using Serializers.Json;
 
     class OutboxPersister : IOutboxStorage
     {
-        public ISessionFactory SessionFactory { get; set; }
-
         public IStorageSessionProvider StorageSessionProvider { get; set; }
-
-        public IDbConnectionProvider DbConnectionProvider { get; set; }
 
         public bool TryGet(string messageId, out OutboxMessage message)
         {
@@ -25,7 +19,7 @@
 
             message = null;
 
-            using (var session = SessionFactory.OpenStatelessSessionEx(DbConnectionProvider.Connection))
+            using (var session = StorageSessionProvider.OpenStatelessSession())
             {
                 using (var tx = session.BeginTransaction(IsolationLevel.ReadCommitted))
                 {
@@ -67,7 +61,7 @@
 
         public void SetAsDispatched(string messageId)
         {
-            using (var session = SessionFactory.OpenStatelessSessionEx(DbConnectionProvider.Connection))
+            using (var session = StorageSessionProvider.OpenStatelessSession())
             {
                 using (var tx = session.BeginTransaction(IsolationLevel.ReadCommitted))
                 {

@@ -47,8 +47,7 @@ namespace NServiceBus.Features
                 Deduplication.NHibernate.Installer.Installer.RunInstaller = context.Settings.Get<bool>("NHibernate.Common.AutoUpdateSchema");
             }
 
-            context.Container.ConfigureComponent<Deduplication.NHibernate.GatewayDeduplication>(
-                DependencyLifecycle.SingleInstance)
+            context.Container.ConfigureComponent<Deduplication.NHibernate.GatewayDeduplication>(DependencyLifecycle.SingleInstance)
                 .ConfigureProperty(p => p.SessionFactory, configuration.BuildSessionFactory());
         }
     }

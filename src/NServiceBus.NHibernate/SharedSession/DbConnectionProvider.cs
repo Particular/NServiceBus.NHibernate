@@ -9,7 +9,7 @@ namespace NServiceBus.NHibernate.SharedSession
     {
         public PipelineExecutor PipelineExecutor { get; set; }
 
-        public string ConnectionString { get; set; }
+        public string DefaultConnectionString { get; set; }
 
         public IDbConnection Connection
         {
@@ -18,12 +18,12 @@ namespace NServiceBus.NHibernate.SharedSession
                 IDbConnection existingConnection;
                 Lazy<IDbConnection> lazyExistingConnection;
 
-                if (PipelineExecutor.CurrentContext.TryGet(string.Format("SqlConnection-{0}", ConnectionString), out existingConnection))
+                if (PipelineExecutor.CurrentContext.TryGet(string.Format("SqlConnection-{0}", DefaultConnectionString), out existingConnection))
                 {
                     return existingConnection;
                 }
 
-                if (!PipelineExecutor.CurrentContext.TryGet(string.Format("LazySqlConnection-{0}", ConnectionString), out lazyExistingConnection))
+                if (!PipelineExecutor.CurrentContext.TryGet(string.Format("LazySqlConnection-{0}", DefaultConnectionString), out lazyExistingConnection))
                 {
                     throw new Exception("No active sql connection found");
                 }
@@ -32,15 +32,20 @@ namespace NServiceBus.NHibernate.SharedSession
             }
         }
 
-        public bool TryGetConnection(out IDbConnection connection)
+        public bool TryGetConnection(out IDbConnection connection, string connectionString = null)
         {
-            var result = PipelineExecutor.CurrentContext.TryGet(string.Format("SqlConnection-{0}", ConnectionString), out connection);
+            if (connectionString == null)
+            {
+                connectionString = DefaultConnectionString;
+            }
+
+            var result = PipelineExecutor.CurrentContext.TryGet(string.Format("SqlConnection-{0}", connectionString), out connection);
 
             if (result == false)
             {
                 Lazy<IDbConnection> lazyConnection;
-                
-                result = PipelineExecutor.CurrentContext.TryGet(string.Format("LazySqlConnection-{0}", ConnectionString), out lazyConnection);
+
+                result = PipelineExecutor.CurrentContext.TryGet(string.Format("LazySqlConnection-{0}", connectionString), out lazyConnection);
                 
                 if (result)
                 {

@@ -9,7 +9,7 @@ namespace NServiceBus.NHibernate.SharedSession
 
     class OpenSessionBehavior : IBehavior<IncomingContext>
     {
-        public ISessionFactory SessionFactory { get; set; }
+        public ISessionFactoryProvider SessionFactoryProvider { get; set; }
 
         public string ConnectionString { get; set; }
 
@@ -37,7 +37,7 @@ namespace NServiceBus.NHibernate.SharedSession
             }
             else
             {
-                var lazyConnection = new Lazy<IDbConnection>(() => SessionFactory.GetConnection());
+                var lazyConnection = new Lazy<IDbConnection>(() => SessionFactoryProvider.SessionFactory.GetConnection());
 
                 context.Set(string.Format("LazySqlConnection-{0}", ConnectionString), lazyConnection);
                 try
@@ -60,7 +60,7 @@ namespace NServiceBus.NHibernate.SharedSession
         {
             var lazySession = new Lazy<ISession>(() =>
             {
-                var session = SessionFactory.OpenSession(connectionRetriever());
+                var session = SessionFactoryProvider.SessionFactory.OpenSession(connectionRetriever());
                 session.FlushMode = FlushMode.Never;
 
                 return session;

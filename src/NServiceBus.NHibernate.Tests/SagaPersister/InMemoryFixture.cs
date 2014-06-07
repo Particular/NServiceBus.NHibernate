@@ -40,7 +40,7 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
 
             session = SessionFactory.OpenSession();
 
-            SagaPersister = new SagaPersister(new FakeSessionProvider(session));
+            SagaPersister = new SagaPersister(new FakeSessionProvider(SessionFactory, session));
 
             new Installer().Install(WindowsIdentity.GetCurrent().Name, null);
         }
@@ -72,11 +72,18 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
 
     class FakeSessionProvider : IStorageSessionProvider
     {
-        public FakeSessionProvider(ISession session)
+        readonly ISessionFactory sessionFactory;
+
+        public FakeSessionProvider(ISessionFactory sessionFactory, ISession session)
         {
+            this.sessionFactory = sessionFactory;
             Session = session;
         }
 
         public ISession Session { get; private set; }
+        public IStatelessSession OpenStatelessSession()
+        {
+            return sessionFactory.OpenStatelessSession();
+        }
     }
 }

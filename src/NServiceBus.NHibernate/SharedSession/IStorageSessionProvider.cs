@@ -5,5 +5,7 @@ namespace NServiceBus.NHibernate.SharedSession
     interface IStorageSessionProvider
     {
         ISession Session { get; }
+
+        IStatelessSession OpenStatelessSession();
     }
 }

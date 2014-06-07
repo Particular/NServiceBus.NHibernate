@@ -12,7 +12,7 @@ namespace NServiceBus.NHibernate.Tests.Outbox
         }
 
         public IDbConnection Connection { get; private set; }
-        public bool TryGetConnection(out IDbConnection connection)
+        public bool TryGetConnection(out IDbConnection connection, string connectionString = null)
         {
             connection = Connection;
 

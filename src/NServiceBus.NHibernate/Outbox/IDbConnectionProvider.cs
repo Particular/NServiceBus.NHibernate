@@ -5,6 +5,6 @@
     interface IDbConnectionProvider
     {
         IDbConnection Connection { get; }
-        bool TryGetConnection(out IDbConnection connection);
+        bool TryGetConnection(out IDbConnection connection,string connectionString = null);
     }
 }

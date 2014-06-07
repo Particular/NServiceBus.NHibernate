@@ -7,7 +7,6 @@ namespace NServiceBus.NHibernate.Tests.Outbox
     using global::NHibernate;
     using global::NHibernate.Mapping.ByCode;
     using global::NHibernate.Tool.hbm2ddl;
-    using Internal;
     using NServiceBus.Outbox.NHibernate;
     using SagaPersisters.NHibernate.Tests;
 #if !USE_SQLSERVER
@@ -50,17 +49,12 @@ namespace NServiceBus.NHibernate.Tests.Outbox
 
             SessionFactory = configuration.BuildSessionFactory();
 
-
-            var connection = SessionFactory.GetConnection();
-
             Session = SessionFactory.OpenSession();
 
 
             persister = new OutboxPersister
             {
-                DbConnectionProvider = new FakeDbConnectionProvider(connection),
-                SessionFactory = SessionFactory,
-                StorageSessionProvider = new FakeSessionProvider(SessionFactory.OpenSession())
+                StorageSessionProvider = new FakeSessionProvider(SessionFactory, Session)
             };
          
         }

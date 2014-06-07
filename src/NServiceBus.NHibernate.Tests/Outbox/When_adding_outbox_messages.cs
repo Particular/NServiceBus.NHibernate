@@ -17,7 +17,7 @@ namespace NServiceBus.NHibernate.Tests.Outbox
         {
             using (var session = SessionFactory.OpenSession())
             {
-                persister.StorageSessionProvider = new FakeSessionProvider(session);
+                persister.StorageSessionProvider = new FakeSessionProvider(SessionFactory,session);
                 persister.Store("MySpecialId", Enumerable.Empty<TransportOperation>());
                 persister.Store("MySpecialId", Enumerable.Empty<TransportOperation>());
 
@@ -31,7 +31,7 @@ namespace NServiceBus.NHibernate.Tests.Outbox
             var id = Guid.NewGuid().ToString("N");
             using (var session = SessionFactory.OpenSession())
             {
-                persister.StorageSessionProvider = new FakeSessionProvider(session);
+                persister.StorageSessionProvider = new FakeSessionProvider(SessionFactory, session);
                 persister.Store(id, new List<TransportOperation>
                 {
                     new TransportOperation("MyMessage", new Dictionary<string, string>(), new byte[1024*5], new Dictionary<string, string>()),
@@ -57,7 +57,7 @@ namespace NServiceBus.NHibernate.Tests.Outbox
 
             using (var session = SessionFactory.OpenSession())
             {
-                persister.StorageSessionProvider = new FakeSessionProvider(session);
+                persister.StorageSessionProvider = new FakeSessionProvider(SessionFactory, session);
                 persister.Store(id, new List<TransportOperation>
                 {
                     new TransportOperation("MyMessage", new Dictionary<string, string>(), new byte[1024*5], new Dictionary<string, string>()),
