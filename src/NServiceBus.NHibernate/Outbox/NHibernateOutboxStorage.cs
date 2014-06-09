@@ -84,7 +84,9 @@ namespace NServiceBus.Features
                 OutboxPersister.RemoveEntriesOlderThan(DateTime.UtcNow - timeToKeepDeduplicationData);
             }
  
+// ReSharper disable NotAccessedField.Local
             Timer cleanupTimer;
+// ReSharper restore NotAccessedField.Local
             TimeSpan timeToKeepDeduplicationData;
             TimeSpan frequencyToRunDeduplicationDataCleanup;
         }
