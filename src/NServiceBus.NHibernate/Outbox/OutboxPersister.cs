@@ -6,6 +6,7 @@
     using System.Data;
     using System.Linq;
     using NHibernate;
+    using NServiceBus.NHibernate.Internal;
     using NServiceBus.NHibernate.SharedSession;
     using Serializers.Json;
 
@@ -21,7 +22,7 @@
 
             using (var session = StorageSessionProvider.OpenStatelessSession())
             {
-                using (var tx = session.BeginTransaction(IsolationLevel.ReadCommitted))
+                using (var tx = session.BeginAmbientTransactionAware(IsolationLevel.ReadCommitted))
                 {
                     result = session.QueryOver<OutboxRecord>().Where(o => o.MessageId == messageId)
                         .Fetch(entity => entity.TransportOperations).Eager
