@@ -18,17 +18,21 @@ namespace NServiceBus.Outbox.NHibernate
                     c.Unique(true);
                 });
             });
-            Property(p => p.Dispatched, pm => pm.Column(c =>
+            Property(p => p.Dispatched, pm =>
             {
-                c.Default(0);
-                c.NotNullable(true);
-            }));
+                pm.Column(c =>
+                {
+                    c.Default(0);
+                    c.NotNullable(true);
+                });
+                pm.Index("Dispatched_Index");
+            });
             Property(p => p.DispatchedAt, pm => pm.Index("DispatchedAt_Index"));
-            Bag(p=>p.TransportOperations, b =>
+            Bag(p => p.TransportOperations, b =>
             {
                 b.Cascade(Cascade.All | Cascade.DeleteOrphans);
                 b.Key(km => km.Column("OutboxRecord_id"));
-            }, r=> r.OneToMany());
+            }, r => r.OneToMany());
         }
     }
 
