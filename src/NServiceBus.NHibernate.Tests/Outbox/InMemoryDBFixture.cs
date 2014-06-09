@@ -7,7 +7,6 @@ namespace NServiceBus.NHibernate.Tests.Outbox
     using global::NHibernate;
     using global::NHibernate.Mapping.ByCode;
     using global::NHibernate.Tool.hbm2ddl;
-    using Internal;
     using NServiceBus.Outbox.NHibernate;
     using SagaPersisters.NHibernate.Tests;
     using System.IO;
@@ -38,7 +37,7 @@ namespace NServiceBus.NHibernate.Tests.Outbox
                 .AddProperties(new Dictionary<string, string>
                 {
                     { "dialect", dialect },
-                    { global::NHibernate.Cfg.Environment.ConnectionString, connectionString }
+                    { global::NHibernate.Cfg.Environment.ConnectionString,connectionString }
                 });
 
             configuration.AddMapping(mapper.CompileMappingForAllExplicitlyAddedEntities());
@@ -47,17 +46,13 @@ namespace NServiceBus.NHibernate.Tests.Outbox
 
             SessionFactory = configuration.BuildSessionFactory();
 
-            var connection = SessionFactory.GetConnection();
-
             Session = SessionFactory.OpenSession();
 
             persister = new OutboxPersister
             {
-                DbConnectionProvider = new FakeDbConnectionProvider(connection),
-                SessionFactory = SessionFactory,
-                StorageSessionProvider = new FakeSessionProvider(SessionFactory.OpenSession())
+                StorageSessionProvider = new FakeSessionProvider(SessionFactory, Session)
             };
-         
+
         }
 
         [TearDown]

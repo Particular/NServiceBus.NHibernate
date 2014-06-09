@@ -16,12 +16,12 @@ namespace NServiceBus.Features
         public NHibernateTimeoutStorage()
         {
             DependsOn<TimeoutManager>();
+            DependsOn<NHibernateDBConnectionProvider>();
         }
 
         /// <summary>
         /// Called when the feature should perform its initialization. This call will only happen if the feature is enabled.
         /// </summary>
-        /// 
         protected override void Setup(FeatureConfigurationContext context)
         {
             var properties = new ConfigureNHibernate(context.Settings)
@@ -50,7 +50,22 @@ namespace NServiceBus.Features
                 TimeoutPersisters.NHibernate.Installer.Installer.RunInstaller = context.Settings.Get<bool>("NHibernate.Common.AutoUpdateSchema");
             }
 
-            context.Container.ConfigureComponent<TimeoutStorage>(DependencyLifecycle.SingleInstance)
+            string connString;
+
+            if (!configuration.Properties.TryGetValue(Environment.ConnectionString, out connString))
+            {
+                string connStringName;
+
+                if (configuration.Properties.TryGetValue(Environment.ConnectionStringName, out connStringName))
+                {
+                    var connectionStringSettings = System.Configuration.ConfigurationManager.ConnectionStrings[connStringName];
+
+                    connString = connectionStringSettings.ConnectionString;
+                }
+            }
+
+            context.Container.ConfigureComponent<TimeoutPersister>(DependencyLifecycle.SingleInstance)
+                .ConfigureProperty(p => p.ConnectionString, connString)
                 .ConfigureProperty(p => p.SessionFactory, configuration.BuildSessionFactory())
                 .ConfigureProperty(p => p.EndpointName, context.Settings.EndpointName());
         }

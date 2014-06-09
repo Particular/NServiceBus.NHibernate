@@ -32,7 +32,7 @@ namespace NServiceBus.Unicast.Subscriptions.NHibernate.Tests
 
             subscriptionStorageSessionProvider = new SubscriptionStorageSessionProvider(cfg.BuildSessionFactory());
 
-            storage = new SubscriptionStorage(subscriptionStorageSessionProvider);
+            storage = new SubscriptionPersister(subscriptionStorageSessionProvider);
         }
     }
 }

@@ -11,9 +11,9 @@ namespace NServiceBus.Unicast.Subscriptions.NHibernate
     /// <summary>
     ///     Subscription storage using NHibernate for persistence
     /// </summary>
-    class SubscriptionStorage : ISubscriptionStorage
+    class SubscriptionPersister : ISubscriptionStorage
     {
-        public SubscriptionStorage(SubscriptionStorageSessionProvider subscriptionStorageSessionProvider)
+        public SubscriptionPersister(SubscriptionStorageSessionProvider subscriptionStorageSessionProvider)
         {
             this.subscriptionStorageSessionProvider = subscriptionStorageSessionProvider;
         }

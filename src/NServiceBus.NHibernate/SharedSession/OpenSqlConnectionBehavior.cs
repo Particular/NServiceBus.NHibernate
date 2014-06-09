@@ -2,14 +2,13 @@ namespace NServiceBus.NHibernate.SharedSession
 {
     using System;
     using System.Data;
-    using global::NHibernate;
     using Internal;
     using Pipeline;
     using Pipeline.Contexts;
 
     class OpenSqlConnectionBehavior : IBehavior<IncomingContext>
     {
-        public ISessionFactory SessionFactory { get; set; }
+        public ISessionFactoryProvider SessionFactoryProvider { get; set; }
 
         public string ConnectionString { get; set; }
 
@@ -23,7 +22,7 @@ namespace NServiceBus.NHibernate.SharedSession
                 return;
             }
 
-            var lazyConnection = new Lazy<IDbConnection>(() => SessionFactory.GetConnection());
+            var lazyConnection = new Lazy<IDbConnection>(() => SessionFactoryProvider.SessionFactory.GetConnection());
 
             context.Set(string.Format("LazySqlConnection-{0}", ConnectionString), lazyConnection);
             try

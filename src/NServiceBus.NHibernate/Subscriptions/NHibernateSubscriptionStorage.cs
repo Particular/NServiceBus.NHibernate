@@ -55,11 +55,11 @@ namespace NServiceBus.Features
 
             if (context.Settings.HasSetting("NHibernate.Subscriptions.CacheExpiration"))
             {
-                context.Container.RegisterSingleton<ISubscriptionStorage>(new CachedSubscriptionStorage(sessionSource, context.Settings.Get<TimeSpan>("NHibernate.Subscriptions.CacheExpiration")));
+                context.Container.RegisterSingleton<ISubscriptionStorage>(new CachedSubscriptionPersister(sessionSource, context.Settings.Get<TimeSpan>("NHibernate.Subscriptions.CacheExpiration")));
             }
             else
             {
-                context.Container.ConfigureComponent<SubscriptionStorage>(DependencyLifecycle.InstancePerCall);
+                context.Container.ConfigureComponent<SubscriptionPersister>(DependencyLifecycle.InstancePerCall);
             }
         }
     }

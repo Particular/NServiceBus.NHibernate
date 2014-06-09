@@ -78,6 +78,7 @@
   <ItemGroup>
     <Compile Include="Deduplication\DeduplicationConfig.cs" />
     <Compile Include="Deduplication\NHibernateGatewayDeduplication.cs" />
+    <Compile Include="Internal\NHibernateDBConnectionProvider.cs" />
     <Compile Include="NHibernateConfigurer.cs" />
     <Compile Include="Obsoletes\ConfigureNHibernateGatewayDeduplication.cs" />
     <Compile Include="Obsoletes\ConfigureNHibernateSagaPersister.cs" />
@@ -95,6 +96,7 @@
     <Compile Include="Deduplication\GatewayDeduplication.cs" />
     <Compile Include="Deduplication\Installer\Installer.cs" />
     <Compile Include="InternalsVisibleTo.cs" />
+    <Compile Include="SharedSession\ISessionFactoryProvider.cs" />
     <Compile Include="SharedSession\IStorageSessionProvider.cs" />
     <Compile Include="Outbox\NHibernateOutboxStorage.cs" />
     <Compile Include="SagaPersisters\NHibernateSagaStorage.cs" />
@@ -117,9 +119,10 @@
     <Compile Include="SharedSession\Installer.cs" />
     <Compile Include="SagaPersisters\SessionFactoryBuilder.cs" />
     <Compile Include="SagaPersisters\SagaPersister.cs" />
+    <Compile Include="SharedSession\SessionFactoryProvider.cs" />
     <Compile Include="SharedSession\SharedMappings.cs" />
     <Compile Include="SharedSession\StorageSessionProvider.cs" />
-    <Compile Include="Subscriptions\CachedSubscriptionStorage.cs" />
+    <Compile Include="Subscriptions\CachedSubscriptionPersister.cs" />
     <Compile Include="Subscriptions\NHibernateSubscriptionStorage.cs" />
     <Compile Include="Subscriptions\SubscriptionConfig.cs" />
     <Compile Include="TimeoutPersisters\TimeoutEntityMap.cs" />
@@ -128,11 +131,11 @@
     <Compile Include="TimeoutPersisters\NHibernateTimeoutStorage.cs" />
     <Compile Include="TimeoutPersisters\TimeoutConfig.cs" />
     <Compile Include="TimeoutPersisters\TimeoutEntity.cs" />
-    <Compile Include="TimeoutPersisters\TimeoutStorage.cs" />
+    <Compile Include="TimeoutPersisters\TimeoutPersister.cs" />
     <Compile Include="Subscriptions\Config\SubscriptionMap.cs" />
     <Compile Include="Subscriptions\Installer\Installer.cs" />
     <Compile Include="Subscriptions\Subscription.cs" />
-    <Compile Include="Subscriptions\SubscriptionStorage.cs" />
+    <Compile Include="Subscriptions\SubscriptionPersister.cs" />
     <Compile Include="Subscriptions\SubscriptionStorageSessionProvider.cs" />
     <Compile Include="SharedSession\OpenSqlConnectionBehavior.cs" />
   </ItemGroup>

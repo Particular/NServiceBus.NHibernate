@@ -17,7 +17,7 @@ namespace NServiceBus.NHibernate.Tests.Outbox
         {
             using (var session = SessionFactory.OpenSession())
             {
-                persister.StorageSessionProvider = new FakeSessionProvider(session);
+                persister.StorageSessionProvider = new FakeSessionProvider(SessionFactory, session);
                 persister.Store("MySpecialId", Enumerable.Empty<TransportOperation>());
                 persister.Store("MySpecialId", Enumerable.Empty<TransportOperation>());
 
@@ -31,7 +31,7 @@ namespace NServiceBus.NHibernate.Tests.Outbox
             var id = Guid.NewGuid().ToString("N");
             using (var session = SessionFactory.OpenSession())
             {
-                persister.StorageSessionProvider = new FakeSessionProvider(session);
+                persister.StorageSessionProvider = new FakeSessionProvider(SessionFactory, session);
                 persister.Store(id, new List<TransportOperation>
                 {
                     new TransportOperation(id, new Dictionary<string, string>(), new byte[1024*5], new Dictionary<string, string>()),
@@ -55,7 +55,7 @@ namespace NServiceBus.NHibernate.Tests.Outbox
 
             using (var session = SessionFactory.OpenSession())
             {
-                persister.StorageSessionProvider = new FakeSessionProvider(session);
+                persister.StorageSessionProvider = new FakeSessionProvider(SessionFactory, session);
                 persister.Store(id, new List<TransportOperation>
                 {
                     new TransportOperation(id, new Dictionary<string, string>(), new byte[1024*5], new Dictionary<string, string>()),
@@ -83,7 +83,7 @@ namespace NServiceBus.NHibernate.Tests.Outbox
 
             using (var session = SessionFactory.OpenSession())
             {
-                persister.StorageSessionProvider = new FakeSessionProvider(session);
+                persister.StorageSessionProvider = new FakeSessionProvider(SessionFactory, session);
                 persister.Store(id, new List<TransportOperation>
                 {
                     new TransportOperation(id, new Dictionary<string, string>(), new byte[1024*5], new Dictionary<string, string>()),
@@ -110,7 +110,7 @@ namespace NServiceBus.NHibernate.Tests.Outbox
             
             using (var session = SessionFactory.OpenSession())
             {
-                persister.StorageSessionProvider = new FakeSessionProvider(session);
+                persister.StorageSessionProvider = new FakeSessionProvider(SessionFactory, session);
                 persister.Store("NotDispatched", Enumerable.Empty<TransportOperation>());
                 persister.Store(id, new List<TransportOperation>
                 {
@@ -131,27 +131,6 @@ namespace NServiceBus.NHibernate.Tests.Outbox
                 Assert.AreEqual(1, result.Count);
                 Assert.AreEqual("NotDispatched", result[0].MessageId);
             }
-        }
-
-        [Test]
-        [ExpectedException(typeof(Exception))]
-        public void Should_throw_concurrency_exception_if_dispatched_flag_has_already_been_set()
-        {
-            var id = Guid.NewGuid().ToString("N");
-
-            using (var session = SessionFactory.OpenSession())
-            {
-                persister.StorageSessionProvider = new FakeSessionProvider(session);
-                persister.Store(id, new List<TransportOperation>
-                {
-                    new TransportOperation(id, new Dictionary<string, string>(), new byte[1024*5], new Dictionary<string, string>()),
-                });
-
-                session.Flush();
-            }
-
-            persister.SetAsDispatched(id);
-            persister.SetAsDispatched(id);
         }
     }
 }
