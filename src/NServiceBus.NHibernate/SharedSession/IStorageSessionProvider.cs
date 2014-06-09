@@ -7,5 +7,7 @@ namespace NServiceBus.NHibernate.SharedSession
         ISession Session { get; }
 
         IStatelessSession OpenStatelessSession();
+
+        ISession OpenSession();
     }
 }

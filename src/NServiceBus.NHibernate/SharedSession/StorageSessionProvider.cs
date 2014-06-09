@@ -42,5 +42,17 @@ namespace NServiceBus.NHibernate.SharedSession
 
             return SessionFactoryProvider.SessionFactory.OpenStatelessSession();
         }
+
+        public ISession OpenSession()
+        {
+            IDbConnection connection;
+
+            if (DbConnectionProvider.TryGetConnection(out connection, ConnectionString))
+            {
+                return SessionFactoryProvider.SessionFactory.OpenSession(connection);
+            }
+
+            return SessionFactoryProvider.SessionFactory.OpenSession();
+        }
     }
 }

@@ -72,12 +72,31 @@
                         .SetParameter("messageid", messageId)
                         .SetParameter("date", DateTime.UtcNow)
                         .ExecuteUpdate();
-
+                    
                     queryString = string.Format("delete from {0} where MessageId = :messageid",
                         typeof(OutboxOperation));
                     session.CreateQuery(queryString)
                         .SetParameter("messageid", messageId)
                         .ExecuteUpdate();
+                    
+                    tx.Commit();
+                }
+            }
+        }
+
+        public void RemoveEntriesOlderThan(DateTime dateTime)
+        {
+            using (var session = StorageSessionProvider.OpenSession())
+            {
+                using (var tx = session.BeginTransaction(IsolationLevel.ReadCommitted))
+                {
+                    var result = session.QueryOver<OutboxRecord>().Where(o => o.Dispatched && o.DispatchedAt < dateTime)
+                        .List();
+
+                    foreach (var record in result)
+                    {
+                        session.Delete(record);
+                    }
 
                     tx.Commit();
                 }

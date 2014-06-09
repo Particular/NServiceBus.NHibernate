@@ -17,7 +17,7 @@ namespace NServiceBus.NHibernate.Tests.Outbox
         {
             using (var session = SessionFactory.OpenSession())
             {
-                persister.StorageSessionProvider = new FakeSessionProvider(SessionFactory,session);
+                persister.StorageSessionProvider = new FakeSessionProvider(SessionFactory, session);
                 persister.Store("MySpecialId", Enumerable.Empty<TransportOperation>());
                 persister.Store("MySpecialId", Enumerable.Empty<TransportOperation>());
 
@@ -34,7 +34,7 @@ namespace NServiceBus.NHibernate.Tests.Outbox
                 persister.StorageSessionProvider = new FakeSessionProvider(SessionFactory, session);
                 persister.Store(id, new List<TransportOperation>
                 {
-                    new TransportOperation("MyMessage", new Dictionary<string, string>(), new byte[1024*5], new Dictionary<string, string>()),
+                    new TransportOperation(id, new Dictionary<string, string>(), new byte[1024*5], new Dictionary<string, string>()),
                 });
 
                 session.Flush();
@@ -43,11 +43,9 @@ namespace NServiceBus.NHibernate.Tests.Outbox
             OutboxMessage result;
             persister.TryGet(id, out result);
 
-
             var operation = result.TransportOperations.Single();
 
-
-            Assert.AreEqual("MyMessage", operation.MessageId);
+            Assert.AreEqual(id, operation.MessageId);
         }
 
         [Test]
@@ -60,7 +58,7 @@ namespace NServiceBus.NHibernate.Tests.Outbox
                 persister.StorageSessionProvider = new FakeSessionProvider(SessionFactory, session);
                 persister.Store(id, new List<TransportOperation>
                 {
-                    new TransportOperation("MyMessage", new Dictionary<string, string>(), new byte[1024*5], new Dictionary<string, string>()),
+                    new TransportOperation(id, new Dictionary<string, string>(), new byte[1024*5], new Dictionary<string, string>()),
                 });
 
                 session.Flush();
@@ -75,6 +73,63 @@ namespace NServiceBus.NHibernate.Tests.Outbox
 
 
                 Assert.True(result.Dispatched);
+            }
+        }
+
+        [Test]
+        public void Should_delete_TransportOperation_as_part_setting_dispatched_flag()
+        {
+            var id = Guid.NewGuid().ToString("N");
+
+            using (var session = SessionFactory.OpenSession())
+            {
+                persister.StorageSessionProvider = new FakeSessionProvider(SessionFactory, session);
+                persister.Store(id, new List<TransportOperation>
+                {
+                    new TransportOperation(id, new Dictionary<string, string>(), new byte[1024*5], new Dictionary<string, string>()),
+                });
+
+                session.Flush();
+            }
+
+            persister.SetAsDispatched(id);
+
+            using (var session = SessionFactory.OpenSession())
+            {
+                var result = session.QueryOver<OutboxRecord>().Where(o => o.MessageId == id)
+                    .SingleOrDefault();
+
+                Assert.AreEqual(0, result.TransportOperations.Count);
+            }
+        }
+
+        [Test]
+        public void Should_delete_all_OutboxRecords_that_have_been_dispatched()
+        {
+            var id = Guid.NewGuid().ToString("N");
+            
+            using (var session = SessionFactory.OpenSession())
+            {
+                persister.StorageSessionProvider = new FakeSessionProvider(SessionFactory, session);
+                persister.Store("NotDispatched", Enumerable.Empty<TransportOperation>());
+                persister.Store(id, new List<TransportOperation>
+                {
+                    new TransportOperation(id, new Dictionary<string, string>(), new byte[1024*5], new Dictionary<string, string>()),
+                });
+
+                session.Flush();
+            }
+
+            persister.SetAsDispatched(id);
+
+            persister.RemoveEntriesOlderThan(DateTime.UtcNow.AddMinutes(1));
+
+            using (var session = SessionFactory.OpenSession())
+            {
+                var result = session.QueryOver<OutboxRecord>().List();
+                    
+                Assert.AreEqual(1, result.Count);
+                Assert.AreEqual("NotDispatched", result[0].MessageId);
             }
         }
     }

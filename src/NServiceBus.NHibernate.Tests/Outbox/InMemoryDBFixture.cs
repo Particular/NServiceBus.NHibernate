@@ -9,9 +9,7 @@ namespace NServiceBus.NHibernate.Tests.Outbox
     using global::NHibernate.Tool.hbm2ddl;
     using NServiceBus.Outbox.NHibernate;
     using SagaPersisters.NHibernate.Tests;
-#if !USE_SQLSERVER
     using System.IO;
-#endif
     using NServiceBus.Outbox;
     using NUnit.Framework;
 
@@ -44,19 +42,17 @@ namespace NServiceBus.NHibernate.Tests.Outbox
 
             configuration.AddMapping(mapper.CompileMappingForAllExplicitlyAddedEntities());
 
-
             new SchemaUpdate(configuration).Execute(false, true);
 
             SessionFactory = configuration.BuildSessionFactory();
 
             Session = SessionFactory.OpenSession();
 
-
             persister = new OutboxPersister
             {
                 StorageSessionProvider = new FakeSessionProvider(SessionFactory, Session)
             };
-         
+
         }
 
         [TearDown]

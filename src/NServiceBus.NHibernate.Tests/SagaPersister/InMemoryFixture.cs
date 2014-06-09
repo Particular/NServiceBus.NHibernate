@@ -85,5 +85,10 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
         {
             return sessionFactory.OpenStatelessSession();
         }
+
+        public ISession OpenSession()
+        {
+            return sessionFactory.OpenSession();
+        }
     }
 }
