@@ -98,21 +98,22 @@
 
         public void RemoveEntriesOlderThan(DateTime dateTime)
         {
-            using (var session = SessionFactory.OpenStatelessSessionEx(DbConnectionProvider.Connection))
+            using (var session = SessionFactory.OpenSessionEx(DbConnectionProvider.Connection))
             {
                 using (var tx = session.BeginTransaction(IsolationLevel.ReadCommitted))
                 {
-                    var queryString = string.Format("delete from {0} where DispatchedAt < :date And Dispatched = true",
-                        typeof(OutboxRecord));
-                    session.CreateQuery(queryString)
-                        .SetParameter("date", dateTime)
-                        .ExecuteUpdate();
-                    
+                    var result = session.QueryOver<OutboxRecord>().Where(o => o.Dispatched && o.DispatchedAt < dateTime)
+                        .List();
+
+                    foreach (var record in result)
+                    {
+                        session.Delete(record);
+                    }
+
                     tx.Commit();
                 }
             }
         }
-
 
         static Dictionary<string, string> ConvertStringToDictionary(string data)
         {
