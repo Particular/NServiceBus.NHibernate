@@ -25,7 +25,7 @@ namespace NServiceBus.TimeoutPersisters.NHibernate
         /// <param name="startSlice">The time where to start retrieving the next slice, the slice should exclude this date.</param>
         /// <param name="nextTimeToRunQuery">Returns the next time we should query again.</param>
         /// <returns>Returns the next range of timeouts that are due.</returns>
-        public List<Tuple<string, DateTime>> GetNextChunk(DateTime startSlice, out DateTime nextTimeToRunQuery)
+        public IEnumerable<Tuple<string, DateTime>> GetNextChunk(DateTime startSlice, out DateTime nextTimeToRunQuery)
         {
             var now = DateTime.UtcNow;
 
