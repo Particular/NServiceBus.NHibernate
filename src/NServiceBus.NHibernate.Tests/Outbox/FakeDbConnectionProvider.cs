@@ -5,18 +5,18 @@ namespace NServiceBus.NHibernate.Tests.Outbox
 
     class FakeDbConnectionProvider : IDbConnectionProvider
     {
+        readonly IDbConnection dbConnection;
 
         public FakeDbConnectionProvider(IDbConnection dbConnection)
         {
-            Connection = dbConnection;
+            this.dbConnection = dbConnection;
         }
 
-        public IDbConnection Connection { get; private set; }
-        public bool TryGetConnection(out IDbConnection connection, string connectionString = null)
+        public bool TryGetConnection(out IDbConnection connection, string connectionString)
         {
-            connection = Connection;
+            connection = dbConnection;
 
-            return Connection != null;
+            return connection != null;
         }
     }
 }

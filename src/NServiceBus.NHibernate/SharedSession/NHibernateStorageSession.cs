@@ -1,8 +1,10 @@
 namespace NServiceBus.Features
 {
+    using NHibernate;
     using NHibernate.Internal;
     using NHibernate.SharedSession;
     using global::NHibernate.Cfg;
+    using Pipeline;
     using Environment = global::NHibernate.Cfg.Environment;
 
     /// <summary>
@@ -32,7 +34,7 @@ namespace NServiceBus.Features
                 configuration = new Configuration()
                     .SetProperties(properties);
             }
-            
+
             context.Settings.Get<SharedMappings>()
                 .ApplyTo(configuration);
 
@@ -50,7 +52,7 @@ namespace NServiceBus.Features
                 }
             }
 
-            context.Container.RegisterSingleton<ISessionFactoryProvider>(new SessionFactoryProvider(configuration.BuildSessionFactory()));
+            context.Container.RegisterSingleton<SessionFactoryProvider>(new SessionFactoryProvider(configuration.BuildSessionFactory()));
 
             context.Pipeline.Register<OpenSqlConnectionBehavior.Registration>();
             context.Pipeline.Register<OpenSessionBehavior.Registration>();
@@ -62,13 +64,15 @@ namespace NServiceBus.Features
             context.Container.ConfigureProperty<DbConnectionProvider>(p => p.DefaultConnectionString, connString);
 
             context.Container.ConfigureComponent<OpenSqlConnectionBehavior>(DependencyLifecycle.InstancePerCall)
-                    .ConfigureProperty(p => p.ConnectionString, connString);
+                .ConfigureProperty(p => p.ConnectionString, connString);
 
             context.Container.ConfigureComponent<OpenSessionBehavior>(DependencyLifecycle.InstancePerCall)
                 .ConfigureProperty(p => p.ConnectionString, connString);
 
             context.Container.ConfigureComponent<OpenNativeTransactionBehavior>(DependencyLifecycle.InstancePerCall)
-                    .ConfigureProperty(p => p.ConnectionString, connString);
+                .ConfigureProperty(p => p.ConnectionString, connString);
+
+            context.Container.ConfigureComponent(b => new CurrentContextNHibernateDatabaseProperties(b.Build<PipelineExecutor>(), connString), DependencyLifecycle.InstancePerUnitOfWork);
 
             Installer.RunInstaller = context.Settings.Get<bool>("NHibernate.Common.AutoUpdateSchema");
 

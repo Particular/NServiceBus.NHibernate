@@ -9,7 +9,7 @@ namespace NServiceBus.NHibernate.SharedSession
 
     class OpenSessionBehavior : IBehavior<IncomingContext>
     {
-        public ISessionFactoryProvider SessionFactoryProvider { get; set; }
+        public SessionFactoryProvider SessionFactoryProvider { get; set; }
 
         public string ConnectionString { get; set; }
 

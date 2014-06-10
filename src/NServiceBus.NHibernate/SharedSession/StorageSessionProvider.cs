@@ -12,7 +12,7 @@ namespace NServiceBus.NHibernate.SharedSession
 
         public string ConnectionString { get; set; }
 
-        public ISessionFactoryProvider SessionFactoryProvider { get; set; }
+        public SessionFactoryProvider SessionFactoryProvider { get; set; }
 
         public IDbConnectionProvider DbConnectionProvider { get; set; }
 

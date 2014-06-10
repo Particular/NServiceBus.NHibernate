@@ -1,9 +1,8 @@
-namespace NServiceBus.Features
+namespace NServiceBus.NHibernate.SharedSession
 {
     using global::NHibernate;
-    using NHibernate.SharedSession;
 
-    class SessionFactoryProvider:ISessionFactoryProvider
+    class SessionFactoryProvider
     {
         readonly ISessionFactory sessionFactory;
 

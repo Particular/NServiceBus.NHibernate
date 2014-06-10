@@ -76,6 +76,7 @@
     <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CurrentContextNHibernateDatabaseProperties.cs" />
     <Compile Include="Deduplication\DeduplicationConfig.cs" />
     <Compile Include="Deduplication\NHibernateGatewayDeduplication.cs" />
     <Compile Include="Internal\NHibernateDBConnectionProvider.cs" />
@@ -96,7 +97,6 @@
     <Compile Include="Deduplication\GatewayDeduplication.cs" />
     <Compile Include="Deduplication\Installer\Installer.cs" />
     <Compile Include="InternalsVisibleTo.cs" />
-    <Compile Include="SharedSession\ISessionFactoryProvider.cs" />
     <Compile Include="SharedSession\IStorageSessionProvider.cs" />
     <Compile Include="Outbox\NHibernateOutboxStorage.cs" />
     <Compile Include="SagaPersisters\NHibernateSagaStorage.cs" />

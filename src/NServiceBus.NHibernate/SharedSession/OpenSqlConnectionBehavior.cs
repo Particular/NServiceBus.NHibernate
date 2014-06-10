@@ -8,7 +8,7 @@ namespace NServiceBus.NHibernate.SharedSession
 
     class OpenSqlConnectionBehavior : IBehavior<IncomingContext>
     {
-        public ISessionFactoryProvider SessionFactoryProvider { get; set; }
+        public SessionFactoryProvider SessionFactoryProvider { get; set; }
 
         public string ConnectionString { get; set; }
 

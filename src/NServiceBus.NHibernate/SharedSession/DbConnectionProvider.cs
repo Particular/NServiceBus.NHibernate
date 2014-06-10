@@ -11,28 +11,7 @@ namespace NServiceBus.NHibernate.SharedSession
 
         public string DefaultConnectionString { get; set; }
 
-        public IDbConnection Connection
-        {
-            get
-            {
-                IDbConnection existingConnection;
-                Lazy<IDbConnection> lazyExistingConnection;
-
-                if (PipelineExecutor.CurrentContext.TryGet(string.Format("SqlConnection-{0}", DefaultConnectionString), out existingConnection))
-                {
-                    return existingConnection;
-                }
-
-                if (!PipelineExecutor.CurrentContext.TryGet(string.Format("LazySqlConnection-{0}", DefaultConnectionString), out lazyExistingConnection))
-                {
-                    throw new Exception("No active sql connection found");
-                }
-
-                return lazyExistingConnection.Value;
-            }
-        }
-
-        public bool TryGetConnection(out IDbConnection connection, string connectionString = null)
+        public bool TryGetConnection(out IDbConnection connection, string connectionString)
         {
             if (connectionString == null)
             {
