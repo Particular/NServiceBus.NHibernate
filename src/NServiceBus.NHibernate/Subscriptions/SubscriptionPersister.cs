@@ -28,17 +28,7 @@ namespace NServiceBus.Unicast.Subscriptions.NHibernate
                     {
                         foreach (var messageType in messageTypes)
                         {
-                            var type = messageType;
-
-                            if (session.QueryOver<Subscription>()
-                                .Where(s => s.TypeName == type.TypeName && s.SubscriberEndpoint == address.ToString())
-                                .List()
-                                .Any(s => new MessageType(s.TypeName, s.Version) == messageType))
-                            {
-                                continue;
-                            }
-
-                            session.Save(new Subscription
+                            session.SaveOrUpdate(new Subscription
                             {
                                 SubscriberEndpoint = address.ToString(),
                                 MessageType = messageType.TypeName + "," + messageType.Version,
