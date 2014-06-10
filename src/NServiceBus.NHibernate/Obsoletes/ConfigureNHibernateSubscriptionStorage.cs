@@ -1,9 +1,9 @@
 namespace NServiceBus
 {
-    using NHibernate;
     using global::NHibernate;
     using global::NHibernate.Cfg;
     using Persistence;
+    using Persistence.NHibernate;
 
     /// <summary>
     /// Configuration extensions for the NHibernate subscription storage
@@ -40,7 +40,7 @@ namespace NServiceBus
         [ObsoleteEx(RemoveInVersion = "6", TreatAsErrorFromVersion = "5.1", Replacement = "config.UsePersistence<Persistence.NHibernate>();")]
         public static Configure UseNHibernateSubscriptionPersister(this Configure config)
         {
-            return config.UsePersistence<Persistence.NHibernate>();
+            return config.UsePersistence<NHibernate>();
         }
 
         /// <summary>
@@ -53,7 +53,7 @@ namespace NServiceBus
         [ObsoleteEx(RemoveInVersion = "6", TreatAsErrorFromVersion = "5.1", Replacement = "config.UsePersistence<Persistence.NHibernate>(c => c.UseSubscriptionStorageConfiguration(configuration));")]
         public static Configure UseNHibernateSubscriptionPersister(this Configure config, Configuration configuration)
         {
-            return config.UsePersistence<Persistence.NHibernate>(c => c.UseSubscriptionStorageConfiguration(configuration));
+            return config.UsePersistence<NHibernate>(c => c.UseSubscriptionStorageConfiguration(configuration));
         }
 
         /// <summary>
@@ -64,7 +64,7 @@ namespace NServiceBus
         [ObsoleteEx(RemoveInVersion = "6", TreatAsErrorFromVersion = "5.1", Replacement = "config.UsePersistence<Persistence.NHibernate>(c=>c.DisableSubscriptionStorageSchemaUpdate());")]
         public static Configure DisableNHibernateSubscriptionPersisterInstall(this Configure config)
         {
-            return config.UsePersistence<Persistence.NHibernate>(c=>c.DisableSubscriptionStorageSchemaUpdate());
+            return config.UsePersistence<NHibernate>(c=>c.DisableSubscriptionStorageSchemaUpdate());
         }
     }
 }

@@ -1,9 +1,8 @@
 ﻿namespace NServiceBus.Persistence
 {
     using Features;
-    using NServiceBus.NHibernate.Internal;
 
-    class NHibernateConfigurer : IConfigurePersistence<NHibernate>
+    class NHibernateConfigurer : IConfigurePersistence<NServiceBus.NHibernate>
     {
         public void Enable(Configure config)
         {

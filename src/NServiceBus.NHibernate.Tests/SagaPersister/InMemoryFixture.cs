@@ -7,8 +7,8 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
     using AutoPersistence;
     using global::NHibernate;
     using global::NHibernate.Tool.hbm2ddl;
-    using NServiceBus.NHibernate.SharedSession;
     using NUnit.Framework;
+    using Persistence.NHibernate;
     using Saga;
 
     class InMemoryFixture<T> where T : IContainSagaData

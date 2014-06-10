@@ -1,9 +1,9 @@
 ﻿namespace NServiceBus
 {
     using System;
-    using NHibernate;
     using global::NHibernate;
     using Persistence;
+    using Persistence.NHibernate;
     using Configuration = global::NHibernate.Cfg.Configuration;
 
     /// <summary>
@@ -41,7 +41,7 @@
         [ObsoleteEx(RemoveInVersion = "6", TreatAsErrorFromVersion = "5.1", Replacement = "config.UsePersistence<Persistence.NHibernate>()")]
         public static Configure UseNHibernateSagaPersister(this Configure config)
         {
-            return config.UsePersistence<Persistence.NHibernate>();
+            return config.UsePersistence<NHibernate>();
         }
 
         /// <summary>
@@ -75,7 +75,7 @@
         [ObsoleteEx(RemoveInVersion = "6", TreatAsErrorFromVersion = "5.1", Replacement = "config.UsePersistence<Persistence.NHibernate>(c => c.SagaTableNamingConvention(tableNamingConvention))")]
         public static Configure UseNHibernateSagaPersister(this Configure config, Func<Type, string> tableNamingConvention)
         {
-            return config.UsePersistence<Persistence.NHibernate>(c => c.SagaTableNamingConvention(tableNamingConvention));
+            return config.UsePersistence<NHibernate>(c => c.SagaTableNamingConvention(tableNamingConvention));
         }
 
         /// <summary>
@@ -88,7 +88,7 @@
         [ObsoleteEx(RemoveInVersion = "6", TreatAsErrorFromVersion = "5.1", Replacement = "config.UsePersistence<Persistence.NHibernate>(c => c.UseConfiguration(configuration))")]
         public static Configure UseNHibernateSagaPersister(this Configure config, Configuration configuration)
         {
-            return config.UsePersistence<Persistence.NHibernate>(c => c.UseConfiguration(configuration));
+            return config.UsePersistence<NHibernate>(c => c.UseConfiguration(configuration));
         }
 
         /// <summary>
@@ -102,7 +102,7 @@
         [ObsoleteEx(RemoveInVersion = "6", TreatAsErrorFromVersion = "5.1", Replacement = "config.UsePersistence<Persistence.NHibernate>(c =>{c.UseConfiguration(configuration);c.SagaTableNamingConvention(tableNamingConvention);})")]
         public static Configure UseNHibernateSagaPersister(this Configure config, Configuration configuration, Func<Type, string> tableNamingConvention)
         {
-            return config.UsePersistence<Persistence.NHibernate>(c =>
+            return config.UsePersistence<NHibernate>(c =>
             {
                 c.UseConfiguration(configuration);
                 c.SagaTableNamingConvention(tableNamingConvention);

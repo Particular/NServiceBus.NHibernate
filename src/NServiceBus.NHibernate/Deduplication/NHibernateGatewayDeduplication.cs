@@ -2,7 +2,7 @@ namespace NServiceBus.Features
 {
     using Deduplication.NHibernate.Config;
     using global::NHibernate.Cfg;
-    using NHibernate.Internal;
+    using Persistence.NHibernate;
 
     /// <summary>
     /// NHibernate Gateway Deduplication.

@@ -1,5 +1,7 @@
-﻿namespace NServiceBus.Persistence
+﻿namespace NServiceBus
 {
+    using Persistence;
+
     /// <summary>
     /// NHibernate persistence for everything.
     /// </summary>

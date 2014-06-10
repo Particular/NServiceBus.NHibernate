@@ -2,7 +2,7 @@ namespace NServiceBus.Features
 {
     using System;
     using global::NHibernate.Cfg;
-    using NHibernate.Internal;
+    using Persistence.NHibernate;
     using Unicast.Subscriptions.MessageDrivenSubscriptions;
     using Unicast.Subscriptions.NHibernate;
     using Unicast.Subscriptions.NHibernate.Config;

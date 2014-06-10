@@ -1,9 +1,7 @@
 namespace NServiceBus.Features
 {
-    using NHibernate;
-    using NHibernate.Internal;
-    using NHibernate.SharedSession;
     using global::NHibernate.Cfg;
+    using Persistence.NHibernate;
     using Pipeline;
     using Environment = global::NHibernate.Cfg.Environment;
 

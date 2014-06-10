@@ -3,9 +3,8 @@ using System.Collections.Specialized;
 using System.Security.Cryptography;
 using System.Text;
 using NServiceBus;
-using NServiceBus.NHibernate;
-using NServiceBus.NHibernate.Internal;
 using NServiceBus.Persistence;
+using NServiceBus.Persistence.NHibernate;
 using NServiceBus.Saga;
 
 public class ConfigureNHibernatePersistence
@@ -17,7 +16,7 @@ public class ConfigureNHibernatePersistence
             {"NServiceBus/Persistence/NHibernate/connection.driver_class", "NHibernate.Driver.OracleDataClientDriver"},
             {"NServiceBus/Persistence/NHibernate/dialect", "NHibernate.Dialect.Oracle10gDialect"}
         };
-        config.UsePersistence<NServiceBus.Persistence.NHibernate>(c =>
+        config.UsePersistence<NServiceBus.NHibernate>(c =>
         {
             c.ConnectionString(@"Data Source=XE;User Id=particular;Password=Welcome1");
             c.SagaTableNamingConvention(type=>

@@ -1,7 +1,7 @@
 namespace NServiceBus
 {
-    using NHibernate;
     using Persistence;
+    using Persistence.NHibernate;
 // ReSharper disable RedundantNameQualifier
     using global::NHibernate.Cfg;
 // ReSharper restore RedundantNameQualifier
@@ -42,7 +42,7 @@ namespace NServiceBus
         [ObsoleteEx(RemoveInVersion = "6", TreatAsErrorFromVersion = "5.1", Replacement = "config.UsePersistence<Persistence.NHibernate>()")]
         public static Configure UseNHibernateTimeoutPersister(this Configure config)
         {
-            return config.UsePersistence<Persistence.NHibernate>();
+            return config.UsePersistence<NHibernate>();
         }
 
         /// <summary>
@@ -56,7 +56,7 @@ namespace NServiceBus
         [ObsoleteEx(RemoveInVersion = "6", TreatAsErrorFromVersion = "5.1", Replacement = "config.UsePersistence<Persistence.NHibernate>(c =>{c.UseTimeoutStorageConfiguration(configuration);if (!autoUpdateSchema){c.DisableTimeoutStorageSchemaUpdate();}});")]
         public static Configure UseNHibernateTimeoutPersister(this Configure config, Configuration configuration, bool autoUpdateSchema)
         {
-            return config.UsePersistence<Persistence.NHibernate>(c =>
+            return config.UsePersistence<NHibernate>(c =>
             {
                 c.UseTimeoutStorageConfiguration(configuration);
                 if (!autoUpdateSchema)
@@ -74,7 +74,7 @@ namespace NServiceBus
         [ObsoleteEx(RemoveInVersion = "6", TreatAsErrorFromVersion = "5.1", Replacement = "config.UsePersistence<Persistence.NHibernate>(c=>c.DisableTimeoutStorageSchemaUpdate())")]
         public static Configure DisableNHibernateTimeoutPersisterInstall(this Configure config)
         {
-            return config.UsePersistence<Persistence.NHibernate>(c=>c.DisableTimeoutStorageSchemaUpdate());
+            return config.UsePersistence<NHibernate>(c=>c.DisableTimeoutStorageSchemaUpdate());
         }
     }
 }

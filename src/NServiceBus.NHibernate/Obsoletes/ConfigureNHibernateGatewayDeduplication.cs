@@ -1,7 +1,7 @@
 ﻿namespace NServiceBus
 {
-    using NHibernate;
     using Persistence;
+    using Persistence.NHibernate;
 // ReSharper disable once RedundantNameQualifier
     using global::NHibernate.Cfg;
 
@@ -40,7 +40,7 @@
         [ObsoleteEx(RemoveInVersion = "6", TreatAsErrorFromVersion = "5.1", Replacement = "config.UsePersistence<Persistence.NHibernate>()")]
         public static Configure UseNHibernateGatewayDeduplication(this Configure config)
         {
-            return config.UsePersistence<Persistence.NHibernate>();
+            return config.UsePersistence<NHibernate>();
         }
 
         /// <summary>
@@ -52,7 +52,7 @@
         [ObsoleteEx(RemoveInVersion = "6", TreatAsErrorFromVersion = "5.1", Replacement = "config.UsePersistence<Persistence.NHibernate>(c => c.UseGatewayDeduplicationConfiguration(configuration));")]
         public static Configure UseNHibernateGatewayDeduplication(this Configure config, Configuration configuration)
         {
-            return config.UsePersistence<Persistence.NHibernate>(c=> c.UseGatewayDeduplicationConfiguration(configuration));
+            return config.UsePersistence<NHibernate>(c=> c.UseGatewayDeduplicationConfiguration(configuration));
         }
 
         /// <summary>
@@ -63,7 +63,7 @@
         [ObsoleteEx(RemoveInVersion = "6", TreatAsErrorFromVersion = "5.1", Replacement = "config.UsePersistence<Persistence.NHibernate>(c=>c.DisableGatewayDeduplicationSchemaUpdate())")]
         public static Configure DisableNHibernateGatewayDeduplicationInstall(this Configure config)
         {
-            return config.UsePersistence<Persistence.NHibernate>();
+            return config.UsePersistence<NHibernate>();
         }
     }
 }

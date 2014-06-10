@@ -1,9 +1,8 @@
-namespace NServiceBus.NHibernate.SharedSession
+namespace NServiceBus.Persistence.NHibernate
 {
     using System;
     using System.Data;
     using global::NHibernate;
-    using Internal;
     using Pipeline;
     using Pipeline.Contexts;
 

@@ -1,4 +1,4 @@
-namespace NServiceBus.NHibernate.SharedSession
+namespace NServiceBus.Persistence.NHibernate
 {
     using global::NHibernate;
 

@@ -7,9 +7,9 @@ namespace NServiceBus.TimeoutPersisters.NHibernate.Tests
     using global::NHibernate;
     using global::NHibernate.Mapping.ByCode;
     using global::NHibernate.Tool.hbm2ddl;
-    using NServiceBus.NHibernate.Internal;
     using NServiceBus.NHibernate.Tests.Outbox;
     using NUnit.Framework;
+    using Persistence.NHibernate;
 
     abstract class InMemoryDBFixture
     {
@@ -26,7 +26,7 @@ namespace NServiceBus.TimeoutPersisters.NHibernate.Tests
               .AddProperties(new Dictionary<string, string>
                 {
                     { "dialect", dialect },
-                    { global::NHibernate.Cfg.Environment.ConnectionString,connectionString }
+                    { global::NHibernate.Cfg.Environment.ConnectionString, connectionString }
                 });
             var mapper = new ModelMapper();
             mapper.AddMapping<TimeoutEntityMap>();

@@ -6,8 +6,7 @@
     using System.Data;
     using System.Linq;
     using NHibernate;
-    using NServiceBus.NHibernate.Internal;
-    using NServiceBus.NHibernate.SharedSession;
+    using Persistence.NHibernate;
     using Serializers.Json;
 
     class OutboxPersister : IOutboxStorage

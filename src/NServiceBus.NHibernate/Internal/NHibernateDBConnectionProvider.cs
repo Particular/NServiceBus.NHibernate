@@ -1,7 +1,6 @@
-﻿namespace NServiceBus.NHibernate.Internal
+﻿namespace NServiceBus.Features
 {
-    using Features;
-    using SharedSession;
+    using Persistence.NHibernate;
 
     /// <summary>
     /// Provides access to connections available on the pipeline

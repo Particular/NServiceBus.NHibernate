@@ -6,7 +6,7 @@
     using Gateway.Deduplication;
     using global::NHibernate;
     using global::NHibernate.Exceptions;
-    using NServiceBus.NHibernate.Internal;
+    using Persistence.NHibernate;
 
     class GatewayDeduplication : IDeduplicateMessages
     {

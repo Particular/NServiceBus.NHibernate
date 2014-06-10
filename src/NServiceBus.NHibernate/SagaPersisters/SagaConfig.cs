@@ -1,4 +1,4 @@
-namespace NServiceBus.NHibernate
+namespace NServiceBus.Persistence.NHibernate
 {
     using System;
     using Persistence;

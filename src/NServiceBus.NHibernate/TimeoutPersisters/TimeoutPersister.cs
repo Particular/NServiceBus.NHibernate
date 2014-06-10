@@ -6,8 +6,8 @@ namespace NServiceBus.TimeoutPersisters.NHibernate
     using System.Data;
     using System.Linq;
     using global::NHibernate;
-    using NServiceBus.NHibernate.Internal;
     using Outbox;
+    using Persistence.NHibernate;
     using Serializers.Json;
     using Timeout.Core;
 

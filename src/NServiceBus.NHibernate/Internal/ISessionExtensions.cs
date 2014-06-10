@@ -1,4 +1,4 @@
-namespace NServiceBus.NHibernate.Internal
+namespace NServiceBus.Persistence.NHibernate
 {
     using System.Data;
     using global::NHibernate;

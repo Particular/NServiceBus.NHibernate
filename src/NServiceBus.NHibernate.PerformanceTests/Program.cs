@@ -8,8 +8,8 @@
     using System.Transactions;
     using NServiceBus;
     using NServiceBus.Features;
-    using NServiceBus.NHibernate.Internal;
     using NServiceBus.Persistence;
+    using NServiceBus.Persistence.NHibernate;
     using Saga;
 
     internal class Program

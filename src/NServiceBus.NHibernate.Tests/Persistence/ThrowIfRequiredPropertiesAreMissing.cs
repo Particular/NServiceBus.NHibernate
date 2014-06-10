@@ -2,7 +2,6 @@ namespace NServiceBus.Persistence.NHibernate.Tests
 {
     using System;
     using System.Collections.Generic;
-    using NServiceBus.NHibernate.Internal;
     using NUnit.Framework;
 
     [TestFixture]

@@ -3,7 +3,7 @@ namespace NServiceBus.TimeoutPersisters.NHibernate.Config
     using global::NHibernate;
     using global::NHibernate.Mapping.ByCode;
     using global::NHibernate.Mapping.ByCode.Conformist;
-    using NServiceBus.NHibernate.Internal;
+    using Persistence.NHibernate;
 
     /// <summary>
     /// Timeout entity map class
