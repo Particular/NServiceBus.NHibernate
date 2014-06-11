@@ -70,7 +70,7 @@ namespace NServiceBus.Features
             context.Container.ConfigureComponent<OpenNativeTransactionBehavior>(DependencyLifecycle.InstancePerCall)
                 .ConfigureProperty(p => p.ConnectionString, connString);
 
-            context.Container.ConfigureComponent(b => new CurrentContextNHibernateDatabaseProperties(b.Build<PipelineExecutor>(), connString), DependencyLifecycle.InstancePerUnitOfWork);
+            context.Container.ConfigureComponent(b => new NHibernateStorageContext(b.Build<PipelineExecutor>(), connString), DependencyLifecycle.InstancePerUnitOfWork);
 
             Installer.RunInstaller = context.Settings.Get<bool>("NHibernate.Common.AutoUpdateSchema");
 

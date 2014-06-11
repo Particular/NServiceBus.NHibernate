@@ -8,12 +8,12 @@ namespace NServiceBus.Persistence.NHibernate
     /// <summary>
     /// Provides users with access to the current NHibernate <see cref="ITransaction"/>, <see cref="IDbConnection"/> and <see cref="ISession"/>. 
     /// </summary>
-    public class CurrentContextNHibernateDatabaseProperties
+    public class NHibernateStorageContext
     {
         readonly PipelineExecutor pipelineExecutor;
         readonly string connectionString;
 
-        internal CurrentContextNHibernateDatabaseProperties(PipelineExecutor pipelineExecutor, string connectionString)
+        internal NHibernateStorageContext(PipelineExecutor pipelineExecutor, string connectionString)
         {
             this.pipelineExecutor = pipelineExecutor;
             this.connectionString = connectionString;
