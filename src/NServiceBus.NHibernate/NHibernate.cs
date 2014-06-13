@@ -12,7 +12,7 @@
         /// </summary>
         public NHibernate()
         {
-            HasGatewaysStorage = true;
+            HasGatewayStorage = true;
             HasOutboxStorage = true;
             HasSagaStorage = true;
             HasSubscriptionStorage = true;
