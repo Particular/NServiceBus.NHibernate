@@ -35,13 +35,5 @@
         {
             persistenceConfiguration.Config.Settings.Set("StorageConfiguration", configuration);
         }
-
-        class Defaults : IWantToRunBeforeConfiguration
-        {
-            public void Init(Configure configure)
-            {
-                configure.Settings.SetDefault("NHibernate.Common.AutoUpdateSchema", true);
-            }
-        }
     }
 }

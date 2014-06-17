@@ -6,6 +6,7 @@
     {
         public void Enable(Configure config)
         {
+            config.Settings.SetDefault("NHibernate.Common.AutoUpdateSchema", true);
 
             config.Settings.EnableFeatureByDefault<NHibernateDBConnectionProvider>();
             config.Settings.EnableFeatureByDefault<NHibernateStorageSession>();
