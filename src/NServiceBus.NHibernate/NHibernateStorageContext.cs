@@ -29,10 +29,7 @@ namespace NServiceBus.Persistence.NHibernate
                 Lazy<IDbConnection> lazy;
                 if (pipelineExecutor.CurrentContext.TryGet(string.Format("LazySqlConnection-{0}", connectionString), out lazy))
                 {
-                    if (lazy.IsValueCreated)
-                    {
-                        return lazy.Value;
-                    }
+                    return lazy.Value;
                 }
 
                 return null;
@@ -49,10 +46,7 @@ namespace NServiceBus.Persistence.NHibernate
                 Lazy<ISession> lazy;
                 if (pipelineExecutor.CurrentContext.TryGet(string.Format("LazyNHibernateSession-{0}", connectionString), out lazy))
                 {
-                    if (lazy.IsValueCreated)
-                    {
-                        return lazy.Value;
-                    }
+                    return lazy.Value;
                 }
 
                 return null;
@@ -69,10 +63,7 @@ namespace NServiceBus.Persistence.NHibernate
                 Lazy<ITransaction> lazy;
                 if (pipelineExecutor.CurrentContext.TryGet(string.Format("LazyNHibernateTransaction-{0}", connectionString), out lazy))
                 {
-                    if (lazy.IsValueCreated)
-                    {
-                        return lazy.Value;
-                    }
+                    return lazy.Value;
                 }
 
                 return null;
