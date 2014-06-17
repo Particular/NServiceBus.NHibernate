@@ -20,7 +20,7 @@ namespace NServiceBus.Persistence.NHibernate
         }
 
         /// <summary>
-        /// Gets the current context NHibernate <see cref="IDbConnection"/> or <code>null</code> if no current context NHibernate <see cref="IDbConnection"/> available.
+        /// Gets the current context NHibernate <see cref="IDbConnection"/>.
         /// </summary>
         public IDbConnection Connection
         {
@@ -37,7 +37,7 @@ namespace NServiceBus.Persistence.NHibernate
         }
 
         /// <summary>
-        /// Gets the current context NHibernate <see cref="ISession"/> or <code>null</code> if no current context NHibernate <see cref="ISession"/> available.
+        /// Gets the current context NHibernate <see cref="ISession"/>.
         /// </summary>
         public ISession Session
         {
@@ -54,7 +54,7 @@ namespace NServiceBus.Persistence.NHibernate
         }
 
         /// <summary>
-        /// Gets the current context NHibernate <see cref="ITransaction"/> or <code>null</code> if no current context NHibernate <see cref="ITransaction"/> available.
+        /// Gets the current context NHibernate <see cref="ITransaction"/>.
         /// </summary>
         public ITransaction Transaction
         {
