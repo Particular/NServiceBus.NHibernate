@@ -32,7 +32,7 @@ namespace NServiceBus.Persistence.NHibernate
                     return lazy.Value;
                 }
 
-                return null;
+                throw new InvalidOperationException("No connection available");
             }
         }
 
@@ -49,7 +49,7 @@ namespace NServiceBus.Persistence.NHibernate
                     return lazy.Value;
                 }
 
-                return null;
+                throw new InvalidOperationException("No session available");
             }
         }
 
@@ -66,7 +66,7 @@ namespace NServiceBus.Persistence.NHibernate
                     return lazy.Value;
                 }
 
-                return null;
+                throw new InvalidOperationException("No transaction available");
             }
         }
     }
