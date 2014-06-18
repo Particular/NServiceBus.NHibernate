@@ -47,7 +47,7 @@ namespace NServiceBus.Persistence.NHibernate
                 : base("OpenNHibernateTransaction", typeof(OpenNativeTransactionBehavior), "Makes sure that there is a NHibernate ITransaction wrapping the pipeline")
             {
                 InsertAfter(WellKnownBehavior.ExecuteUnitOfWork);
-                InsertBefore(WellKnownBehavior.InvokeSaga);
+                InsertBeforeIfExists(WellKnownBehavior.InvokeSaga);
                 InsertBeforeIfExists("OutboxRecorder");
             }
         }
