@@ -91,7 +91,7 @@ namespace NServiceBus.Persistence.NHibernate
             public Registration()
                 : base("OpenNHibernateSession", typeof(OpenSessionBehavior), "Makes sure that there is a NHibernate ISession available on the pipeline")
             {
-                InsertAfter(WellKnownBehavior.UnitOfWork);
+                InsertAfter(WellKnownBehavior.ExecuteUnitOfWork);
                 InsertAfterIfExists("OutboxDeduplication");
                 InsertBeforeIfExists("OutboxRecorder");
                 InsertBefore("OpenNHibernateTransaction");

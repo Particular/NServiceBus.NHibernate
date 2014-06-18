@@ -12,11 +12,11 @@
         /// </summary>
         public NHibernate()
         {
-            HasGatewayStorage = true;
-            HasOutboxStorage = true;
-            HasSagaStorage = true;
-            HasSubscriptionStorage = true;
-            HasTimeoutStorage = true;
+            Supports(Storage.GatewayDeduplication);
+            Supports(Storage.Timeouts);
+            Supports(Storage.Sagas);
+            Supports(Storage.Subscriptions);
+            Supports(Storage.Outbox);
         }
     }
 }

@@ -43,9 +43,9 @@ namespace NServiceBus.Persistence.NHibernate
         {
             public Registration(): base("OpenSqlConnection", typeof(OpenSqlConnectionBehavior), "Makes sure that there is an IDbConnection available on the pipeline")
             {
-                InsertAfter(WellKnownBehavior.ChildContainer);
+                InsertAfter(WellKnownBehavior.CreateChildContainer);
                 InsertBeforeIfExists("OutboxDeduplication");
-                InsertBefore(WellKnownBehavior.UnitOfWork);
+                InsertBefore(WellKnownBehavior.ExecuteUnitOfWork);
             }
         }
     }
