@@ -47,7 +47,6 @@
             }
 
             var config = Configure.With(b => b.EndpointName(endpointName))
-                .DefaultBuilder()
                 .UseTransport<Msmq>()
                 .EnableInstallers();
 
