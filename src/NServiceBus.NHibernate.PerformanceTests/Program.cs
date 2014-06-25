@@ -72,7 +72,7 @@
                     throw new InvalidOperationException("Illegal serialization format " + args[2]);
             }
 
-            config.Features(f => f.Disable<Audit>());
+            config.DisableFeature<Audit>();
 
             NHibernateSettingRetriever.ConnectionStrings = () => new ConnectionStringSettingsCollection
                 {

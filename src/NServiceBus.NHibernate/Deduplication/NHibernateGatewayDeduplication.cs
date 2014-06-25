@@ -14,7 +14,7 @@ namespace NServiceBus.Features
         /// </summary>
         public NHibernateGatewayDeduplication()
         {
-            DependsOn<Gateway>();
+            DependsOn("Gateway");
         }
 
         /// <summary>
