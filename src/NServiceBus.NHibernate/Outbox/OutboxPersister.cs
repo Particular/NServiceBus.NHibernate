@@ -109,7 +109,7 @@
                 return new Dictionary<string, string>();
             }
 
-            return serializer.DeserializeObject<Dictionary<string, string>>(data);
+            return (Dictionary<string, string>) serializer.DeserializeObject(data,typeof(Dictionary<string, string>));
         }
 
         static string ConvertDictionaryToString(ICollection data)
