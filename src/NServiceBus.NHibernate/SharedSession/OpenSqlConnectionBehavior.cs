@@ -39,13 +39,13 @@ namespace NServiceBus.Persistence.NHibernate
             }
         }
 
-        public class Registration : RegisterBehavior
+        public class Registration : RegisterStep
         {
             public Registration(): base("OpenSqlConnection", typeof(OpenSqlConnectionBehavior), "Makes sure that there is an IDbConnection available on the pipeline")
             {
-                InsertAfter(WellKnownBehavior.CreateChildContainer);
+                InsertAfter(WellKnownStep.CreateChildContainer);
                 InsertBeforeIfExists("OutboxDeduplication");
-                InsertBefore(WellKnownBehavior.ExecuteUnitOfWork);
+                InsertBefore(WellKnownStep.ExecuteUnitOfWork);
             }
         }
     }

@@ -41,13 +41,13 @@ namespace NServiceBus.Persistence.NHibernate
             }
         }
 
-        public class Registration : RegisterBehavior
+        public class Registration : RegisterStep
         {
             public Registration()
                 : base("OpenNHibernateTransaction", typeof(OpenNativeTransactionBehavior), "Makes sure that there is a NHibernate ITransaction wrapping the pipeline")
             {
-                InsertAfter(WellKnownBehavior.ExecuteUnitOfWork);
-                InsertBeforeIfExists(WellKnownBehavior.InvokeSaga);
+                InsertAfter(WellKnownStep.ExecuteUnitOfWork);
+                InsertBeforeIfExists(WellKnownStep.InvokeSaga);
                 InsertBeforeIfExists("OutboxRecorder");
             }
         }
