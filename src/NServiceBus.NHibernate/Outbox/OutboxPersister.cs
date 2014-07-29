@@ -63,19 +63,20 @@
         {
             using (var session = StorageSessionProvider.OpenStatelessSession())
             {
+                session.SetBatchSize(2);
                 using (var tx = session.BeginTransaction(IsolationLevel.ReadCommitted))
                 {
                     var queryString = string.Format("update {0} set Dispatched = true, DispatchedAt = :date where MessageId = :messageid And Dispatched = false",
                         typeof(OutboxRecord));
                     session.CreateQuery(queryString)
-                        .SetParameter("messageid", messageId)
-                        .SetParameter("date", DateTime.UtcNow)
+                        .SetString("messageid", messageId)
+                        .SetDateTime("date", DateTime.UtcNow)
                         .ExecuteUpdate();
                     
                     queryString = string.Format("delete from {0} where MessageId = :messageid",
                         typeof(OutboxOperation));
                     session.CreateQuery(queryString)
-                        .SetParameter("messageid", messageId)
+                        .SetString("messageid", messageId)
                         .ExecuteUpdate();
                     
                     tx.Commit();
