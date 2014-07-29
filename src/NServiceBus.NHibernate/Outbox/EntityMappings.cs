@@ -11,7 +11,7 @@ namespace NServiceBus.Outbox.NHibernate
             Id(x => x.Id, m => m.Generator(Generators.Native));
             Property(p => p.MessageId, pm =>
             {
-                pm.Index("MessageId_Index");
+                pm.Index("OutboxRecord_MessageId_Index");
                 pm.Column(c =>
                 {
                     c.NotNullable(true);
@@ -25,9 +25,9 @@ namespace NServiceBus.Outbox.NHibernate
                     c.Default(0);
                     c.NotNullable(true);
                 });
-                pm.Index("Dispatched_Index");
+                pm.Index("OutboxRecord_Dispatched_Index");
             });
-            Property(p => p.DispatchedAt, pm => pm.Index("DispatchedAt_Index"));
+            Property(p => p.DispatchedAt, pm => pm.Index("OutboxRecord_DispatchedAt_Index"));
             Bag(p => p.TransportOperations, b =>
             {
                 b.Cascade(Cascade.All | Cascade.DeleteOrphans);
@@ -41,7 +41,11 @@ namespace NServiceBus.Outbox.NHibernate
         public TransportOperationEntityMap()
         {
             Id(x => x.Id, m => m.Generator(Generators.Native));
-            Property(p => p.MessageId, pm => pm.Column(c => c.NotNullable(true)));
+            Property(p => p.MessageId, pm =>
+            {
+                pm.Index("OutboxOperation_MessageId_Index");
+                pm.Column(c => c.NotNullable(true));
+            });
             Property(p => p.Message, pm => pm.Type(NHibernateUtil.BinaryBlob));
             Property(p => p.Headers, pm => pm.Type(NHibernateUtil.StringClob));
             Property(p => p.Options, pm => pm.Type(NHibernateUtil.StringClob));
