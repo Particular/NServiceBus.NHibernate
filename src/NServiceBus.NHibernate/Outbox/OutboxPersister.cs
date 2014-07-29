@@ -63,7 +63,6 @@
         {
             using (var session = StorageSessionProvider.OpenStatelessSession())
             {
-                session.SetBatchSize(2);
                 using (var tx = session.BeginTransaction(IsolationLevel.ReadCommitted))
                 {
                     var queryString = string.Format("update {0} set Dispatched = true, DispatchedAt = :date where MessageId = :messageid And Dispatched = false",
