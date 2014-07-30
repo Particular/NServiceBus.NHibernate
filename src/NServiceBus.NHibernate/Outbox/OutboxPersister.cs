@@ -1,7 +1,6 @@
 ﻿namespace NServiceBus.Outbox
 {
     using System;
-    using System.Collections;
     using System.Collections.Generic;
     using System.Data;
     using System.Linq;
@@ -24,7 +23,6 @@
                 using (var tx = session.BeginAmbientTransactionAware(IsolationLevel.ReadCommitted))
                 {
                     result = session.QueryOver<OutboxRecord>().Where(o => o.MessageId == messageId)
-                        .Fetch(entity => entity.TransportOperations).Eager
                         .SingleOrDefault();
 
                     tx.Commit();
@@ -37,25 +35,29 @@
             }
 
             message = new OutboxMessage(result.MessageId);
-            message.TransportOperations.AddRange(result.TransportOperations.Select(t => new TransportOperation(t.MessageId, 
-                ConvertStringToDictionary(t.Options), t.Message, ConvertStringToDictionary(t.Headers))));
+
+            var operations = ConvertStringToObject(result.TransportOperations);
+            message.TransportOperations.AddRange(operations.Select(t => new TransportOperation(t.MessageId, 
+                t.Options, t.Message, t.Headers)));
 
             return true;
         }
 
         public void Store(string messageId, IEnumerable<TransportOperation> transportOperations)
         {
+            var operations = transportOperations.Select(t => new OutboxOperation
+            {
+                Message = t.Body,
+                Headers = t.Headers,
+                MessageId = t.MessageId,
+                Options = t.Options,
+            });
+
             StorageSessionProvider.Session.Save(new OutboxRecord
             {
                 MessageId = messageId,
                 Dispatched = false,
-                TransportOperations = transportOperations.Select(t => new OutboxOperation
-                {
-                    Message = t.Body,
-                    Headers = ConvertDictionaryToString(t.Headers),
-                    MessageId = t.MessageId,
-                    Options = ConvertDictionaryToString(t.Options),
-                }).ToList()
+                TransportOperations = ConvertObjectToString(operations)
             });
         }
 
@@ -71,13 +73,7 @@
                         .SetString("messageid", messageId)
                         .SetDateTime("date", DateTime.UtcNow)
                         .ExecuteUpdate();
-                    
-                    queryString = string.Format("delete from {0} where MessageId = :messageid",
-                        typeof(OutboxOperation));
-                    session.CreateQuery(queryString)
-                        .SetString("messageid", messageId)
-                        .ExecuteUpdate();
-                    
+
                     tx.Commit();
                 }
             }
@@ -102,24 +98,24 @@
             }
         }
 
-        static Dictionary<string, string> ConvertStringToDictionary(string data)
+        static IEnumerable<OutboxOperation> ConvertStringToObject(string data)
         {
             if (String.IsNullOrEmpty(data))
             {
-                return new Dictionary<string, string>();
+                return Enumerable.Empty<OutboxOperation>();
             }
 
-            return (Dictionary<string, string>) serializer.DeserializeObject(data,typeof(Dictionary<string, string>));
+            return (IEnumerable<OutboxOperation>)serializer.DeserializeObject(data, typeof(IEnumerable<OutboxOperation>));
         }
 
-        static string ConvertDictionaryToString(ICollection data)
+        static string ConvertObjectToString(IEnumerable<OutboxOperation> operations)
         {
-            if (data == null || data.Count == 0)
+            if (operations == null || !operations.Any())
             {
                 return null;
             }
 
-            return serializer.SerializeObject(data);
+            return serializer.SerializeObject(operations);
         }
 
         static readonly JsonMessageSerializer serializer = new JsonMessageSerializer(null);

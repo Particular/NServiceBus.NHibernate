@@ -31,7 +31,6 @@ namespace NServiceBus.NHibernate.Tests.Outbox
         {
             var mapper = new ModelMapper();
             mapper.AddMapping<OutboxEntityMap>();
-            mapper.AddMapping<TransportOperationEntityMap>();
 
             var configuration = new global::NHibernate.Cfg.Configuration()
                 .AddProperties(new Dictionary<string, string>

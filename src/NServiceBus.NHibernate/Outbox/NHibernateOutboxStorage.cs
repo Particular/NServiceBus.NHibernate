@@ -37,7 +37,6 @@ namespace NServiceBus.Features
         {
             var mapper = new ModelMapper();
             mapper.AddMapping<OutboxEntityMap>();
-            mapper.AddMapping<TransportOperationEntityMap>();
 
             config.AddMapping(mapper.CompileMappingForAllExplicitlyAddedEntities());
         }

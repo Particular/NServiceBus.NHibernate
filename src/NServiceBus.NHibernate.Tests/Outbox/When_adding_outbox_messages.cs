@@ -71,35 +71,7 @@ namespace NServiceBus.NHibernate.Tests.Outbox
                 var result = session.QueryOver<OutboxRecord>().Where(o => o.MessageId == id)
                     .SingleOrDefault();
 
-
                 Assert.True(result.Dispatched);
-            }
-        }
-
-        [Test]
-        public void Should_delete_TransportOperation_as_part_setting_dispatched_flag()
-        {
-            var id = Guid.NewGuid().ToString("N");
-
-            using (var session = SessionFactory.OpenSession())
-            {
-                persister.StorageSessionProvider = new FakeSessionProvider(SessionFactory, session);
-                persister.Store(id, new List<TransportOperation>
-                {
-                    new TransportOperation(id, new Dictionary<string, string>(), new byte[1024*5], new Dictionary<string, string>()),
-                });
-
-                session.Flush();
-            }
-
-            persister.SetAsDispatched(id);
-
-            using (var session = SessionFactory.OpenSession())
-            {
-                var result = session.QueryOver<OutboxRecord>().Where(o => o.MessageId == id)
-                    .SingleOrDefault();
-
-                Assert.AreEqual(0, result.TransportOperations.Count);
             }
         }
 
