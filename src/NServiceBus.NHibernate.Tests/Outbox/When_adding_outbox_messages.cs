@@ -3,6 +3,7 @@ namespace NServiceBus.NHibernate.Tests.Outbox
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Threading;
     using NServiceBus.Outbox;
     using NServiceBus.Outbox.NHibernate;
     using NUnit.Framework;
@@ -93,6 +94,7 @@ namespace NServiceBus.NHibernate.Tests.Outbox
             }
 
             persister.SetAsDispatched(id);
+            Thread.Sleep(TimeSpan.FromSeconds(1)); //Need to wait for dispatch logic to finish
 
             persister.RemoveEntriesOlderThan(DateTime.UtcNow.AddMinutes(1));
 
