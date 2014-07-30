@@ -56,7 +56,7 @@ namespace NServiceBus.Features
             context.Pipeline.Register<OpenSessionBehavior.Registration>();
             context.Pipeline.Register<OpenNativeTransactionBehavior.Registration>();
 
-            context.Container.ConfigureComponent<StorageSessionProvider>(DependencyLifecycle.InstancePerCall)
+            context.Container.ConfigureComponent<StorageSessionProvider>(DependencyLifecycle.SingleInstance)
                 .ConfigureProperty(p => p.ConnectionString, connString);
 
             context.Container.ConfigureProperty<DbConnectionProvider>(p => p.DefaultConnectionString, connString);
