@@ -4,6 +4,7 @@
     using System.Collections.Generic;
     using System.Data;
     using System.Linq;
+    using System.Threading.Tasks;
     using NHibernate;
     using Persistence.NHibernate;
     using Serializers.Json;
@@ -63,20 +64,23 @@
 
         public void SetAsDispatched(string messageId)
         {
-            using (var session = StorageSessionProvider.OpenStatelessSession())
+            Task.Factory.StartNew(() =>
             {
-                using (var tx = session.BeginTransaction(IsolationLevel.ReadCommitted))
+                using (var session = StorageSessionProvider.OpenStatelessSession())
                 {
-                    var queryString = string.Format("update {0} set Dispatched = true, DispatchedAt = :date where MessageId = :messageid And Dispatched = false",
-                        typeof(OutboxRecord));
-                    session.CreateQuery(queryString)
-                        .SetString("messageid", messageId)
-                        .SetDateTime("date", DateTime.UtcNow)
-                        .ExecuteUpdate();
+                    using (var tx = session.BeginTransaction(IsolationLevel.ReadCommitted))
+                    {
+                        var queryString = string.Format("update {0} set Dispatched = true, DispatchedAt = :date where MessageId = :messageid And Dispatched = false",
+                            typeof(OutboxRecord));
+                        session.CreateQuery(queryString)
+                            .SetString("messageid", messageId)
+                            .SetDateTime("date", DateTime.UtcNow)
+                            .ExecuteUpdate();
 
-                    tx.Commit();
+                        tx.Commit();
+                    }
                 }
-            }
+            });
         }
 
         public void RemoveEntriesOlderThan(DateTime dateTime)
