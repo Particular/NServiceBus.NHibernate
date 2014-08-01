@@ -5,6 +5,7 @@
     using System.Data;
     using System.Linq;
     using System.Threading.Tasks;
+    using global::NHibernate.Criterion;
     using NHibernate;
     using Persistence.NHibernate;
     using Serializers.Json;
@@ -23,8 +24,10 @@
             {
                 using (var tx = session.BeginAmbientTransactionAware(IsolationLevel.ReadCommitted))
                 {
-                    result = session.QueryOver<OutboxRecord>().Where(o => o.MessageId == messageId)
-                        .SingleOrDefault();
+                    //Explicitly using ICriteria instead of QueryOver for performance reasons.
+                    //It seems QueryOver uses quite a bit reflection and that takes longer.
+                    result = session.CreateCriteria<OutboxRecord>().Add(Expression.Eq("MessageId", messageId))
+                        .UniqueResult<OutboxRecord>();
 
                     tx.Commit();
                 }
