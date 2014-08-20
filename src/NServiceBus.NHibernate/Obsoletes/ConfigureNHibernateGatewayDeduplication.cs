@@ -1,9 +1,6 @@
 ﻿namespace NServiceBus
 {
-    using Persistence;
-    using Persistence.NHibernate;
-// ReSharper disable once RedundantNameQualifier
-    using global::NHibernate.Cfg;
+    using System;
 
     /// <summary>
     /// Configuration extensions for the NHibernate Gateway deduplication
@@ -37,10 +34,12 @@
         /// </example>
         /// <param name="config">The configuration object.</param>
         /// <returns>The configuration object.</returns>
-        [ObsoleteEx(RemoveInVersion = "6", TreatAsErrorFromVersion = "5.1", Replacement = "config.UsePersistence<Persistence.NHibernate>()")]
+        [ObsoleteEx(RemoveInVersion = "6", TreatAsErrorFromVersion = "5.0", Replacement = "builder.UsePersistence<NHibernatePersistence>().For(Storage.GatewayDeduplication)")]
+// ReSharper disable UnusedParameter.Global
         public static Configure UseNHibernateGatewayDeduplication(this Configure config)
+// ReSharper restore UnusedParameter.Global
         {
-            return config.UsePersistence<NHibernate>();
+            throw new InvalidOperationException();
         }
 
         /// <summary>
@@ -49,10 +48,12 @@
         /// <param name="config">The configuration object.</param>
         /// <param name="configuration">The <see cref="Configuration"/> object.</param>
         /// <returns>The configuration object</returns>
-        [ObsoleteEx(RemoveInVersion = "6", TreatAsErrorFromVersion = "5.1", Replacement = "config.UsePersistence<Persistence.NHibernate>(c => c.UseGatewayDeduplicationConfiguration(configuration));")]
-        public static Configure UseNHibernateGatewayDeduplication(this Configure config, Configuration configuration)
+        [ObsoleteEx(RemoveInVersion = "6", TreatAsErrorFromVersion = "5.0", Replacement = "builder.UsePersistence<NHibernatePersistence>().For(Storage.GatewayDeduplication).UseGatewayDeduplicationConfiguration(configuration)")]
+// ReSharper disable UnusedParameter.Global
+        public static Configure UseNHibernateGatewayDeduplication(this Configure config, NHibernate.Cfg.Configuration configuration)
+// ReSharper restore UnusedParameter.Global
         {
-            return config.UsePersistence<NHibernate>(c=> c.UseGatewayDeduplicationConfiguration(configuration));
+            throw new InvalidOperationException();
         }
 
         /// <summary>
@@ -60,10 +61,12 @@
         /// </summary>
         /// <param name="config">The configuration object.</param>
         /// <returns>The configuration object.</returns>
-        [ObsoleteEx(RemoveInVersion = "6", TreatAsErrorFromVersion = "5.1", Replacement = "config.UsePersistence<Persistence.NHibernate>(c=>c.DisableGatewayDeduplicationSchemaUpdate())")]
+        [ObsoleteEx(RemoveInVersion = "6", TreatAsErrorFromVersion = "5.1", Replacement = "builder.UsePersistence<NHibernatePersistence>().For(Storage.GatewayDeduplication).DisableGatewayDeduplicationSchemaUpdate()")]
+// ReSharper disable UnusedParameter.Global
         public static Configure DisableNHibernateGatewayDeduplicationInstall(this Configure config)
+// ReSharper restore UnusedParameter.Global
         {
-            return config.UsePersistence<NHibernate>();
+            throw new InvalidOperationException();
         }
     }
 }

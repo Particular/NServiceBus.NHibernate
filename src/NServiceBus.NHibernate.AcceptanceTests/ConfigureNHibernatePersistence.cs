@@ -3,8 +3,9 @@ using NServiceBus.Persistence;
 
 public class ConfigureNHibernatePersistence
 {
-    public void Configure(Configure config)
+    public void Configure(BusConfiguration config)
     {
-        config.UsePersistence<NServiceBus.NHibernate>(c => c.ConnectionString(@"Server=localhost\sqlexpress;Database=nservicebus;Trusted_Connection=True;"));
+        config.UsePersistence<NHibernatePersistence>()
+            .ConnectionString(@"Server=localhost\sqlexpress;Database=nservicebus;Trusted_Connection=True;");
     }
 }

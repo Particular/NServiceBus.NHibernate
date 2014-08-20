@@ -1,10 +1,6 @@
 namespace NServiceBus
 {
-    using Persistence;
-    using Persistence.NHibernate;
-// ReSharper disable RedundantNameQualifier
-    using global::NHibernate.Cfg;
-// ReSharper restore RedundantNameQualifier
+    using System;
 
     /// <summary>
     /// Configuration extensions for the NHibernate Timeouts persister
@@ -39,10 +35,12 @@ namespace NServiceBus
         /// <param name="config">The configuration object.</param>
         /// <returns>The configuration object.</returns>
 
-        [ObsoleteEx(RemoveInVersion = "6", TreatAsErrorFromVersion = "5.1", Replacement = "config.UsePersistence<Persistence.NHibernate>()")]
+        [ObsoleteEx(RemoveInVersion = "6", TreatAsErrorFromVersion = "5.0", Replacement = "builder.UsePersistence<NHibernatePersistence>().For(Storage.Timeout)")]
+// ReSharper disable UnusedParameter.Global
         public static Configure UseNHibernateTimeoutPersister(this Configure config)
+// ReSharper restore UnusedParameter.Global
         {
-            return config.UsePersistence<NHibernate>();
+            throw new InvalidOperationException();
         }
 
         /// <summary>
@@ -53,17 +51,12 @@ namespace NServiceBus
         /// <param name="configuration">The <see cref="Configuration"/> object.</param>
         /// <param name="autoUpdateSchema"><value>true</value> to auto update schema</param>
         /// <returns>The configuration object</returns>
-        [ObsoleteEx(RemoveInVersion = "6", TreatAsErrorFromVersion = "5.1", Replacement = "config.UsePersistence<Persistence.NHibernate>(c =>{c.UseTimeoutStorageConfiguration(configuration);if (!autoUpdateSchema){c.DisableTimeoutStorageSchemaUpdate();}});")]
-        public static Configure UseNHibernateTimeoutPersister(this Configure config, Configuration configuration, bool autoUpdateSchema)
+        [ObsoleteEx(RemoveInVersion = "6", TreatAsErrorFromVersion = "5.0", Replacement = "builder.UsePersistence<NHibernatePersistence>().For(Storage.Timeout).UseTimeoutStorageConfiguration(configuration)[.DisableTimeoutStorageSchemaUpdate()]")]
+// ReSharper disable UnusedParameter.Global
+        public static Configure UseNHibernateTimeoutPersister(this Configure config, NHibernate.Cfg.Configuration configuration, bool autoUpdateSchema)
+// ReSharper restore UnusedParameter.Global
         {
-            return config.UsePersistence<NHibernate>(c =>
-            {
-                c.UseTimeoutStorageConfiguration(configuration);
-                if (!autoUpdateSchema)
-                {
-                    c.DisableTimeoutStorageSchemaUpdate();   
-                }
-            });
+            throw new InvalidOperationException();
         }
 
         /// <summary>
@@ -71,10 +64,12 @@ namespace NServiceBus
         /// </summary>
         /// <param name="config">The configuration object.</param>
         /// <returns>The configuration object.</returns>
-        [ObsoleteEx(RemoveInVersion = "6", TreatAsErrorFromVersion = "5.1", Replacement = "config.UsePersistence<Persistence.NHibernate>(c=>c.DisableTimeoutStorageSchemaUpdate())")]
+        [ObsoleteEx(RemoveInVersion = "6", TreatAsErrorFromVersion = "5.0", Replacement = "builder.UsePersistence<NHibernatePersistence>().For(Storage.Timeout).DisableTimeoutStorageSchemaUpdate()")]
+// ReSharper disable UnusedParameter.Global
         public static Configure DisableNHibernateTimeoutPersisterInstall(this Configure config)
+// ReSharper restore UnusedParameter.Global
         {
-            return config.UsePersistence<NHibernate>(c=>c.DisableTimeoutStorageSchemaUpdate());
+            throw new InvalidOperationException();
         }
     }
 }

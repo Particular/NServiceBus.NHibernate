@@ -1,10 +1,7 @@
 ﻿namespace NServiceBus
 {
     using System;
-    using global::NHibernate;
-    using Persistence;
-    using Persistence.NHibernate;
-    using Configuration = global::NHibernate.Cfg.Configuration;
+    using NHibernate;
 
     /// <summary>
     /// Contains extension methods to NServiceBus.Configure for the NHibernate saga persister.
@@ -38,10 +35,12 @@
         /// </example>
         /// <param name="config">The configuration object.</param>
         /// <returns>The configuration object.</returns>
-        [ObsoleteEx(RemoveInVersion = "6", TreatAsErrorFromVersion = "5.1", Replacement = "config.UsePersistence<Persistence.NHibernate>()")]
+        [ObsoleteEx(RemoveInVersion = "6", TreatAsErrorFromVersion = "5.0", Replacement = "builder.UsePersistence<NHibernatePersistence>().For(Storage.Sagas)")]
+// ReSharper disable UnusedParameter.Global
         public static Configure UseNHibernateSagaPersister(this Configure config)
+// ReSharper restore UnusedParameter.Global
         {
-            return config.UsePersistence<NHibernate>();
+            throw new InvalidOperationException();
         }
 
         /// <summary>
@@ -72,10 +71,12 @@
         /// <param name="config">The configuration object.</param>
         /// <param name="tableNamingConvention">Convention to use for naming tables.</param>
         /// <returns>The configuration object.</returns>
-        [ObsoleteEx(RemoveInVersion = "6", TreatAsErrorFromVersion = "5.1", Replacement = "config.UsePersistence<Persistence.NHibernate>(c => c.SagaTableNamingConvention(tableNamingConvention))")]
+        [ObsoleteEx(RemoveInVersion = "6", TreatAsErrorFromVersion = "5.0", Replacement = "builder.UsePersistence<NHibernatePersistence>().For(Storage.Sagas).SagaTableNamingConvention(tableNamingConvention)")]
+// ReSharper disable UnusedParameter.Global
         public static Configure UseNHibernateSagaPersister(this Configure config, Func<Type, string> tableNamingConvention)
+// ReSharper restore UnusedParameter.Global
         {
-            return config.UsePersistence<NHibernate>(c => c.SagaTableNamingConvention(tableNamingConvention));
+            throw new InvalidOperationException();
         }
 
         /// <summary>
@@ -85,10 +86,12 @@
         /// <param name="config">The <see cref="Configure" /> object.</param>
         /// <param name="configuration">The <see cref="Configuration" /> allows the application to specify properties and mapping documents to be used when creating a <see cref="ISessionFactory" />.</param>
         /// <returns>The <see cref="Configure" /> object.</returns>
-        [ObsoleteEx(RemoveInVersion = "6", TreatAsErrorFromVersion = "5.1", Replacement = "config.UsePersistence<Persistence.NHibernate>(c => c.UseConfiguration(configuration))")]
-        public static Configure UseNHibernateSagaPersister(this Configure config, Configuration configuration)
+        [ObsoleteEx(RemoveInVersion = "6", TreatAsErrorFromVersion = "5.0", Replacement = "builder.UsePersistence<NHibernatePersistence>().For(Storage.Sagas).UseConfiguration(configuration)")]
+// ReSharper disable UnusedParameter.Global
+        public static Configure UseNHibernateSagaPersister(this Configure config, NHibernate.Cfg.Configuration configuration)
+// ReSharper restore UnusedParameter.Global
         {
-            return config.UsePersistence<NHibernate>(c => c.UseConfiguration(configuration));
+            throw new InvalidOperationException();
         }
 
         /// <summary>
@@ -99,14 +102,12 @@
         /// <param name="configuration">The <see cref="Configuration" /> allows the application to specify properties and mapping documents to be used when creating a <see cref="ISessionFactory" />.</param>
         /// <param name="tableNamingConvention">Convention to use for naming tables.</param>
         /// <returns>The <see cref="Configure" /> object.</returns>
-        [ObsoleteEx(RemoveInVersion = "6", TreatAsErrorFromVersion = "5.1", Replacement = "config.UsePersistence<Persistence.NHibernate>(c =>{c.UseConfiguration(configuration);c.SagaTableNamingConvention(tableNamingConvention);})")]
-        public static Configure UseNHibernateSagaPersister(this Configure config, Configuration configuration, Func<Type, string> tableNamingConvention)
+        [ObsoleteEx(RemoveInVersion = "6", TreatAsErrorFromVersion = "5.0", Replacement = "builder.UsePersistence<NHibernatePersistence>().For(Storage.Sagas).UseConfiguration(configuration).SagaTableNamingConvention(tableNamingConvention)")]
+// ReSharper disable UnusedParameter.Global
+        public static Configure UseNHibernateSagaPersister(this Configure config, NHibernate.Cfg.Configuration configuration, Func<Type, string> tableNamingConvention)
+// ReSharper restore UnusedParameter.Global
         {
-            return config.UsePersistence<NHibernate>(c =>
-            {
-                c.UseConfiguration(configuration);
-                c.SagaTableNamingConvention(tableNamingConvention);
-            });
+            throw new InvalidOperationException();
         }
     }
 }

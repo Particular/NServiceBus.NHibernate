@@ -1,9 +1,9 @@
 namespace NServiceBus.Features
 {
-    using global::NHibernate.Cfg;
+    using NHibernate.Cfg;
     using Persistence.NHibernate;
     using Pipeline;
-    using Environment = global::NHibernate.Cfg.Environment;
+    using Environment = NHibernate.Cfg.Environment;
 
     /// <summary>
     /// NHibernate Storage Session.
@@ -50,7 +50,7 @@ namespace NServiceBus.Features
                 }
             }
 
-            context.Container.RegisterSingleton<SessionFactoryProvider>(new SessionFactoryProvider(configuration.BuildSessionFactory()));
+            context.Container.RegisterSingleton(new SessionFactoryProvider(configuration.BuildSessionFactory()));
 
             context.Pipeline.Register<OpenSqlConnectionBehavior.Registration>();
             context.Pipeline.Register<OpenSessionBehavior.Registration>();

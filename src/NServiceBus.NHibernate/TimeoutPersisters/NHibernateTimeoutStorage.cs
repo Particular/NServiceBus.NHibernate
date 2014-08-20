@@ -1,6 +1,6 @@
 namespace NServiceBus.Features
 {
-    using global::NHibernate.Cfg;
+    using NHibernate.Cfg;
     using Persistence.NHibernate;
     using TimeoutPersisters.NHibernate;
     using TimeoutPersisters.NHibernate.Config;

@@ -1,9 +1,7 @@
 namespace NServiceBus
 {
-    using global::NHibernate;
-    using global::NHibernate.Cfg;
-    using Persistence;
-    using Persistence.NHibernate;
+    using System;
+    using NHibernate;
 
     /// <summary>
     /// Configuration extensions for the NHibernate subscription storage
@@ -37,10 +35,12 @@ namespace NServiceBus
         /// </example>
         /// <param name="config">The configuration object.</param>
         /// <returns>The configuration object.</returns>
-        [ObsoleteEx(RemoveInVersion = "6", TreatAsErrorFromVersion = "5.1", Replacement = "config.UsePersistence<Persistence.NHibernate>();")]
+        [ObsoleteEx(RemoveInVersion = "6", TreatAsErrorFromVersion = "5.0", Replacement = "builder.UsePersistence<NHibernatePersistence>().For(Storage.Subscriptions)")]
+// ReSharper disable UnusedParameter.Global
         public static Configure UseNHibernateSubscriptionPersister(this Configure config)
+// ReSharper restore UnusedParameter.Global
         {
-            return config.UsePersistence<NHibernate>();
+            throw new InvalidOperationException();
         }
 
         /// <summary>
@@ -50,10 +50,12 @@ namespace NServiceBus
         /// <param name="config">The <see cref="Configure" /> object.</param>
         /// <param name="configuration">The <see cref="Configuration" /> allows the application to specify properties and mapping documents to be used when creating a <see cref="ISessionFactory" />.</param>
         /// <returns>The <see cref="Configure" /> object.</returns>
-        [ObsoleteEx(RemoveInVersion = "6", TreatAsErrorFromVersion = "5.1", Replacement = "config.UsePersistence<Persistence.NHibernate>(c => c.UseSubscriptionStorageConfiguration(configuration));")]
-        public static Configure UseNHibernateSubscriptionPersister(this Configure config, Configuration configuration)
+        [ObsoleteEx(RemoveInVersion = "6", TreatAsErrorFromVersion = "5.0", Replacement = "builder.UsePersistence<NHibernatePersistence>().For(Storage.Subscriptions).UseSubscriptionStorageConfiguration(configuration)")]
+// ReSharper disable UnusedParameter.Global
+        public static Configure UseNHibernateSubscriptionPersister(this Configure config, NHibernate.Cfg.Configuration configuration)
+// ReSharper restore UnusedParameter.Global
         {
-            return config.UsePersistence<NHibernate>(c => c.UseSubscriptionStorageConfiguration(configuration));
+            throw new InvalidOperationException();
         }
 
         /// <summary>
@@ -61,10 +63,12 @@ namespace NServiceBus
         /// </summary>
         /// <param name="config">The configuration object.</param>
         /// <returns>The configuration object.</returns>
-        [ObsoleteEx(RemoveInVersion = "6", TreatAsErrorFromVersion = "5.1", Replacement = "config.UsePersistence<Persistence.NHibernate>(c=>c.DisableSubscriptionStorageSchemaUpdate());")]
+        [ObsoleteEx(RemoveInVersion = "6", TreatAsErrorFromVersion = "5.0", Replacement = "builder.UsePersistence<NHibernatePersistence>().For(Storage.Subscriptions).DisableSubscriptionStorageSchemaUpdate()")]
+// ReSharper disable UnusedParameter.Global
         public static Configure DisableNHibernateSubscriptionPersisterInstall(this Configure config)
+// ReSharper restore UnusedParameter.Global
         {
-            return config.UsePersistence<NHibernate>(c=>c.DisableSubscriptionStorageSchemaUpdate());
+            throw new InvalidOperationException();
         }
     }
 }

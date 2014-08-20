@@ -46,26 +46,27 @@
                 endpointName += ".outbox";
             }
 
-            var config = Configure.With(b => b.EndpointName(endpointName))
-                .UseTransport<Msmq>()
-                .EnableInstallers();
+            var config = new BusConfiguration();
+            config.EndpointName(endpointName);
+            config.UseTransport<NServiceBus.MsmqTransport>();
+            config.EnableInstallers();
 
             switch (args[2].ToLower())
             {
                 case "xml":
-                    config.UseSerialization<Xml>();
+                    config.UseSerialization<XmlSerializer>();
                     break;
 
                 case "json":
-                    config.UseSerialization<Json>();
+                    config.UseSerialization<JsonSerializer>();
                     break;
 
                 case "bson":
-                    config.UseSerialization<Bson>();
+                    config.UseSerialization<BsonSerializer>();
                     break;
 
                 case "bin":
-                    config.UseSerialization<Binary>();
+                    config.UseSerialization<BinarySerializer>();
                     break;
 
                 default:
@@ -80,11 +81,11 @@
                 };
 
 
-            config.UsePersistence<NHibernate>();
+            config.UsePersistence<NHibernatePersistence>();
 
             if (suppressDTC)
             {
-                config.Transactions(ts=> ts.Advanced(settings => settings.DisableDistributedTransactions()));
+                config.Transactions().DisableDistributedTransactions();
             }
 
             if (outbox)
@@ -92,8 +93,9 @@
                 config.EnableOutbox();
             }
 
+            config.DiscardFailedMessagesInsteadOfSendingToErrorQueue();
 
-            using (var startableBus = config.InMemoryFaultManagement().CreateBus())
+            using (var startableBus = Bus.Create(config))
             {
                 if (saga)
                 {

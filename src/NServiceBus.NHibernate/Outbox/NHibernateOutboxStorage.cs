@@ -3,10 +3,10 @@ namespace NServiceBus.Features
     using System;
     using System.Configuration;
     using System.Threading;
-    using global::NHibernate.Mapping.ByCode;
+    using NHibernate.Mapping.ByCode;
     using NServiceBus.Outbox;
     using NServiceBus.Outbox.NHibernate;
-    using Configuration = global::NHibernate.Cfg.Configuration;
+    using Configuration = NHibernate.Cfg.Configuration;
 
     /// <summary>
     /// NHibernate Outbox Storage.

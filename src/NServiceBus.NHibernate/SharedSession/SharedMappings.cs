@@ -1,7 +1,7 @@
 namespace NServiceBus.Features
 {
     using System;
-    using global::NHibernate.Cfg;
+    using NHibernate.Cfg;
 
     class SharedMappings
     {

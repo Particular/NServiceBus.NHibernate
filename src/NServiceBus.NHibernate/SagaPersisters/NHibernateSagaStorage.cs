@@ -2,7 +2,7 @@ namespace NServiceBus.Features
 {
     using System;
     using System.Linq;
-    using global::NHibernate.Cfg;
+    using NHibernate.Cfg;
     using SagaPersisters.NHibernate;
     using SagaPersisters.NHibernate.AutoPersistence;
     using Settings;

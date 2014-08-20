@@ -1,7 +1,7 @@
 namespace NServiceBus.Features
 {
     using System;
-    using global::NHibernate.Cfg;
+    using NHibernate.Cfg;
     using Persistence.NHibernate;
     using Unicast.Subscriptions.MessageDrivenSubscriptions;
     using Unicast.Subscriptions.NHibernate;
@@ -51,7 +51,7 @@ namespace NServiceBus.Features
             }
             var sessionSource = new SubscriptionStorageSessionProvider(configuration.BuildSessionFactory());
 
-            context.Container.RegisterSingleton<SubscriptionStorageSessionProvider>(sessionSource);
+            context.Container.RegisterSingleton(sessionSource);
 
             if (context.Settings.HasSetting("NHibernate.Subscriptions.CacheExpiration"))
             {

@@ -1,5 +1,6 @@
 ﻿namespace NServiceBus.Persistence
 {
+    using Configuration.AdvanceExtensibility;
     using global::NHibernate.Cfg;
 
     /// <summary>
@@ -12,18 +13,20 @@
         /// </summary>
         /// <param name="persistenceConfiguration"></param>
         /// <param name="connectionString">The connection string to use.</param>
-        public static void ConnectionString(this PersistenceConfiguration persistenceConfiguration, string connectionString) 
+        public static PersistenceExtentions<NHibernatePersistence> ConnectionString(this PersistenceExtentions<NHibernatePersistence> persistenceConfiguration, string connectionString) 
         {
-            persistenceConfiguration.Config.Settings.Set("NHibernate.Common.ConnectionString", connectionString);
+            persistenceConfiguration.GetSettings().Set("NHibernate.Common.ConnectionString", connectionString);
+            return persistenceConfiguration;
         }
 
         /// <summary>
         /// Disables automatic schema update.
         /// </summary>
         /// <param name="persistenceConfiguration"></param>
-        public static void DisableSchemaUpdate(this PersistenceConfiguration persistenceConfiguration)
+        public static PersistenceExtentions<NHibernatePersistence> DisableSchemaUpdate(this PersistenceExtentions<NHibernatePersistence> persistenceConfiguration)
         {
-            persistenceConfiguration.Config.Settings.Set("NHibernate.Common.AutoUpdateSchema", false);
+            persistenceConfiguration.GetSettings().Set("NHibernate.Common.AutoUpdateSchema", false);
+            return persistenceConfiguration;
         }
 
         /// <summary>
@@ -31,9 +34,10 @@
         /// </summary>
         /// <param name="persistenceConfiguration"></param>
         /// <param name="configuration">The <see cref="Configuration"/> object.</param>
-        public static void UseConfiguration(this PersistenceConfiguration persistenceConfiguration, Configuration configuration)
+        public static PersistenceExtentions<NHibernatePersistence> UseConfiguration(this PersistenceExtentions<NHibernatePersistence> persistenceConfiguration, Configuration configuration)
         {
-            persistenceConfiguration.Config.Settings.Set("StorageConfiguration", configuration);
+            persistenceConfiguration.GetSettings().Set("StorageConfiguration", configuration);
+            return persistenceConfiguration;
         }
     }
 }

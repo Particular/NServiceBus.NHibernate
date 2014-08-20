@@ -1,7 +1,7 @@
 namespace NServiceBus.Features
 {
     using Deduplication.NHibernate.Config;
-    using global::NHibernate.Cfg;
+    using NHibernate.Cfg;
     using Persistence.NHibernate;
 
     /// <summary>

@@ -9,17 +9,16 @@ using NServiceBus.Saga;
 
 public class ConfigureNHibernatePersistence
 {
-    public void Configure(Configure config)
+    public void Configure(BusConfiguration config)
     {
         NHibernateSettingRetriever.AppSettings = () => new NameValueCollection
         {
             {"NServiceBus/Persistence/NHibernate/connection.driver_class", "NHibernate.Driver.OracleDataClientDriver"},
             {"NServiceBus/Persistence/NHibernate/dialect", "NHibernate.Dialect.Oracle10gDialect"}
         };
-        config.UsePersistence<NServiceBus.NHibernate>(c =>
-        {
-            c.ConnectionString(@"Data Source=XE;User Id=particular;Password=Welcome1");
-            c.SagaTableNamingConvention(type=>
+        config.UsePersistence<NHibernatePersistence>()
+            .ConnectionString(@"Data Source=XE;User Id=particular;Password=Welcome1")
+            .SagaTableNamingConvention(type =>
             {
                 var tablename = DefaultTableNameConvention(type);
 
@@ -30,7 +29,6 @@ public class ConfigureNHibernatePersistence
 
                 return tablename;
             });
-        });
     }
 
     static string Create(params object[] data)
