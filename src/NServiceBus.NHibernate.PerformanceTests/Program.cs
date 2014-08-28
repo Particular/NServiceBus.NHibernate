@@ -48,7 +48,7 @@
 
             var config = new BusConfiguration();
             config.EndpointName(endpointName);
-            config.UseTransport<NServiceBus.MsmqTransport>();
+            config.UseTransport<MsmqTransport>();
             config.EnableInstallers();
 
             switch (args[2].ToLower())
