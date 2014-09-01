@@ -209,6 +209,7 @@
     <Compile Include="App_Packages\NServiceBus.AcceptanceTests\Transactions\When_sending_messages_within_an_ambient_transaction.cs" />
     <Compile Include="App_Packages\NServiceBus.AcceptanceTests\Versioning\When_multiple_versions_of_a_message_is_published.cs" />
     <Compile Include="ConfigureNHibernatePersistence.cs" />
+    <Compile Include="When_using_hbms.cs" />
     <Compile Include="When_saga_contains_nested_collection_without_parent_relation.cs" />
     <Compile Include="When_saga_contains_nested_collection.cs" />
     <Compile Include="When_saga_contains_nested_collection_with_row_version.cs" />
@@ -221,6 +222,11 @@
       <Project>{281646e3-32e0-4f4d-bcf6-1dc5efc6c268}</Project>
       <Name>NServiceBus.NHibernate</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="TestSagaData.hbm.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

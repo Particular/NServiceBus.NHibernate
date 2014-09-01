@@ -123,6 +123,9 @@
     <Compile Include="..\NServiceBus.NHibernate.AcceptanceTests\When_saga_contains_nested_collection_with_row_version.cs">
       <Link>When_saga_contains_nested_collection_with_row_version.cs</Link>
     </Compile>
+    <Compile Include="..\NServiceBus.NHibernate.AcceptanceTests\When_using_hbms.cs">
+      <Link>When_using_hbms.cs</Link>
+    </Compile>
     <Compile Include="App_Packages\NServiceBus.AcceptanceTests\Audit\When_a_message_is_audited.cs" />
     <Compile Include="App_Packages\NServiceBus.AcceptanceTests\Audit\When_using_auditing_as_a_feature.cs" />
     <Compile Include="App_Packages\NServiceBus.AcceptanceTests\Audit\When_using_audit_message_is_received.cs" />
@@ -232,6 +235,11 @@
     <None Include="packages.config">
       <SubType>Designer</SubType>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="TestSagaData.hbm.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
