@@ -1,10 +1,8 @@
 namespace NServiceBus.Features
 {
     using System;
-    using System.IO;
     using System.Linq;
     using NHibernate.Cfg;
-    using NHibernate.Mapping.ByCode;
     using SagaPersisters.NHibernate;
     using SagaPersisters.NHibernate.AutoPersistence;
     using Settings;
@@ -55,10 +53,7 @@ namespace NServiceBus.Features
                 modelMapper = new SagaModelMapper(types, tableNamingConvention);
             }
 
-            var mappingDocument = modelMapper.Compile();
-
-            File.WriteAllText(@"c:\temp\foo.txt", mappingDocument.AsString());
-            configuration.AddMapping(mappingDocument);
+            configuration.AddMapping(modelMapper.Compile());
         }
     }
 }
