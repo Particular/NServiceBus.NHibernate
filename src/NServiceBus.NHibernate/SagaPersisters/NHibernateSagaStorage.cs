@@ -1,8 +1,10 @@
 namespace NServiceBus.Features
 {
     using System;
+    using System.IO;
     using System.Linq;
     using NHibernate.Cfg;
+    using NHibernate.Mapping.ByCode;
     using SagaPersisters.NHibernate;
     using SagaPersisters.NHibernate.AutoPersistence;
     using Settings;
@@ -31,7 +33,7 @@ namespace NServiceBus.Features
             context.Container.ConfigureComponent<SagaPersister>(DependencyLifecycle.InstancePerCall);
         }
 
-        void ApplyMappings(ReadOnlySettings settings, Configuration configuration)
+        internal void ApplyMappings(ReadOnlySettings settings, Configuration configuration)
         {
             var tableNamingConvention = settings.GetOrDefault<Func<Type, string>>("NHibernate.Sagas.TableNamingConvention");
 
@@ -53,7 +55,10 @@ namespace NServiceBus.Features
                 modelMapper = new SagaModelMapper(types, tableNamingConvention);
             }
 
-            configuration.AddMapping(modelMapper.Compile());
+            var mappingDocument = modelMapper.Compile();
+
+            File.WriteAllText(@"c:\temp\foo.txt", mappingDocument.AsString());
+            configuration.AddMapping(mappingDocument);
         }
     }
 }

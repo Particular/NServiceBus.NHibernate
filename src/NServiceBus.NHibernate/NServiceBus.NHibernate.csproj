@@ -120,7 +120,6 @@
     <Compile Include="SagaPersisters\LockModeAttribute.cs" />
     <Compile Include="SagaPersisters\TableNameAttribute.cs" />
     <Compile Include="SharedSession\Installer.cs" />
-    <Compile Include="SagaPersisters\SessionFactoryBuilder.cs" />
     <Compile Include="SagaPersisters\SagaPersister.cs" />
     <Compile Include="SharedSession\SessionFactoryProvider.cs" />
     <Compile Include="SharedSession\SharedMappings.cs" />
