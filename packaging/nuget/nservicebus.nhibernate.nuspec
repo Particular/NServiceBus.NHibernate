@@ -16,7 +16,7 @@
     <tags>nservicebus servicebus msmq cqrs publish subscribe</tags>
     <dependencies>
       <dependency id="NHibernate" version="[3.3.3.4001, 4.0.0.0)" />
-      <dependency id="NServiceBus" version="[5.0.0-beta0002, 6.0.0-alpha0001)" />
+      <dependency id="NServiceBus" version="[5.0.0, 6.0.0)" />
     </dependencies>
   </metadata>
   <files>
