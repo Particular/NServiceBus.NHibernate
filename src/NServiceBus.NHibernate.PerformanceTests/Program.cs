@@ -8,7 +8,6 @@
     using System.Transactions;
     using NServiceBus;
     using NServiceBus.Features;
-    using NServiceBus.Persistence;
     using NServiceBus.Persistence.NHibernate;
     using Saga;
 
