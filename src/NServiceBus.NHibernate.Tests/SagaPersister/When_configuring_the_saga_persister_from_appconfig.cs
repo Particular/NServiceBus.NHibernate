@@ -50,8 +50,6 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
         [Test]
         public void Handles_Multiple_registrations_of_UnitOfWork()
         {
-            config.NHibernateUnitOfWork();
-
             var uow = config.Builder.BuildAll<UnitOfWorkManager>().ToList();
 
             Assert.IsNotNull(uow);

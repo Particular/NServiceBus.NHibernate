@@ -66,7 +66,7 @@ namespace NServiceBus.Unicast.Subscriptions.NHibernate.Tests
             Configure.With(Enumerable.Empty<Type>())
                 .DefineEndpointName("Foo")
                 .DefaultBuilder()
-                .DBSubcriptionStorageWithSQLiteAndAutomaticSchemaGeneration();
+                .UseNHibernateSubscriptionPersister();
 
             var expected = new Dictionary<string, string>
                                {

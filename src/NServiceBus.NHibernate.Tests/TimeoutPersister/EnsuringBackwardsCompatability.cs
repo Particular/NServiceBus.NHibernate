@@ -68,7 +68,7 @@ namespace NServiceBus.TimeoutPersisters.NHibernate.Tests
             Configure.With(Enumerable.Empty<Type>())
                 .DefineEndpointName("Foo")
                 .DefaultBuilder()
-                .UseNHibernateTimeoutPersisterWithSQLiteAndAutomaticSchemaGeneration();
+                .UseNHibernateTimeoutPersister();
 
             var expected = new Dictionary<string, string>
                                {
