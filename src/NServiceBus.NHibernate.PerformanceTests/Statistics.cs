@@ -11,30 +11,41 @@
         public static Int64 NumberOfRetries;
         public static TimeSpan SendTimeNoTx = TimeSpan.Zero;
         public static TimeSpan SendTimeWithTx = TimeSpan.Zero;
+        public static TimeSpan PublishTimeNoTx = TimeSpan.Zero;
+        public static TimeSpan PublishTimeWithTx = TimeSpan.Zero;
 
         public static void Dump()
         {
             Console.Out.WriteLine("");
             Console.Out.WriteLine("---------------- Statistics ----------------");
 
-            var durationSeconds = (Last - First.Value).TotalSeconds;
-
             PrintStats("NumberOfMessages", NumberOfMessages, "#");
 
-            var throughput = Convert.ToDouble(NumberOfMessages)/durationSeconds;
+            if (First.HasValue)
+            {
+                var durationSeconds = (Last - First.Value).TotalSeconds;
+                var throughput = Convert.ToDouble(NumberOfMessages) / durationSeconds;
 
-            PrintStats("Throughput", throughput, "msg/s");
+                PrintStats("Throughput", throughput, "msg/s");
 
-            Console.Out.WriteLine("##teamcity[buildStatisticValue key='ReceiveThroughputSagas' value='{0}']", Math.Round(throughput));
+                Console.Out.WriteLine("##teamcity[buildStatisticValue key='ReceiveThroughputSagas' value='{0}']", Math.Round(throughput));
 
-            PrintStats("NumberOfRetries", NumberOfRetries, "#");
-            PrintStats("TimeToFirstMessage", (First - StartTime).Value.TotalSeconds, "s");
+                PrintStats("NumberOfRetries", NumberOfRetries, "#");
+                PrintStats("TimeToFirstMessage", (First - StartTime).Value.TotalSeconds, "s");
+            }
+
 
             if (SendTimeNoTx != TimeSpan.Zero)
                 PrintStats("Sending", Convert.ToDouble(NumberOfMessages / 2) / SendTimeNoTx.TotalSeconds, "msg/s");
 
             if (SendTimeWithTx != TimeSpan.Zero)
                 PrintStats("SendingInsideTX", Convert.ToDouble(NumberOfMessages / 2) / SendTimeWithTx.TotalSeconds, "msg/s");
+
+            if (PublishTimeNoTx != TimeSpan.Zero)
+                PrintStats("PublishTimeNoTx", Convert.ToDouble(NumberOfMessages / 2) / PublishTimeNoTx.TotalSeconds, "msg/s");
+
+            if (PublishTimeWithTx != TimeSpan.Zero)
+                PrintStats("PublishTimeWithTx", Convert.ToDouble(NumberOfMessages / 2) / PublishTimeWithTx.TotalSeconds, "msg/s");
         }
 
         static void PrintStats(string key, double value, string unit)

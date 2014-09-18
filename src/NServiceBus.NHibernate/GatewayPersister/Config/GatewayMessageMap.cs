@@ -1,5 +1,6 @@
 namespace NServiceBus.GatewayPersister.NHibernate.Config
 {
+    using System;
     using global::NHibernate;
     using global::NHibernate.Mapping.ByCode;
     using global::NHibernate.Mapping.ByCode.Conformist;
@@ -16,7 +17,11 @@ namespace NServiceBus.GatewayPersister.NHibernate.Config
         {
             Table("GatewayMessages");
             Id(x => x.Id, m => m.Generator(Generators.Assigned));
-            Property(p => p.OriginalMessage, pm => pm.Type(NHibernateUtil.BinaryBlob));
+            Property(p => p.OriginalMessage, pm =>
+            {
+                pm.Type(NHibernateUtil.BinaryBlob);
+                pm.Length(Int32.MaxValue);
+            });
             Property(p => p.Acknowledged);
             Property(p => p.TimeReceived);
             Property(p => p.Headers, pm => pm.Type(NHibernateUtil.StringClob));
