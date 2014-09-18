@@ -142,7 +142,7 @@ namespace NServiceBus.Persistence.NHibernate.Tests
 
             var expected = new Dictionary<string, string>
                 {
-                    {"connection.connection_string", @"Testing"},
+                    {"connection.connection_string", @"Data Source=:memory:;New=True;"},
                 };
             
             CollectionAssert.IsSubsetOf(expected, result);
@@ -164,7 +164,7 @@ namespace NServiceBus.Persistence.NHibernate.Tests
 
             var expected = new Dictionary<string, string>
                 {
-                    {"connection.connection_string", @"Testing2"},
+                    {"connection.connection_string", @"Server=localhost\sqlexpress;Database=nservicebus;Trusted_Connection=True;"},
                 };
 
             CollectionAssert.IsSubsetOf(expected, result);
