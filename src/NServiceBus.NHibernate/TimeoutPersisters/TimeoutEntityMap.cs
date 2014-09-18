@@ -1,5 +1,6 @@
 namespace NServiceBus.TimeoutPersisters.NHibernate.Config
 {
+    using System;
     using global::NHibernate;
     using global::NHibernate.Mapping.ByCode;
     using global::NHibernate.Mapping.ByCode.Conformist;
@@ -16,7 +17,11 @@ namespace NServiceBus.TimeoutPersisters.NHibernate.Config
         public TimeoutEntityMap()
         {
             Id(x => x.Id, m => m.Generator(Generators.Assigned));
-            Property(p => p.State, pm => pm.Type(NHibernateUtil.BinaryBlob));
+            Property(p => p.State, pm =>
+            {
+                pm.Type(NHibernateUtil.BinaryBlob);
+                pm.Length(Int32.MaxValue);
+            });
             Property(p => p.Destination, pm =>
             {
                 pm.Type<AddressUserType>();

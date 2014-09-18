@@ -159,6 +159,23 @@ namespace NServiceBus.SagaPersisters.NHibernate.AutoPersistence
             {
                 map.Unique(true);
             }
+
+            var propertyInfo = type.LocalMember as PropertyInfo;
+            if (propertyInfo != null)
+            {
+                if (propertyInfo.PropertyType == typeof(byte[]))
+                {
+                    map.Length(Int32.MaxValue);
+                }
+
+                return;
+            }
+
+            var fieldInfo = type.LocalMember as FieldInfo;
+            if (fieldInfo != null && fieldInfo.FieldType == typeof(byte[]))
+            {
+                map.Length(Int32.MaxValue);
+            }
         }
 
         void ApplyBagConvention(IModelInspector mi, PropertyPath type, IBagPropertiesMapper map)
