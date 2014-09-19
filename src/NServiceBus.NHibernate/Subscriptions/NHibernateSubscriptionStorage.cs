@@ -29,7 +29,7 @@ namespace NServiceBus.Features
 
             ConfigureNHibernate.ThrowIfRequiredPropertiesAreMissing(properties);
 
-            var configuration = context.Settings.GetOrDefault<Configuration>("NHibernate.Subscriptions.Configuration");
+            var configuration = context.Settings.GetOrDefault<Configuration>("NHibernate.Subscriptions.Configuration") ?? context.Settings.GetOrDefault<Configuration>("StorageConfiguration");
 
             if (configuration == null)
             {

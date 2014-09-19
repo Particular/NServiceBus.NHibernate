@@ -29,7 +29,7 @@ namespace NServiceBus.Features
 
             ConfigureNHibernate.ThrowIfRequiredPropertiesAreMissing(properties);
 
-            var configuration = context.Settings.GetOrDefault<Configuration>("NHibernate.Timeouts.Configuration");
+            var configuration = context.Settings.GetOrDefault<Configuration>("NHibernate.Timeouts.Configuration") ?? context.Settings.GetOrDefault<Configuration>("StorageConfiguration");
 
             if (configuration == null)
             {
