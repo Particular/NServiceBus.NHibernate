@@ -31,14 +31,14 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Iesi.Collections, Version=1.0.1.0, Culture=neutral, PublicKeyToken=aa95f207798dfdb4, processorArchitecture=MSIL">
+    <Reference Include="Iesi.Collections, Version=4.0.0.0, Culture=neutral, PublicKeyToken=aa95f207798dfdb4, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Iesi.Collections.3.4.0.4000\lib\Net35\Iesi.Collections.dll</HintPath>
+      <HintPath>..\packages\Iesi.Collections.4.0.0.4000\lib\net40\Iesi.Collections.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
-    <Reference Include="NHibernate, Version=3.3.1.4000, Culture=neutral, PublicKeyToken=aa95f207798dfdb4, processorArchitecture=MSIL">
+    <Reference Include="NHibernate, Version=4.0.0.4000, Culture=neutral, PublicKeyToken=aa95f207798dfdb4, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\NHibernate.3.3.3.4001\lib\Net35\NHibernate.dll</HintPath>
+      <HintPath>..\packages\NHibernate.4.0.0.4000\lib\net40\NHibernate.dll</HintPath>
     </Reference>
     <Reference Include="NServiceBus, Version=4.4.0.0, Culture=neutral, PublicKeyToken=9fc386479f8a226c, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -94,7 +94,6 @@
     <Compile Include="SagaPersister\When_persisting_sagas_on_non_transactional_endpoints.cs" />
     <Compile Include="SagaPersister\When_persisting_sagas_on_transactional_endpoints.cs" />
     <Compile Include="SubscriptionStorage\Config\When_configuring_the_subscription_storage.cs" />
-    <Compile Include="SubscriptionStorage\EnsuringBackwardsCompatability.cs" />
     <Compile Include="SubscriptionStorage\InMemoryDBFixture.cs" />
     <Compile Include="SubscriptionStorage\TestData.cs" />
     <Compile Include="SubscriptionStorage\When_initializing_the_storage_with_existing_v2X_subscriptions.cs" />
@@ -102,7 +101,6 @@
     <Compile Include="SubscriptionStorage\When_receiving_a_subscription_message.cs" />
     <Compile Include="SubscriptionStorage\When_receiving_a_unsubscription_message.cs" />
     <Compile Include="SubscriptionStorage\When_using_semantic_versioning_of_messages.cs" />
-    <Compile Include="TimeoutPersister\EnsuringBackwardsCompatability.cs" />
     <Compile Include="TimeoutPersister\InMemoryDBFixture.cs" />
     <Compile Include="TimeoutPersister\When_fetching_timeouts_from_storage.cs" />
     <Compile Include="TimeoutPersister\When_removing_timeouts_from_the_storage.cs" />
@@ -110,11 +108,11 @@
   <ItemGroup>
     <Content Include="hibernate.cfg.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <SubType>Designer</SubType>
     </Content>
     <EmbeddedResource Include="SagaPersister\TestSagaWithHbmlXmlOverride.hbm.xml" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
     <None Include="packages.config" />
     <None Include="Testing.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

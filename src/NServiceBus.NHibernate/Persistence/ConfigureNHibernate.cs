@@ -189,7 +189,7 @@ PM> Install-Package System.Data.SQLite.{1}
             Logger.WarnFormat(warningMsg, GetConfigFileIfExists(), System.Environment.Is64BitOperatingSystem ? "x64" : "x86", Message);
 
             properties.Add("dialect", "NHibernate.Dialect.SQLiteDialect");
-            properties.Add("connection.connection_string", @"Data Source=.\NServiceBus.sqllite;Version=3;New=True;");
+            properties.Add("connection.connection_string", @"Data Source=.\NServiceBus.sqllite;New=True;");
         }
 
         /// <summary>
