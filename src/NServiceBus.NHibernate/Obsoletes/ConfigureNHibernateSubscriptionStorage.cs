@@ -35,7 +35,7 @@ namespace NServiceBus
         /// </example>
         /// <param name="config">The configuration object.</param>
         /// <returns>The configuration object.</returns>
-        [ObsoleteEx(RemoveInVersion = "6", TreatAsErrorFromVersion = "5.0", Replacement = "builder.UsePersistence<NHibernatePersistence>().For(Storage.Subscriptions)")]
+        [ObsoleteEx(RemoveInVersion = "7", TreatAsErrorFromVersion = "5.0", Replacement = "builder.UsePersistence<NHibernatePersistence>().For(Storage.Subscriptions)")]
 // ReSharper disable UnusedParameter.Global
         public static Configure UseNHibernateSubscriptionPersister(this Configure config)
 // ReSharper restore UnusedParameter.Global
@@ -50,7 +50,7 @@ namespace NServiceBus
         /// <param name="config">The <see cref="Configure" /> object.</param>
         /// <param name="configuration">The <see cref="Configuration" /> allows the application to specify properties and mapping documents to be used when creating a <see cref="ISessionFactory" />.</param>
         /// <returns>The <see cref="Configure" /> object.</returns>
-        [ObsoleteEx(RemoveInVersion = "6", TreatAsErrorFromVersion = "5.0", Replacement = "builder.UsePersistence<NHibernatePersistence>().For(Storage.Subscriptions).UseSubscriptionStorageConfiguration(configuration)")]
+        [ObsoleteEx(RemoveInVersion = "7", TreatAsErrorFromVersion = "5.0", Replacement = "builder.UsePersistence<NHibernatePersistence>().For(Storage.Subscriptions).UseSubscriptionStorageConfiguration(configuration)")]
 // ReSharper disable UnusedParameter.Global
         public static Configure UseNHibernateSubscriptionPersister(this Configure config, NHibernate.Cfg.Configuration configuration)
 // ReSharper restore UnusedParameter.Global
@@ -63,7 +63,7 @@ namespace NServiceBus
         /// </summary>
         /// <param name="config">The configuration object.</param>
         /// <returns>The configuration object.</returns>
-        [ObsoleteEx(RemoveInVersion = "6", TreatAsErrorFromVersion = "5.0", Replacement = "builder.UsePersistence<NHibernatePersistence>().For(Storage.Subscriptions).DisableSubscriptionStorageSchemaUpdate()")]
+        [ObsoleteEx(RemoveInVersion = "7", TreatAsErrorFromVersion = "5.0", Replacement = "builder.UsePersistence<NHibernatePersistence>().For(Storage.Subscriptions).DisableSubscriptionStorageSchemaUpdate()")]
 // ReSharper disable UnusedParameter.Global
         public static Configure DisableNHibernateSubscriptionPersisterInstall(this Configure config)
 // ReSharper restore UnusedParameter.Global

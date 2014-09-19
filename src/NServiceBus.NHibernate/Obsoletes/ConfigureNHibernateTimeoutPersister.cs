@@ -35,7 +35,7 @@ namespace NServiceBus
         /// <param name="config">The configuration object.</param>
         /// <returns>The configuration object.</returns>
 
-        [ObsoleteEx(RemoveInVersion = "6", TreatAsErrorFromVersion = "5.0", Replacement = "builder.UsePersistence<NHibernatePersistence>().For(Storage.Timeout)")]
+        [ObsoleteEx(RemoveInVersion = "7", TreatAsErrorFromVersion = "5.0", Replacement = "builder.UsePersistence<NHibernatePersistence>().For(Storage.Timeout)")]
 // ReSharper disable UnusedParameter.Global
         public static Configure UseNHibernateTimeoutPersister(this Configure config)
 // ReSharper restore UnusedParameter.Global
@@ -51,7 +51,7 @@ namespace NServiceBus
         /// <param name="configuration">The <see cref="Configuration"/> object.</param>
         /// <param name="autoUpdateSchema"><value>true</value> to auto update schema</param>
         /// <returns>The configuration object</returns>
-        [ObsoleteEx(RemoveInVersion = "6", TreatAsErrorFromVersion = "5.0", Replacement = "builder.UsePersistence<NHibernatePersistence>().For(Storage.Timeout).UseTimeoutStorageConfiguration(configuration)[.DisableTimeoutStorageSchemaUpdate()]")]
+        [ObsoleteEx(RemoveInVersion = "7", TreatAsErrorFromVersion = "5.0", Replacement = "builder.UsePersistence<NHibernatePersistence>().For(Storage.Timeout).UseTimeoutStorageConfiguration(configuration)[.DisableTimeoutStorageSchemaUpdate()]")]
 // ReSharper disable UnusedParameter.Global
         public static Configure UseNHibernateTimeoutPersister(this Configure config, NHibernate.Cfg.Configuration configuration, bool autoUpdateSchema)
 // ReSharper restore UnusedParameter.Global
@@ -64,7 +64,7 @@ namespace NServiceBus
         /// </summary>
         /// <param name="config">The configuration object.</param>
         /// <returns>The configuration object.</returns>
-        [ObsoleteEx(RemoveInVersion = "6", TreatAsErrorFromVersion = "5.0", Replacement = "builder.UsePersistence<NHibernatePersistence>().For(Storage.Timeout).DisableTimeoutStorageSchemaUpdate()")]
+        [ObsoleteEx(RemoveInVersion = "7", TreatAsErrorFromVersion = "5.0", Replacement = "builder.UsePersistence<NHibernatePersistence>().For(Storage.Timeout).DisableTimeoutStorageSchemaUpdate()")]
 // ReSharper disable UnusedParameter.Global
         public static Configure DisableNHibernateTimeoutPersisterInstall(this Configure config)
 // ReSharper restore UnusedParameter.Global

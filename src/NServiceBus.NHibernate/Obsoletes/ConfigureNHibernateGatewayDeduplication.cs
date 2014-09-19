@@ -34,7 +34,7 @@
         /// </example>
         /// <param name="config">The configuration object.</param>
         /// <returns>The configuration object.</returns>
-        [ObsoleteEx(RemoveInVersion = "6", TreatAsErrorFromVersion = "5.0", Replacement = "builder.UsePersistence<NHibernatePersistence>().For(Storage.GatewayDeduplication)")]
+        [ObsoleteEx(RemoveInVersion = "7", TreatAsErrorFromVersion = "5.0", Replacement = "builder.UsePersistence<NHibernatePersistence>().For(Storage.GatewayDeduplication)")]
 // ReSharper disable UnusedParameter.Global
         public static Configure UseNHibernateGatewayDeduplication(this Configure config)
 // ReSharper restore UnusedParameter.Global
@@ -48,7 +48,7 @@
         /// <param name="config">The configuration object.</param>
         /// <param name="configuration">The <see cref="Configuration"/> object.</param>
         /// <returns>The configuration object</returns>
-        [ObsoleteEx(RemoveInVersion = "6", TreatAsErrorFromVersion = "5.0", Replacement = "builder.UsePersistence<NHibernatePersistence>().For(Storage.GatewayDeduplication).UseGatewayDeduplicationConfiguration(configuration)")]
+        [ObsoleteEx(RemoveInVersion = "7", TreatAsErrorFromVersion = "5.0", Replacement = "builder.UsePersistence<NHibernatePersistence>().For(Storage.GatewayDeduplication).UseGatewayDeduplicationConfiguration(configuration)")]
 // ReSharper disable UnusedParameter.Global
         public static Configure UseNHibernateGatewayDeduplication(this Configure config, NHibernate.Cfg.Configuration configuration)
 // ReSharper restore UnusedParameter.Global
@@ -61,7 +61,7 @@
         /// </summary>
         /// <param name="config">The configuration object.</param>
         /// <returns>The configuration object.</returns>
-        [ObsoleteEx(RemoveInVersion = "6", TreatAsErrorFromVersion = "5.1", Replacement = "builder.UsePersistence<NHibernatePersistence>().For(Storage.GatewayDeduplication).DisableGatewayDeduplicationSchemaUpdate()")]
+        [ObsoleteEx(RemoveInVersion = "7", TreatAsErrorFromVersion = "5.1", Replacement = "builder.UsePersistence<NHibernatePersistence>().For(Storage.GatewayDeduplication).DisableGatewayDeduplicationSchemaUpdate()")]
 // ReSharper disable UnusedParameter.Global
         public static Configure DisableNHibernateGatewayDeduplicationInstall(this Configure config)
 // ReSharper restore UnusedParameter.Global
