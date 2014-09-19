@@ -1,5 +1,7 @@
 namespace NServiceBus.SagaPersisters.NHibernate.Tests
 {
+    using System.Collections.Specialized;
+    using System.Configuration;
     using System.Linq;
     using Config.Internal;
     using NUnit.Framework;
@@ -14,6 +16,13 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
         [SetUp]
         public void SetUp()
         {
+            NHibernateSettingRetriever.AppSettings = () => new NameValueCollection();
+            NHibernateSettingRetriever.ConnectionStrings = () => new ConnectionStringSettingsCollection
+            {
+                new ConnectionStringSettings("NServiceBus/Persistence", @"Server=localhost\sqlexpress;Database=nservicebus;Trusted_Connection=True;")
+            };
+            ConfigureNHibernate.Init();
+
             Configure.Features.Enable<Features.Sagas>();
 
             var types = SessionFactoryHelper.Types();
@@ -46,7 +55,6 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
             Assert.IsNotNull(uow);
         }
 
-#pragma warning disable 0618
         [Test]
         public void Handles_Multiple_registrations_of_UnitOfWork()
         {
@@ -55,6 +63,5 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
             Assert.IsNotNull(uow);
             Assert.That(uow, Has.Count.EqualTo(1));
         }
-#pragma warning restore 0618
     }
 }

@@ -10,8 +10,7 @@ namespace NServiceBus.Persistence.NHibernate.Tests
     [TestFixture]
     public class NHibernateProperties
     {
-        private const string connectionString = @"Data Source=nsb;Version=3;New=True;";
-        private const string dialect = "NHibernate.Dialect.SQLiteDialect";
+        private const string connectionString = @"Data Source=nsb;New=True;";
 
         [Test]
         public void Should_assign_default_properties_to_all_persisters()
