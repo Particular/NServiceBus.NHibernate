@@ -39,10 +39,10 @@
                 transportToUse.Contains("Msmq") ||
                 transportToUse.Contains("SqlServer") ||
                 transportToUse.Contains("RabbitMq"))
-                config.UseInMemoryTimeoutPersister();
+                config.UseNHibernateTimeoutPersister();
 
             if (transportToUse == null || transportToUse.Contains("Msmq") || transportToUse.Contains("SqlServer"))
-                config.DefineSubscriptionStorage(settings.GetOrNull("SubscriptionStorage"));
+                config.UseNHibernateSubscriptionPersister();
 
             return config.UnicastBus();
         }

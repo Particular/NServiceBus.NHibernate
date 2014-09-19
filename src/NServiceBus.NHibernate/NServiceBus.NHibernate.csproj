@@ -39,9 +39,9 @@
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Iesi.Collections, Version=1.0.1.0, Culture=neutral, PublicKeyToken=aa95f207798dfdb4, processorArchitecture=MSIL">
+    <Reference Include="Iesi.Collections, Version=4.0.0.0, Culture=neutral, PublicKeyToken=aa95f207798dfdb4, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Iesi.Collections.3.4.0.4000\lib\Net35\Iesi.Collections.dll</HintPath>
+      <HintPath>..\packages\Iesi.Collections.4.0.0.4000\lib\net40\Iesi.Collections.dll</HintPath>
     </Reference>
     <Reference Include="Janitor, Version=1.1.0.0, Culture=neutral, PublicKeyToken=d34c7d3bba3746e6, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -49,9 +49,9 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
-    <Reference Include="NHibernate, Version=3.3.1.4000, Culture=neutral, PublicKeyToken=aa95f207798dfdb4, processorArchitecture=MSIL">
+    <Reference Include="NHibernate, Version=4.0.0.4000, Culture=neutral, PublicKeyToken=aa95f207798dfdb4, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\NHibernate.3.3.3.4001\lib\Net35\NHibernate.dll</HintPath>
+      <HintPath>..\packages\NHibernate.4.0.0.4000\lib\net40\NHibernate.dll</HintPath>
     </Reference>
     <Reference Include="NServiceBus, Version=4.4.0.0, Culture=neutral, PublicKeyToken=9fc386479f8a226c, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -83,11 +83,6 @@
     <Compile Include="ConfigureNHibernateSubscriptionStorage.cs" />
     <Compile Include="ConfigureNHibernateTimeoutPersister.cs" />
     <Compile Include="ConfigureNHibernateUnitOfWork.cs" />
-    <Compile Include="Config\DBSubscriptionStorageConfig.cs" />
-    <Compile Include="Config\NHibernateProperty.cs" />
-    <Compile Include="Config\NHibernatePropertyCollection.cs" />
-    <Compile Include="Config\NHibernateSagaPersisterConfig.cs" />
-    <Compile Include="Config\TimeoutPersisterConfig.cs" />
     <Compile Include="Deduplication\Config\DeduplicationMessage.cs" />
     <Compile Include="Deduplication\Config\DeduplicationMessageMap.cs" />
     <Compile Include="Deduplication\GatewayDeduplication.cs" />

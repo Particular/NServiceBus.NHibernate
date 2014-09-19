@@ -1,7 +1,6 @@
 namespace NServiceBus
 {
     using System;
-    using Config;
 // ReSharper disable RedundantNameQualifier
     using global::NHibernate;
     using global::NHibernate.Cfg;
@@ -78,28 +77,12 @@ namespace NServiceBus
         /// <returns>The configuration object.</returns>
         public static Configure UseNHibernateSubscriptionPersister(this Configure config, TimeSpan? cacheExpiration)
         {
-            var configSection = Configure.GetConfigSection<DBSubscriptionStorageConfig>();
-
-            if (configSection != null)
-            {
-                if (configSection.NHibernateProperties.Count == 0)
-                {
-                    throw new InvalidOperationException(
-                        "No NHibernate properties found. Please specify NHibernateProperties in your DBSubscriptionStorageConfig section");
-                }
-
-                foreach (var property in configSection.NHibernateProperties.ToProperties())
-                {
-                    ConfigureNHibernate.SubscriptionStorageProperties[property.Key] = property.Value;
-                }
-            }
-
             ConfigureNHibernate.ConfigureSqlLiteIfRunningInDebugModeAndNoConfigPropertiesSet(ConfigureNHibernate.SubscriptionStorageProperties);
 
             var properties = ConfigureNHibernate.SubscriptionStorageProperties;
 
             return config.UseNHibernateSubscriptionPersisterInternal(ConfigureNHibernate.CreateConfigurationWith(properties),
-                                                                configSection == null || configSection.UpdateSchema, cacheExpiration);
+                                                                true, cacheExpiration);
         }
 
         /// <summary>
@@ -203,7 +186,7 @@ namespace NServiceBus
 
         /// <summary>
         /// Configures DB Subscription Storage.
-        /// Database settings are read from custom config section <see cref="DBSubscriptionStorageConfig"/>.
+        /// Database settings are read from custom config section.
         /// </summary>
         /// <param name="config">The <see cref="Configure" /> object.</param>
         /// <returns>The <see cref="Configure" /> object.</returns>
