@@ -16,7 +16,7 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
             var cfg = Base();
 
             cfg.Add(Environment.ReleaseConnections, "on_close");
-            cfg.Add(Environment.ConnectionString, "Data Source=:memory:;Version=3;New=True;");
+            cfg.Add(Environment.ConnectionString, "Data Source=:memory:;New=True;");
 
             return cfg;
         }
@@ -28,7 +28,7 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
         {
             var cfg = Base();
 
-            cfg.Add(Environment.ConnectionString, string.Format(@"Data Source={0};Version=3;New=True;", filename));
+            cfg.Add(Environment.ConnectionString, string.Format(@"Data Source={0};New=True;", filename));
 
             return cfg;
         }

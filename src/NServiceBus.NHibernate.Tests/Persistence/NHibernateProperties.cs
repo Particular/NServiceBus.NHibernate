@@ -11,7 +11,7 @@ namespace NServiceBus.Persistence.NHibernate.Tests
     [TestFixture]
     public class NHibernateProperties
     {
-        private const string connectionString = @"Data Source=nsb;Version=3;New=True;";
+        private const string connectionString = @"Data Source=nsb;New=True;";
 
         [Test]
         public void Should_assign_default_properties_to_all_persisters()
@@ -145,7 +145,7 @@ namespace NServiceBus.Persistence.NHibernate.Tests
 
             var expected = new Dictionary<string, string>
                 {
-                    {"connection.connection_string", @"Testing"},
+                    {"connection.connection_string", @"Data Source=:memory:;New=True;"},
                 };
             
             CollectionAssert.IsSubsetOf(expected, result);
@@ -167,7 +167,7 @@ namespace NServiceBus.Persistence.NHibernate.Tests
 
             var expected = new Dictionary<string, string>
                 {
-                    {"connection.connection_string", @"Testing2"},
+                    {"connection.connection_string", @"Server=localhost\sqlexpress;Database=nservicebus;Trusted_Connection=True;"},
                 };
 
             CollectionAssert.IsSubsetOf(expected, result);

@@ -20,7 +20,7 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
         [SetUp]
         public void SetUp()
         {
-            connectionString = String.Format(@"Data Source={0};Version=3;New=True;", Path.GetTempFileName());
+            connectionString = String.Format(@"Data Source={0};New=True;", Path.GetTempFileName());
 
 
             var configuration = new global::NHibernate.Cfg.Configuration()
