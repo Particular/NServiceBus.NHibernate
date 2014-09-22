@@ -15,8 +15,9 @@
     <copyright>Copyright 2010-2014 NServiceBus. All rights reserved</copyright>
     <tags>nservicebus servicebus msmq cqrs publish subscribe</tags>
     <dependencies>
-      <dependency id="NHibernate" version="[3.3.3.4001, 4.0.0.0)" />
-      <dependency id="NServiceBus" version="[5.0.0-beta0003, 6.0.0)" />
+      <dependency id="Iesi.Collections" version="[4.0.1.4000, 5.0.0)" />
+      <dependency id="NHibernate" version="[4.0.1.4000, 5.0.0)" />
+      <dependency id="NServiceBus" version="[4.0.0, 5.0.0)" />
     </dependencies>
   </metadata>
   <files>
