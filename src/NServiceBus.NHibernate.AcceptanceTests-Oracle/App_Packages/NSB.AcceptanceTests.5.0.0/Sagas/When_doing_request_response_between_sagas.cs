@@ -117,14 +117,14 @@ namespace NServiceBus.AcceptanceTests.Sagas
                 {
                     if (Context.ReplyFromNonInitiatingHandler)
                     {
-                        Data.CorrelationIdFromRequestingSaga = message.SomeIdThatTheResponseSagaCanCorrelateBackToUs; //wont be needed in the future
+                        Data.CorrIdFromRequestingSaga = message.SomeIdThatTheResponseSagaCanCorrelateBackToUs; //wont be needed in the future
                         Bus.SendLocal(new SendReplyFromNonInitiatingHandler{SagaIdSoWeCanCorrelate = Data.Id});
                         return;
                     }
 
                     if (Context.ReplyFromTimeout)
                     {
-                        Data.CorrelationIdFromRequestingSaga = message.SomeIdThatTheResponseSagaCanCorrelateBackToUs; //wont be needed in the future
+                        Data.CorrIdFromRequestingSaga = message.SomeIdThatTheResponseSagaCanCorrelateBackToUs; //wont be needed in the future
                         RequestTimeout<DelayReply>(TimeSpan.FromSeconds(1));
                         return;
                     }
@@ -143,7 +143,7 @@ namespace NServiceBus.AcceptanceTests.Sagas
 
                 public class RespondingSagaData : ContainSagaData
                 {
-                    public virtual Guid CorrelationIdFromRequestingSaga { get; set; }
+                    public virtual Guid CorrIdFromRequestingSaga { get; set; }
                 }
 
 
@@ -164,7 +164,7 @@ namespace NServiceBus.AcceptanceTests.Sagas
                     //reply to originator must be used here since the sender of the incoming message the timeoutmanager and not the requesting saga
                     ReplyToOriginator(new ResponseFromOtherSaga //change this line to Bus.Reply(new ResponseFromOtherSaga  and see it fail
                     {
-                        SomeCorrelationId = Data.CorrelationIdFromRequestingSaga //wont be needed in the future
+                        SomeCorrelationId = Data.CorrIdFromRequestingSaga //wont be needed in the future
                     });
                 }
             }
