@@ -6,7 +6,7 @@
     using AcceptanceTesting;
     using NUnit.Framework;
     using Saga;
-    using SagaPersisters.NHibernate.AutoPersistence.Attributes;
+    using SagaPersisters.NHibernate;
     using ScenarioDescriptors;
 
     public class When_saga_contains_nested_collection_with_row_version : NServiceBusAcceptanceTest
@@ -50,12 +50,11 @@
 
             public class TestSaga : Saga<TestSagaData>, IAmStartedByMessages<Message2>, IAmStartedByMessages<Message3>, IAmStartedByMessages<Message1>
             {
-                
-                public override void ConfigureHowToFindSaga()
+                protected override void ConfigureHowToFindSaga(SagaPropertyMapper<TestSagaData> mapper)
                 {
-                    ConfigureMapping<Message2>(m => m.SomeId).ToSaga(s => s.SomeId);
-                    ConfigureMapping<Message3>(m => m.SomeId).ToSaga(s => s.SomeId);
-                    ConfigureMapping<Message1>(m => m.SomeId).ToSaga(s => s.SomeId);
+                    mapper.ConfigureMapping<Message2>(m => m.SomeId).ToSaga(s => s.SomeId);
+                    mapper.ConfigureMapping<Message3>(m => m.SomeId).ToSaga(s => s.SomeId);
+                    mapper.ConfigureMapping<Message1>(m => m.SomeId).ToSaga(s => s.SomeId);
                 }
 
                 void PerformSagaCompletionCheck()

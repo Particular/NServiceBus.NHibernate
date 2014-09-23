@@ -1,11 +1,12 @@
 namespace NServiceBus.SagaPersisters.NHibernate.Tests
 {
     using System;
-    using Config.Internal;
+    using Features;
     using global::NHibernate.Cfg;
     using global::NHibernate.Impl;
     using NUnit.Framework;
     using Saga;
+    using Settings;
 
     [TestFixture]
     public class When_autoMapping_sagas_with_abstract_base_class
@@ -15,11 +16,14 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
         [SetUp]
         public void SetUp()
         {
-            var builder = new SessionFactoryBuilder(new[] { typeof(SagaWithAbstractBaseClass), typeof(ContainSagaData), typeof(MyOwnAbstractBase) });
-
+            var builder = new NHibernateSagaStorage();
             var properties = SQLiteConfiguration.InMemory();
 
-            sessionFactory = builder.Build(new Configuration().AddProperties(properties)) as SessionFactoryImpl;
+            var configuration = new Configuration().AddProperties(properties);
+            var settings = new SettingsHolder();
+            settings.Set("TypesToScan", new[] { typeof(SagaWithAbstractBaseClass), typeof(ContainSagaData), typeof(MyOwnAbstractBase) });
+            builder.ApplyMappings(settings, configuration);
+            sessionFactory = configuration.BuildSessionFactory() as SessionFactoryImpl;
         }
 
         [Test]

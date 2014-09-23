@@ -8,22 +8,10 @@
     using global::NHibernate.Exceptions;
     using Persistence.NHibernate;
 
-    /// <summary>
-    /// NHibernate Gateway deduplication
-    /// </summary>
-    public class GatewayDeduplication : IDeduplicateMessages
+    class GatewayDeduplication : IDeduplicateMessages
     {
-        /// <summary>
-        /// Creates <c>ISession</c>s.
-        /// </summary>
         public ISessionFactory SessionFactory { get; set; }
 
-        /// <summary>
-        /// Adds a new message
-        /// </summary>
-        /// <param name="clientId">Client to add</param>
-        /// <param name="timeReceived">Time the message was received</param>
-        /// <returns><value>true</value> if successfully added.</returns>
         public bool DeduplicateMessage(string clientId, DateTime timeReceived)
         {
             using (var conn = SessionFactory.GetConnection())

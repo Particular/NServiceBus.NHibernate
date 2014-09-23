@@ -49,12 +49,11 @@
 
             public class TestSaga : Saga<TestSagaData>, IAmStartedByMessages<Message2>, IAmStartedByMessages<Message3>, IAmStartedByMessages<Message1>
             {
-                
-                public override void ConfigureHowToFindSaga()
+                protected override void ConfigureHowToFindSaga(SagaPropertyMapper<TestSagaData> mapper)
                 {
-                    ConfigureMapping<Message2>(m => m.SomeId).ToSaga(s => s.SomeId);
-                    ConfigureMapping<Message3>(m => m.SomeId).ToSaga(s => s.SomeId);
-                    ConfigureMapping<Message1>(m => m.SomeId).ToSaga(s => s.SomeId);
+                    mapper.ConfigureMapping<Message2>(m => m.SomeId).ToSaga(s => s.SomeId);
+                    mapper.ConfigureMapping<Message3>(m => m.SomeId).ToSaga(s => s.SomeId);
+                    mapper.ConfigureMapping<Message1>(m => m.SomeId).ToSaga(s => s.SomeId);
                 }
 
                 void PerformSagaCompletionCheck()
@@ -79,19 +78,20 @@
                     Data.MessageOneReceived = true;
                     PerformSagaCompletionCheck();
                 }
+
                 public void Handle(Message2 message)
                 {
                     Data.SomeId = message.SomeId;
                     Data.MessageTwoReceived = true;
                     PerformSagaCompletionCheck();
                 }
+
                 public void Handle(Message3 message)
                 {
                     Data.SomeId = message.SomeId;
                     Data.MessageThreeReceived = true;
                     PerformSagaCompletionCheck();
                 }
-
             }
 
         }

@@ -5,21 +5,20 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
     using NUnit.Framework;
 
     [TestFixture]
-    public class When_persisting_sagas_on_transactional_endpoints : InMemoryFixture
+    class When_persisting_sagas_on_transactional_endpoints : InMemoryFixture<TestSaga>
     {
         [Test]
         public void Ambient_transaction_should_commit_saga()
-        {     
+        {
             using (var transactionScope = new TransactionScope())
             {
-                UnitOfWork.Begin();
-               
+
                 SagaPersister.Save(new TestSaga
                                    {
                                        Id = Guid.NewGuid()
                                    });
 
-                UnitOfWork.End();
+                FlushSession();
                 transactionScope.Complete();
             }
 
@@ -34,16 +33,12 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
         {
             using (new TransactionScope())
             {
-                UnitOfWork.Begin();
-
                 SagaPersister.Save(new TestSaga
-                    {
-                        Id = Guid.NewGuid()
-                    });
+                {
+                    Id = Guid.NewGuid()
+                });
             }
 
-            UnitOfWork.End(new Exception());
-       
             using (var session = SessionFactory.OpenSession())
             {
                 Assert.AreEqual(0, session.CreateCriteria(typeof(TestSaga)).List<TestSaga>().Count);

@@ -6,7 +6,7 @@ namespace NServiceBus.TimeoutPersisters.NHibernate
     /// <summary>
     /// NHibernate wrapper class for <see cref="TimeoutData"/>
     /// </summary>
-    public class TimeoutEntity
+    class TimeoutEntity
     {
         /// <summary>
         /// Id of this timeout.
@@ -32,11 +32,6 @@ namespace NServiceBus.TimeoutPersisters.NHibernate
         /// The time at which the saga ID expired.
         /// </summary>
         public virtual DateTime Time { get; set; }
-
-        /// <summary>
-        /// We store the correlation id in order to preserve it across timeouts.
-        /// </summary>
-        public virtual string CorrelationId { get; set; }
 
         /// <summary>
         /// Store the headers to preserve them across timeouts.

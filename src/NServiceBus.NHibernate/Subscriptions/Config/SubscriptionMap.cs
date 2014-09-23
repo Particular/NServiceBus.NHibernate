@@ -4,7 +4,7 @@ namespace NServiceBus.Unicast.Subscriptions.NHibernate.Config
     using global::NHibernate.Mapping.ByCode;
     using global::NHibernate.Mapping.ByCode.Conformist;
 
-    public class SubscriptionMap : ClassMapping<Subscription>
+    class SubscriptionMap : ClassMapping<Subscription>
     {
         public SubscriptionMap()
         {

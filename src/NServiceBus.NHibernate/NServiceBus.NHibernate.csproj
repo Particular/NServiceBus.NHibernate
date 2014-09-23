@@ -7,13 +7,15 @@
     <ProjectGuid>{281646E3-32E0-4F4D-BCF6-1DC5EFC6C268}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>NServiceBus</RootNamespace>
+    <RootNamespace>NServiceBus.NHibernate</RootNamespace>
     <AssemblyName>NServiceBus.NHibernate</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AssemblyOriginatorKeyFile>..\NServiceBus.snk</AssemblyOriginatorKeyFile>
     <SignAssembly>true</SignAssembly>
-    <NuGetPackageImportStamp>09f8639e</NuGetPackageImportStamp>
+    <TargetFrameworkProfile />
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
+    <NuGetPackageImportStamp>97e88943</NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -24,8 +26,10 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>..\..\binaries\NServiceBus.NHibernate.xml</DocumentationFile>
-    <NoWarn>1591,1573,618</NoWarn>
+    <NoWarn>
+    </NoWarn>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -35,34 +39,32 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>..\..\binaries\NServiceBus.NHibernate.xml</DocumentationFile>
-    <NoWarn>1591,1573,618</NoWarn>
+    <NoWarn>
+    </NoWarn>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <None Include="FodyWeavers.xml">
+      <SubType>Designer</SubType>
+    </None>
     <Reference Include="Iesi.Collections, Version=4.0.0.0, Culture=neutral, PublicKeyToken=aa95f207798dfdb4, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Iesi.Collections.4.0.1.4000\lib\net40\Iesi.Collections.dll</HintPath>
     </Reference>
-    <Reference Include="Janitor, Version=1.1.0.0, Culture=neutral, PublicKeyToken=d34c7d3bba3746e6, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="Janitor">
       <HintPath>..\packages\Janitor.Fody.1.1.0.0\Lib\portable-net4+sl5+wp8+win8+wpa81+MonoAndroid16+MonoTouch40\Janitor.dll</HintPath>
-      <Private>False</Private>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="NHibernate, Version=4.0.0.4000, Culture=neutral, PublicKeyToken=aa95f207798dfdb4, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\NHibernate.4.0.1.4000\lib\net40\NHibernate.dll</HintPath>
     </Reference>
-    <Reference Include="NServiceBus, Version=4.4.0.0, Culture=neutral, PublicKeyToken=9fc386479f8a226c, processorArchitecture=MSIL">
+    <Reference Include="NServiceBus.Core, Version=5.0.0.0, Culture=neutral, PublicKeyToken=9fc386479f8a226c, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\NServiceBus.Interfaces.4.4.2\lib\net40\NServiceBus.dll</HintPath>
+      <HintPath>..\packages\NServiceBus.5.0.0\lib\net45\NServiceBus.Core.dll</HintPath>
     </Reference>
-    <Reference Include="NServiceBus.Core, Version=4.4.0.0, Culture=neutral, PublicKeyToken=9fc386479f8a226c, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\NServiceBus.4.4.2\lib\net40\NServiceBus.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="Obsolete, Version=3.1.0.0, Culture=neutral, PublicKeyToken=1ca091877d12ca03, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="Obsolete">
       <HintPath>..\packages\Obsolete.Fody.3.1.0.0\Lib\NET35\Obsolete.dll</HintPath>
       <Private>False</Private>
     </Reference>
@@ -77,53 +79,71 @@
     <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ConfigureNHibernateGatewayDeduplication.cs" />
-    <Compile Include="ConfigureNHibernateGatewayPersister.cs" />
-    <Compile Include="ConfigureNHibernateSagaPersister.cs" />
-    <Compile Include="ConfigureNHibernateSubscriptionStorage.cs" />
-    <Compile Include="ConfigureNHibernateTimeoutPersister.cs" />
-    <Compile Include="ConfigureNHibernateUnitOfWork.cs" />
+    <Compile Include="NHibernateStorageContext.cs" />
+    <Compile Include="Deduplication\DeduplicationConfig.cs" />
+    <Compile Include="Deduplication\NHibernateGatewayDeduplication.cs" />
+    <Compile Include="Internal\NHibernateDBConnectionProvider.cs" />
+    <Compile Include="Obsoletes\ConfigureNHibernateGatewayDeduplication.cs" />
+    <Compile Include="Obsoletes\ConfigureNHibernateSagaPersister.cs" />
+    <Compile Include="Obsoletes\ConfigureNHibernateSubscriptionStorage.cs" />
+    <Compile Include="Obsoletes\ConfigureNHibernateTimeoutPersister.cs" />
+    <Compile Include="NHibernatePersistence.cs" />
+    <Compile Include="SagaPersisters\LockModes.cs" />
+    <Compile Include="SagaPersisters\RowVersionAttribute.cs" />
+    <Compile Include="SagaPersisters\SagaConfig.cs" />
+    <Compile Include="SagaPersisters\SagaModelMapper.cs" />
+    <Compile Include="SharedConfig.cs" />
+    <Compile Include="SharedSession\DbConnectionProvider.cs" />
     <Compile Include="Deduplication\Config\DeduplicationMessage.cs" />
     <Compile Include="Deduplication\Config\DeduplicationMessageMap.cs" />
     <Compile Include="Deduplication\GatewayDeduplication.cs" />
     <Compile Include="Deduplication\Installer\Installer.cs" />
-    <Compile Include="GatewayPersister\Config\GatewayMessage.cs" />
-    <Compile Include="GatewayPersister\Config\GatewayMessageMap.cs" />
-    <Compile Include="GatewayPersister\GatewayPersister.cs" />
-    <Compile Include="GatewayPersister\Installer\Installer.cs" />
-    <Compile Include="Persistence\AmbientTransactionAwareWrapper.cs" />
-    <Compile Include="Persistence\ISessionExtensions.cs" />
-    <Compile Include="Persistence\NHibernatePersistence.cs" />
-    <Compile Include="Persistence\AddressUserType.cs" />
-    <Compile Include="Persistence\ConfigureNHibernate.cs" />
-    <Compile Include="Persistence\NHibernateSettingRetriever.cs" />
+    <Compile Include="InternalsVisibleTo.cs" />
+    <Compile Include="SharedSession\IStorageSessionProvider.cs" />
+    <Compile Include="Outbox\NHibernateOutboxStorage.cs" />
+    <Compile Include="SagaPersisters\NHibernateSagaStorage.cs" />
+    <Compile Include="SharedSession\OpenNativeTransactionBehavior.cs" />
+    <Compile Include="SharedSession\NHibernateStorageSession.cs" />
+    <Compile Include="SharedSession\OpenSessionBehavior.cs" />
+    <Compile Include="Outbox\IDbConnectionProvider.cs" />
+    <Compile Include="Outbox\Entities.cs" />
+    <Compile Include="Outbox\EntityMappings.cs" />
+    <Compile Include="Outbox\OutboxPersister.cs" />
+    <Compile Include="Internal\AmbientTransactionAwareWrapper.cs" />
+    <Compile Include="Internal\ISessionExtensions.cs" />
+    <Compile Include="Internal\AddressUserType.cs" />
+    <Compile Include="Internal\ConfigureNHibernate.cs" />
+    <Compile Include="Internal\NHibernateSettingRetriever.cs" />
     <Compile Include="AssemblyInfo.cs" />
-    <Compile Include="Persistence\ISessionFactoryExtensions.cs" />
-    <Compile Include="SagaPersisters\AutoPersistence\Attributes\LockModeAttribute.cs" />
-    <Compile Include="SagaPersisters\AutoPersistence\Attributes\TableNameAttribute.cs" />
-    <Compile Include="SagaPersisters\AutoPersistence\SagaModelMapper.cs" />
-    <Compile Include="SagaPersisters\Config\Installer\Installer.cs" />
-    <Compile Include="SagaPersisters\Config\Internal\SessionFactoryBuilder.cs" />
+    <Compile Include="Internal\ISessionFactoryExtensions.cs" />
+    <Compile Include="SagaPersisters\LockModeAttribute.cs" />
+    <Compile Include="SagaPersisters\TableNameAttribute.cs" />
+    <Compile Include="SharedSession\Installer.cs" />
     <Compile Include="SagaPersisters\SagaPersister.cs" />
-    <Compile Include="Subscriptions\CachedSubscriptionStorage.cs" />
-    <Compile Include="TimeoutPersisters\Config\TimeoutEntityMap.cs" />
-    <Compile Include="TimeoutPersisters\Installer\Installer.cs" />
-    <Compile Include="TimeoutPersisters\Installer\OptimizedSchemaUpdate.cs" />
+    <Compile Include="SharedSession\SessionFactoryProvider.cs" />
+    <Compile Include="SharedSession\SharedMappings.cs" />
+    <Compile Include="SharedSession\StorageSessionProvider.cs" />
+    <Compile Include="Subscriptions\CachedSubscriptionPersister.cs" />
+    <Compile Include="Subscriptions\NHibernateSubscriptionStorage.cs" />
+    <Compile Include="Subscriptions\SubscriptionConfig.cs" />
+    <Compile Include="TimeoutPersisters\TimeoutEntityMap.cs" />
+    <Compile Include="TimeoutPersisters\Installer.cs" />
+    <Compile Include="TimeoutPersisters\OptimizedSchemaUpdate.cs" />
+    <Compile Include="TimeoutPersisters\NHibernateTimeoutStorage.cs" />
+    <Compile Include="TimeoutPersisters\TimeoutConfig.cs" />
     <Compile Include="TimeoutPersisters\TimeoutEntity.cs" />
-    <Compile Include="TimeoutPersisters\TimeoutStorage.cs" />
+    <Compile Include="TimeoutPersisters\TimeoutPersister.cs" />
     <Compile Include="Subscriptions\Config\SubscriptionMap.cs" />
     <Compile Include="Subscriptions\Installer\Installer.cs" />
-    <Compile Include="Subscriptions\ISubscriptionStorageSessionProvider.cs" />
     <Compile Include="Subscriptions\Subscription.cs" />
-    <Compile Include="Subscriptions\SubscriptionStorage.cs" />
+    <Compile Include="Subscriptions\SubscriptionPersister.cs" />
     <Compile Include="Subscriptions\SubscriptionStorageSessionProvider.cs" />
-    <Compile Include="UnitOfWorkManager.cs" />
+    <Compile Include="SharedSession\OpenSqlConnectionBehavior.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="FodyWeavers.xml" />
+    <None Include="packages.config">
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\Fody.1.25.0\build\Fody.targets" Condition="Exists('..\packages\Fody.1.25.0\build\Fody.targets')" />

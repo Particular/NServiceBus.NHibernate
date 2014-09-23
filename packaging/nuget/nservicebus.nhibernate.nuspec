@@ -10,7 +10,7 @@
     <projectUrl>http://particular.net/</projectUrl>
     <iconUrl>http://s3.amazonaws.com/nuget.images/NServiceBus_32.png</iconUrl>
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
-    <description>The NHibernate for the NServicebus</description>
+    <description>NHibernate integration for NServiceBus</description>
     <releaseNotes></releaseNotes>
     <copyright>Copyright 2010-2014 NServiceBus. All rights reserved</copyright>
     <tags>nservicebus servicebus msmq cqrs publish subscribe</tags>
@@ -18,11 +18,10 @@
       <dependency id="Iesi.Collections" version="[4.0.1.4000, 5.0.0)" />
       <dependency id="NHibernate" version="[4.0.1.4000, 5.0.0)" />
       <dependency id="NServiceBus" version="[4.0.0, 5.0.0)" />
-      <dependency id="NServiceBus.Interfaces" version="[4.0.0, 5.0.0)" />
     </dependencies>
   </metadata>
   <files>
-    <file src="..\..\binaries\NServiceBus.NHibernate.???" target="lib\net40" />
-    <file src="tools\install.ps1" target="tools" />
+    <file src="..\..\binaries\NServiceBus.NHibernate.???" target="lib\net45" />
+	<file src="..\..\src\NServiceBus.NHibernate\**\*.cs" exclude="..\..\src\NServiceBus.NHibernate\**\TemporaryGeneratedFile_*.cs" target="src" />
   </files>
 </package>

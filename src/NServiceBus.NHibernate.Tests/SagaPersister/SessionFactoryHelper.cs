@@ -3,10 +3,11 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using Config.Internal;
+    using Features;
     using global::NHibernate.Cfg;
     using global::NHibernate.Impl;
     using Saga;
+    using Settings;
 
     public static class SessionFactoryHelper
     {
@@ -14,10 +15,14 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
         {
             var types = Types();
 
-            var builder = new SessionFactoryBuilder(types);
+            var builder = new NHibernateSagaStorage();
             var properties = SQLiteConfiguration.InMemory();
 
-            return builder.Build(new Configuration().AddProperties(properties)) as SessionFactoryImpl;
+            var configuration = new Configuration().AddProperties(properties);
+            var settings = new SettingsHolder();
+            settings.Set("TypesToScan", types);
+            builder.ApplyMappings(settings, configuration);
+            return configuration.BuildSessionFactory() as SessionFactoryImpl;
         }
 
         public static List<Type> Types()

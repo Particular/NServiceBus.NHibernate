@@ -4,7 +4,7 @@
     using NUnit.Framework;
 
     [TestFixture]
-    public class When_receiving_a_subscription_message : InMemoryDBFixture
+    class When_receiving_a_subscription_message : InMemoryDBFixture
     {
         [Test]
         public void A_subscription_entry_should_be_added_to_the_database()

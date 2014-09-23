@@ -1,70 +1,94 @@
 namespace NServiceBus.SagaPersisters.NHibernate.Tests
 {
     using System;
-    using System.Collections.Specialized;
-    using System.Configuration;
+    using System.Collections.Generic;
     using System.IO;
     using System.Security.Principal;
-    using Config.Installer;
-    using Config.Internal;
+    using AutoPersistence;
     using global::NHibernate;
+    using global::NHibernate.Tool.hbm2ddl;
     using NUnit.Framework;
     using Persistence.NHibernate;
-    using UnitOfWork;
-    using UnitOfWork.NHibernate;
+    using Saga;
 
-    public class InMemoryFixture
+    class InMemoryFixture<T> where T : IContainSagaData
     {
-        protected IManageUnitsOfWork UnitOfWork;
         protected SagaPersister SagaPersister;
         protected ISessionFactory SessionFactory;
 
-        private const string dialect = "NHibernate.Dialect.SQLiteDialect";
 
         [SetUp]
         public void SetUp()
         {
-            var connectionString = String.Format(@"Data Source={0};New=True;", Path.GetTempFileName());
+            connectionString = String.Format(@"Data Source={0};New=True;", Path.GetTempFileName());
 
-            Configure.ConfigurationSource = new FakeConfigurationSource();
 
-            NHibernateSettingRetriever.AppSettings = () => new NameValueCollection
-                                                               {
-                                                                   {"NServiceBus/Persistence/NHibernate/dialect", dialect}
-                                                               };
+            var configuration = new global::NHibernate.Cfg.Configuration()
+                .AddProperties(new Dictionary<string, string>
+                {
+                    { "dialect", dialect },
+                    { global::NHibernate.Cfg.Environment.ConnectionString,connectionString }
+                });
 
-            NHibernateSettingRetriever.ConnectionStrings = () => new ConnectionStringSettingsCollection
-                                                                     {
-                                                                         new ConnectionStringSettings("NServiceBus/Persistence/NHibernate/Saga", connectionString)
-                                                                     };
+            var modelMapper = new SagaModelMapper(new[] { typeof(T) });
 
-            ConfigureNHibernate.Init();
+            configuration.AddMapping(modelMapper.Compile());
 
-            Configure.Features.Enable<Features.Sagas>();
+            SessionFactory = configuration.BuildSessionFactory();
 
-            var types = SessionFactoryHelper.Types();
+            new SchemaUpdate(configuration).Execute(false, true);
 
-            Configure.With(types)
-                .DefineEndpointName("Foo")
-                .DefaultBuilder()
-                .UseNHibernateSagaPersister();
+            session = SessionFactory.OpenSession();
 
-            var builder = new SessionFactoryBuilder(Configure.TypesToScan);
-            var properties = ConfigureNHibernate.SagaPersisterProperties;
+            SagaPersister = new SagaPersister(new FakeSessionProvider(SessionFactory, session));
 
-            SessionFactory = builder.Build(ConfigureNHibernate.CreateConfigurationWith(properties));
+            new Installer().Install(WindowsIdentity.GetCurrent().Name, null);
+        }
 
-            UnitOfWork = new UnitOfWorkManager { SessionFactory = SessionFactory };
+        protected void FlushSession()
+        {
+            if (sessionFlushed)
+            {
+                return;
+            }
 
-            SagaPersister = new SagaPersister { UnitOfWorkManager = (UnitOfWorkManager)UnitOfWork };
+            sessionFlushed = true;
 
-            new Installer().Install(WindowsIdentity.GetCurrent().Name);
+            session.Flush();
         }
 
         [TearDown]
         public void Cleanup()
         {
+            FlushSession();
             SessionFactory.Close();
+        }
+
+        const string dialect = "NHibernate.Dialect.SQLiteDialect";
+        string connectionString;
+        ISession session;
+        bool sessionFlushed;
+    }
+
+    class FakeSessionProvider : IStorageSessionProvider
+    {
+        readonly ISessionFactory sessionFactory;
+
+        public FakeSessionProvider(ISessionFactory sessionFactory, ISession session)
+        {
+            this.sessionFactory = sessionFactory;
+            Session = session;
+        }
+
+        public ISession Session { get; private set; }
+        public IStatelessSession OpenStatelessSession()
+        {
+            return sessionFactory.OpenStatelessSession();
+        }
+
+        public ISession OpenSession()
+        {
+            return sessionFactory.OpenSession();
         }
     }
 }

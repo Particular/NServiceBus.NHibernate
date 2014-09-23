@@ -1,6 +1,6 @@
 namespace NServiceBus.SagaPersisters.NHibernate.Tests
 {
-    using NServiceBus.Config.ConfigurationSource;
+    using Config.ConfigurationSource;
 
     class FakeConfigurationSource : IConfigurationSource
     {

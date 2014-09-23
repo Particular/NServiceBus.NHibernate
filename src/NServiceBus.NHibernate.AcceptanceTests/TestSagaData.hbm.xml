@@ -1,0 +1,12 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<hibernate-mapping xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="urn:nhibernate-mapping-2.2">
+  <class name="NServiceBus.AcceptanceTests.Sagas.When_using_hbms+TestSagaData, NServiceBus.NHibernate.AcceptanceTests" table="When_using_hbms" dynamic-update="true" optimistic-lock="all">
+    <id name="Id" type="Guid">
+      <generator class="assigned" />
+    </id>
+    <property name="Originator" />
+    <property name="OriginalMessageId" />
+    <property name="LargeText" type="StringClob" />
+    <property name="SomeId" unique="true" />
+  </class>
+</hibernate-mapping>

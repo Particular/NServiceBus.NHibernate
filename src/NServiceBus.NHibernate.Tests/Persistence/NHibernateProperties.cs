@@ -6,6 +6,7 @@ namespace NServiceBus.Persistence.NHibernate.Tests
     using System.Configuration;
     using System.Reflection;
     using NUnit.Framework;
+    using Settings;
 
     [TestFixture]
     public class NHibernateProperties
@@ -21,7 +22,7 @@ namespace NServiceBus.Persistence.NHibernate.Tests
                     new ConnectionStringSettings("NServiceBus/Persistence", connectionString)
                 };
 
-            ConfigureNHibernate.Init();
+            var config = new ConfigureNHibernate(new SettingsHolder());
 
             var expected = new Dictionary<string, string>
                 {
@@ -30,11 +31,12 @@ namespace NServiceBus.Persistence.NHibernate.Tests
                    
                 };
 
-            CollectionAssert.IsSubsetOf(expected, ConfigureNHibernate.DistributorPersisterProperties);
-            CollectionAssert.IsSubsetOf(expected, ConfigureNHibernate.GatewayPersisterProperties);
-            CollectionAssert.IsSubsetOf(expected, ConfigureNHibernate.SagaPersisterProperties);
-            CollectionAssert.IsSubsetOf(expected, ConfigureNHibernate.SubscriptionStorageProperties);
-            CollectionAssert.IsSubsetOf(expected, ConfigureNHibernate.TimeoutPersisterProperties);
+            CollectionAssert.IsSubsetOf(expected, config.DistributorPersisterProperties);
+            CollectionAssert.IsSubsetOf(expected, config.GatewayDeduplicationProperties);
+            CollectionAssert.IsSubsetOf(expected, config.OutboxProperties);
+            CollectionAssert.IsSubsetOf(expected, config.SagaPersisterProperties);
+            CollectionAssert.IsSubsetOf(expected, config.SubscriptionStorageProperties);
+            CollectionAssert.IsSubsetOf(expected, config.TimeoutPersisterProperties);
         }
 
         [Test]
@@ -48,7 +50,7 @@ namespace NServiceBus.Persistence.NHibernate.Tests
                                                  "timeout_connection_string")
                 };
 
-            ConfigureNHibernate.Init();
+            var config = new ConfigureNHibernate(new SettingsHolder());
 
             var expectedForTimeout = new Dictionary<string, string>
                 {
@@ -60,11 +62,12 @@ namespace NServiceBus.Persistence.NHibernate.Tests
                     {"connection.connection_string", connectionString}
                 };
 
-            CollectionAssert.IsSubsetOf(expectedDefault, ConfigureNHibernate.DistributorPersisterProperties);
-            CollectionAssert.IsSubsetOf(expectedDefault, ConfigureNHibernate.GatewayPersisterProperties);
-            CollectionAssert.IsSubsetOf(expectedDefault, ConfigureNHibernate.SagaPersisterProperties);
-            CollectionAssert.IsSubsetOf(expectedDefault, ConfigureNHibernate.SubscriptionStorageProperties);
-            CollectionAssert.IsSubsetOf(expectedForTimeout, ConfigureNHibernate.TimeoutPersisterProperties);
+            CollectionAssert.IsSubsetOf(expectedDefault, config.DistributorPersisterProperties);
+            CollectionAssert.IsSubsetOf(expectedDefault, config.GatewayDeduplicationProperties);
+            CollectionAssert.IsSubsetOf(expectedDefault, config.OutboxProperties);
+            CollectionAssert.IsSubsetOf(expectedDefault, config.SagaPersisterProperties);
+            CollectionAssert.IsSubsetOf(expectedDefault, config.SubscriptionStorageProperties);
+            CollectionAssert.IsSubsetOf(expectedForTimeout, config.TimeoutPersisterProperties);
         }
 
         [Test]
@@ -81,7 +84,7 @@ namespace NServiceBus.Persistence.NHibernate.Tests
                     new ConnectionStringSettings("NServiceBus/Persistence", connectionString)
                 };
 
-            ConfigureNHibernate.Init();
+            var config = new ConfigureNHibernate(new SettingsHolder());
 
             var expected = new Dictionary<string, string>
                 {
@@ -90,11 +93,12 @@ namespace NServiceBus.Persistence.NHibernate.Tests
                     {"connection.driver_class", "driver_class"},
                 };
 
-            CollectionAssert.IsSubsetOf(expected, ConfigureNHibernate.DistributorPersisterProperties);
-            CollectionAssert.IsSubsetOf(expected, ConfigureNHibernate.GatewayPersisterProperties);
-            CollectionAssert.IsSubsetOf(expected, ConfigureNHibernate.SagaPersisterProperties);
-            CollectionAssert.IsSubsetOf(expected, ConfigureNHibernate.SubscriptionStorageProperties);
-            CollectionAssert.IsSubsetOf(expected, ConfigureNHibernate.TimeoutPersisterProperties);
+            CollectionAssert.IsSubsetOf(expected, config.DistributorPersisterProperties);
+            CollectionAssert.IsSubsetOf(expected, config.GatewayDeduplicationProperties);
+            CollectionAssert.IsSubsetOf(expected, config.OutboxProperties);
+            CollectionAssert.IsSubsetOf(expected, config.SagaPersisterProperties);
+            CollectionAssert.IsSubsetOf(expected, config.SubscriptionStorageProperties);
+            CollectionAssert.IsSubsetOf(expected, config.TimeoutPersisterProperties);
         }
 
         [Test]
@@ -110,19 +114,19 @@ namespace NServiceBus.Persistence.NHibernate.Tests
                 {
                     new ConnectionStringSettings("NServiceBus/Persistence", connectionString)
                 };
-
-            ConfigureNHibernate.Init();
+            var config = new ConfigureNHibernate(new SettingsHolder());
 
             var expected = new Dictionary<string, string>
                 {
                     {"connection.connection_string", connectionString},
                 };
 
-            CollectionAssert.IsSubsetOf(expected, ConfigureNHibernate.DistributorPersisterProperties);
-            CollectionAssert.IsSubsetOf(expected, ConfigureNHibernate.GatewayPersisterProperties);
-            CollectionAssert.IsSubsetOf(expected, ConfigureNHibernate.SagaPersisterProperties);
-            CollectionAssert.IsSubsetOf(expected, ConfigureNHibernate.SubscriptionStorageProperties);
-            CollectionAssert.IsSubsetOf(expected, ConfigureNHibernate.TimeoutPersisterProperties);
+            CollectionAssert.IsSubsetOf(expected, config.DistributorPersisterProperties);
+            CollectionAssert.IsSubsetOf(expected, config.GatewayDeduplicationProperties);
+            CollectionAssert.IsSubsetOf(expected, config.OutboxProperties);
+            CollectionAssert.IsSubsetOf(expected, config.SagaPersisterProperties);
+            CollectionAssert.IsSubsetOf(expected, config.SubscriptionStorageProperties);
+            CollectionAssert.IsSubsetOf(expected, config.TimeoutPersisterProperties);
         }
 
         [Test]
@@ -223,9 +227,9 @@ namespace NServiceBus.Persistence.NHibernate.Tests
                     new ConnectionStringSettings("NServiceBus/Persistence", "specified")
                 };
 
-                ConfigureNHibernate.Init();
+                var config = new ConfigureNHibernate(new SettingsHolder());
                 var configuration =
-                    ConfigureNHibernate.CreateConfigurationWith(ConfigureNHibernate.DistributorPersisterProperties);
+                    ConfigureNHibernate.CreateConfigurationWith(config.DistributorPersisterProperties);
 
                 return configuration.Properties;
             }
@@ -236,9 +240,9 @@ namespace NServiceBus.Persistence.NHibernate.Tests
             public IDictionary<string, string> Execute()
             {
 
-                ConfigureNHibernate.Init();
+                var config = new ConfigureNHibernate(new SettingsHolder());
                 var configuration =
-                    ConfigureNHibernate.CreateConfigurationWith(ConfigureNHibernate.DistributorPersisterProperties);
+                    ConfigureNHibernate.CreateConfigurationWith(config.DistributorPersisterProperties);
 
                 return configuration.Properties;
             }

@@ -52,9 +52,9 @@
                 RecordSuccess();
         }
 
-        public void Init()
+        public void Customize(BusConfiguration builder)
         {
-            Configure.Component<StatisticsUoW>(DependencyLifecycle.InstancePerUnitOfWork);
+            builder.RegisterComponents(c=> c.ConfigureComponent<StatisticsUoW>(DependencyLifecycle.InstancePerUnitOfWork));
         }
     }
 }

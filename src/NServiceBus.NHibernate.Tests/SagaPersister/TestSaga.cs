@@ -2,7 +2,6 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
 {
     using System;
     using System.Collections.Generic;
-    using AutoPersistence.Attributes;
     using Saga;
 
     public class TestSaga : IContainSagaData

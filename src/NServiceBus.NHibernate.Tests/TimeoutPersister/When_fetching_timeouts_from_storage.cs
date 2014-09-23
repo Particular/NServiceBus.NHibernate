@@ -8,7 +8,7 @@ namespace NServiceBus.TimeoutPersisters.NHibernate.Tests
     using Timeout.Core;
 
     [TestFixture]
-    public class When_fetching_timeouts_from_storage : InMemoryDBFixture
+    class When_fetching_timeouts_from_storage : InMemoryDBFixture
     {
         [Test]
         public void Should_return_the_complete_list_of_timeouts()
@@ -20,12 +20,11 @@ namespace NServiceBus.TimeoutPersisters.NHibernate.Tests
                 persister.Add(new TimeoutData
                                   {
                                       Time = DateTime.UtcNow.AddHours(-1),
-                                      CorrelationId = "boo",
                                       Destination = new Address("timeouts", RuntimeEnvironment.MachineName),
                                       SagaId = Guid.NewGuid(),
                                       State = new byte[] { 0, 0, 133 },
                                       Headers = new Dictionary<string, string> { { "Bar", "34234" }, { "Foo", "aString1" }, { "Super", "aString2" } },
-                                      OwningTimeoutManager = Configure.EndpointName,
+                                      OwningTimeoutManager = "MyTestEndpoint",
                                   });
             }
             DateTime nextTimeToRunQuery;
@@ -40,12 +39,11 @@ namespace NServiceBus.TimeoutPersisters.NHibernate.Tests
             persister.Add(new TimeoutData
             {
                 Time = nextTime,
-                CorrelationId = "boo",
                 Destination = new Address("timeouts", RuntimeEnvironment.MachineName),
                 SagaId = Guid.NewGuid(),
                 State = new byte[] { 0, 0, 133 },
                 Headers = new Dictionary<string, string> { { "Bar", "34234" }, { "Foo", "aString1" }, { "Super", "aString2" } },
-                OwningTimeoutManager = Configure.EndpointName,
+                OwningTimeoutManager = "MyTestEndpoint",
             });
             
 
