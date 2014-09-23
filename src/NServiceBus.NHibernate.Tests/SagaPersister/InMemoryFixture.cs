@@ -24,7 +24,7 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
         [SetUp]
         public void SetUp()
         {
-            var connectionString = String.Format(@"Data Source={0};Version=3;New=True;", Path.GetTempFileName());
+            var connectionString = String.Format(@"Data Source={0};New=True;", Path.GetTempFileName());
 
             Configure.ConfigurationSource = new FakeConfigurationSource();
 

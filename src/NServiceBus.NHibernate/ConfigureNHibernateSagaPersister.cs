@@ -2,7 +2,6 @@
 {
     using System;
     using System.Collections.Generic;
-    using Config;
     // ReSharper disable RedundantNameQualifier
     using global::NHibernate;
     using global::NHibernate.Cfg;
@@ -79,27 +78,11 @@
         /// <returns>The configuration object.</returns>
         public static Configure UseNHibernateSagaPersister(this Configure config, Func<Type, string> tableNamingConvention)
         {
-            var configSection = Configure.GetConfigSection<NHibernateSagaPersisterConfig>();
-
-            if (configSection != null)
-            {
-                if (configSection.NHibernateProperties.Count == 0)
-                {
-                    throw new InvalidOperationException(
-                        "No NHibernate properties found. Please specify NHibernateProperties in your NHibernateSagaPersisterConfig section");
-                }
-
-                foreach (var property in configSection.NHibernateProperties.ToProperties())
-                {
-                    ConfigureNHibernate.SagaPersisterProperties[property.Key] = property.Value;
-                }
-            }
-
             ConfigureNHibernate.ConfigureSqlLiteIfRunningInDebugModeAndNoConfigPropertiesSet(ConfigureNHibernate.SagaPersisterProperties);
 
             var properties = ConfigureNHibernate.SagaPersisterProperties;
 
-            return config.UseNHibernateSagaPersisterInternal(ConfigureNHibernate.CreateConfigurationWith(properties), configSection == null || configSection.UpdateSchema, tableNamingConvention);
+            return config.UseNHibernateSagaPersisterInternal(ConfigureNHibernate.CreateConfigurationWith(properties), true, tableNamingConvention);
         }
 
         /// <summary>

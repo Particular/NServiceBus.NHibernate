@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <hibernate-configuration xmlns="urn:nhibernate-configuration-2.2">
   <session-factory>
-    <property name="connection.connection_string">Testing2</property>
+    <property name="connection.connection_string">Server=localhost\sqlexpress;Database=nservicebus;Trusted_Connection=True;</property>
   </session-factory>
 </hibernate-configuration>
