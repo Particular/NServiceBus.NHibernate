@@ -77,7 +77,17 @@ namespace NServiceBus.Features
 
                 cleanupTimer = new Timer(PerformCleanup, null, TimeSpan.FromMinutes(1), frequencyToRunDeduplicationDataCleanup);
             }
- 
+
+            protected override void OnStop()
+            {
+                using (var waitHandle = new ManualResetEvent(false))
+                {
+                    cleanupTimer.Dispose(waitHandle);
+
+                    waitHandle.WaitOne();
+                }
+            }
+
             void PerformCleanup(object state)
             {
                 OutboxPersister.RemoveEntriesOlderThan(DateTime.UtcNow - timeToKeepDeduplicationData);
