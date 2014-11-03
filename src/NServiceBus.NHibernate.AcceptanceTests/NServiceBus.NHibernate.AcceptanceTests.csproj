@@ -132,9 +132,12 @@
     <Compile Include="App_Packages\NServiceBus.AcceptanceTests\ScenarioDescriptors\AllSerializers.cs" />
     <Compile Include="App_Packages\NServiceBus.AcceptanceTests\ScenarioDescriptors\AllSubscriptionStorages.cs" />
     <Compile Include="App_Packages\NServiceBus.AcceptanceTests\ScenarioDescriptors\AllTransports.cs" />
+    <Compile Include="App_Packages\NServiceBus.AcceptanceTests\ScenarioDescriptors\Builders.cs" />
     <Compile Include="App_Packages\NServiceBus.AcceptanceTests\ScenarioDescriptors\SagaPersisters.cs" />
     <Compile Include="App_Packages\NServiceBus.AcceptanceTests\ScenarioDescriptors\Serializers.cs" />
+    <Compile Include="App_Packages\NServiceBus.AcceptanceTests\ScenarioDescriptors\SubscriptionPersisters.cs" />
     <Compile Include="App_Packages\NServiceBus.AcceptanceTests\ScenarioDescriptors\SubscriptionStorages.cs" />
+    <Compile Include="App_Packages\NServiceBus.AcceptanceTests\ScenarioDescriptors\TimeoutPersisters.cs" />
     <Compile Include="App_Packages\NServiceBus.AcceptanceTests\ScenarioDescriptors\Transports.cs" />
     <Compile Include="App_Packages\NServiceBus.AcceptanceTests\Scheduling\When_scheduling_a_recurring_task.cs" />
     <Compile Include="App_Packages\NServiceBus.AcceptanceTests\Transactions\FakePromotableResourceManager.cs" />
