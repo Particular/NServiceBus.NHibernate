@@ -66,7 +66,7 @@
             public SagaEndpoint()
             {
                 EndpointSetup<DefaultServer>(
-                    c => c.RavenSagaPersister().UnicastBus().LoadMessageHandlers<First<TestSaga>>());
+                    c => c.UnicastBus().LoadMessageHandlers<First<TestSaga>>());
             }
 
           
