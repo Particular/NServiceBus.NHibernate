@@ -12,7 +12,6 @@
             if (System.Diagnostics.Debugger.IsAttached)
             {
                 Assert.Ignore("Can't run this unit test with debugger attached.");
-                return;
             }
 
             var properties = new Dictionary<string, string>();
@@ -27,7 +26,6 @@
             if (!System.Diagnostics.Debugger.IsAttached)
             {
                 Assert.Ignore("Debugger needs to be attached to run this unit test.");
-                return;
             }
 
             var properties = new Dictionary<string, string>();
