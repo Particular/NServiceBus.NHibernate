@@ -149,6 +149,7 @@
     <Compile Include="App_Packages\NServiceBus.AcceptanceTests\Transactions\When_sending_messages_within_an_ambient_transaction.cs" />
     <Compile Include="App_Packages\NServiceBus.AcceptanceTests\Versioning\When_multiple_versions_of_a_message_is_published.cs" />
     <Compile Include="Config.cs" />
+    <Compile Include="Issue_67.cs" />
     <Compile Include="When_saga_contains_nested_collection_without_parent_relation.cs" />
     <Compile Include="When_saga_contains_nested_collection.cs" />
     <Compile Include="When_saga_contains_nested_collection_with_row_version.cs" />
