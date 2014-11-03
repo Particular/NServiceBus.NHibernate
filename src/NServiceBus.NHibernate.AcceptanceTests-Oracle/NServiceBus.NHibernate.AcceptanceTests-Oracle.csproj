@@ -74,6 +74,9 @@
     <Reference Include="System.Web" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\NServiceBus.NHibernate.AcceptanceTests\Issue_67.cs">
+      <Link>Issue_67.cs</Link>
+    </Compile>
     <Compile Include="..\NServiceBus.NHibernate.AcceptanceTests\When_saga_contains_nested_collection.cs">
       <Link>When_saga_contains_nested_collection.cs</Link>
     </Compile>
