@@ -76,19 +76,7 @@ namespace NServiceBus.TimeoutPersisters.NHibernate
         /// <param name="timeout">Timeout data.</param>
         public void Add(TimeoutData timeout)
         {
-            var timeoutId = Guid.Empty;
-
-            string messageId;
-            if (timeout.Headers.TryGetValue(Headers.MessageId, out messageId))
-            {
-                Guid.TryParse(messageId, out timeoutId);
-            }
-
-            if (timeoutId == Guid.Empty)
-            {
-                timeoutId = GenerateCombGuid();
-            }
-
+            var timeoutId = GenerateCombGuid();
             IDbConnection connection;
 
             if (TryGetConnection(out connection))
