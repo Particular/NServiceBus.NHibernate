@@ -132,6 +132,29 @@
             return config.UseNHibernateSagaPersisterInternal(configuration, true, tableNamingConvention);
         }
 
+        /// <summary>
+        /// Configures the storage with the user supplied persistence configuration
+        /// DB schema is updated if requested by the user
+        /// </summary>
+        /// <param name="config">The <see cref="Configure" /> object.</param>
+        /// <param name="configuration">The <see cref="Configuration" /> allows the application to specify properties and mapping documents to be used when creating a <see cref="ISessionFactory" />.</param>
+        /// <param name="tableNamingConvention">Convention to use for naming tables.</param>
+        /// <param name="autoUpdateSchema">Enable/Disable the automatic creation of the database schema.</param>
+        /// <returns>The <see cref="Configure" /> object.</returns>
+        public static Configure UseNHibernateSagaPersister(this Configure config, Configuration configuration, Func<Type, string> tableNamingConvention, bool autoUpdateSchema)
+        {
+            if (configuration == null)
+            {
+                ConfigureNHibernate.ConfigureSqlLiteIfRunningInDebugModeAndNoConfigPropertiesSet(ConfigureNHibernate.SagaPersisterProperties);
+
+                var properties = ConfigureNHibernate.SagaPersisterProperties;
+
+                configuration = ConfigureNHibernate.CreateConfigurationWith(properties);
+            }
+
+            return config.UseNHibernateSagaPersisterInternal(configuration, autoUpdateSchema, tableNamingConvention);
+        }
+
         static Configure UseNHibernateSagaPersisterInternal(this Configure config, Configuration configuration, bool autoUpdateSchema, Func<Type, string> tableNamingConvention = null)
         {
             ConfigureNHibernate.ThrowIfRequiredPropertiesAreMissing(ConfigureNHibernate.SagaPersisterProperties);
