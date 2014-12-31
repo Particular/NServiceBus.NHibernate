@@ -22,7 +22,7 @@ namespace NServiceBus.Outbox.NHibernate
             {
                 pm.Column(c =>
                 {
-                    c.Default(0);
+                    c.Default(true);
                     c.NotNullable(true);
                 });
                 pm.Index("OutboxRecord_Dispatched_Index");
