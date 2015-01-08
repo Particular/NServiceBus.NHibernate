@@ -17,8 +17,8 @@
     <dependencies>
       <dependency id="Iesi.Collections" version="[3.3.3.4000, 4.0.0.0)" />
       <dependency id="NHibernate" version="[3.3.3.4001, 4.0.0.0)" />
-      <dependency id="NServiceBus" version="[4.0.0.0, 5.0.0.0)" />
-      <dependency id="NServiceBus.Interfaces" version="[4.0.0.0, 5.0.0.0)" />
+      <dependency id="NServiceBus" version="[4.4.2.0, 5.0.0.0)" />
+      <dependency id="NServiceBus.Interfaces" version="[4.4.2.0, 5.0.0.0)" />
     </dependencies>
   </metadata>
   <files>
