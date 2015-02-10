@@ -123,6 +123,7 @@
     <Compile Include="SharedSession\SessionFactoryProvider.cs" />
     <Compile Include="SharedSession\SharedMappings.cs" />
     <Compile Include="SharedSession\StorageSessionProvider.cs" />
+    <Compile Include="SharedSession\TransportIntegrationFeature.cs" />
     <Compile Include="Subscriptions\CachedSubscriptionPersister.cs" />
     <Compile Include="Subscriptions\NHibernateSubscriptionStorage.cs" />
     <Compile Include="Subscriptions\SubscriptionConfig.cs" />
