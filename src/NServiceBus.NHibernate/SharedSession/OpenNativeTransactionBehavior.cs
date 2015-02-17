@@ -8,7 +8,7 @@ namespace NServiceBus.Persistence.NHibernate
 
     class OpenNativeTransactionBehavior : IBehavior<IncomingContext>
     {
-        public IStorageSessionProvider StorageSessionProvider { get; set; }
+        public SharedConnectionStorageSessionProvider StorageSessionProvider { get; set; }
 
         public string ConnectionString { get; set; }
 

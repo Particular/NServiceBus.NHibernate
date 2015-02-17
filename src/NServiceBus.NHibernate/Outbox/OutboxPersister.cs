@@ -56,12 +56,12 @@
                 Options = t.Options,
             });
 
-            StorageSessionProvider.Session.Save(new OutboxRecord
+            StorageSessionProvider.ExecuteInTransaction(x => x.Save(new OutboxRecord
             {
                 MessageId = messageId,
                 Dispatched = false,
                 TransportOperations = ConvertObjectToString(operations)
-            });
+            }));
         }
 
         public void SetAsDispatched(string messageId)

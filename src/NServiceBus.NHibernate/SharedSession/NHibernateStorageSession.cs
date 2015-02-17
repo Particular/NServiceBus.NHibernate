@@ -10,9 +10,15 @@ namespace NServiceBus.Features
     /// </summary>
     public class NHibernateStorageSession : Feature
     {
+        internal const string ShareTransportConnectionSettingsKey = "NHibernate.SharedSession.ShareTransportConnection";
+
         internal NHibernateStorageSession()
         {
-            Defaults(s => s.SetDefault<SharedMappings>(new SharedMappings()));
+            Defaults(s =>
+            {
+                s.SetDefault(ShareTransportConnectionSettingsKey,true);
+                s.SetDefault<SharedMappings>(new SharedMappings());
+            });
 
             DependsOn<NHibernateDBConnectionProvider>();
             DependsOnAtLeastOne(typeof(NHibernateSagaStorage), typeof(NHibernateOutboxStorage));
@@ -52,28 +58,30 @@ namespace NServiceBus.Features
 
             context.Container.RegisterSingleton(new SessionFactoryProvider(configuration.BuildSessionFactory()));
 
-            context.Pipeline.Register<OpenSqlConnectionBehavior.Registration>();
-            context.Pipeline.Register<OpenSessionBehavior.Registration>();
-            context.Pipeline.Register<OpenNativeTransactionBehavior.Registration>();
-
-            context.Container.ConfigureComponent<StorageSessionProvider>(DependencyLifecycle.SingleInstance)
-                .ConfigureProperty(p => p.ConnectionString, connString);
-
-            context.Container.ConfigureProperty<DbConnectionProvider>(p => p.DefaultConnectionString, connString);
-
-            context.Container.ConfigureComponent<OpenSqlConnectionBehavior>(DependencyLifecycle.InstancePerCall)
-                .ConfigureProperty(p => p.ConnectionString, connString);
-
-            context.Container.ConfigureComponent<OpenSessionBehavior>(DependencyLifecycle.InstancePerCall)
-                .ConfigureProperty(p => p.ConnectionString, connString);
-
-            context.Container.ConfigureComponent<OpenNativeTransactionBehavior>(DependencyLifecycle.InstancePerCall)
-                .ConfigureProperty(p => p.ConnectionString, connString);
-
-            context.Container.ConfigureComponent(b => new NHibernateStorageContext(b.Build<PipelineExecutor>(), connString), DependencyLifecycle.InstancePerUnitOfWork);
+            //Only when sharing transport connection
+            var shareTransportConnection = context.Settings.Get<bool>(ShareTransportConnectionSettingsKey);
+            if (shareTransportConnection)
+            {
+                context.Pipeline.Register<OpenSqlConnectionBehavior.Registration>();
+                context.Pipeline.Register<OpenSessionBehavior.Registration>();
+                context.Pipeline.Register<OpenNativeTransactionBehavior.Registration>();
+                context.Container.ConfigureProperty<DbConnectionProvider>(p => p.DefaultConnectionString, connString);
+                context.Container.ConfigureComponent<OpenSqlConnectionBehavior>(DependencyLifecycle.InstancePerCall)
+                    .ConfigureProperty(p => p.ConnectionString, connString);
+                context.Container.ConfigureComponent<OpenSessionBehavior>(DependencyLifecycle.InstancePerCall)
+                    .ConfigureProperty(p => p.ConnectionString, connString);
+                context.Container.ConfigureComponent<OpenNativeTransactionBehavior>(DependencyLifecycle.InstancePerCall)
+                    .ConfigureProperty(p => p.ConnectionString, connString);
+                context.Container.ConfigureComponent(b => new NHibernateStorageContext(b.Build<PipelineExecutor>(), connString), DependencyLifecycle.InstancePerUnitOfWork);
+                context.Container.ConfigureComponent<SharedConnectionStorageSessionProvider>(DependencyLifecycle.SingleInstance)
+                    .ConfigureProperty(p => p.ConnectionString, connString);
+            }
+            else
+            {
+                context.Container.ConfigureComponent<NonSharedConnectionStorageSessionProvider>(DependencyLifecycle.SingleInstance);
+            }
 
             Installer.RunInstaller = context.Settings.Get<bool>("NHibernate.Common.AutoUpdateSchema");
-
             Installer.configuration = configuration;
         }
     }
