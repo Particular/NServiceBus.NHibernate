@@ -22,6 +22,5 @@
   </metadata>
   <files>
     <file src="..\..\binaries\NServiceBus.NHibernate.???" target="lib\net45" />
-	<file src="..\..\src\NServiceBus.NHibernate\**\*.cs" exclude="..\..\src\NServiceBus.NHibernate\**\TemporaryGeneratedFile_*.cs" target="src" />
   </files>
 </package>
