@@ -57,6 +57,7 @@ namespace NServiceBus.Features
             if (context.Container.HasComponent<OutboxPersister>())
             {
                 context.Container.ConfigureComponent<NonSharedConnectionStorageSessionProvider>(DependencyLifecycle.SingleInstance);
+                context.Container.ConfigureProperty<DbConnectionProvider>(p => p.DisableConnectionSharing, true);
             }
             else
             {

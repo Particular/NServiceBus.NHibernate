@@ -8,11 +8,16 @@ namespace NServiceBus.Persistence.NHibernate
     class DbConnectionProvider : IDbConnectionProvider
     {
         public PipelineExecutor PipelineExecutor { get; set; }
-
         public string DefaultConnectionString { get; set; }
+        public bool DisableConnectionSharing { get; set; }
 
         public bool TryGetConnection(out IDbConnection connection, string connectionString)
         {
+            if (DisableConnectionSharing)
+            {
+                connection = null;
+                return false;
+            }
             if (connectionString == null)
             {
                 connectionString = DefaultConnectionString;
