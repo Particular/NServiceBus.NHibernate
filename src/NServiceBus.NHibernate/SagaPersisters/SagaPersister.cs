@@ -56,7 +56,7 @@ namespace NServiceBus.SagaPersisters.NHibernate
         T ISagaPersister.Get<T>(string property, object value)
         {
             var result = default(T);
-            storageSessionProvider.ExecuteInTransaction(x => x.CreateCriteria(typeof(T))
+            storageSessionProvider.ExecuteInTransaction(x => result = x.CreateCriteria(typeof(T))
                  .SetLockMode(GetLockModeForSaga<T>())
                  .Add(Restrictions.Eq(property, value))
                 .UniqueResult<T>());
