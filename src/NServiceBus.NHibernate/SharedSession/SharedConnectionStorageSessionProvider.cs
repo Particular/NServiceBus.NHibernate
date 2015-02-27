@@ -6,7 +6,7 @@ namespace NServiceBus.Persistence.NHibernate
     using Outbox;
     using Pipeline;
 
-    class StorageSessionProvider : IStorageSessionProvider
+    class SharedConnectionStorageSessionProvider : IStorageSessionProvider
     {
         public PipelineExecutor PipelineExecutor { get; set; }
 
@@ -53,6 +53,11 @@ namespace NServiceBus.Persistence.NHibernate
             }
 
             return SessionFactoryProvider.SessionFactory.OpenSession();
+        }
+
+        public void ExecuteInTransaction(Action<ISession> operation)
+        {
+            operation(Session);
         }
     }
 }

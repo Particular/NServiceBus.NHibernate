@@ -99,6 +99,7 @@
     <Compile Include="Deduplication\GatewayDeduplication.cs" />
     <Compile Include="Deduplication\Installer\Installer.cs" />
     <Compile Include="InternalsVisibleTo.cs" />
+    <Compile Include="SharedSession\NonSharedConnectionStorageSessionProvider.cs" />
     <Compile Include="SharedSession\IStorageSessionProvider.cs" />
     <Compile Include="Outbox\NHibernateOutboxStorage.cs" />
     <Compile Include="SagaPersisters\NHibernateSagaStorage.cs" />
@@ -122,8 +123,8 @@
     <Compile Include="SagaPersisters\SagaPersister.cs" />
     <Compile Include="SharedSession\SessionFactoryProvider.cs" />
     <Compile Include="SharedSession\SharedMappings.cs" />
-    <Compile Include="SharedSession\StorageSessionProvider.cs" />
     <Compile Include="SharedSession\TransportIntegrationFeature.cs" />
+    <Compile Include="SharedSession\SharedConnectionStorageSessionProvider.cs" />
     <Compile Include="Subscriptions\CachedSubscriptionPersister.cs" />
     <Compile Include="Subscriptions\NHibernateSubscriptionStorage.cs" />
     <Compile Include="Subscriptions\SubscriptionConfig.cs" />

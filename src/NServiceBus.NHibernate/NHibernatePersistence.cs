@@ -21,7 +21,7 @@
                 s.EnableFeatureByDefault<NHibernateDBConnectionProvider>();
                 s.EnableFeatureByDefault<NHibernateStorageSession>();
             });
-
+           
             Supports(Storage.GatewayDeduplication, s => s.EnableFeatureByDefault<NHibernateGatewayDeduplication>());
             Supports(Storage.Timeouts, s => s.EnableFeatureByDefault<NHibernateTimeoutStorage>());
             Supports(Storage.Sagas, s => s.EnableFeatureByDefault<NHibernateSagaStorage>());

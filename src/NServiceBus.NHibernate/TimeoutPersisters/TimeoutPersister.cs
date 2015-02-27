@@ -100,7 +100,7 @@ namespace NServiceBus.TimeoutPersisters.NHibernate
             {
                 using (var tx = session.BeginAmbientTransactionAware(IsolationLevel.ReadCommitted))
                 {
-                    session.Save(new TimeoutEntity
+                    session.SaveOrUpdate(new TimeoutEntity
                     {
                         Id = timeoutId,
                         Destination = timeout.Destination,

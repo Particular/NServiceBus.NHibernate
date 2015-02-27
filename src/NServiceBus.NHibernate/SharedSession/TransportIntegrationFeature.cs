@@ -1,6 +1,7 @@
 namespace NServiceBus.Features
 {
     using System;
+    using NServiceBus.Persistence.NHibernate;
 
     class TransportIntegrationFeature : Feature
     {
@@ -13,11 +14,11 @@ namespace NServiceBus.Features
 
         protected override void Setup(FeatureConfigurationContext context)
         {
-            if (context.Settings.GetOrDefault<bool>("Transactions.SuppressDistributedTransactions"))
+            if (context.Settings.GetOrDefault<bool>("Transactions.SuppressDistributedTransactions") 
+                && context.Container.HasComponent<SharedConnectionStorageSessionProvider>())
             {
-                throw new InvalidOperationException(@"In order for NHibernate persistence to work with SQLServer transport, ambient transactions need to be enabled. 
-Do not use busConfig.DisableDistributedTransactions(). 
-The transaction WILL NOT be escalated to a distrubuted transaction because SQLServer ADO.NET driver supports promotable enlistements and both NHibernate persistence and SQLServer transport will use the same connection.");
+                throw new InvalidOperationException(@"In order for NHibernate persistence to work with SQLServer transport, either ambient transactions or outbox need to be enabled. 
+In any cases, the transaction WILL NOT be escalated to a distrubuted transaction if transport, NServiceBus persistence and user persistence all use exactly the same connection string.");
             }
         }
     }
