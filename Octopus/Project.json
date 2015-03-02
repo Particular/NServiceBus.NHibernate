@@ -3,7 +3,8 @@
     "LibraryVariableSets-33",
     "LibraryVariableSets-36",
     "LibraryVariableSets-35",
-	"LibraryVariableSets-65"
+	"LibraryVariableSets-65",
+	"LibraryVariableSets-67"
   ],
   "DefaultToSkipIfAlreadyInstalled": false,
   "VersioningStrategy": {
@@ -14,4 +15,5 @@
   "Description": "",
   "IsDisabled": false,
   "ProjectGroupId": "ProjectGroups-99",
+  "LifecycleId": "lifecycle-ProjectGroups-99",
 }
