@@ -90,5 +90,10 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
         {
             return sessionFactory.OpenSession();
         }
+
+        public void ExecuteInTransaction(Action<ISession> operation)
+        {
+            operation(Session);
+        }
     }
 }
