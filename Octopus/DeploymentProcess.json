@@ -76,7 +76,7 @@
           ],
           "Properties": {
             "Octopus.Action.Manual.ResponsibleTeamIds": "teams-everyone",
-            "Octopus.Action.Manual.Instructions": "Please verify the draft release notes of NuGetPackager at https://github.com/Particular/NuGetPackager/releases"
+            "Octopus.Action.Manual.Instructions": "Please verify the draft release notes of %PROJECT_NAME% at https://github.com/Particular/%PROJECT_NAME%/releases"
           },
           "SensitiveProperties": {}
         }
