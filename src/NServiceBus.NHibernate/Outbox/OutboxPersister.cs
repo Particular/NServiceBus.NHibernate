@@ -12,6 +12,7 @@
     class OutboxPersister : IOutboxStorage
     {
         public IStorageSessionProvider StorageSessionProvider { get; set; }
+        public SessionFactoryProvider SessionFactoryProvider { get; set; }
 
         public bool TryGet(string messageId, out OutboxMessage message)
         {
@@ -19,9 +20,9 @@
 
             message = null;
 
-            using (var session = StorageSessionProvider.OpenStatelessSession())
+            using (var session = SessionFactoryProvider.SessionFactory.OpenStatelessSession())
             {
-                using (var tx = session.BeginAmbientTransactionAware(IsolationLevel.ReadCommitted))
+                using (var tx = session.BeginTransaction(IsolationLevel.ReadCommitted))
                 {
                     //Explicitly using ICriteria instead of QueryOver for performance reasons.
                     //It seems QueryOver uses quite a bit reflection and that takes longer.
@@ -66,7 +67,7 @@
 
         public void SetAsDispatched(string messageId)
         {
-            using (var session = StorageSessionProvider.OpenStatelessSession())
+            using (var session = SessionFactoryProvider.SessionFactory.OpenStatelessSession())
             {
                 using (var tx = session.BeginTransaction(IsolationLevel.ReadCommitted))
                 {
@@ -84,7 +85,7 @@
 
         public void RemoveEntriesOlderThan(DateTime dateTime)
         {
-            using (var session = StorageSessionProvider.OpenSession())
+            using (var session = SessionFactoryProvider.SessionFactory.OpenStatelessSession())
             {
                 using (var tx = session.BeginTransaction(IsolationLevel.ReadCommitted))
                 {

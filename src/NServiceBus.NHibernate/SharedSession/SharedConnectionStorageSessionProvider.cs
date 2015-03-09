@@ -1,7 +1,6 @@
 namespace NServiceBus.Persistence.NHibernate
 {
     using System;
-    using System.Data;
     using global::NHibernate;
     using Outbox;
     using Pipeline;
@@ -29,30 +28,6 @@ namespace NServiceBus.Persistence.NHibernate
 
                 return existingSession.Value;
             }
-        }
-
-        public IStatelessSession OpenStatelessSession()
-        {
-            IDbConnection connection;
-
-            if (DbConnectionProvider.TryGetConnection(out connection, ConnectionString))
-            {
-                return SessionFactoryProvider.SessionFactory.OpenStatelessSession(connection);
-            }
-
-            return SessionFactoryProvider.SessionFactory.OpenStatelessSession();
-        }
-
-        public ISession OpenSession()
-        {
-            IDbConnection connection;
-
-            if (DbConnectionProvider.TryGetConnection(out connection, ConnectionString))
-            {
-                return SessionFactoryProvider.SessionFactory.OpenSession(connection);
-            }
-
-            return SessionFactoryProvider.SessionFactory.OpenSession();
         }
 
         public void ExecuteInTransaction(Action<ISession> operation)

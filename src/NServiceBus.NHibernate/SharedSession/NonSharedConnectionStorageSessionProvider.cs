@@ -12,16 +12,6 @@ namespace NServiceBus.Persistence.NHibernate
             this.sessionFactoryProvider = sessionFactoryProvider;
         }
 
-        public IStatelessSession OpenStatelessSession()
-        {
-            return sessionFactoryProvider.SessionFactory.OpenStatelessSession();
-        }
-
-        public ISession OpenSession()
-        {
-            return sessionFactoryProvider.SessionFactory.OpenSession();
-        }
-
         public void ExecuteInTransaction(Action<ISession> operation)
         {
             using (var session = sessionFactoryProvider.SessionFactory.OpenSession())

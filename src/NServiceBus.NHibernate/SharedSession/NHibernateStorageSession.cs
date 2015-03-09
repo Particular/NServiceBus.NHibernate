@@ -1,7 +1,6 @@
 namespace NServiceBus.Features
 {
     using NHibernate.Cfg;
-    using NServiceBus.Outbox;
     using Persistence.NHibernate;
     using Pipeline;
     using Environment = NHibernate.Cfg.Environment;
@@ -13,7 +12,12 @@ namespace NServiceBus.Features
     {
         internal NHibernateStorageSession()
         {
-            Defaults(s => s.SetDefault<SharedMappings>(new SharedMappings()));
+            Defaults(s =>
+            {
+                //By default we share the connection between Outbox store and Saga store and we also expose is it as NHibernateStorageContext
+                s.SetDefault("NHibernate.Common.ShareConnection", true);
+                s.SetDefault<SharedMappings>(new SharedMappings());
+            });
             
             DependsOn<NHibernateDBConnectionProvider>();
             DependsOnAtLeastOne(typeof(NHibernateSagaStorage), typeof(NHibernateOutboxStorage));
@@ -53,13 +57,7 @@ namespace NServiceBus.Features
 
             context.Container.RegisterSingleton(new SessionFactoryProvider(configuration.BuildSessionFactory()));
 
-            //When outbox is enbaled, do not share transport connection.
-            if (context.Container.HasComponent<OutboxPersister>())
-            {
-                context.Container.ConfigureComponent<NonSharedConnectionStorageSessionProvider>(DependencyLifecycle.SingleInstance);
-                context.Container.ConfigureProperty<DbConnectionProvider>(p => p.DisableConnectionSharing, true);
-            }
-            else
+            if (context.Settings.Get<bool>("NHibernate.Common.ShareConnection"))
             {
                 context.Pipeline.Register<OpenSqlConnectionBehavior.Registration>();
                 context.Pipeline.Register<OpenSessionBehavior.Registration>();
@@ -74,6 +72,11 @@ namespace NServiceBus.Features
                 context.Container.ConfigureComponent(b => new NHibernateStorageContext(b.Build<PipelineExecutor>(), connString), DependencyLifecycle.InstancePerUnitOfWork);
                 context.Container.ConfigureComponent<SharedConnectionStorageSessionProvider>(DependencyLifecycle.SingleInstance)
                     .ConfigureProperty(p => p.ConnectionString, connString);
+            }
+            else
+            {
+                context.Container.ConfigureComponent<NonSharedConnectionStorageSessionProvider>(DependencyLifecycle.SingleInstance);
+                context.Container.ConfigureProperty<DbConnectionProvider>(p => p.DisableConnectionSharing, true);
             }
 
             Installer.RunInstaller = context.Settings.Get<bool>("NHibernate.Common.AutoUpdateSchema");
