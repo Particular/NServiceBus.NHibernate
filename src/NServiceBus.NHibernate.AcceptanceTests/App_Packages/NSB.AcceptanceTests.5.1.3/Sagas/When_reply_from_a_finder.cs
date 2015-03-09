@@ -18,7 +18,7 @@
             };
 
             Scenario.Define(context)
-                .WithEndpoint<SagaEndpoint>(b => b.Given(bus => bus.SendLocal(new StartSagaMessage
+                .WithEndpoint<Endpoint>(b => b.Given(bus => bus.SendLocal(new StartSagaMessage
                                                                               {
                                                                                   Id = context.Id
                                                                               })))
@@ -34,9 +34,9 @@
             public Guid Id { get; set; }
         }
 
-        public class SagaEndpoint : EndpointConfigurationBuilder
+        public class Endpoint : EndpointConfigurationBuilder
         {
-            public SagaEndpoint()
+            public Endpoint()
             {
                 EndpointSetup<DefaultServer>();
             }
