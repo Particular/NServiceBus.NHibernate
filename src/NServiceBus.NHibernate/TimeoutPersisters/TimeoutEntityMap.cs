@@ -4,7 +4,6 @@ namespace NServiceBus.TimeoutPersisters.NHibernate.Config
     using global::NHibernate;
     using global::NHibernate.Mapping.ByCode;
     using global::NHibernate.Mapping.ByCode.Conformist;
-    using Persistence.NHibernate;
 
     /// <summary>
     /// Timeout entity map class
@@ -24,7 +23,6 @@ namespace NServiceBus.TimeoutPersisters.NHibernate.Config
             });
             Property(p => p.Destination, pm =>
             {
-                pm.Type<AddressUserType>();
                 pm.Length(1024);
             });
             Property(p => p.SagaId, pm => pm.Index("TimeoutEntity_SagaIdIdx"));
@@ -37,4 +35,6 @@ namespace NServiceBus.TimeoutPersisters.NHibernate.Config
             });
         }
     }
+
+    
 }

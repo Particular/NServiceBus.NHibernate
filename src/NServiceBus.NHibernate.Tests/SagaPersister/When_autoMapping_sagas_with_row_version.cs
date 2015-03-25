@@ -1,11 +1,8 @@
 namespace NServiceBus.SagaPersisters.NHibernate.Tests
 {
-    using Features;
+    using System.Threading.Tasks;
     using global::NHibernate;
-    using global::NHibernate.Cfg;
     using NUnit.Framework;
-    using Saga;
-    using Settings;
 
     [TestFixture]
     public class When_autoMapping_sagas_with_row_version
@@ -13,14 +10,14 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
         [Test]
         public void Should_throw_if_class_is_derived()
         {
-            var builder = new NHibernateSagaStorage();
-            var properties = SQLiteConfiguration.InMemory();
-
-            var configuration = new Configuration().AddProperties(properties);
-            var settings = new SettingsHolder();
-            settings.Set("TypesToScan", new[] { typeof(MyDerivedClassWithRowVersion) });
-            
-            Assert.Throws<MappingException>(() => builder.ApplyMappings(settings, configuration));
+            Assert.Throws<MappingException>(() =>
+            {
+                SessionFactoryHelper.Build(new[]
+                {
+                    typeof(MyDerivedClassWithRowVersionSaga),
+                    typeof(MyDerivedClassWithRowVersion)
+                });
+            });
         }
     }
 
@@ -28,5 +25,17 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
     {
         [RowVersion]
         public virtual byte[] MyVersion { get; set; }
+    }
+
+    public class MyDerivedClassWithRowVersionSaga : Saga<MyDerivedClassWithRowVersion>, IAmStartedByMessages<IMessage>
+    {
+        protected override void ConfigureHowToFindSaga(SagaPropertyMapper<MyDerivedClassWithRowVersion> mapper)
+        {
+        }
+
+        public Task Handle(IMessage message, IMessageHandlerContext context)
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }

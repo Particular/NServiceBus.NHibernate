@@ -1,6 +1,8 @@
 namespace NServiceBus.Features
 {
     using Deduplication.NHibernate.Config;
+    using Deduplication.NHibernate;
+    using Deduplication.NHibernate.Installer;
     using Persistence.NHibernate;
 
     /// <summary>
@@ -25,12 +27,10 @@ namespace NServiceBus.Features
             builder.AddMappings<DeduplicationMessageMap>();
             var config = builder.Build();
 
-            context.Container.ConfigureComponent<Deduplication.NHibernate.Installer.Installer>(DependencyLifecycle.SingleInstance)
-                .ConfigureProperty(x => x.Configuration, config.Configuration)
-                .ConfigureProperty(x => x.RunInstaller, RunInstaller(context));
+            context.Container.ConfigureComponent<Installer>(DependencyLifecycle.SingleInstance)
+                .ConfigureProperty(x => x.Configuration, RunInstaller(context) ? new Installer.ConfigWrapper(config.Configuration) : null);
 
-            context.Container.ConfigureComponent<Deduplication.NHibernate.GatewayDeduplication>(DependencyLifecycle.SingleInstance)
-                .ConfigureProperty(p => p.SessionFactory, config.Configuration.BuildSessionFactory());
+            context.Container.ConfigureComponent(b => new GatewayDeduplication(config.Configuration.BuildSessionFactory()), DependencyLifecycle.SingleInstance);
         }
 
         static bool RunInstaller(FeatureConfigurationContext context)

@@ -1,19 +1,23 @@
 ﻿namespace Runner.Saga
 {
+    using System.Threading.Tasks;
     using NServiceBus;
-    using NServiceBus.Saga;
 
     class TestSaga : Saga<SagaData>, IAmStartedByMessages<StartSagaMessage>, IHandleMessages<CompleteSagaMessage>
     {
-        public void Handle(StartSagaMessage message)
+        public Task Handle(StartSagaMessage message, IMessageHandlerContext context)
         {
             Data.Number = message.Id;
             Data.NumCalls++;
+
+            return Task.FromResult(0);
         }
 
-        public void Handle(CompleteSagaMessage message)
+        public Task Handle(CompleteSagaMessage message, IMessageHandlerContext context)
         {
             MarkAsComplete();
+
+            return Task.FromResult(0);
         }
 
         protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaData> mapper)

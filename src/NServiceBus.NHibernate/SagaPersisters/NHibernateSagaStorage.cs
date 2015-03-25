@@ -3,6 +3,7 @@ namespace NServiceBus.Features
     using System;
     using System.Linq;
     using NHibernate.Cfg;
+    using NServiceBus.Sagas;
     using SagaPersisters.NHibernate;
     using SagaPersisters.NHibernate.AutoPersistence;
     using Settings;
@@ -26,9 +27,9 @@ namespace NServiceBus.Features
         protected override void Setup(FeatureConfigurationContext context)
         {
             context.Settings.Get<SharedMappings>()
-                .AddMapping(c => ApplyMappings(context.Settings,c));
+                .AddMapping(configuration => ApplyMappings(context.Settings, configuration));
 
-            context.Container.ConfigureComponent<SagaPersister>(DependencyLifecycle.InstancePerCall);
+            context.Container.ConfigureComponent<SagaPersister>(DependencyLifecycle.SingleInstance);
         }
 
         internal void ApplyMappings(ReadOnlySettings settings, Configuration configuration)
@@ -42,15 +43,16 @@ namespace NServiceBus.Features
                 configuration.AddAssembly(assembly);
             }
 
+            var allSagaMetadata = settings.Get<SagaMetadataCollection>();
             var types = settings.GetAvailableTypes().Except(configuration.ClassMappings.Select(x => x.MappedClass));
             SagaModelMapper modelMapper;
             if (tableNamingConvention == null)
             {
-                modelMapper = new SagaModelMapper(types);
+                modelMapper = new SagaModelMapper(allSagaMetadata, types);
             }
             else
             {
-                modelMapper = new SagaModelMapper(types, tableNamingConvention);
+                modelMapper = new SagaModelMapper(allSagaMetadata, types, tableNamingConvention);
             }
 
             configuration.AddMapping(modelMapper.Compile());

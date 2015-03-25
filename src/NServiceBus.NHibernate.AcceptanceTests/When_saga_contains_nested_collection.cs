@@ -2,32 +2,32 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Threading.Tasks;
     using EndpointTemplates;
     using AcceptanceTesting;
     using NUnit.Framework;
-    using Saga;
     using ScenarioDescriptors;
 
     public class When_saga_contains_nested_collection : NServiceBusAcceptanceTest
     {
         [Test]
-        public void Should_persist_correctly()
+        public async Task Should_persist_correctly()
         {
-            Scenario.Define(() => new Context {Id = Guid.NewGuid()})
-                      .WithEndpoint<SagaEndpoint>(b => b.Given((bus, context) =>
+            await Scenario.Define<Context>(c => c.Id = Guid.NewGuid())
+                      .WithEndpoint<NHNestedCollectionEndpoint>(b => b.When(async (bus, context) =>
                       {
-                          bus.SendLocal(new Message1
+                          await bus.SendLocal(new Message1
                           {
                               SomeId = context.Id
-                          });
-                          bus.SendLocal(new Message2
+                          }).ConfigureAwait(false);
+                          await bus.SendLocal(new Message2
                           {
                               SomeId = context.Id
-                          });
-                          bus.SendLocal(new Message3
+                          }).ConfigureAwait(false);
+                          await bus.SendLocal(new Message3
                           {
                               SomeId = context.Id
-                          });
+                          }).ConfigureAwait(false);
                       }))
                     .Done(c => c.SagaCompleted)
                     .Repeat(r => r.For(Transports.Default))
@@ -40,57 +40,58 @@
             public bool SagaCompleted { get; set; }
         }
 
-        public class SagaEndpoint : EndpointConfigurationBuilder
+        public class NHNestedCollectionEndpoint : EndpointConfigurationBuilder
         {
-            public SagaEndpoint()
+            public NHNestedCollectionEndpoint()
             {
-                EndpointSetup<DefaultServer>();
+                EndpointSetup<DefaultServer>(c => c.LimitMessageProcessingConcurrencyTo(1));
             }
 
-            public class TestSaga : Saga<TestSagaData>, IAmStartedByMessages<Message2>, IAmStartedByMessages<Message3>, IAmStartedByMessages<Message1>
+            public class NHNestedCollectionSaga : Saga<NHNestedCollectionSagaData>, IAmStartedByMessages<Message2>, IAmStartedByMessages<Message3>, IAmStartedByMessages<Message1>
             {
-                protected override void ConfigureHowToFindSaga(SagaPropertyMapper<TestSagaData> mapper)
+                protected override void ConfigureHowToFindSaga(SagaPropertyMapper<NHNestedCollectionSagaData> mapper)
                 {
                     mapper.ConfigureMapping<Message2>(m => m.SomeId).ToSaga(s => s.SomeId);
                     mapper.ConfigureMapping<Message3>(m => m.SomeId).ToSaga(s => s.SomeId);
                     mapper.ConfigureMapping<Message1>(m => m.SomeId).ToSaga(s => s.SomeId);
                 }
 
-                void PerformSagaCompletionCheck()
+                Task PerformSagaCompletionCheck(IMessageHandlerContext context)
                 {
                     if (Data.RelatedData == null)
                     Data.RelatedData = new List<ChildData>
                                        {
-                                           new ChildData{TestSagaData = Data},
-                                           new ChildData{TestSagaData = Data},
-                                           new ChildData{TestSagaData = Data}
+                                           new ChildData{NhNestedCollectionSagaData = Data},
+                                           new ChildData{NhNestedCollectionSagaData = Data},
+                                           new ChildData{NhNestedCollectionSagaData = Data}
                                        };
                     if (Data.MessageOneReceived && Data.MessageTwoReceived && Data.MessageThreeReceived)
                     {
                         MarkAsComplete();
-                        Bus.SendLocal(new SagaCompleted());
+                        return context.SendLocal(new SagaCompleted());
                     }
+                    return Task.FromResult(0);
                 }
 
-                public void Handle(Message1 message)
+                public Task Handle(Message1 message, IMessageHandlerContext context)
                 {
                     Data.SomeId = message.SomeId;
                     Data.MessageOneReceived = true;
-                    PerformSagaCompletionCheck();
+                    return PerformSagaCompletionCheck(context);
                 }
 
-                public void Handle(Message2 message)
+                public Task Handle(Message2 message, IMessageHandlerContext context)
                 {
                     Data.SomeId = message.SomeId;
                     Data.MessageTwoReceived = true;
-                    PerformSagaCompletionCheck();
+                    return PerformSagaCompletionCheck(context);
                 }
 
-                public void Handle(Message3 message)
+                public Task Handle(Message3 message, IMessageHandlerContext context)
                 {
                     Data.SomeId = message.SomeId;
                     Data.MessageThreeReceived = true;
-                    PerformSagaCompletionCheck();
+                    return PerformSagaCompletionCheck(context);
                 }
             }
 
@@ -99,17 +100,18 @@
         {
             public Context Context { get; set; }
 
-            public void Handle(SagaCompleted message)
+            public Task Handle(SagaCompleted message, IMessageHandlerContext context)
             {
                 Context.SagaCompleted = true;
+
+                return Task.FromResult(0);
             }
         }
-        public class TestSagaData : IContainSagaData
+        public class NHNestedCollectionSagaData : IContainSagaData
         {
             public virtual Guid Id { get; set; }
             public virtual string Originator { get; set; }
             public virtual string OriginalMessageId { get; set; }
-            [Unique]
             public virtual Guid SomeId { get; set; }
             public virtual bool MessageTwoReceived { get; set; }
             public virtual bool MessageOneReceived { get; set; }
@@ -138,7 +140,7 @@
         public class ChildData
         {
             public virtual Guid Id { get; set; }
-            public virtual TestSagaData TestSagaData { get; set; }
+            public virtual NHNestedCollectionSagaData NhNestedCollectionSagaData { get; set; }
         }
 
         [Serializable]

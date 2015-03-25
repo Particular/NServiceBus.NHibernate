@@ -3,6 +3,7 @@
     using System;
     using System.Configuration;
     using System.Diagnostics;
+    using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
     using System.Transactions;
@@ -47,7 +48,7 @@
 
             var config = new BusConfiguration();
             config.EndpointName(endpointName);
-            config.UseTransport<MsmqTransport>();
+            config.UseTransport<MsmqTransport>().Transactions(suppressDTC ? TransportTransactionMode.SendsAtomicWithReceive : TransportTransactionMode.TransactionScope);
             config.EnableInstallers();
 
             switch (args[2].ToLower())
@@ -58,14 +59,6 @@
 
                 case "json":
                     config.UseSerialization<JsonSerializer>();
-                    break;
-
-                case "bson":
-                    config.UseSerialization<BsonSerializer>();
-                    break;
-
-                case "bin":
-                    config.UseSerialization<BinarySerializer>();
                     break;
 
                 default:
@@ -79,50 +72,69 @@
                     new ConnectionStringSettings("NServiceBus/Persistence", SqlServerConnectionString)
                 };
 
-
             config.UsePersistence<NHibernatePersistence>();
-
-            if (suppressDTC)
-            {
-                config.Transactions().DisableDistributedTransactions();
-            }
-
             if (outbox)
             {
                 config.EnableOutbox();
             }
 
-            config.DiscardFailedMessagesInsteadOfSendingToErrorQueue();
-
-            using (var startableBus = Bus.Create(config))
+            config.RunWhenEndpointStartsAndStops(new Loader(async session =>
             {
                 if (saga)
                 {
-                    SeedSagaMessages(startableBus,numberOfMessages, endpointName, concurrency);
+                    await SeedSagaMessages(session, numberOfMessages, endpointName, concurrency).ConfigureAwait(false);
                 }
                 else if (publish)
                 {
-                    Statistics.PublishTimeNoTx = PublishEvents(startableBus,numberOfMessages / 2, numberOfThreads, false);
-                    Statistics.PublishTimeWithTx = PublishEvents(startableBus,numberOfMessages / 2, numberOfThreads, !outbox);
+                    Statistics.PublishTimeNoTx = await PublishEvents(session, numberOfMessages / 2, numberOfThreads, false).ConfigureAwait(false);
+                    Statistics.PublishTimeWithTx = await PublishEvents(session, numberOfMessages / 2, numberOfThreads, !outbox).ConfigureAwait(false);
                 }
                 else
                 {
-                    Statistics.SendTimeNoTx = SeedInputQueue(startableBus,numberOfMessages / 2, endpointName, numberOfThreads, false, twoPhaseCommit);
-                    Statistics.SendTimeWithTx = SeedInputQueue(startableBus,numberOfMessages / 2, endpointName, numberOfThreads, !outbox, twoPhaseCommit);
+                    Statistics.SendTimeNoTx = await SeedInputQueue(session, numberOfMessages / 2, endpointName, numberOfThreads, false, twoPhaseCommit).ConfigureAwait(false);
+                    Statistics.SendTimeWithTx = await SeedInputQueue(session, numberOfMessages / 2, endpointName, numberOfThreads, !outbox, twoPhaseCommit).ConfigureAwait(false);
                 }
+                }));
 
-                Statistics.StartTime = DateTime.Now;
+                PerformTest(args, config, saga, numberOfMessages, endpointName, concurrency, publish, numberOfThreads, outbox, twoPhaseCommit).GetAwaiter().GetResult();
+        }
 
-                startableBus.Start();
+        class Loader : IWantToRunWhenBusStartsAndStops
+        {
+            Func<IBusSession, Task> loadAction;
 
-                while (Interlocked.Read(ref Statistics.NumberOfMessages) < numberOfMessages)
-                {
-                    Thread.Sleep(1000);
-                }
-
-                DumpSetting(args);
-                Statistics.Dump();
+            public Loader(Func<IBusSession, Task> loadAction)
+            {
+                this.loadAction = loadAction;
             }
+
+            public Task Start(IBusSession session)
+            {
+                return loadAction(session);
+            }
+
+            public Task Stop(IBusSession session)
+            {
+                return Task.FromResult(0);
+            }
+        }
+
+        static async Task PerformTest(string[] args, BusConfiguration config, bool saga, int numberOfMessages, string endpointName, int concurrency, bool publish, int numberOfThreads, bool outbox, bool twoPhaseCommit)
+        {
+            var startableBus = await Endpoint.Create(config).ConfigureAwait(false);
+
+
+            Statistics.StartTime = DateTime.Now;
+
+            await startableBus.Start().ConfigureAwait(false);
+
+            while (Interlocked.Read(ref Statistics.NumberOfMessages) < numberOfMessages)
+            {
+                Thread.Sleep(1000);
+            }
+
+            DumpSetting(args);
+            Statistics.Dump();
         }
 
 
@@ -136,86 +148,79 @@
                 args[5]);
         }
 
-        static void SeedSagaMessages(IBus bus, int numberOfMessages, string inputQueue, int concurrency)
+        static async Task SeedSagaMessages(IBusSession bus, int numberOfMessages, string inputQueue, int concurrency)
         {
-            for (var i = 0; i < numberOfMessages/concurrency; i++)
+            for (var i = 0; i < numberOfMessages / concurrency; i++)
             {
                 for (var j = 0; j < concurrency; j++)
                 {
-                    bus.Send(inputQueue, new StartSagaMessage
+                    await bus.Send(inputQueue, new StartSagaMessage
                     {
                         Id = i
-                    });
+                    }).ConfigureAwait(false);
                 }
             }
         }
 
-        static TimeSpan SeedInputQueue(IBus bus,int numberOfMessages, string inputQueue, int numberOfThreads, bool createTransaction, bool twoPhaseCommit)
+        static async Task<TimeSpan> SeedInputQueue(IBusSession bus, int numberOfMessages, string inputQueue, int numberOfThreads, bool createTransaction, bool twoPhaseCommit)
         {
             var sw = new Stopwatch();
-           
             sw.Start();
-            Parallel.For(
-                0,
-                numberOfMessages,
-                new ParallelOptions
-                {
-                    MaxDegreeOfParallelism = numberOfThreads
-                },
-                x =>
+            var tasks = Enumerable.Range(0, numberOfThreads)
+                .Select(i => Task.Factory.StartNew( async () =>
+            {
+                for (var j = 0; j < numberOfMessages/numberOfThreads; i++)
                 {
                     var message = CreateMessage();
                     message.TwoPhaseCommit = twoPhaseCommit;
-                    message.Id = x;
+                    message.Id = j;
 
                     if (createTransaction)
                     {
                         using (var tx = new TransactionScope())
                         {
-                            bus.Send(inputQueue, message);
+                            await bus.Send(inputQueue, message).ConfigureAwait(false);
                             tx.Complete();
                         }
                     }
                     else
                     {
-                        bus.Send(inputQueue, message);
+                        await bus.Send(inputQueue, message).ConfigureAwait(false);
                     }
-                });
-            sw.Stop();
+                }   
+            }, CancellationToken.None, TaskCreationOptions.LongRunning, TaskScheduler.Default)).ToArray();
 
+            await Task.WhenAll(tasks).ConfigureAwait(false);
+            sw.Stop();
             return sw.Elapsed;
         }
 
-        static TimeSpan PublishEvents(IBus bus, int numberOfMessages, int numberOfThreads, bool createTransaction)
+        static async Task<TimeSpan> PublishEvents(IBusSession bus, int numberOfMessages, int numberOfThreads, bool createTransaction)
         {
             var sw = new Stopwatch();
-            
             sw.Start();
-            Parallel.For(
-                0,
-                numberOfMessages,
-                new ParallelOptions
+            var tasks = Enumerable.Range(0, numberOfThreads)
+                .Select(i => Task.Factory.StartNew(async () =>
                 {
-                    MaxDegreeOfParallelism = numberOfThreads
-                },
-                x =>
-                {
-                    if (createTransaction)
+                    for (var j = 0; j < numberOfMessages/numberOfThreads; i++)
                     {
-                        using (var tx = new TransactionScope())
+                        if (createTransaction)
                         {
-                            bus.Publish<TestEvent>();
-                            tx.Complete();
+                            using (var tx = new TransactionScope())
+                            {
+                                await bus.Publish<TestEvent>().ConfigureAwait(false);
+                                tx.Complete();
+                            }
                         }
+                        else
+                        {
+                            await bus.Publish<TestEvent>().ConfigureAwait(false);
+                        }
+                        Interlocked.Increment(ref Statistics.NumberOfMessages);
                     }
-                    else
-                    {
-                        bus.Publish<TestEvent>();
-                    }
-                    Interlocked.Increment(ref Statistics.NumberOfMessages);
-                });
+                }, CancellationToken.None, TaskCreationOptions.LongRunning, TaskScheduler.Default)).ToArray();
+            await Task.WhenAll(tasks).ConfigureAwait(false);
             sw.Stop();
-
             return sw.Elapsed;
         }
 

@@ -3,6 +3,7 @@ namespace NServiceBus.Features
     using Persistence.NHibernate;
     using TimeoutPersisters.NHibernate;
     using TimeoutPersisters.NHibernate.Config;
+    using TimeoutPersisters.NHibernate.Installer;
 
     /// <summary>
     /// NHibernate Timeout Storage.
@@ -15,7 +16,6 @@ namespace NServiceBus.Features
         public NHibernateTimeoutStorage()
         {
             DependsOn<TimeoutManager>();
-            DependsOn<NHibernateDBConnectionProvider>();
         }
 
         /// <summary>
@@ -27,14 +27,10 @@ namespace NServiceBus.Features
             builder.AddMappings<TimeoutEntityMap>();
             var config = builder.Build();
 
-            context.Container.ConfigureComponent<TimeoutPersisters.NHibernate.Installer.Installer>(DependencyLifecycle.SingleInstance)
-                .ConfigureProperty(x => x.Configuration, config.Configuration)
-                .ConfigureProperty(x => x.RunInstaller, RunInstaller(context));
+            context.Container.ConfigureComponent<Installer>(DependencyLifecycle.SingleInstance)
+                .ConfigureProperty(x => x.Configuration, RunInstaller(context) ? new Installer.ConfigWrapper(config.Configuration) : null);
 
-            context.Container.ConfigureComponent<TimeoutPersister>(DependencyLifecycle.SingleInstance)
-                .ConfigureProperty(p => p.ConnectionString, config.ConnectionString)
-                .ConfigureProperty(p => p.SessionFactory, config.Configuration.BuildSessionFactory())
-                .ConfigureProperty(p => p.EndpointName, context.Settings.EndpointName());
+            context.Container.ConfigureComponent(b => new TimeoutPersister(context.Settings.EndpointName().ToString(), config.Configuration.BuildSessionFactory()), DependencyLifecycle.SingleInstance);
         }
 
         static bool RunInstaller(FeatureConfigurationContext context)

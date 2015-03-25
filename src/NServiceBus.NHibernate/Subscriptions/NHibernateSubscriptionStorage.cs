@@ -5,18 +5,22 @@ namespace NServiceBus.Features
     using Unicast.Subscriptions.MessageDrivenSubscriptions;
     using Unicast.Subscriptions.NHibernate;
     using Unicast.Subscriptions.NHibernate.Config;
+    using Unicast.Subscriptions.NHibernate.Installer;
 
     /// <summary>
     /// NHibernate Subscription Storage
     /// </summary>
-    public class NHibernateSubscriptionStorage : Feature
+    class NHibernateSubscriptionStorage : Feature
     {
+        public static readonly string CacheExpirationSettingsKey = "NHibernate.Subscriptions.CacheExpiration";
+        public static readonly string AutoupdateschemaSettingsKey = "NHibernate.Subscriptions.AutoUpdateSchema";
+
         /// <summary>
         /// Creates an instance of <see cref="NHibernateSubscriptionStorage"/>.
         /// </summary>
         public NHibernateSubscriptionStorage()
         {
-            DependsOn<StorageDrivenPublishing>();
+            DependsOn<MessageDrivenSubscriptions>();
         }
 
         /// <summary>
@@ -28,28 +32,26 @@ namespace NServiceBus.Features
             builder.AddMappings<SubscriptionMap>();
             var config = builder.Build();
 
-            context.Container.ConfigureComponent<Unicast.Subscriptions.NHibernate.Installer.Installer>(DependencyLifecycle.SingleInstance)
-                .ConfigureProperty(x => x.Configuration, config.Configuration)
-                .ConfigureProperty(x => x.RunInstaller, RunInstaller(context));
+            context.Container.ConfigureComponent<Installer>(DependencyLifecycle.SingleInstance)
+                .ConfigureProperty(x => x.Configuration, RunInstaller(context) ? new Installer.ConfigWrapper(config.Configuration) : null);
 
-            var sessionSource = new SubscriptionStorageSessionProvider(config.Configuration.BuildSessionFactory());
-
-            context.Container.RegisterSingleton(sessionSource);
-
-            if (context.Settings.HasSetting("NHibernate.Subscriptions.CacheExpiration"))
+            var sessionFactory = config.Configuration.BuildSessionFactory();
+            if (context.Settings.HasSetting(CacheExpirationSettingsKey))
             {
-                context.Container.RegisterSingleton<ISubscriptionStorage>(new CachedSubscriptionPersister(sessionSource, context.Settings.Get<TimeSpan>("NHibernate.Subscriptions.CacheExpiration")));
+                var persister = new CachedSubscriptionPersister(sessionFactory, context.Settings.Get<TimeSpan>(CacheExpirationSettingsKey));
+                context.Container.RegisterSingleton<ISubscriptionStorage>(persister);
             }
             else
             {
-                context.Container.ConfigureComponent<SubscriptionPersister>(DependencyLifecycle.InstancePerCall);
+                var persister = new SubscriptionPersister(sessionFactory);
+                context.Container.RegisterSingleton<ISubscriptionStorage>(persister);
             }
         }
 
         static bool RunInstaller(FeatureConfigurationContext context)
         {
-            return context.Settings.Get<bool>(context.Settings.HasSetting("NHibernate.Subscriptions.AutoUpdateSchema")
-                ? "NHibernate.Subscriptions.AutoUpdateSchema"
+            return context.Settings.Get<bool>(context.Settings.HasSetting(AutoupdateschemaSettingsKey)
+                ? AutoupdateschemaSettingsKey
                 : "NHibernate.Common.AutoUpdateSchema");
         }
     }

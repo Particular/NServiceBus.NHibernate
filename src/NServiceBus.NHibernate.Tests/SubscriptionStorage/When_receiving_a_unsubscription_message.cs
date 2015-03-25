@@ -1,29 +1,20 @@
 namespace NServiceBus.Unicast.Subscriptions.NHibernate.Tests
 {
-    using System.Transactions;
+    using System.Threading.Tasks;
+    using NServiceBus.Extensibility;
     using NUnit.Framework;
 
     [TestFixture]
     class When_receiving_a_unsubscribe_message : InMemoryDBFixture
     {
         [Test]
-        public void All_subscription_entries_for_specified_message_types_should_be_removed()
+        public async Task All_subscription_entries_for_specified_message_types_should_be_removed()
         {
-            using (var transaction = new TransactionScope())
-            {
-                storage.Subscribe(TestClients.ClientA, MessageTypes.All);
-                transaction.Complete();
-            }
+            await storage.Subscribe(TestClients.ClientA, MessageTypes.All, new ContextBag()).ConfigureAwait(false);
 
+            await storage.Unsubscribe(TestClients.ClientA, MessageTypes.All, new ContextBag()).ConfigureAwait(false);
 
-            using (var transaction = new TransactionScope())
-            {
-                storage.Unsubscribe(TestClients.ClientA, MessageTypes.All);
-                transaction.Complete();
-            }
-
-
-            using (var session = subscriptionStorageSessionProvider.OpenSession())
+            using (var session = SessionFactory.OpenSession())
             {
                 var subscriptions = session.CreateCriteria(typeof(Subscription)).List<Subscription>();
                 Assert.AreEqual(subscriptions.Count, 0);

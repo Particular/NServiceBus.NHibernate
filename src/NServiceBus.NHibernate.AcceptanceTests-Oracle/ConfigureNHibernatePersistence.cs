@@ -5,7 +5,6 @@ using System.Text;
 using NServiceBus;
 using NServiceBus.Persistence;
 using NServiceBus.Persistence.NHibernate;
-using NServiceBus.Saga;
 
 public class ConfigureNHibernatePersistence
 {
@@ -29,6 +28,10 @@ public class ConfigureNHibernatePersistence
 
                 return tablename;
             });
+    }
+
+    public void Cleanup()
+    {
     }
 
     static string Create(params object[] data)

@@ -2,6 +2,7 @@
 {
     using System;
     using System.Threading;
+    using System.Threading.Tasks;
     using System.Transactions;
 
     using NServiceBus;
@@ -10,7 +11,7 @@
     {
         private static TwoPhaseCommitEnlistment enlistment = new TwoPhaseCommitEnlistment();
 
-        public void Handle(TestMessage message)
+        public Task Handle(TestMessage message, IMessageHandlerContext context)
         {
             if (!Statistics.First.HasValue)
             {
@@ -24,6 +25,8 @@
             }
 
             Statistics.Last = DateTime.Now;
+
+            return Task.FromResult(0);
         }
     }
 }

@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>NServiceBus.NHibernate.Tests</RootNamespace>
     <AssemblyName>NServiceBus.NHibernate.Tests</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
     <AssemblyOriginatorKeyFile>..\NServiceBus.snk</AssemblyOriginatorKeyFile>
@@ -49,8 +49,8 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\NHibernate.4.0.3.4000\lib\net40\NHibernate.dll</HintPath>
     </Reference>
-    <Reference Include="NServiceBus.Core, Version=5.0.0.0, Culture=neutral, PublicKeyToken=9fc386479f8a226c, processorArchitecture=MSIL">
-      <HintPath>..\packages\NServiceBus.5.0.6\lib\net45\NServiceBus.Core.dll</HintPath>
+    <Reference Include="NServiceBus.Core, Version=6.0.0.0, Culture=neutral, PublicKeyToken=9fc386479f8a226c, processorArchitecture=MSIL">
+      <HintPath>..\packages\NServiceBus.6.0.0-unstable1362\lib\net452\NServiceBus.Core.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="nunit.framework, Version=2.6.3.13283, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
@@ -81,14 +81,13 @@
     <Compile Include="SagaPersister\MySaga.cs" />
     <Compile Include="SagaPersister\SessionFactoryHelper.cs" />
     <Compile Include="SagaPersister\SQLiteConfiguration.cs" />
-    <Compile Include="SagaPersister\TestSaga.cs" />
+    <Compile Include="SagaPersister\TestSagaData.cs" />
     <Compile Include="SagaPersister\When_automapping_sagas.cs" />
     <Compile Include="SagaPersister\When_automapping_sagas_with_abstract_base_class.cs" />
     <Compile Include="SagaPersister\When_automapping_sagas_with_nested_types.cs" />
     <Compile Include="SagaPersister\When_autoMapping_sagas_with_row_version.cs" />
     <Compile Include="SagaPersister\When_building_the_sessionfactory.cs" />
     <Compile Include="SagaPersister\When_persisting_a_saga_with_a_unique_property.cs" />
-    <Compile Include="SagaPersister\When_persisting_sagas_on_transactional_endpoints.cs" />
     <Compile Include="SubscriptionStorage\InMemoryDBFixture.cs" />
     <Compile Include="SubscriptionStorage\TestData.cs" />
     <Compile Include="SubscriptionStorage\When_initializing_the_storage_with_existing_v2X_subscriptions.cs" />

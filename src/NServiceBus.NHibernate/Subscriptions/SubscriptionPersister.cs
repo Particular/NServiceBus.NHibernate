@@ -2,10 +2,14 @@ namespace NServiceBus.Unicast.Subscriptions.NHibernate
 {
     using System.Collections.Generic;
     using System.Linq;
+    using System.Threading.Tasks;
     using System.Transactions;
+    using global::NHibernate;
     using global::NHibernate.Criterion;
     using Logging;
     using MessageDrivenSubscriptions;
+    using NServiceBus.Extensibility;
+    using NServiceBus.Routing;
     using IsolationLevel = System.Data.IsolationLevel;
 
     /// <summary>
@@ -13,16 +17,22 @@ namespace NServiceBus.Unicast.Subscriptions.NHibernate
     /// </summary>
     class SubscriptionPersister : ISubscriptionStorage
     {
-        public SubscriptionPersister(SubscriptionStorageSessionProvider subscriptionStorageSessionProvider)
+
+        static readonly ILog Logger = LogManager.GetLogger(typeof(ISubscriptionStorage));
+        static readonly IEqualityComparer<Subscription> SubscriptionComparer = new SubscriptionByTransportAddressComparer();
+
+        ISessionFactory sessionFactory;
+
+        public SubscriptionPersister(ISessionFactory sessionFactory)
         {
-            this.subscriptionStorageSessionProvider = subscriptionStorageSessionProvider;
+            this.sessionFactory = sessionFactory;
         }
 
-        public virtual void Subscribe(Address address, IEnumerable<MessageType> messageTypes)
+        public virtual Task Subscribe(Subscriber subscriber, IReadOnlyCollection<MessageType> messageTypes, ContextBag context)
         {
-            using (var transaction = new TransactionScope(TransactionScopeOption.Suppress))
+            using (new TransactionScope(TransactionScopeOption.Suppress))
             {
-                using (var session = subscriptionStorageSessionProvider.OpenSession())
+                using (var session = sessionFactory.OpenSession())
                 {
                     using (var tx = session.BeginTransaction(IsolationLevel.ReadCommitted))
                     {
@@ -30,7 +40,8 @@ namespace NServiceBus.Unicast.Subscriptions.NHibernate
                         {
                             session.SaveOrUpdate(new Subscription
                             {
-                                SubscriberEndpoint = address.ToString(),
+                                SubscriberEndpoint = subscriber.TransportAddress,
+                                LogicalEndpoint = subscriber.Endpoint != null ? subscriber.Endpoint.ToString() : null,
                                 MessageType = messageType.TypeName + "," + messageType.Version,
                                 Version = messageType.Version.ToString(),
                                 TypeName = messageType.TypeName
@@ -38,24 +49,25 @@ namespace NServiceBus.Unicast.Subscriptions.NHibernate
                         }
 
                         tx.Commit();
-                        transaction.Complete();
                     }
                 }
             }
+            return Task.FromResult(0);
         }
 
-        public virtual void Unsubscribe(Address address, IEnumerable<MessageType> messageTypes)
+        public virtual Task Unsubscribe(Subscriber address, IReadOnlyCollection<MessageType> messageTypes, ContextBag context)
         {
-            using (var transaction = new TransactionScope(TransactionScopeOption.Suppress))
+            using (new TransactionScope(TransactionScopeOption.Suppress))
             {
-                using (var session = subscriptionStorageSessionProvider.OpenSession())
+                using (var session = sessionFactory.OpenSession())
                 {
                     using (var tx = session.BeginTransaction(IsolationLevel.ReadCommitted))
                     {
+                        var transportAddress = address.TransportAddress;
                         var subscriptions = session.QueryOver<Subscription>()
                             .Where(
                                 s => s.TypeName.IsIn(messageTypes.Select(mt => mt.TypeName).ToList()) &&
-                                     s.SubscriberEndpoint == address.ToString())
+                                     s.SubscriberEndpoint == transportAddress)
                             .List();
 
                         foreach (var subscription in subscriptions.Where(s => messageTypes.Contains(new MessageType(s.TypeName, s.Version))))
@@ -64,32 +76,33 @@ namespace NServiceBus.Unicast.Subscriptions.NHibernate
                         }
 
                         tx.Commit();
-                        transaction.Complete();
                     }
                 }
             }
+            return Task.FromResult(0);
         }
 
-        public virtual IEnumerable<Address> GetSubscriberAddressesForMessage(IEnumerable<MessageType> messageTypes)
+        public virtual Task<IEnumerable<Subscriber>> GetSubscriberAddressesForMessage(IReadOnlyCollection<MessageType> messageTypes, ContextBag context)
         {
-            using (var transaction = new TransactionScope(TransactionScopeOption.Suppress))
+            using (new TransactionScope(TransactionScopeOption.Suppress))
             {
-                using (var session = subscriptionStorageSessionProvider.OpenStatelessSession())
+                using (var session = sessionFactory.OpenStatelessSession())
                 {
                     using (var tx = session.BeginTransaction(IsolationLevel.ReadCommitted))
                     {
-                        var results = session.QueryOver<Subscription>()
+                        var tmp = session.QueryOver<Subscription>()
                             .Where(s => s.TypeName.IsIn(messageTypes.Select(mt => mt.TypeName).ToList()))
-                            .List()
+                            .List();
+
+                        var results = tmp
                             .Where(s => messageTypes.Contains(new MessageType(s.TypeName, s.Version)))
-                            .Select(s => Address.Parse(s.SubscriberEndpoint))
-                            .Distinct()
+                            .Distinct(SubscriptionComparer)
+                            .Select(s => new Subscriber(s.SubscriberEndpoint, s.LogicalEndpoint != null ? new EndpointName(s.LogicalEndpoint) : null))
                             .ToList();
 
                         tx.Commit();
-                        transaction.Complete();
 
-                        return results;
+                        return Task.FromResult(results.AsEnumerable());
                     }
                 }
             }
@@ -97,9 +110,9 @@ namespace NServiceBus.Unicast.Subscriptions.NHibernate
 
         public void Init()
         {
-            using (var transaction = new TransactionScope(TransactionScopeOption.Suppress))
+            using (new TransactionScope(TransactionScopeOption.Suppress))
             {
-                using (var session = subscriptionStorageSessionProvider.OpenStatelessSession())
+                using (var session = sessionFactory.OpenStatelessSession())
                 {
                     using (var tx = session.BeginTransaction(IsolationLevel.ReadCommitted))
                     {
@@ -123,15 +136,24 @@ namespace NServiceBus.Unicast.Subscriptions.NHibernate
                         }
 
                         tx.Commit();
-                        transaction.Complete();
-
                         Logger.InfoFormat("{0} v2X subscriptions upgraded", v2XSubscriptions.Count);
                     }
                 }
             }
         }
 
-        static readonly ILog Logger = LogManager.GetLogger(typeof(ISubscriptionStorage));
-        readonly SubscriptionStorageSessionProvider subscriptionStorageSessionProvider;
+        private class SubscriptionByTransportAddressComparer : IEqualityComparer<Subscription>
+        {
+            public bool Equals(Subscription x, Subscription y)
+            {
+                return x.SubscriberEndpoint.Equals(y.SubscriberEndpoint);
+            }
+
+            public int GetHashCode(Subscription obj)
+            {
+                return obj.SubscriberEndpoint.GetHashCode();
+            }
+        }
+
     }
 }
