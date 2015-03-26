@@ -81,7 +81,7 @@ namespace NServiceBus.Features
         static bool DisableConnectionSharing(FeatureConfigurationContext context, Configuration configuration)
         {
             return context.Settings.GetOrDefault<bool>("NServiceBus.Features.SqlServerTransportFeature")
-                   && context.Settings.Get<bool>(typeof(Outbox).FullName)
+                   && context.Settings.GetOrDefault<bool>(typeof(Outbox).FullName)
                    && (SqlServerDriver(configuration) || SqlServerDialect(configuration));
         }
 
