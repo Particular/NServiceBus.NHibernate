@@ -12,13 +12,8 @@ namespace NServiceBus.Features
     {
         internal NHibernateStorageSession()
         {
-            Defaults(s =>
-            {
-                //By default we share the connection between Outbox store and Saga store and we also expose is it as NHibernateStorageContext
-                s.SetDefault("NHibernate.Common.ShareConnection", true);
-                s.SetDefault<SharedMappings>(new SharedMappings());
-            });
-            
+            Defaults(s => s.SetDefault<SharedMappings>(new SharedMappings()));
+
             DependsOn<NHibernateDBConnectionProvider>();
             DependsOnAtLeastOne(typeof(NHibernateSagaStorage), typeof(NHibernateOutboxStorage));
         }
@@ -57,7 +52,12 @@ namespace NServiceBus.Features
 
             context.Container.RegisterSingleton(new SessionFactoryProvider(configuration.BuildSessionFactory()));
 
-            if (context.Settings.Get<bool>("NHibernate.Common.ShareConnection"))
+            if (DisableConnectionSharing(context, configuration))
+            {
+                context.Container.ConfigureComponent<NonSharedConnectionStorageSessionProvider>(DependencyLifecycle.SingleInstance);
+                context.Container.ConfigureProperty<DbConnectionProvider>(p => p.DisableConnectionSharing, true);
+            }
+            else
             {
                 context.Pipeline.Register<OpenSqlConnectionBehavior.Registration>();
                 context.Pipeline.Register<OpenSessionBehavior.Registration>();
@@ -73,14 +73,30 @@ namespace NServiceBus.Features
                 context.Container.ConfigureComponent<SharedConnectionStorageSessionProvider>(DependencyLifecycle.SingleInstance)
                     .ConfigureProperty(p => p.ConnectionString, connString);
             }
-            else
-            {
-                context.Container.ConfigureComponent<NonSharedConnectionStorageSessionProvider>(DependencyLifecycle.SingleInstance);
-                context.Container.ConfigureProperty<DbConnectionProvider>(p => p.DisableConnectionSharing, true);
-            }
 
             Installer.RunInstaller = context.Settings.Get<bool>("NHibernate.Common.AutoUpdateSchema");
             Installer.configuration = configuration;
+        }
+
+        static bool DisableConnectionSharing(FeatureConfigurationContext context, Configuration configuration)
+        {
+            return context.Settings.GetOrDefault<bool>("NServiceBus.Features.SqlServerTransportFeature")
+                   && context.Settings.Get<bool>(typeof(Outbox).FullName)
+                   && (SqlServerDriver(configuration) || SqlServerDialect(configuration));
+        }
+
+        static bool SqlServerDialect(Configuration configuration)
+        {
+            string dialect;
+            return configuration.Properties.TryGetValue("dialect", out dialect)
+                   && dialect.StartsWith("NHibernate.Dialect.MsSql");
+        }
+
+        static bool SqlServerDriver(Configuration configuration)
+        {
+            string driver;
+            return configuration.Properties.TryGetValue("connection.driver_class", out driver)
+                   && (driver == "NHibernate.Driver.SqlClientDriver" || driver == "NHibernate.Driver.Sql2008ClientDriver");
         }
     }
 }
