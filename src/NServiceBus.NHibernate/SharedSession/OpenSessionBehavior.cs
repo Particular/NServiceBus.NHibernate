@@ -129,7 +129,7 @@ namespace NServiceBus.Persistence.NHibernate
                 InsertAfter(WellKnownStep.ExecuteUnitOfWork);
                 InsertAfterIfExists("OutboxDeduplication");
                 InsertBeforeIfExists("OutboxRecorder");
-                InsertBefore("OpenNHibernateTransaction");
+                InsertBeforeIfExists(WellKnownStep.InvokeSaga);
             }
         }
     }
