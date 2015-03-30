@@ -19,13 +19,6 @@ namespace NServiceBus.Persistence.NHibernate
 
             if (context.TryGet(string.Format("SqlConnection-{0}", ConnectionString), out existingConnection))
             {
-                var transactionScopeDisabled = Settings.Get<bool>("Transactions.SuppressDistributedTransactions");
-                if (transactionScopeDisabled)
-                {
-                    throw new InvalidOperationException(@"In order for NHibernate persistence to work with SQLServer transport, ambient transactions need to be enabled. 
-Do not use busConfig.DisableDistributedTransactions(). 
-The transaction WILL NOT be escalated to a distrubuted transaction because SQLServer ADO.NET driver supports promotable enlistements and both NHibernate persistence and SQLServer transport will use the same connection.");
-                }
                 next();
                 return;
             }

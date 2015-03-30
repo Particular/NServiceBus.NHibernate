@@ -69,37 +69,43 @@
 
         public void SetAsDispatched(string messageId)
         {
-            using (var session = SessionFactoryProvider.SessionFactory.OpenStatelessSession())
+            using (new TransactionScope(TransactionScopeOption.Suppress))
             {
-                using (var tx = session.BeginTransaction(IsolationLevel.ReadCommitted))
+                using (var session = SessionFactoryProvider.SessionFactory.OpenStatelessSession())
                 {
-                    var queryString = string.Format("update {0} set Dispatched = true, DispatchedAt = :date where MessageId = :messageid And Dispatched = false",
-                        typeof(OutboxRecord));
-                    session.CreateQuery(queryString)
-                        .SetString("messageid", messageId)
-                        .SetDateTime("date", DateTime.UtcNow)
-                        .ExecuteUpdate();
+                    using (var tx = session.BeginTransaction(IsolationLevel.ReadCommitted))
+                    {
+                        var queryString = string.Format("update {0} set Dispatched = true, DispatchedAt = :date where MessageId = :messageid And Dispatched = false",
+                            typeof(OutboxRecord));
+                        session.CreateQuery(queryString)
+                            .SetString("messageid", messageId)
+                            .SetDateTime("date", DateTime.UtcNow)
+                            .ExecuteUpdate();
 
-                    tx.Commit();
+                        tx.Commit();
+                    }
                 }
             }
         }
 
         public void RemoveEntriesOlderThan(DateTime dateTime)
         {
-            using (var session = SessionFactoryProvider.SessionFactory.OpenStatelessSession())
+            using (new TransactionScope(TransactionScopeOption.Suppress))
             {
-                using (var tx = session.BeginTransaction(IsolationLevel.ReadCommitted))
+                using (var session = SessionFactoryProvider.SessionFactory.OpenStatelessSession())
                 {
-                    var result = session.QueryOver<OutboxRecord>().Where(o => o.Dispatched && o.DispatchedAt < dateTime)
-                        .List();
-
-                    foreach (var record in result)
+                    using (var tx = session.BeginTransaction(IsolationLevel.ReadCommitted))
                     {
-                        session.Delete(record);
-                    }
+                        var result = session.QueryOver<OutboxRecord>().Where(o => o.Dispatched && o.DispatchedAt < dateTime)
+                            .List();
 
-                    tx.Commit();
+                        foreach (var record in result)
+                        {
+                            session.Delete(record);
+                        }
+
+                        tx.Commit();
+                    }
                 }
             }
         }

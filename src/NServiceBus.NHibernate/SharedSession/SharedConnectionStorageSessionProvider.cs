@@ -2,7 +2,6 @@ namespace NServiceBus.Persistence.NHibernate
 {
     using System;
     using global::NHibernate;
-    using Outbox;
     using Pipeline;
 
     class SharedConnectionStorageSessionProvider : IStorageSessionProvider
@@ -11,11 +10,7 @@ namespace NServiceBus.Persistence.NHibernate
 
         public string ConnectionString { get; set; }
 
-        public SessionFactoryProvider SessionFactoryProvider { get; set; }
-
-        public IDbConnectionProvider DbConnectionProvider { get; set; }
-
-        public ISession Session
+        ISession Session
         {
             get
             {

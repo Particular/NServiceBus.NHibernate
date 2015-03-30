@@ -99,11 +99,9 @@
     <Compile Include="Deduplication\GatewayDeduplication.cs" />
     <Compile Include="Deduplication\Installer\Installer.cs" />
     <Compile Include="InternalsVisibleTo.cs" />
-    <Compile Include="SharedSession\NonSharedConnectionStorageSessionProvider.cs" />
     <Compile Include="SharedSession\IStorageSessionProvider.cs" />
     <Compile Include="Outbox\NHibernateOutboxStorage.cs" />
     <Compile Include="SagaPersisters\NHibernateSagaStorage.cs" />
-    <Compile Include="SharedSession\OpenNativeTransactionBehavior.cs" />
     <Compile Include="SharedSession\NHibernateStorageSession.cs" />
     <Compile Include="SharedSession\OpenSessionBehavior.cs" />
     <Compile Include="Outbox\IDbConnectionProvider.cs" />
