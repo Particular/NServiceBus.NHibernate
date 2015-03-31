@@ -81,7 +81,8 @@ namespace NServiceBus.Features
 
         static bool DisableConnectionSharing(FeatureConfigurationContext context)
         {
-            return context.Settings.GetOrDefault<bool>(typeof(Outbox).FullName);
+            var nativeTransactions = context.Settings.GetOrDefault<bool>("Transactions.SuppressDistributedTransactions");
+            return nativeTransactions;
         }
     }
 }
