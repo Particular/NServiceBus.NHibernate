@@ -122,7 +122,6 @@
     <Compile Include="SharedSession\SessionFactoryProvider.cs" />
     <Compile Include="SharedSession\SharedMappings.cs" />
     <Compile Include="SharedSession\SharedConnectionStorageSessionProvider.cs" />
-    <Compile Include="SqlServerTransport\ValidateAmbientTransactionOrOutbox.cs" />
     <Compile Include="Subscriptions\CachedSubscriptionPersister.cs" />
     <Compile Include="Subscriptions\NHibernateSubscriptionStorage.cs" />
     <Compile Include="Subscriptions\SubscriptionConfig.cs" />
