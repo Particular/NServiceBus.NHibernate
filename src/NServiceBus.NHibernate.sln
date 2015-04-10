@@ -13,11 +13,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NServiceBus.NHibernate.Acce
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NServiceBus.NHibernate.AcceptanceTests-Oracle", "NServiceBus.NHibernate.AcceptanceTests-Oracle\NServiceBus.NHibernate.AcceptanceTests-Oracle.csproj", "{0412098A-6622-44AF-8932-C4C77E525B1F}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{B93591D8-9259-4C57-A130-27272595FDAF}"
-	ProjectSection(SolutionItems) = preProject
-		.nuget\packages.config = .nuget\packages.config
-	EndProjectSection
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{8A0A9664-98CF-4DD4-9330-9FA28183BC23}"
 	ProjectSection(SolutionItems) = preProject
 		..\packaging\nuget\nservicebus.nhibernate.nuspec = ..\packaging\nuget\nservicebus.nhibernate.nuspec
