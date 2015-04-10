@@ -2,6 +2,7 @@ namespace NServiceBus.Persistence.NHibernate
 {
     using System;
     using System.Data;
+    using System.Data.Common;
     using global::NHibernate;
     using Pipeline;
 
@@ -20,7 +21,7 @@ namespace NServiceBus.Persistence.NHibernate
         }
 
         /// <summary>
-        /// Gets the current context NHibernate <see cref="IDbConnection"/>.
+        /// Gets the database connection associated with the current NHibernate <see cref="Session"/>
         /// </summary>
         public IDbConnection Connection
         {
@@ -33,6 +34,21 @@ namespace NServiceBus.Persistence.NHibernate
                 }
 
                 throw new InvalidOperationException("No connection available");
+            }
+        }
+        
+        /// <summary>
+        /// Gets the database connection associated with the current NHibernate <see cref="Session"/>
+        /// </summary>
+        public IDbTransaction AdoTransaction
+        {
+            get
+            {
+                using (var command = Connection.CreateCommand())
+                {
+                    Transaction.Enlist(command);
+                    return command.Transaction;
+                }
             }
         }
 
