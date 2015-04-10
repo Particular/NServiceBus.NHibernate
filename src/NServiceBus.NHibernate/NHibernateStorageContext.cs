@@ -2,7 +2,6 @@ namespace NServiceBus.Persistence.NHibernate
 {
     using System;
     using System.Data;
-    using System.Data.Common;
     using global::NHibernate;
     using Pipeline;
 
