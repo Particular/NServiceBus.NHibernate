@@ -11,7 +11,8 @@ namespace NServiceBus.Persistence.NHibernate
     {
         public SessionFactoryProvider SessionFactoryProvider { get; set; }
         public string ConnectionString { get; set; }
-        public Func<ISessionFactory, string, ISession> SessionCreator { get; set; } 
+        public Func<ISessionFactory, string, ISession> SessionCreator { get; set; }
+        public bool DisableConnectionSharing { get; set; }
 
         public void Invoke(IncomingContext context, Action next)
         {
@@ -27,7 +28,7 @@ namespace NServiceBus.Persistence.NHibernate
             IDbConnection existingConnection;
             Lazy<IDbConnection> lazyExistingConnection;
 
-            if (context.TryGet(string.Format("SqlConnection-{0}", ConnectionString), out existingConnection))
+            if (!DisableConnectionSharing && context.TryGet(string.Format("SqlConnection-{0}", ConnectionString), out existingConnection))
             {
                 InnerInvoke(context, next, () => existingConnection);
             }
@@ -120,6 +121,7 @@ namespace NServiceBus.Persistence.NHibernate
         {
             get { return string.Format("LazyNHibernateSession-{0}", ConnectionString); }
         }
+
 
         public class Registration : RegisterStep
         {

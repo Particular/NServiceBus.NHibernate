@@ -26,10 +26,10 @@ namespace NServiceBus.Persistence.NHibernate
         {
             get
             {
-                Lazy<IDbConnection> lazy;
-                if (pipelineExecutor.CurrentContext.TryGet(string.Format("LazySqlConnection-{0}", connectionString), out lazy))
+                Lazy<ISession> lazy;
+                if (pipelineExecutor.CurrentContext.TryGet(string.Format("LazyNHibernateSession-{0}", connectionString), out lazy))
                 {
-                    return lazy.Value;
+                    return lazy.Value.Connection;
                 }
 
                 throw new InvalidOperationException("No connection available");

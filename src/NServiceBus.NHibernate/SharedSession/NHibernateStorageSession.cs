@@ -52,7 +52,7 @@ namespace NServiceBus.Features
 
             context.Container.RegisterSingleton(new SessionFactoryProvider(configuration.BuildSessionFactory()));
 
-            var disableConnectionSharing = DisableConnectionSharing(context);
+            var disableConnectionSharing = DisableTransportConnectionSharing(context);
 
             context.Container
                 .ConfigureProperty<DbConnectionProvider>(p => p.DisableConnectionSharing, disableConnectionSharing)
@@ -62,10 +62,14 @@ namespace NServiceBus.Features
             context.Pipeline.Register<OpenSessionBehavior.Registration>();
 
             context.Container.ConfigureComponent<OpenSqlConnectionBehavior>(DependencyLifecycle.InstancePerCall)
-                .ConfigureProperty(p => p.ConnectionString, connString);
+                .ConfigureProperty(p => p.ConnectionString, connString)
+                .ConfigureProperty(p => p.DisableConnectionSharing, disableConnectionSharing);
+
             context.Container.ConfigureComponent<OpenSessionBehavior>(DependencyLifecycle.InstancePerCall)
                 .ConfigureProperty(p => p.ConnectionString, connString)
+                .ConfigureProperty(p => p.DisableConnectionSharing, disableConnectionSharing)
                 .ConfigureProperty(p => p.SessionCreator, context.Settings.GetOrDefault<Func<ISessionFactory, string, ISession>>("NHibernate.SessionCreator"));
+
             context.Container.ConfigureComponent(b => new NHibernateStorageContext(b.Build<PipelineExecutor>(), connString), DependencyLifecycle.InstancePerUnitOfWork);
             context.Container.ConfigureComponent<SharedConnectionStorageSessionProvider>(DependencyLifecycle.SingleInstance)
                 .ConfigureProperty(p => p.ConnectionString, connString);
@@ -79,7 +83,7 @@ namespace NServiceBus.Features
             Installer.configuration = configuration;
         }
 
-        static bool DisableConnectionSharing(FeatureConfigurationContext context)
+        static bool DisableTransportConnectionSharing(FeatureConfigurationContext context)
         {
             var nativeTransactions = context.Settings.GetOrDefault<bool>("Transactions.SuppressDistributedTransactions");
             return nativeTransactions;

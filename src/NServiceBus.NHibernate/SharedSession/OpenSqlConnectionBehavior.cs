@@ -12,12 +12,13 @@ namespace NServiceBus.Persistence.NHibernate
         public ReadOnlySettings Settings { get; set; }
 
         public string ConnectionString { get; set; }
+        public bool DisableConnectionSharing { get; set; }
 
         public void Invoke(IncomingContext context, Action next)
         {
             IDbConnection existingConnection;
 
-            if (context.TryGet(string.Format("SqlConnection-{0}", ConnectionString), out existingConnection))
+            if (!DisableConnectionSharing && context.TryGet(string.Format("SqlConnection-{0}", ConnectionString), out existingConnection))
             {
                 next();
                 return;
