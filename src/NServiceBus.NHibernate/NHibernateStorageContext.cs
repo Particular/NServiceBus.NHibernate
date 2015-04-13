@@ -37,17 +37,22 @@ namespace NServiceBus.Persistence.NHibernate
         }
         
         /// <summary>
-        /// Gets the database connection associated with the current NHibernate <see cref="Session"/>
+        /// Gets the database transaction associated with the current NHibernate <see cref="Session"/> or null when using TransactionScope.
         /// </summary>
-        public IDbTransaction AdoTransaction
+        public IDbTransaction DatabaseTransaction
         {
             get
             {
                 using (var command = Connection.CreateCommand())
                 {
-                    Transaction.Enlist(command);
-                    return command.Transaction;
+                    Lazy<ITransaction> lazy;
+                    if (pipelineExecutor.CurrentContext.TryGet(string.Format("LazyNHibernateTransaction-{0}", connectionString), out lazy))
+                    {
+                        lazy.Value.Enlist(command);
+                        return command.Transaction;
+                    }
                 }
+                return null;
             }
         }
 
