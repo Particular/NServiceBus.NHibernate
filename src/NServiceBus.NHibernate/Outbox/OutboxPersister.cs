@@ -13,6 +13,7 @@
     class OutboxPersister : IOutboxStorage
     {
         public IStorageSessionProvider StorageSessionProvider { get; set; }
+        public SessionFactoryProvider SessionFactoryProvider { get; set; }
 
         public bool TryGet(string messageId, out OutboxMessage message)
         {
@@ -20,7 +21,7 @@
 
             message = null;
 
-            using (var session = StorageSessionProvider.OpenStatelessSession())
+            using (var session = SessionFactoryProvider.SessionFactory.OpenStatelessSession())
             {
                 using (var tx = session.BeginAmbientTransactionAware(IsolationLevel.ReadCommitted))
                 {
