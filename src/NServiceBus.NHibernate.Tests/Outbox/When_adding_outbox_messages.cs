@@ -6,6 +6,7 @@ namespace NServiceBus.NHibernate.Tests.Outbox
     using System.Threading;
     using NServiceBus.Outbox;
     using NServiceBus.Outbox.NHibernate;
+    using NServiceBus.Persistence.NHibernate;
     using NUnit.Framework;
     using SagaPersisters.NHibernate.Tests;
 
@@ -33,6 +34,7 @@ namespace NServiceBus.NHibernate.Tests.Outbox
             using (var session = SessionFactory.OpenSession())
             {
                 persister.StorageSessionProvider = new FakeSessionProvider(SessionFactory, session);
+                persister.SessionFactoryProvider = new SessionFactoryProvider(SessionFactory);
                 persister.Store(id, new List<TransportOperation>
                 {
                     new TransportOperation(id, new Dictionary<string, string>(), new byte[1024*5], new Dictionary<string, string>()),
