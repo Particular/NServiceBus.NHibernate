@@ -79,8 +79,9 @@ namespace NServiceBus.Features
                 context.Container.ConfigureComponent(b => b.Build<NHibernateStorageContext>().Session, DependencyLifecycle.InstancePerCall);
             }
 
-            Installer.RunInstaller = context.Settings.Get<bool>("NHibernate.Common.AutoUpdateSchema");
-            Installer.configuration = configuration;
+            context.Container.ConfigureComponent<Installer>(DependencyLifecycle.SingleInstance)
+                .ConfigureProperty(x => x.Configuration, configuration)
+                .ConfigureProperty(x => x.RunInstaller, context.Settings.Get<bool>("NHibernate.Common.AutoUpdateSchema"));
         }
 
         static bool DisableTransportConnectionSharing(FeatureConfigurationContext context)

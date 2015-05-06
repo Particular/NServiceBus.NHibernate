@@ -9,15 +9,14 @@ namespace NServiceBus.Persistence.NHibernate
 
     class Installer : INeedToInstallSomething
     {
-        public static bool RunInstaller { get; set; }
-
-        internal static Configuration configuration;
+        public bool RunInstaller { get; set; }
+        public Configuration Configuration { get; set; }
 
         public void Install(string identity, Configure config)
         {
             if (RunInstaller)
             {
-                var schemaUpdate = new SchemaUpdate(configuration);
+                var schemaUpdate = new SchemaUpdate(Configuration);
                 var sb = new StringBuilder();
                 schemaUpdate.Execute(s => sb.AppendLine(s), true);
 

@@ -5,15 +5,14 @@ namespace NServiceBus.TimeoutPersisters.NHibernate.Installer
 
     class Installer : INeedToInstallSomething
     {
-        public static bool RunInstaller { get; set; }
-
-        internal static Configuration configuration;
+        public bool RunInstaller { get; set; }
+        public Configuration Configuration { get; set; }
 
         public void Install(string identity, Configure config)
         {
             if (RunInstaller)
             {
-                new OptimizedSchemaUpdate(configuration).Execute(false, true);
+                new OptimizedSchemaUpdate(Configuration).Execute(false, true);
             }
         }
     }
