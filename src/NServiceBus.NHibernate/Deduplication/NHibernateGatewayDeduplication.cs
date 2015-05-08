@@ -22,17 +22,14 @@ namespace NServiceBus.Features
         /// </summary>
         protected override void Setup(FeatureConfigurationContext context)
         {
-            var properties = new ConfigureNHibernate(context.Settings).GatewayDeduplicationProperties;
-
-            ConfigureNHibernate.ThrowIfRequiredPropertiesAreMissing(properties);
-
             var configuration = context.Settings.GetOrDefault<Configuration>("NHibernate.GatewayDeduplication.Configuration") ?? context.Settings.GetOrDefault<Configuration>("StorageConfiguration");
 
             if (configuration == null)
             {
-                configuration = new Configuration()
-                    .SetProperties(properties);
+                var properties = new ConfigureNHibernate(context.Settings).GatewayDeduplicationProperties;
+                configuration = new Configuration().SetProperties(properties);
             }
+            ConfigureNHibernate.ThrowIfRequiredPropertiesAreMissing(configuration.Properties);
 
             ConfigureNHibernate.AddMappings<DeduplicationMessageMap>(configuration);
 

@@ -24,18 +24,15 @@ namespace NServiceBus.Features
         /// Called when the feature should perform its initialization. This call will only happen if the feature is enabled.
         /// </summary>
         protected override void Setup(FeatureConfigurationContext context)
-        {
-            var properties = new ConfigureNHibernate(context.Settings).SubscriptionStorageProperties;
-
-            ConfigureNHibernate.ThrowIfRequiredPropertiesAreMissing(properties);
-
+        {            
             var configuration = context.Settings.GetOrDefault<Configuration>("NHibernate.Subscriptions.Configuration") ?? context.Settings.GetOrDefault<Configuration>("StorageConfiguration");
 
             if (configuration == null)
             {
-                configuration = new Configuration()
-                    .SetProperties(properties);
+                var properties = new ConfigureNHibernate(context.Settings).SubscriptionStorageProperties;
+                configuration = new Configuration().SetProperties(properties);
             }
+            ConfigureNHibernate.ThrowIfRequiredPropertiesAreMissing(configuration.Properties);
 
             ConfigureNHibernate.AddMappings<SubscriptionMap>(configuration);
 
