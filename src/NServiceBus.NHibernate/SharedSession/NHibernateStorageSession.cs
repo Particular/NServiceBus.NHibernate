@@ -1,7 +1,8 @@
 namespace NServiceBus.Features
 {
+    using System;
+    using NHibernate;
     using NHibernate.Cfg;
-    using NServiceBus.Outbox;
     using Persistence.NHibernate;
     using Pipeline;
     using Environment = NHibernate.Cfg.Environment;
@@ -14,9 +15,7 @@ namespace NServiceBus.Features
         internal NHibernateStorageSession()
         {
             Defaults(s => s.SetDefault<SharedMappings>(new SharedMappings()));
-            
             DependsOn<NHibernateDBConnectionProvider>();
-            DependsOnAtLeastOne(typeof(NHibernateSagaStorage), typeof(NHibernateOutboxStorage));
         }
 
         /// <summary>
@@ -53,31 +52,41 @@ namespace NServiceBus.Features
 
             context.Container.RegisterSingleton(new SessionFactoryProvider(configuration.BuildSessionFactory()));
 
-            //When outbox is enbaled, do not share transport connection.
-            if (context.Container.HasComponent<OutboxPersister>())
+            var disableConnectionSharing = DisableTransportConnectionSharing(context);
+
+            context.Container
+                .ConfigureProperty<DbConnectionProvider>(p => p.DisableConnectionSharing, disableConnectionSharing)
+                .ConfigureProperty<DbConnectionProvider>(p => p.DefaultConnectionString, connString);
+
+            context.Pipeline.Register<OpenSqlConnectionBehavior.Registration>();
+            context.Pipeline.Register<OpenSessionBehavior.Registration>();
+
+            context.Container.ConfigureComponent<OpenSqlConnectionBehavior>(DependencyLifecycle.InstancePerCall)
+                .ConfigureProperty(p => p.ConnectionString, connString)
+                .ConfigureProperty(p => p.DisableConnectionSharing, disableConnectionSharing);
+
+            context.Container.ConfigureComponent<OpenSessionBehavior>(DependencyLifecycle.InstancePerCall)
+                .ConfigureProperty(p => p.ConnectionString, connString)
+                .ConfigureProperty(p => p.DisableConnectionSharing, disableConnectionSharing)
+                .ConfigureProperty(p => p.SessionCreator, context.Settings.GetOrDefault<Func<ISessionFactory, string, ISession>>("NHibernate.SessionCreator"));
+
+            context.Container.ConfigureComponent(b => new NHibernateStorageContext(b.Build<PipelineExecutor>(), connString), DependencyLifecycle.InstancePerUnitOfWork);
+            context.Container.ConfigureComponent<SharedConnectionStorageSessionProvider>(DependencyLifecycle.SingleInstance)
+                .ConfigureProperty(p => p.ConnectionString, connString);
+
+            if (context.Settings.GetOrDefault<bool>("NHibernate.RegisterManagedSession"))
             {
-                context.Container.ConfigureComponent<NonSharedConnectionStorageSessionProvider>(DependencyLifecycle.SingleInstance);
-                context.Container.ConfigureProperty<DbConnectionProvider>(p => p.DisableConnectionSharing, true);
-            }
-            else
-            {
-                context.Pipeline.Register<OpenSqlConnectionBehavior.Registration>();
-                context.Pipeline.Register<OpenSessionBehavior.Registration>();
-                context.Pipeline.Register<OpenNativeTransactionBehavior.Registration>();
-                context.Container.ConfigureProperty<DbConnectionProvider>(p => p.DefaultConnectionString, connString);
-                context.Container.ConfigureComponent<OpenSqlConnectionBehavior>(DependencyLifecycle.InstancePerCall)
-                    .ConfigureProperty(p => p.ConnectionString, connString);
-                context.Container.ConfigureComponent<OpenSessionBehavior>(DependencyLifecycle.InstancePerCall)
-                    .ConfigureProperty(p => p.ConnectionString, connString);
-                context.Container.ConfigureComponent<OpenNativeTransactionBehavior>(DependencyLifecycle.InstancePerCall)
-                    .ConfigureProperty(p => p.ConnectionString, connString);
-                context.Container.ConfigureComponent(b => new NHibernateStorageContext(b.Build<PipelineExecutor>(), connString), DependencyLifecycle.InstancePerUnitOfWork);
-                context.Container.ConfigureComponent<SharedConnectionStorageSessionProvider>(DependencyLifecycle.SingleInstance)
-                    .ConfigureProperty(p => p.ConnectionString, connString);
+                context.Container.ConfigureComponent(b => b.Build<NHibernateStorageContext>().Session, DependencyLifecycle.InstancePerCall);
             }
 
             Installer.RunInstaller = context.Settings.Get<bool>("NHibernate.Common.AutoUpdateSchema");
             Installer.configuration = configuration;
+        }
+
+        static bool DisableTransportConnectionSharing(FeatureConfigurationContext context)
+        {
+            var nativeTransactions = context.Settings.GetOrDefault<bool>("Transactions.SuppressDistributedTransactions");
+            return nativeTransactions;
         }
     }
 }

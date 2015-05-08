@@ -14,7 +14,7 @@
         public void Should_hydrate_and_invoke_the_existing_instance()
         {
             Scenario.Define<Context>()
-                    .WithEndpoint<SagaEndpoint>(b => b.Given(bus =>
+                    .WithEndpoint<Endpoint>(b => b.Given(bus =>
                         {
                             bus.SendLocal(new StartSagaMessage { Key = "Part1_Part2"});
                             bus.SendLocal(new OtherMessage { Part1 = "Part1", Part2 = "Part2" });                                    
@@ -29,9 +29,9 @@
             public bool SecondMessageReceived { get; set; }
         }
 
-        public class SagaEndpoint : EndpointConfigurationBuilder
+        public class Endpoint : EndpointConfigurationBuilder
         {
-            public SagaEndpoint()
+            public Endpoint()
             {
                 EndpointSetup<DefaultServer>(
                     

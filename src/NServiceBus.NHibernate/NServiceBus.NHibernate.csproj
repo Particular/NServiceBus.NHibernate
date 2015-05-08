@@ -15,7 +15,7 @@
     <SignAssembly>true</SignAssembly>
     <TargetFrameworkProfile />
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
-    <NuGetPackageImportStamp>cf539c43</NuGetPackageImportStamp>
+    <NuGetPackageImportStamp>ec59a453</NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -99,11 +99,9 @@
     <Compile Include="Deduplication\GatewayDeduplication.cs" />
     <Compile Include="Deduplication\Installer\Installer.cs" />
     <Compile Include="InternalsVisibleTo.cs" />
-    <Compile Include="SharedSession\NonSharedConnectionStorageSessionProvider.cs" />
     <Compile Include="SharedSession\IStorageSessionProvider.cs" />
     <Compile Include="Outbox\NHibernateOutboxStorage.cs" />
     <Compile Include="SagaPersisters\NHibernateSagaStorage.cs" />
-    <Compile Include="SharedSession\OpenNativeTransactionBehavior.cs" />
     <Compile Include="SharedSession\NHibernateStorageSession.cs" />
     <Compile Include="SharedSession\OpenSessionBehavior.cs" />
     <Compile Include="Outbox\IDbConnectionProvider.cs" />
@@ -123,7 +121,6 @@
     <Compile Include="SagaPersisters\SagaPersister.cs" />
     <Compile Include="SharedSession\SessionFactoryProvider.cs" />
     <Compile Include="SharedSession\SharedMappings.cs" />
-    <Compile Include="SharedSession\TransportIntegrationFeature.cs" />
     <Compile Include="SharedSession\SharedConnectionStorageSessionProvider.cs" />
     <Compile Include="Subscriptions\CachedSubscriptionPersister.cs" />
     <Compile Include="Subscriptions\NHibernateSubscriptionStorage.cs" />
@@ -155,8 +152,8 @@
     </PropertyGroup>
     <Error Condition="!Exists('..\packages\Fody.1.25.0\build\Fody.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Fody.1.25.0\build\Fody.targets'))" />
     <Error Condition="!Exists('..\packages\GitVersionTask.2.0.1\Build\GitVersionTask.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\GitVersionTask.2.0.1\Build\GitVersionTask.targets'))" />
-    <Error Condition="!Exists('..\packages\NuGetPackager.0.4.13\build\NuGetPackager.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\NuGetPackager.0.4.13\build\NuGetPackager.targets'))" />
+    <Error Condition="!Exists('..\packages\NuGetPackager.0.5.4\build\NuGetPackager.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\NuGetPackager.0.5.4\build\NuGetPackager.targets'))" />
   </Target>
   <Import Project="..\packages\GitVersionTask.2.0.1\Build\GitVersionTask.targets" Condition="Exists('..\packages\GitVersionTask.2.0.1\Build\GitVersionTask.targets')" />
-  <Import Project="..\packages\NuGetPackager.0.4.13\build\NuGetPackager.targets" Condition="Exists('..\packages\NuGetPackager.0.4.13\build\NuGetPackager.targets')" />
+  <Import Project="..\packages\NuGetPackager.0.5.4\build\NuGetPackager.targets" Condition="Exists('..\packages\NuGetPackager.0.5.4\build\NuGetPackager.targets')" />
 </Project>

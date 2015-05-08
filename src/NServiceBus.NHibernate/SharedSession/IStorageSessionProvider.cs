@@ -5,10 +5,6 @@ namespace NServiceBus.Persistence.NHibernate
 
     interface IStorageSessionProvider
     {
-        IStatelessSession OpenStatelessSession();
-
-        ISession OpenSession();
-
         void ExecuteInTransaction(Action<ISession> operation);
     }
 }

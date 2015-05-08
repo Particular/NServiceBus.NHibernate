@@ -2,6 +2,7 @@ namespace NServiceBus.Persistence.NHibernate
 {
     using System;
     using System.Data;
+    using System.Transactions;
     using global::NHibernate;
     using Pipeline;
     using Pipeline.Contexts;
@@ -9,15 +10,16 @@ namespace NServiceBus.Persistence.NHibernate
     class OpenSessionBehavior : IBehavior<IncomingContext>
     {
         public SessionFactoryProvider SessionFactoryProvider { get; set; }
-
         public string ConnectionString { get; set; }
+        public Func<ISessionFactory, string, ISession> SessionCreator { get; set; }
+        public bool DisableConnectionSharing { get; set; }
 
         public void Invoke(IncomingContext context, Action next)
         {
             ISession existingSession;
 
             //if we already have a session don't interfer
-            if (context.TryGet(string.Format("LazyNHibernateSession-{0}", ConnectionString), out existingSession))
+            if (context.TryGet(LazyNHibernateSessionKey, out existingSession))
             {
                 next();
                 return;
@@ -26,11 +28,11 @@ namespace NServiceBus.Persistence.NHibernate
             IDbConnection existingConnection;
             Lazy<IDbConnection> lazyExistingConnection;
 
-            if (context.TryGet(string.Format("SqlConnection-{0}", ConnectionString), out existingConnection))
+            if (!DisableConnectionSharing && context.TryGet(string.Format("SqlConnection-{0}", ConnectionString), out existingConnection))
             {
                 InnerInvoke(context, next, () => existingConnection);
             }
-            else if (context.TryGet(string.Format("LazySqlConnection-{0}", ConnectionString), out lazyExistingConnection))
+            else if (context.TryGet(LazySqlConnectionKey, out lazyExistingConnection))
             {
                 InnerInvoke(context, next, () => lazyExistingConnection.Value);
             }
@@ -38,7 +40,7 @@ namespace NServiceBus.Persistence.NHibernate
             {
                 var lazyConnection = new Lazy<IDbConnection>(() => SessionFactoryProvider.SessionFactory.GetConnection());
 
-                context.Set(string.Format("LazySqlConnection-{0}", ConnectionString), lazyConnection);
+                context.Set(LazySqlConnectionKey, lazyConnection);
                 try
                 {
                     InnerInvoke(context, next, () => lazyConnection.Value);
@@ -50,7 +52,7 @@ namespace NServiceBus.Persistence.NHibernate
                         lazyConnection.Value.Dispose();
                     }
 
-                    context.Remove(string.Format("LazySqlConnection-{0}", ConnectionString));
+                    context.Remove(LazySqlConnectionKey);
                 }
             }
         }
@@ -59,13 +61,21 @@ namespace NServiceBus.Persistence.NHibernate
         {
             var lazySession = new Lazy<ISession>(() =>
             {
-                var session = SessionFactoryProvider.SessionFactory.OpenSession(connectionRetriever());
+                var session = SessionCreator != null
+                    ? SessionCreator(SessionFactoryProvider.SessionFactory, ConnectionString)
+                    : SessionFactoryProvider.SessionFactory.OpenSession(connectionRetriever());
+
                 session.FlushMode = FlushMode.Never;
 
+                if (Transaction.Current == null)
+                {
+                    var tx = session.BeginTransaction();
+                    context.Set(LazyNHibernateTransactionKey, tx);
+                }
                 return session;
             });
 
-            context.Set(string.Format("LazyNHibernateSession-{0}", ConnectionString), lazySession);
+            context.Set(LazyNHibernateSessionKey, lazySession);
             try
             {
                 next();
@@ -73,18 +83,45 @@ namespace NServiceBus.Persistence.NHibernate
                 if (lazySession.IsValueCreated)
                 {
                     lazySession.Value.Flush();
+                    ITransaction tx;
+                    if (context.TryGet(LazyNHibernateTransactionKey, out tx))
+                    {
+                        tx.Commit();
+                        tx.Dispose();
+                    }
                 }
             }
             finally
             {
                 if (lazySession.IsValueCreated)
                 {
+                    ITransaction tx;
+                    if (context.TryGet(LazyNHibernateTransactionKey, out tx))
+                    {
+                        tx.Dispose();
+                    }
                     lazySession.Value.Dispose();
                 }
 
-                context.Remove(string.Format("LazyNHibernateSession-{0}", ConnectionString));
+                context.Remove(LazyNHibernateSessionKey);
             }
         }
+
+        string LazySqlConnectionKey
+        {
+            get { return string.Format("LazySqlConnection-{0}", ConnectionString); }
+        }
+
+        string LazyNHibernateTransactionKey
+        {
+            get { return string.Format("LazyNHibernateTransaction-{0}", ConnectionString); }
+        }
+
+        string LazyNHibernateSessionKey
+        {
+            get { return string.Format("LazyNHibernateSession-{0}", ConnectionString); }
+        }
+
 
         public class Registration : RegisterStep
         {
@@ -94,7 +131,7 @@ namespace NServiceBus.Persistence.NHibernate
                 InsertAfter(WellKnownStep.ExecuteUnitOfWork);
                 InsertAfterIfExists("OutboxDeduplication");
                 InsertBeforeIfExists("OutboxRecorder");
-                InsertBefore("OpenNHibernateTransaction");
+                InsertBeforeIfExists(WellKnownStep.InvokeSaga);
             }
         }
     }

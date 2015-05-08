@@ -22,8 +22,8 @@
                     .Done(c => c.ExceptionReceived)
                     .Run();
             Assert.AreEqual(typeof(HandlerException), context.ExceptionType);
-      StackTraceAssert.StartsWith(
-@"at NServiceBus.AcceptanceTests.Exceptions.When_handler_throws.Endpoint.Handler.Handle(Message message)
+            StackTraceAssert.StartsWith(
+      @"at NServiceBus.AcceptanceTests.Exceptions.When_handler_throws.Endpoint.Handler.Handle(Message message)
 at NServiceBus.Unicast.MessageHandlerRegistry.Invoke(Object handler, Object message, Dictionary`2 dictionary)
 at NServiceBus.InvokeHandlersBehavior.Invoke(IncomingContext context, Action next)
 at NServiceBus.SetCurrentMessageBeingHandledBehavior.Invoke(IncomingContext context, Action next)
@@ -39,8 +39,7 @@ at NServiceBus.ChildContainerBehavior.Invoke(IncomingContext context, Action nex
 at NServiceBus.ProcessingStatisticsBehavior.Invoke(IncomingContext context, Action next)
 at NServiceBus.Pipeline.PipelineExecutor.Execute[T](BehaviorChain`1 pipelineAction, T context)
 at NServiceBus.Unicast.Transport.TransportReceiver.ProcessMessage(TransportMessage message)
-at NServiceBus.Unicast.Transport.TransportReceiver.TryProcess(TransportMessage message)
-at NServiceBus.Transports.Msmq.MsmqDequeueStrategy.Action()", context.StackTrace);
+at NServiceBus.Unicast.Transport.TransportReceiver.TryProcess(TransportMessage message)", context.StackTrace);
         }
 
         public class Context : ScenarioContext
@@ -108,5 +107,5 @@ at NServiceBus.Transports.Msmq.MsmqDequeueStrategy.Action()", context.StackTrace
             }
         }
     }
-    
+
 }

@@ -20,19 +20,39 @@ namespace NServiceBus.Persistence.NHibernate
         }
 
         /// <summary>
-        /// Gets the current context NHibernate <see cref="IDbConnection"/>.
+        /// Gets the database connection associated with the current NHibernate <see cref="Session"/>
         /// </summary>
         public IDbConnection Connection
         {
             get
             {
-                Lazy<IDbConnection> lazy;
-                if (pipelineExecutor.CurrentContext.TryGet(string.Format("LazySqlConnection-{0}", connectionString), out lazy))
+                Lazy<ISession> lazy;
+                if (pipelineExecutor.CurrentContext.TryGet(string.Format("LazyNHibernateSession-{0}", connectionString), out lazy))
                 {
-                    return lazy.Value;
+                    return lazy.Value.Connection;
                 }
 
                 throw new InvalidOperationException("No connection available");
+            }
+        }
+        
+        /// <summary>
+        /// Gets the database transaction associated with the current NHibernate <see cref="Session"/> or null when using TransactionScope.
+        /// </summary>
+        public IDbTransaction DatabaseTransaction
+        {
+            get
+            {
+                using (var command = Connection.CreateCommand())
+                {
+                    Lazy<ITransaction> lazy;
+                    if (pipelineExecutor.CurrentContext.TryGet(string.Format("LazyNHibernateTransaction-{0}", connectionString), out lazy))
+                    {
+                        lazy.Value.Enlist(command);
+                        return command.Transaction;
+                    }
+                }
+                return null;
             }
         }
 
