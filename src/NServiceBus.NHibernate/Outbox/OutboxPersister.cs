@@ -2,48 +2,51 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.Data;
     using System.Linq;
+    using System.Transactions;
     using global::NHibernate.Criterion;
     using NHibernate;
     using Persistence.NHibernate;
     using Serializers.Json;
+    using IsolationLevel = System.Data.IsolationLevel;
 
     class OutboxPersister : IOutboxStorage
     {
         public IStorageSessionProvider StorageSessionProvider { get; set; }
+        public SessionFactoryProvider SessionFactoryProvider { get; set; }
 
         public bool TryGet(string messageId, out OutboxMessage message)
         {
-            OutboxRecord result;
-
-            message = null;
-
-            using (var session = StorageSessionProvider.OpenStatelessSession())
+            using (new TransactionScope(TransactionScopeOption.Suppress))
             {
-                using (var tx = session.BeginAmbientTransactionAware(IsolationLevel.ReadCommitted))
+                OutboxRecord result;
+                message = null;
+                using (var session = SessionFactoryProvider.SessionFactory.OpenStatelessSession())
                 {
-                    //Explicitly using ICriteria instead of QueryOver for performance reasons.
-                    //It seems QueryOver uses quite a bit reflection and that takes longer.
-                    result = session.CreateCriteria<OutboxRecord>().Add(Expression.Eq("MessageId", messageId))
-                        .UniqueResult<OutboxRecord>();
+                    using (var tx = session.BeginTransaction(IsolationLevel.ReadCommitted))
+                    {
+                        //Explicitly using ICriteria instead of QueryOver for performance reasons.
+                        //It seems QueryOver uses quite a bit reflection and that takes longer.
+                        result = session.CreateCriteria<OutboxRecord>().Add(Expression.Eq("MessageId", messageId))
+                            .UniqueResult<OutboxRecord>();
 
-                    tx.Commit();
+                        tx.Commit();
+                    }
                 }
+
+                if (result == null)
+                {
+                    return false;
+                }
+
+                message = new OutboxMessage(result.MessageId);
+
+                var operations = ConvertStringToObject(result.TransportOperations);
+                message.TransportOperations.AddRange(operations.Select(t => new TransportOperation(t.MessageId,
+                    t.Options, t.Message, t.Headers)));
+
+                return true;
             }
-
-            if (result == null)
-            {
-                return false;
-            }
-
-            message = new OutboxMessage(result.MessageId);
-
-            var operations = ConvertStringToObject(result.TransportOperations);
-            message.TransportOperations.AddRange(operations.Select(t => new TransportOperation(t.MessageId, 
-                t.Options, t.Message, t.Headers)));
-
-            return true;
         }
 
         public void Store(string messageId, IEnumerable<TransportOperation> transportOperations)
@@ -66,37 +69,43 @@
 
         public void SetAsDispatched(string messageId)
         {
-            using (var session = StorageSessionProvider.OpenStatelessSession())
+            using (new TransactionScope(TransactionScopeOption.Suppress))
             {
-                using (var tx = session.BeginTransaction(IsolationLevel.ReadCommitted))
+                using (var session = SessionFactoryProvider.SessionFactory.OpenStatelessSession())
                 {
-                    var queryString = string.Format("update {0} set Dispatched = true, DispatchedAt = :date where MessageId = :messageid And Dispatched = false",
-                        typeof(OutboxRecord));
-                    session.CreateQuery(queryString)
-                        .SetString("messageid", messageId)
-                        .SetDateTime("date", DateTime.UtcNow)
-                        .ExecuteUpdate();
+                    using (var tx = session.BeginTransaction(IsolationLevel.ReadCommitted))
+                    {
+                        var queryString = string.Format("update {0} set Dispatched = true, DispatchedAt = :date where MessageId = :messageid And Dispatched = false",
+                            typeof(OutboxRecord));
+                        session.CreateQuery(queryString)
+                            .SetString("messageid", messageId)
+                            .SetDateTime("date", DateTime.UtcNow)
+                            .ExecuteUpdate();
 
-                    tx.Commit();
+                        tx.Commit();
+                    }
                 }
             }
         }
 
         public void RemoveEntriesOlderThan(DateTime dateTime)
         {
-            using (var session = StorageSessionProvider.OpenSession())
+            using (new TransactionScope(TransactionScopeOption.Suppress))
             {
-                using (var tx = session.BeginTransaction(IsolationLevel.ReadCommitted))
+                using (var session = SessionFactoryProvider.SessionFactory.OpenStatelessSession())
                 {
-                    var result = session.QueryOver<OutboxRecord>().Where(o => o.Dispatched && o.DispatchedAt < dateTime)
-                        .List();
-
-                    foreach (var record in result)
+                    using (var tx = session.BeginTransaction(IsolationLevel.ReadCommitted))
                     {
-                        session.Delete(record);
-                    }
+                        var result = session.QueryOver<OutboxRecord>().Where(o => o.Dispatched && o.DispatchedAt < dateTime)
+                            .List();
 
-                    tx.Commit();
+                        foreach (var record in result)
+                        {
+                            session.Delete(record);
+                        }
+
+                        tx.Commit();
+                    }
                 }
             }
         }

@@ -1,9 +1,7 @@
 namespace NServiceBus.Persistence.NHibernate
 {
     using System;
-    using System.Data;
     using global::NHibernate;
-    using Outbox;
     using Pipeline;
 
     class SharedConnectionStorageSessionProvider : IStorageSessionProvider
@@ -12,11 +10,7 @@ namespace NServiceBus.Persistence.NHibernate
 
         public string ConnectionString { get; set; }
 
-        public SessionFactoryProvider SessionFactoryProvider { get; set; }
-
-        public IDbConnectionProvider DbConnectionProvider { get; set; }
-
-        public ISession Session
+        ISession Session
         {
             get
             {
@@ -29,30 +23,6 @@ namespace NServiceBus.Persistence.NHibernate
 
                 return existingSession.Value;
             }
-        }
-
-        public IStatelessSession OpenStatelessSession()
-        {
-            IDbConnection connection;
-
-            if (DbConnectionProvider.TryGetConnection(out connection, ConnectionString))
-            {
-                return SessionFactoryProvider.SessionFactory.OpenStatelessSession(connection);
-            }
-
-            return SessionFactoryProvider.SessionFactory.OpenStatelessSession();
-        }
-
-        public ISession OpenSession()
-        {
-            IDbConnection connection;
-
-            if (DbConnectionProvider.TryGetConnection(out connection, ConnectionString))
-            {
-                return SessionFactoryProvider.SessionFactory.OpenSession(connection);
-            }
-
-            return SessionFactoryProvider.SessionFactory.OpenSession();
         }
 
         public void ExecuteInTransaction(Action<ISession> operation)

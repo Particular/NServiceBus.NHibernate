@@ -1,6 +1,8 @@
 ﻿namespace NServiceBus.Persistence
 {
+    using System;
     using Configuration.AdvanceExtensibility;
+    using global::NHibernate;
     using global::NHibernate.Cfg;
 
     /// <summary>
@@ -37,6 +39,33 @@
         public static PersistenceExtentions<NHibernatePersistence> UseConfiguration(this PersistenceExtentions<NHibernatePersistence> persistenceConfiguration, Configuration configuration)
         {
             persistenceConfiguration.GetSettings().Set("StorageConfiguration", configuration);
+            return persistenceConfiguration;
+        }
+
+        /// <summary>
+        /// Instructs the NHibernate persistence to register the managed session available via NHibernateStorageSession in the container.
+        /// </summary>
+        /// <param name="persistenceConfiguration"></param>
+        /// <returns></returns>
+        public static PersistenceExtentions<NHibernatePersistence> RegisterManagedSessionInTheContainer(this PersistenceExtentions<NHibernatePersistence> persistenceConfiguration)
+        {
+            persistenceConfiguration.GetSettings().Set("NHibernate.RegisterManagedSession", true);
+            return persistenceConfiguration;
+        }
+
+        /// <summary>
+        /// Instructs the NHibernate persistence to use a custom session creation method. The provided method takes the ISessionFactory and the connection string and returns a session.
+        /// </summary>
+        /// <param name="persistenceConfiguration"></param>
+        /// <param name="callback"></param>
+        /// <returns></returns>
+        public static PersistenceExtentions<NHibernatePersistence> UseCustomSessionCreationMethod(this PersistenceExtentions<NHibernatePersistence> persistenceConfiguration, Func<ISessionFactory, string, ISession> callback)
+        {
+            if (callback == null)
+            {
+                throw new ArgumentNullException("callback");
+            }
+            persistenceConfiguration.GetSettings().Set("NHibernate.SessionCreator", callback);
             return persistenceConfiguration;
         }
     }
