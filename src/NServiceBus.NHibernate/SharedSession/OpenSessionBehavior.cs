@@ -130,6 +130,7 @@ namespace NServiceBus.Persistence.NHibernate
             {
                 InsertAfter(WellKnownStep.ExecuteUnitOfWork);
                 InsertAfterIfExists("OutboxDeduplication");
+                InsertBefore(WellKnownStep.MutateIncomingTransportMessage);
                 InsertBeforeIfExists("OutboxRecorder");
                 InsertBeforeIfExists(WellKnownStep.InvokeSaga);
             }
