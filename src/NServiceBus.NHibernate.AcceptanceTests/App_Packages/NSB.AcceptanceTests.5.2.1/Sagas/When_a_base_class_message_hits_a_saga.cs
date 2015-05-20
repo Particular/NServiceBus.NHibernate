@@ -70,10 +70,9 @@
                 public class SagaData : ContainSagaData
                 {
                     [Unique]
-                    public Guid SomeId { get; set; }
+                    public virtual Guid SomeId { get; set; }
                 }
             }
-
         }
 
 
