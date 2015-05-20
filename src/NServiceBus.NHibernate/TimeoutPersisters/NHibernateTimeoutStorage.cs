@@ -39,16 +39,10 @@ namespace NServiceBus.Features
 
             ConfigureNHibernate.AddMappings<TimeoutEntityMap>(configuration);
 
-            TimeoutPersisters.NHibernate.Installer.Installer.configuration = configuration;
-
-            if (context.Settings.HasSetting("NHibernate.Timeouts.AutoUpdateSchema"))
-            {
-                TimeoutPersisters.NHibernate.Installer.Installer.RunInstaller = context.Settings.Get<bool>("NHibernate.Timeouts.AutoUpdateSchema");
-            }
-            else
-            {
-                TimeoutPersisters.NHibernate.Installer.Installer.RunInstaller = context.Settings.Get<bool>("NHibernate.Common.AutoUpdateSchema");
-            }
+            context.Container.ConfigureComponent<TimeoutPersisters.NHibernate.Installer.Installer>(DependencyLifecycle.SingleInstance)
+                .ConfigureProperty(x => x.Configuration, configuration)
+                .ConfigureProperty(x => x.RunInstaller, RunInstaller(context));
+                
 
             string connString;
 
@@ -70,5 +64,11 @@ namespace NServiceBus.Features
                 .ConfigureProperty(p => p.EndpointName, context.Settings.EndpointName());
         }
 
+        static bool RunInstaller(FeatureConfigurationContext context)
+        {
+            return context.Settings.Get<bool>(context.Settings.HasSetting("NHibernate.Timeouts.AutoUpdateSchema") 
+                ? "NHibernate.Timeouts.AutoUpdateSchema" 
+                : "NHibernate.Common.AutoUpdateSchema");
+        }
     }
 }

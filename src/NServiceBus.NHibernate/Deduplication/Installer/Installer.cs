@@ -6,15 +6,14 @@
 
     class Installer : INeedToInstallSomething
     {
-        public static bool RunInstaller { get; set; }
-
-        internal static Configuration configuration;
+        public bool RunInstaller { get; set; }
+        public Configuration Configuration { get; set; }
 
         public void Install(string identity, Configure config)
         {
             if (RunInstaller)
             {
-                new SchemaUpdate(configuration).Execute(false, true);
+                new SchemaUpdate(Configuration).Execute(false, true);
             }
         }
     }

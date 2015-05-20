@@ -39,16 +39,10 @@ namespace NServiceBus.Features
 
             ConfigureNHibernate.AddMappings<SubscriptionMap>(configuration);
 
-            Unicast.Subscriptions.NHibernate.Installer.Installer.configuration = configuration;
+            context.Container.ConfigureComponent<Unicast.Subscriptions.NHibernate.Installer.Installer>(DependencyLifecycle.SingleInstance)
+                .ConfigureProperty(x => x.Configuration, configuration)
+                .ConfigureProperty(x => x.RunInstaller, RunInstaller(context));
 
-            if (context.Settings.HasSetting("NHibernate.Subscriptions.AutoUpdateSchema"))
-            {
-                Unicast.Subscriptions.NHibernate.Installer.Installer.RunInstaller = context.Settings.Get<bool>("NHibernate.Subscriptions.AutoUpdateSchema");
-            }
-            else
-            {
-                Unicast.Subscriptions.NHibernate.Installer.Installer.RunInstaller = context.Settings.Get<bool>("NHibernate.Common.AutoUpdateSchema");
-            }
             var sessionSource = new SubscriptionStorageSessionProvider(configuration.BuildSessionFactory());
 
             context.Container.RegisterSingleton(sessionSource);
@@ -61,6 +55,13 @@ namespace NServiceBus.Features
             {
                 context.Container.ConfigureComponent<SubscriptionPersister>(DependencyLifecycle.InstancePerCall);
             }
+        }
+
+        static bool RunInstaller(FeatureConfigurationContext context)
+        {
+            return context.Settings.Get<bool>(context.Settings.HasSetting("NHibernate.Subscriptions.AutoUpdateSchema")
+                ? "NHibernate.Subscriptions.AutoUpdateSchema"
+                : "NHibernate.Common.AutoUpdateSchema");
         }
     }
 }
