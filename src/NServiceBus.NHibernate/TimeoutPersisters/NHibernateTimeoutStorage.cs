@@ -23,19 +23,15 @@ namespace NServiceBus.Features
         /// Called when the feature should perform its initialization. This call will only happen if the feature is enabled.
         /// </summary>
         protected override void Setup(FeatureConfigurationContext context)
-        {
-            var properties = new ConfigureNHibernate(context.Settings)
-                .TimeoutPersisterProperties;
-
-            ConfigureNHibernate.ThrowIfRequiredPropertiesAreMissing(properties);
-
+        {            
             var configuration = context.Settings.GetOrDefault<Configuration>("NHibernate.Timeouts.Configuration") ?? context.Settings.GetOrDefault<Configuration>("StorageConfiguration");
 
             if (configuration == null)
             {
-                configuration = new Configuration()
-                    .SetProperties(properties);
+                var properties = new ConfigureNHibernate(context.Settings).TimeoutPersisterProperties;
+                configuration = new Configuration().SetProperties(properties);
             }
+            ConfigureNHibernate.ThrowIfRequiredPropertiesAreMissing(configuration.Properties);
 
             ConfigureNHibernate.AddMappings<TimeoutEntityMap>(configuration);
 

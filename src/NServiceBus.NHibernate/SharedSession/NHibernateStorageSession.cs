@@ -28,13 +28,11 @@ namespace NServiceBus.Features
             if (configuration == null)
             {
                 var properties = new ConfigureNHibernate(context.Settings).SagaPersisterProperties;
-
-                configuration = new Configuration()
-                    .SetProperties(properties);
+                configuration = new Configuration().SetProperties(properties);
             }
+            ConfigureNHibernate.ThrowIfRequiredPropertiesAreMissing(configuration.Properties);
 
-            context.Settings.Get<SharedMappings>()
-                .ApplyTo(configuration);
+            context.Settings.Get<SharedMappings>().ApplyTo(configuration);
 
             string connString;
 
