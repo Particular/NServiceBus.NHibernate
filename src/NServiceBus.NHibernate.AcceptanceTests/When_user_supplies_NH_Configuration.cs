@@ -10,7 +10,7 @@
     public class When_user_supplies_NH_Configuration : NServiceBusAcceptanceTest
     {
         [Test]
-        public void Should_use_user_supplied_NH_Configuration()
+        public void Should_use_user_supplied_NH_Configuration_and_connection_string()
         {
             var context = new Context();
 
@@ -43,6 +43,14 @@
 
                     c.UsePersistence<NHibernatePersistence>().UseConfiguration(cfg);
                 });
+            }
+
+            public class ConfigurePersistence
+            {
+                public void Configure(BusConfiguration bc)
+                {
+                    //NOOP - not setting the ConnectionString here to check if it will be picked up from the user-specified Configuration.
+                }
             }
 
             public class TestSaga : Saga<TestSagaData>, IAmStartedByMessages<Message1>, IHandleMessages<Message2>
