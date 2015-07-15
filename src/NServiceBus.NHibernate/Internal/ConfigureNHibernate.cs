@@ -10,7 +10,6 @@ namespace NServiceBus.Persistence.NHibernate
     using global::NHibernate.Cfg;
     using global::NHibernate.Cfg.ConfigurationSchema;
     using global::NHibernate.Mapping.ByCode;
-    using Logging;
     using Settings;
     using Configuration = global::NHibernate.Cfg.Configuration;
     using Environment = global::NHibernate.Cfg.Environment;
@@ -20,57 +19,62 @@ namespace NServiceBus.Persistence.NHibernate
     /// </summary>
     class ConfigureNHibernate
     {
-        readonly ReadOnlySettings settings;
-
-        private const string Message =
-            @"
-To run NServiceBus with NHibernate you need to at least specify the database connectionstring.
-Here is an example of what is required:
-  <appSettings>
-    <!-- dialect is defaulted to MsSql2008Dialect, if needed change accordingly -->
-    <add key=""NServiceBus/Persistence/NHibernate/dialect"" value=""NHibernate.Dialect.{your dialect}""/>
-
-    <!-- other optional settings examples -->
-    <add key=""NServiceBus/Persistence/NHibernate/connection.provider"" value=""NHibernate.Connection.DriverConnectionProvider""/>
-    <add key=""NServiceBus/Persistence/NHibernate/connection.driver_class"" value=""NHibernate.Driver.Sql2008ClientDriver""/>
-    <!-- For more setting see http://www.nhforge.org/doc/nh/en/#configuration-hibernatejdbc and http://www.nhforge.org/doc/nh/en/#configuration-optional -->
-  </appSettings>
-  
-  <connectionStrings>
-    <!-- Default connection string for all NHibernate/Sql persisters -->
-    <add name=""NServiceBus/Persistence"" connectionString=""Data Source=.\SQLEXPRESS;Initial Catalog=nservicebus;Integrated Security=True"" />
-    
-    <!-- Optional overrides per persister -->
-    <add name=""NServiceBus/Persistence/NHibernate/Timeout"" connectionString=""Data Source=.\SQLEXPRESS;Initial Catalog=timeout;Integrated Security=True"" />
-    <add name=""NServiceBus/Persistence/NHibernate/Saga"" connectionString=""Data Source=.\SQLEXPRESS;Initial Catalog=sagas;Integrated Security=True"" />
-    <add name=""NServiceBus/Persistence/NHibernate/Subscription"" connectionString=""Data Source=.\SQLEXPRESS;Initial Catalog=subscription;Integrated Security=True"" />
-    <add name=""NServiceBus/Persistence/NHibernate/Deduplication"" connectionString=""Data Source=.\SQLEXPRESS;Initial Catalog=gateway;Integrated Security=True"" />
-    <add name=""NServiceBus/Persistence/NHibernate/Distributor"" connectionString=""Data Source=.\SQLEXPRESS;Initial Catalog=distributor;Integrated Security=True"" />
-  </connectionStrings>";
-
-        static readonly ILog Logger = LogManager.GetLogger(typeof(ConfigureNHibernate));
         static readonly Regex PropertyRetrievalRegex = new Regex(@"NServiceBus/Persistence/NHibernate/([\W\w]+)$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
         private static ConnectionStringSettingsCollection connectionStringSettingsCollection;
-
         public const string DefaultDialect = "NHibernate.Dialect.MsSql2008Dialect";
 
+        readonly Configuration configuration;
 
-        public ConfigureNHibernate(ReadOnlySettings settings)
+        public ConfigureNHibernate(ReadOnlySettings settings, string connectionStringKeySuffix, params string[] settingsKeys)
         {
-            this.settings = settings;
-            Init();
+            if (connectionStringKeySuffix == null)
+            {
+                throw new ArgumentNullException("connectionStringKeySuffix");
+            }
+            if (settingsKeys.Length == 0)
+            {
+                throw new InvalidOperationException("At least one setting key is required");
+            }
+            configuration = settingsKeys.Select(settings.GetOrDefault<Configuration>).FirstOrDefault(x => x != null);
+            if (Configuration == null)
+            {
+                var configurationProperties = InitFromConfiguration(settings);
+                var overriddenProperties = OverrideConnectionStringSettingIfNotNull(configurationProperties, connectionStringKeySuffix);
+                configuration = new Configuration().SetProperties(overriddenProperties);
+                ValidateConfigurationViaConfigFile(Configuration, connectionStringKeySuffix);
+            }
+            else
+            {
+                ValidateConfigurationViaCode(Configuration.Properties);
+            }
         }
 
-        /// <summary>
-        /// Initializes the <see cref="ConfigureNHibernate"/> NHibernate properties.
-        /// </summary>
-        /// <remarks>
-        /// Configure NHibernate using the <c>&lt;hibernate-configuration&gt;</c> section
-        /// from the application config file, if found, or the file <c>hibernate.cfg.xml</c> if the
-        /// <c>&lt;hibernate-configuration&gt;</c> section not include the session-factory configuration.
-        /// However those settings can be overwritten by our own configuration settings if specified.
-        /// </remarks>
-        void Init()
+        public Configuration Configuration
+        {
+            get { return configuration; }
+        }
+
+        public string ConnectionString
+        {
+            get
+            {
+                string connString;
+                if (!configuration.Properties.TryGetValue(Environment.ConnectionString, out connString))
+                {
+                    string connStringName;
+
+                    if (configuration.Properties.TryGetValue(Environment.ConnectionStringName, out connStringName))
+                    {
+                        var connectionStringSettings = ConfigurationManager.ConnectionStrings[connStringName];
+
+                        connString = connectionStringSettings.ConnectionString;
+                    }
+                }
+                return connString;
+            }
+        }
+
+        static IDictionary<string, string> InitFromConfiguration(ReadOnlySettings settings)
         {
             connectionStringSettingsCollection = NHibernateSettingRetriever.ConnectionStrings() ??
                                                  new ConnectionStringSettingsCollection();
@@ -98,117 +102,53 @@ Here is an example of what is required:
             {
                 configurationProperties[Environment.Dialect] = DefaultDialect;
             }
-
-            TimeoutPersisterProperties = OverrideConnectionStringSettingIfNotNull(configurationProperties,
-                "NServiceBus/Persistence/NHibernate/Timeout");
-            SubscriptionStorageProperties = OverrideConnectionStringSettingIfNotNull(configurationProperties,
-                "NServiceBus/Persistence/NHibernate/Subscription");
-            SagaPersisterProperties = OverrideConnectionStringSettingIfNotNull(configurationProperties,
-                "NServiceBus/Persistence/NHibernate/Saga");
-            GatewayDeduplicationProperties = OverrideConnectionStringSettingIfNotNull(configurationProperties,
-                "NServiceBus/Persistence/NHibernate/Deduplication");
-            DistributorPersisterProperties = OverrideConnectionStringSettingIfNotNull(configurationProperties,
-                "NServiceBus/Persistence/NHibernate/Distributor");
-            OutboxProperties = OverrideConnectionStringSettingIfNotNull(configurationProperties,
-                "NServiceBus/Persistence/NHibernate/Outbox");
+            return configurationProperties;
         }
 
-        /// <summary>
-        /// Timeout persister NHibernate properties.
-        /// </summary>
-        public IDictionary<string, string> TimeoutPersisterProperties { get; private set; }
-
-        /// <summary>
-        /// Subscription persister NHibernate properties.
-        /// </summary>
-        public IDictionary<string, string> SubscriptionStorageProperties { get; private set; }
-
-        /// <summary>
-        /// Saga persister NHibernate properties.
-        /// </summary>
-        public IDictionary<string, string> SagaPersisterProperties { get; private set; }
-
-        /// <summary>
-        /// Gateway deduplication NHibernate properties.
-        /// </summary>
-        public IDictionary<string, string> GatewayDeduplicationProperties { get; private set; }
-
-        /// <summary>
-        /// Distributor persister NHibernate properties.
-        /// </summary>
-        public IDictionary<string, string> DistributorPersisterProperties { get; private set; }
-
-        /// <summary>
-        /// Outbox persister NHibernate properties.
-        /// </summary>
-        public IDictionary<string, string> OutboxProperties { get; private set; }
-
-        /// <summary>
-        /// Adds T mapping to <paramref name="configuration"/> .
-        /// </summary>
-        /// <typeparam name="T">The mapping class.</typeparam>
-        /// <param name="configuration">The existing <see cref="Configuration"/>.</param>
-        public static void AddMappings<T>(Configuration configuration) where T : IConformistHoldersProvider, new()
+        public void AddMappings<T>() where T : IConformistHoldersProvider, new()
         {
             var mapper = new ModelMapper();
             mapper.AddMapping<T>();
             var mappings = mapper.CompileMappingForAllExplicitlyAddedEntities();
 
-            configuration.AddMapping(mappings);
+            Configuration.AddMapping(mappings);
         }
 
-        /// <summary>
-        /// Validates minimum required NHibernate properties.
-        /// </summary>
-        /// <param name="props">Properties to validate.</param>
-        public static void ThrowIfRequiredPropertiesAreMissing(IDictionary<string, string> props)
+        static void ValidateConfigurationViaCode(IDictionary<string, string> props)
         {
-            if ((props.ContainsKey(Environment.ConnectionString) || props.ContainsKey(Environment.ConnectionStringName)))
+            if (ContainsRequiredProperties(props))
             {
                 return;
             }
 
-            const string errorMsg = @"No NHibernate properties found in your config file ({0}).
-{1}";
-            throw new InvalidOperationException(String.Format(errorMsg, GetConfigFileIfExists(), Message));
+            const string errorMsg = @"When providing a custom Configuration object you need to at least specify the connection string either via " +
+                                    Environment.ConnectionString + " or " + Environment.ConnectionStringName + ".";
+
+            throw new InvalidOperationException(errorMsg);
         }
 
-        /// <summary>
-        /// It ensures that in DEBUG mode SqlLite is configured if no other settings are specified.
-        /// </summary>
-        /// <param name="properties">The properties to use.</param>
-        public static void ConfigureSqlLiteIfRunningInDebugModeAndNoConfigPropertiesSet(IDictionary<string, string> properties)
+        public static bool ContainsRequiredProperties(IDictionary<string, string> props)
         {
-            if (!System.Diagnostics.Debugger.IsAttached || properties.Count != 0) 
+            return (props.ContainsKey(Environment.ConnectionString) || props.ContainsKey(Environment.ConnectionStringName));
+        }
+
+        static void ValidateConfigurationViaConfigFile(Configuration configuration, string configPrefix)
+        {
+            if (ContainsRequiredProperties(configuration.Properties))
+            {
                 return;
+            }
 
-            const string warningMsg = @"No NHibernate properties found in your config file ({0}). 
-We have automatically fallen back to use SQLite. However, this only happens while you are running in Visual Studio.
-To run in this mode you need to reference the SQLite assembly, here is the NuGet package you need to install:
-PM> Install-Package System.Data.SQLite.{1}
-{2}";
-            Logger.WarnFormat(warningMsg, GetConfigFileIfExists(), System.Environment.Is64BitOperatingSystem ? "x64" : "x86", Message);
+            const string errorMsg = @"In order to use NServiceBus with NHibernate you need to provide at least one connection string. You can do it via (in order of precedence):
+ * specifying 'NServiceBus/Persistence/NHibernate/{0}' connection string for the {0} persister
+ * specifying 'NServiceBus/Persistence' connection string that applies to all persisters
+ * specifying 'NServiceBus/Persistence/connection.connection_string' or 'NServiceBus/Persistence/connection.connection_string_name' value in AppSettings or your NHibernate configuration file.
+For most scenarios the 'NServiceBus/Persistence' connection string is the best option.";
 
-            properties.Add("dialect", "NHibernate.Dialect.SQLiteDialect");
-            properties.Add("connection.connection_string", @"Data Source=.\NServiceBus.sqllite;New=True;");
+            throw new InvalidOperationException(string.Format(errorMsg, configPrefix));
         }
 
-        /// <summary>
-        /// Created and initializes a <see cref="Configuration"/> based on <paramref name="properties"/> specified.
-        /// </summary>
-        /// <param name="properties">The properties to use.</param>
-        /// <returns>A properly initialized <see cref="Configuration"/>.</returns>
-        public static Configuration CreateConfigurationWith(IDictionary<string, string> properties)
-        {
-            return new Configuration().SetProperties(properties);
-        }
-
-        private static string GetConfigFileIfExists()
-        {
-            return AppDomain.CurrentDomain.SetupInformation.ConfigurationFile ?? "App.config";
-        }
-
-        private static Configuration CreateNHibernateConfiguration()
+        static Configuration CreateNHibernateConfiguration()
         {
             var configuration = new Configuration();
             var hc = ConfigurationManager.GetSection(CfgXmlHelper.CfgSectionName) as IHibernateConfiguration;
@@ -223,7 +163,7 @@ PM> Install-Package System.Data.SQLite.{1}
             return configuration;
         }
 
-        private static string GetDefaultConfigurationFilePath()
+        static string GetDefaultConfigurationFilePath()
         {
             var baseDir = AppDomain.CurrentDomain.BaseDirectory;
 
@@ -236,32 +176,28 @@ PM> Install-Package System.Data.SQLite.{1}
             return Path.Combine(binPath, Configuration.DefaultHibernateCfgFileName);
         }
 
-        private static IDictionary<string, string> OverrideConnectionStringSettingIfNotNull(
-            IDictionary<string, string> properties, string name)
+        static IDictionary<string, string> OverrideConnectionStringSettingIfNotNull(IDictionary<string, string> configurationProperties, string connectionStringSuffix)
         {
-            var connectionStringOverride = GetConnectionStringOrNull(name);
+            var connectionStringOverride = GetConnectionStringOrNull("NServiceBus/Persistence/NHibernate/"+connectionStringSuffix);
 
             if (String.IsNullOrEmpty(connectionStringOverride))
             {
-                return new Dictionary<string, string>(properties);
+                return new Dictionary<string, string>(configurationProperties);
             }
 
-            var overriddenProperties = new Dictionary<string, string>(properties);
+            var overriddenProperties = new Dictionary<string, string>(configurationProperties);
             overriddenProperties[Environment.ConnectionString] = connectionStringOverride;
 
             return overriddenProperties;
         }
 
-        private static string GetConnectionStringOrNull(string name)
+        static string GetConnectionStringOrNull(string name)
         {
             var connectionStringSettings = connectionStringSettingsCollection[name];
 
-            if (connectionStringSettings == null)
-            {
-                return null;
-            }
-
-            return connectionStringSettings.ConnectionString;
+            return connectionStringSettings == null 
+                ? null 
+                : connectionStringSettings.ConnectionString;
         }
     }
 }
