@@ -16,11 +16,7 @@ namespace NServiceBus.Outbox.NHibernate
             }));
             Property(p => p.Dispatched, pm =>
             {
-                pm.Column(c =>
-                {
-                    c.Default(0);
-                    c.NotNullable(true);
-                });
+                pm.Column(c => c.NotNullable(true));
                 pm.Index("OutboxRecord_Dispatched_Idx");
             });
             Property(p => p.DispatchedAt, pm => pm.Index("OutboxRecord_DispatchedAt_Idx"));
