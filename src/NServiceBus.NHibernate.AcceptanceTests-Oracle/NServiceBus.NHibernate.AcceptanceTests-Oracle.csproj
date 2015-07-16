@@ -241,6 +241,7 @@
     <Compile Include="App_Packages\NSB.AcceptanceTests.5.2.1\Versioning\When_multiple_versions_of_a_message_is_published.cs" />
     <Compile Include="App_Packages\NSB.AcceptanceTests.5.2.1\Volatile\When_sending_to_non_durable_endpoint.cs" />
     <Compile Include="ConfigureNHibernatePersistence.cs" />
+    <Compile Include="When_cannot_save_data_to_the_database_using_shared_session.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\NServiceBus.NHibernate\NServiceBus.NHibernate.csproj">
