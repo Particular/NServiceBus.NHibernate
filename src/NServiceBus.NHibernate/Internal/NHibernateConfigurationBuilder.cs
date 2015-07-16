@@ -25,14 +25,6 @@ namespace NServiceBus.Persistence.NHibernate
 
         public NHibernateConfigurationBuilder(ReadOnlySettings settings, string connectionStringKeySuffix, params string[] settingsKeys)
         {
-            if (connectionStringKeySuffix == null)
-            {
-                throw new ArgumentNullException("connectionStringKeySuffix");
-            }
-            if (settingsKeys.Length == 0)
-            {
-                throw new InvalidOperationException("At least one setting key is required");
-            }
             configuration = settingsKeys.Select(settings.GetOrDefault<Configuration>).FirstOrDefault(x => x != null);
             if (configuration == null)
             {

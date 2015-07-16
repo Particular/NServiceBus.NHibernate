@@ -1,11 +1,9 @@
 namespace NServiceBus.Features
 {
     using System;
-    using System.Configuration;
     using NHibernate;
     using Persistence.NHibernate;
     using Pipeline;
-    using Environment = NHibernate.Cfg.Environment;
 
     /// <summary>
     /// NHibernate Storage Session.

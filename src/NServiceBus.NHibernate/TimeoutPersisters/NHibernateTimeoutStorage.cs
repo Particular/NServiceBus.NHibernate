@@ -1,7 +1,5 @@
 namespace NServiceBus.Features
 {
-    using System.Configuration;
-    using NHibernate.Cfg;
     using Persistence.NHibernate;
     using TimeoutPersisters.NHibernate;
     using TimeoutPersisters.NHibernate.Config;
