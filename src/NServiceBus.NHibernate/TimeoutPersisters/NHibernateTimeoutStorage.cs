@@ -1,5 +1,7 @@
 namespace NServiceBus.Features
 {
+    using System.Configuration;
+    using NHibernate.Cfg;
     using Persistence.NHibernate;
     using TimeoutPersisters.NHibernate;
     using TimeoutPersisters.NHibernate.Config;
@@ -23,21 +25,19 @@ namespace NServiceBus.Features
         /// </summary>
         protected override void Setup(FeatureConfigurationContext context)
         {
-            var configure = new ConfigureNHibernate(context.Settings, "Timeout", "NHibernate.Timeouts.Configuration", "StorageConfiguration");
-            configure.AddMappings<TimeoutEntityMap>();
+            var builder = new NHibernateConfigurationBuilder(context.Settings, "Timeout", "NHibernate.Timeouts.Configuration", "StorageConfiguration");
+            builder.AddMappings<TimeoutEntityMap>();
+            var config = builder.Build();
 
             context.Container.ConfigureComponent<TimeoutPersisters.NHibernate.Installer.Installer>(DependencyLifecycle.SingleInstance)
-                .ConfigureProperty(x => x.Configuration, configure.Configuration)
+                .ConfigureProperty(x => x.Configuration, config.Configuration)
                 .ConfigureProperty(x => x.RunInstaller, RunInstaller(context));
-                
 
             context.Container.ConfigureComponent<TimeoutPersister>(DependencyLifecycle.SingleInstance)
-                .ConfigureProperty(p => p.ConnectionString, configure.ConnectionString)
-                .ConfigureProperty(p => p.SessionFactory, configure.Configuration.BuildSessionFactory())
+                .ConfigureProperty(p => p.ConnectionString, config.ConnectionString)
+                .ConfigureProperty(p => p.SessionFactory, config.Configuration.BuildSessionFactory())
                 .ConfigureProperty(p => p.EndpointName, context.Settings.EndpointName());
         }
-
-        
 
         static bool RunInstaller(FeatureConfigurationContext context)
         {

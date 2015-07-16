@@ -24,14 +24,15 @@ namespace NServiceBus.Features
         /// </summary>
         protected override void Setup(FeatureConfigurationContext context)
         {
-            var configure = new ConfigureNHibernate(context.Settings, "Subscription", "NHibernate.Subscriptions.Configuration", "StorageConfiguration");
-            configure.AddMappings<SubscriptionMap>();
+            var builder = new NHibernateConfigurationBuilder(context.Settings, "Subscription", "NHibernate.Subscriptions.Configuration", "StorageConfiguration");
+            builder.AddMappings<SubscriptionMap>();
+            var config = builder.Build();
 
             context.Container.ConfigureComponent<Unicast.Subscriptions.NHibernate.Installer.Installer>(DependencyLifecycle.SingleInstance)
-                .ConfigureProperty(x => x.Configuration, configure.Configuration)
+                .ConfigureProperty(x => x.Configuration, config.Configuration)
                 .ConfigureProperty(x => x.RunInstaller, RunInstaller(context));
 
-            var sessionSource = new SubscriptionStorageSessionProvider(configure.Configuration.BuildSessionFactory());
+            var sessionSource = new SubscriptionStorageSessionProvider(config.Configuration.BuildSessionFactory());
 
             context.Container.RegisterSingleton(sessionSource);
 

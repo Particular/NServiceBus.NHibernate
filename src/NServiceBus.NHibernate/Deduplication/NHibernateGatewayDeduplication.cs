@@ -21,15 +21,16 @@ namespace NServiceBus.Features
         /// </summary>
         protected override void Setup(FeatureConfigurationContext context)
         {
-            var configure = new ConfigureNHibernate(context.Settings, "Deduplication", "NHibernate.GatewayDeduplication.Configuration", "StorageConfiguration");
-            configure.AddMappings<DeduplicationMessageMap>();
+            var builder = new NHibernateConfigurationBuilder(context.Settings, "Deduplication", "NHibernate.GatewayDeduplication.Configuration", "StorageConfiguration");
+            builder.AddMappings<DeduplicationMessageMap>();
+            var config = builder.Build();
 
             context.Container.ConfigureComponent<Deduplication.NHibernate.Installer.Installer>(DependencyLifecycle.SingleInstance)
-                .ConfigureProperty(x => x.Configuration, configure.Configuration)
+                .ConfigureProperty(x => x.Configuration, config.Configuration)
                 .ConfigureProperty(x => x.RunInstaller, RunInstaller(context));
 
             context.Container.ConfigureComponent<Deduplication.NHibernate.GatewayDeduplication>(DependencyLifecycle.SingleInstance)
-                .ConfigureProperty(p => p.SessionFactory, configure.Configuration.BuildSessionFactory());
+                .ConfigureProperty(p => p.SessionFactory, config.Configuration.BuildSessionFactory());
         }
 
         static bool RunInstaller(FeatureConfigurationContext context)

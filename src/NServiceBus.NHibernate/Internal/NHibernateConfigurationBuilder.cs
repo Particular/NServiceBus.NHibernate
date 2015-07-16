@@ -14,10 +14,8 @@ namespace NServiceBus.Persistence.NHibernate
     using Configuration = global::NHibernate.Cfg.Configuration;
     using Environment = global::NHibernate.Cfg.Environment;
 
-    /// <summary>
-    /// Helper class to configure NHibernate persisters.
-    /// </summary>
-    class ConfigureNHibernate
+
+    class NHibernateConfigurationBuilder
     {
         static readonly Regex PropertyRetrievalRegex = new Regex(@"NServiceBus/Persistence/NHibernate/([\W\w]+)$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
         private static ConnectionStringSettingsCollection connectionStringSettingsCollection;
@@ -25,7 +23,7 @@ namespace NServiceBus.Persistence.NHibernate
 
         readonly Configuration configuration;
 
-        public ConfigureNHibernate(ReadOnlySettings settings, string connectionStringKeySuffix, params string[] settingsKeys)
+        public NHibernateConfigurationBuilder(ReadOnlySettings settings, string connectionStringKeySuffix, params string[] settingsKeys)
         {
             if (connectionStringKeySuffix == null)
             {
@@ -36,42 +34,34 @@ namespace NServiceBus.Persistence.NHibernate
                 throw new InvalidOperationException("At least one setting key is required");
             }
             configuration = settingsKeys.Select(settings.GetOrDefault<Configuration>).FirstOrDefault(x => x != null);
-            if (Configuration == null)
+            if (configuration == null)
             {
                 var configurationProperties = InitFromConfiguration(settings);
                 var overriddenProperties = OverrideConnectionStringSettingIfNotNull(configurationProperties, connectionStringKeySuffix);
                 configuration = new Configuration().SetProperties(overriddenProperties);
-                ValidateConfigurationViaConfigFile(Configuration, connectionStringKeySuffix);
+                ValidateConfigurationViaConfigFile(configuration, connectionStringKeySuffix);
             }
             else
             {
-                ValidateConfigurationViaCode(Configuration.Properties);
+                ValidateConfigurationViaCode(configuration.Properties);
             }
         }
 
-        public Configuration Configuration
+        public NHibernateConfiguration Build()
         {
-            get { return configuration; }
-        }
-
-        public string ConnectionString
-        {
-            get
+            string connString;
+            if (!configuration.Properties.TryGetValue(Environment.ConnectionString, out connString))
             {
-                string connString;
-                if (!configuration.Properties.TryGetValue(Environment.ConnectionString, out connString))
+                string connStringName;
+
+                if (configuration.Properties.TryGetValue(Environment.ConnectionStringName, out connStringName))
                 {
-                    string connStringName;
+                    var connectionStringSettings = ConfigurationManager.ConnectionStrings[connStringName];
 
-                    if (configuration.Properties.TryGetValue(Environment.ConnectionStringName, out connStringName))
-                    {
-                        var connectionStringSettings = ConfigurationManager.ConnectionStrings[connStringName];
-
-                        connString = connectionStringSettings.ConnectionString;
-                    }
+                    connString = connectionStringSettings.ConnectionString;
                 }
-                return connString;
             }
+            return new NHibernateConfiguration(configuration, connString);
         }
 
         static IDictionary<string, string> InitFromConfiguration(ReadOnlySettings settings)
@@ -111,7 +101,7 @@ namespace NServiceBus.Persistence.NHibernate
             mapper.AddMapping<T>();
             var mappings = mapper.CompileMappingForAllExplicitlyAddedEntities();
 
-            Configuration.AddMapping(mappings);
+            configuration.AddMapping(mappings);
         }
 
         static void ValidateConfigurationViaCode(IDictionary<string, string> props)

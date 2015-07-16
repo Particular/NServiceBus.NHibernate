@@ -1,9 +1,11 @@
 namespace NServiceBus.Features
 {
     using System;
+    using System.Configuration;
     using NHibernate;
     using Persistence.NHibernate;
     using Pipeline;
+    using Environment = NHibernate.Cfg.Environment;
 
     /// <summary>
     /// NHibernate Storage Session.
@@ -21,32 +23,32 @@ namespace NServiceBus.Features
         /// </summary>
         protected override void Setup(FeatureConfigurationContext context)
         {
-            var configure = new ConfigureNHibernate(context.Settings, "Saga", "StorageConfiguration");
-            context.Settings.Get<SharedMappings>().ApplyTo(configure.Configuration);
+            var builder = new NHibernateConfigurationBuilder(context.Settings, "Saga", "StorageConfiguration");
+            var config = builder.Build();
+            context.Settings.Get<SharedMappings>().ApplyTo(config.Configuration);
 
-            context.Container.RegisterSingleton(new SessionFactoryProvider(configure.Configuration.BuildSessionFactory()));
+            context.Container.RegisterSingleton(new SessionFactoryProvider(config.Configuration.BuildSessionFactory()));
 
             var disableConnectionSharing = DisableTransportConnectionSharing(context);
-
             context.Container
                 .ConfigureProperty<DbConnectionProvider>(p => p.DisableConnectionSharing, disableConnectionSharing)
-                .ConfigureProperty<DbConnectionProvider>(p => p.DefaultConnectionString, configure.ConnectionString);
+                .ConfigureProperty<DbConnectionProvider>(p => p.DefaultConnectionString, config.ConnectionString);
 
             context.Pipeline.Register<OpenSqlConnectionBehavior.Registration>();
             context.Pipeline.Register<OpenSessionBehavior.Registration>();
 
             context.Container.ConfigureComponent<OpenSqlConnectionBehavior>(DependencyLifecycle.InstancePerCall)
-                .ConfigureProperty(p => p.ConnectionString, configure.ConnectionString)
+                .ConfigureProperty(p => p.ConnectionString, config.ConnectionString)
                 .ConfigureProperty(p => p.DisableConnectionSharing, disableConnectionSharing);
 
             context.Container.ConfigureComponent<OpenSessionBehavior>(DependencyLifecycle.InstancePerCall)
-                .ConfigureProperty(p => p.ConnectionString, configure.ConnectionString)
+                .ConfigureProperty(p => p.ConnectionString, config.ConnectionString)
                 .ConfigureProperty(p => p.DisableConnectionSharing, disableConnectionSharing)
                 .ConfigureProperty(p => p.SessionCreator, context.Settings.GetOrDefault<Func<ISessionFactory, string, ISession>>("NHibernate.SessionCreator"));
 
-            context.Container.ConfigureComponent(b => new NHibernateStorageContext(b.Build<PipelineExecutor>(), configure.ConnectionString), DependencyLifecycle.InstancePerUnitOfWork);
+            context.Container.ConfigureComponent(b => new NHibernateStorageContext(b.Build<PipelineExecutor>(), config.ConnectionString), DependencyLifecycle.InstancePerUnitOfWork);
             context.Container.ConfigureComponent<SharedConnectionStorageSessionProvider>(DependencyLifecycle.SingleInstance)
-                .ConfigureProperty(p => p.ConnectionString, configure.ConnectionString);
+                .ConfigureProperty(p => p.ConnectionString, config.ConnectionString);
 
             if (context.Settings.GetOrDefault<bool>("NHibernate.RegisterManagedSession"))
             {
@@ -54,7 +56,7 @@ namespace NServiceBus.Features
             }
 
             context.Container.ConfigureComponent<Installer>(DependencyLifecycle.SingleInstance)
-                .ConfigureProperty(x => x.Configuration, configure.Configuration)
+                .ConfigureProperty(x => x.Configuration, config.Configuration)
                 .ConfigureProperty(x => x.RunInstaller, context.Settings.Get<bool>("NHibernate.Common.AutoUpdateSchema"));
         }
 
