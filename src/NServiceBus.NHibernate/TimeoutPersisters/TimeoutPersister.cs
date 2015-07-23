@@ -139,13 +139,11 @@ namespace NServiceBus.TimeoutPersisters.NHibernate
 
         bool TryRemoveTimeoutEntity(Guid timeoutId, IDbConnection connection, out TimeoutData timeoutData)
         {
-            bool found;
-
             using (var session = SessionFactory.OpenStatelessSessionEx(connection))
             {
                 using (var tx = session.BeginAmbientTransactionAware(IsolationLevel.ReadCommitted))
                 {
-                    var te = session.Get<TimeoutEntity>(timeoutId);
+                    var te = session.Get<TimeoutEntity>(timeoutId, LockMode.Upgrade);
 
                     if (te == null)
                     {
@@ -166,18 +164,12 @@ namespace NServiceBus.TimeoutPersisters.NHibernate
 
                     var queryString = string.Format("delete {0} where Id = :id", typeof(TimeoutEntity));
 
-                    found = session.CreateQuery(queryString)
+                    session.CreateQuery(queryString)
                         .SetParameter("id", timeoutId)
-                        .ExecuteUpdate() > 0;
-
+                        .ExecuteUpdate();
+                    
                     tx.Commit();
                 }
-            }
-
-            if (!found)
-            {
-                timeoutData = null;
-                return false;
             }
 
             return true;
@@ -260,7 +252,7 @@ namespace NServiceBus.TimeoutPersisters.NHibernate
                 return new Dictionary<string, string>();
             }
 
-            return (Dictionary<string, string>) serializer.DeserializeObject(data, typeof(Dictionary<string, string>));
+            return (Dictionary<string, string>)serializer.DeserializeObject(data, typeof(Dictionary<string, string>));
         }
 
         static string ConvertDictionaryToString(ICollection data)
@@ -274,5 +266,6 @@ namespace NServiceBus.TimeoutPersisters.NHibernate
         }
 
         static readonly JsonMessageSerializer serializer = new JsonMessageSerializer(null);
+
     }
 }
