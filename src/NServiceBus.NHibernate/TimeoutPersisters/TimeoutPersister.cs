@@ -49,12 +49,13 @@ namespace NServiceBus.TimeoutPersisters.NHibernate
                             .Where(x => x.Endpoint == EndpointName)
                             .Where(x => x.Time > now)
                             .OrderBy(x => x.Time).Asc
+                            .Select(x => x.Time)
                             .Take(1)
-                            .SingleOrDefault();
+                            .SingleOrDefault<DateTime?>();
 
                         if (startOfNextChunk != null)
                         {
-                            nextTimeToRunQuery = startOfNextChunk.Time;
+                            nextTimeToRunQuery = startOfNextChunk.Value;
                         }
                         else
                         {
