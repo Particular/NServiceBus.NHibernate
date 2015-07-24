@@ -76,42 +76,45 @@ namespace NServiceBus.TimeoutPersisters.NHibernate
         /// <param name="timeout">Timeout data.</param>
         public void Add(TimeoutData timeout)
         {
-            var timeoutId = GenerateCombGuid();
+            Guid timeoutId;
             IDbConnection connection;
 
             if (TryGetConnection(out connection))
             {
-                StoreTimeoutEntity(timeout, connection, timeoutId);
+                timeoutId = StoreTimeoutEntity(timeout, connection);
             }
             else
             {
                 using (connection = SessionFactory.GetConnection())
                 {
-                    StoreTimeoutEntity(timeout, connection, timeoutId);
+                    timeoutId = StoreTimeoutEntity(timeout, connection);
                 }
             }
 
             timeout.Id = timeoutId.ToString();
         }
 
-        void StoreTimeoutEntity(TimeoutData timeout, IDbConnection connection, Guid timeoutId)
+        Guid StoreTimeoutEntity(TimeoutData timeout, IDbConnection connection)
         {
             using (var session = SessionFactory.OpenSessionEx(connection))
             {
                 using (var tx = session.BeginAmbientTransactionAware(IsolationLevel.ReadCommitted))
                 {
-                    session.Save(new TimeoutEntity
+                    var entity = new TimeoutEntity
                     {
-                        Id = timeoutId,
                         Destination = timeout.Destination,
                         SagaId = timeout.SagaId,
                         State = timeout.State,
                         Time = timeout.Time,
                         Headers = ConvertDictionaryToString(timeout.Headers),
                         Endpoint = timeout.OwningTimeoutManager,
-                    });
+                    };
+
+                    var id = (Guid)session.Save(entity);
 
                     tx.Commit();
+
+                    return id;
                 }
             }
         }
@@ -216,33 +219,6 @@ namespace NServiceBus.TimeoutPersisters.NHibernate
                     tx.Commit();
                 }
             }
-        }
-
-        static Guid GenerateCombGuid()
-        {
-            var guidArray = Guid.NewGuid().ToByteArray();
-
-            var baseDate = new DateTime(1900, 1, 1);
-            var now = DateTime.Now;
-
-            // Get the days and milliseconds which will be used to build the byte string 
-            var days = new TimeSpan(now.Ticks - baseDate.Ticks);
-            var timeOfDay = now.TimeOfDay;
-
-            // Convert to a byte array 
-            // Note that SQL Server is accurate to 1/300th of a millisecond so we divide by 3.333333 
-            var daysArray = BitConverter.GetBytes(days.Days);
-            var millisecondArray = BitConverter.GetBytes((long)(timeOfDay.TotalMilliseconds / 3.333333));
-
-            // Reverse the bytes to match SQL Servers ordering 
-            Array.Reverse(daysArray);
-            Array.Reverse(millisecondArray);
-
-            // Copy the bytes into the guid 
-            Array.Copy(daysArray, daysArray.Length - 2, guidArray, guidArray.Length - 6, 2);
-            Array.Copy(millisecondArray, millisecondArray.Length - 4, guidArray, guidArray.Length - 4, 4);
-
-            return new Guid(guidArray);
         }
 
         static Dictionary<string, string> ConvertStringToDictionary(string data)
