@@ -29,6 +29,11 @@ namespace NServiceBus.TimeoutPersisters.NHibernate
         public virtual byte[] State { get; set; }
 
         /// <summary>
+        /// Timeout endpoint name.
+        /// </summary>
+        public virtual string Endpoint { get; set; }
+
+        /// <summary>
         /// The time at which the saga ID expired.
         /// </summary>
         public virtual DateTime Time { get; set; }
@@ -37,10 +42,5 @@ namespace NServiceBus.TimeoutPersisters.NHibernate
         /// Store the headers to preserve them across timeouts.
         /// </summary>
         public virtual string Headers { get; set; }
-
-        /// <summary>
-        /// Timeout endpoint name.
-        /// </summary>
-        public virtual string Endpoint { get; set; }
     }
 }
