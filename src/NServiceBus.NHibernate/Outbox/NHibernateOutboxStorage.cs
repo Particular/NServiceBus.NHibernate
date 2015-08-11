@@ -55,7 +55,7 @@ namespace NServiceBus.Features
                 }
                 else
                 {
-                    if (TimeSpan.TryParse(configValue, out timeToKeepDeduplicationData))
+                    if (!TimeSpan.TryParse(configValue, out timeToKeepDeduplicationData))
                     {
                         throw new Exception("Invalid value in \"NServiceBus/Outbox/NHibernate/TimeToKeepDeduplicationData\" AppSetting. Please ensure it is a TimeSpan.");
                     }
@@ -69,7 +69,7 @@ namespace NServiceBus.Features
                 }
                 else
                 {
-                    if (TimeSpan.TryParse(configValue, out frequencyToRunDeduplicationDataCleanup))
+                    if (!TimeSpan.TryParse(configValue, out frequencyToRunDeduplicationDataCleanup))
                     {
                         throw new Exception("Invalid value in \"NServiceBus/Outbox/NHibernate/FrequencyToRunDeduplicationDataCleanup\" AppSetting. Please ensure it is a TimeSpan.");
                     }
