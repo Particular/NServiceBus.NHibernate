@@ -1,6 +1,5 @@
 namespace NServiceBus.Features
 {
-    using NHibernate.Cfg;
     using Persistence.NHibernate;
     using TimeoutPersisters.NHibernate;
     using TimeoutPersisters.NHibernate.Config;
@@ -23,40 +22,18 @@ namespace NServiceBus.Features
         /// Called when the feature should perform its initialization. This call will only happen if the feature is enabled.
         /// </summary>
         protected override void Setup(FeatureConfigurationContext context)
-        {            
-            var configuration = context.Settings.GetOrDefault<Configuration>("NHibernate.Timeouts.Configuration") ?? context.Settings.GetOrDefault<Configuration>("StorageConfiguration");
-
-            if (configuration == null)
-            {
-                var properties = new ConfigureNHibernate(context.Settings).TimeoutPersisterProperties;
-                configuration = new Configuration().SetProperties(properties);
-            }
-            ConfigureNHibernate.ThrowIfRequiredPropertiesAreMissing(configuration.Properties);
-
-            ConfigureNHibernate.AddMappings<TimeoutEntityMap>(configuration);
+        {
+            var builder = new NHibernateConfigurationBuilder(context.Settings, "Timeout", "NHibernate.Timeouts.Configuration", "StorageConfiguration");
+            builder.AddMappings<TimeoutEntityMap>();
+            var config = builder.Build();
 
             context.Container.ConfigureComponent<TimeoutPersisters.NHibernate.Installer.Installer>(DependencyLifecycle.SingleInstance)
-                .ConfigureProperty(x => x.Configuration, configuration)
+                .ConfigureProperty(x => x.Configuration, config.Configuration)
                 .ConfigureProperty(x => x.RunInstaller, RunInstaller(context));
-                
-
-            string connString;
-
-            if (!configuration.Properties.TryGetValue(Environment.ConnectionString, out connString))
-            {
-                string connStringName;
-
-                if (configuration.Properties.TryGetValue(Environment.ConnectionStringName, out connStringName))
-                {
-                    var connectionStringSettings = System.Configuration.ConfigurationManager.ConnectionStrings[connStringName];
-
-                    connString = connectionStringSettings.ConnectionString;
-                }
-            }
 
             context.Container.ConfigureComponent<TimeoutPersister>(DependencyLifecycle.SingleInstance)
-                .ConfigureProperty(p => p.ConnectionString, connString)
-                .ConfigureProperty(p => p.SessionFactory, configuration.BuildSessionFactory())
+                .ConfigureProperty(p => p.ConnectionString, config.ConnectionString)
+                .ConfigureProperty(p => p.SessionFactory, config.Configuration.BuildSessionFactory())
                 .ConfigureProperty(p => p.EndpointName, context.Settings.EndpointName());
         }
 

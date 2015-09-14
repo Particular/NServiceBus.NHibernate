@@ -79,6 +79,7 @@
     <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Internal\NHibernateConfiguration.cs" />
     <Compile Include="NHibernateStorageContext.cs" />
     <Compile Include="Deduplication\DeduplicationConfig.cs" />
     <Compile Include="Deduplication\NHibernateGatewayDeduplication.cs" />
@@ -111,7 +112,7 @@
     <Compile Include="Internal\AmbientTransactionAwareWrapper.cs" />
     <Compile Include="Internal\ISessionExtensions.cs" />
     <Compile Include="Internal\AddressUserType.cs" />
-    <Compile Include="Internal\ConfigureNHibernate.cs" />
+    <Compile Include="Internal\NHibernateConfigurationBuilder.cs" />
     <Compile Include="Internal\NHibernateSettingRetriever.cs" />
     <Compile Include="AssemblyInfo.cs" />
     <Compile Include="Internal\ISessionFactoryExtensions.cs" />

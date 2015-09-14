@@ -1,7 +1,6 @@
 namespace NServiceBus.Features
 {
     using Deduplication.NHibernate.Config;
-    using NHibernate.Cfg;
     using Persistence.NHibernate;
 
     /// <summary>
@@ -22,23 +21,16 @@ namespace NServiceBus.Features
         /// </summary>
         protected override void Setup(FeatureConfigurationContext context)
         {
-            var configuration = context.Settings.GetOrDefault<Configuration>("NHibernate.GatewayDeduplication.Configuration") ?? context.Settings.GetOrDefault<Configuration>("StorageConfiguration");
-
-            if (configuration == null)
-            {
-                var properties = new ConfigureNHibernate(context.Settings).GatewayDeduplicationProperties;
-                configuration = new Configuration().SetProperties(properties);
-            }
-            ConfigureNHibernate.ThrowIfRequiredPropertiesAreMissing(configuration.Properties);
-
-            ConfigureNHibernate.AddMappings<DeduplicationMessageMap>(configuration);
+            var builder = new NHibernateConfigurationBuilder(context.Settings, "Deduplication", "NHibernate.GatewayDeduplication.Configuration", "StorageConfiguration");
+            builder.AddMappings<DeduplicationMessageMap>();
+            var config = builder.Build();
 
             context.Container.ConfigureComponent<Deduplication.NHibernate.Installer.Installer>(DependencyLifecycle.SingleInstance)
-                .ConfigureProperty(x => x.Configuration, configuration)
+                .ConfigureProperty(x => x.Configuration, config.Configuration)
                 .ConfigureProperty(x => x.RunInstaller, RunInstaller(context));
 
             context.Container.ConfigureComponent<Deduplication.NHibernate.GatewayDeduplication>(DependencyLifecycle.SingleInstance)
-                .ConfigureProperty(p => p.SessionFactory, configuration.BuildSessionFactory());
+                .ConfigureProperty(p => p.SessionFactory, config.Configuration.BuildSessionFactory());
         }
 
         static bool RunInstaller(FeatureConfigurationContext context)

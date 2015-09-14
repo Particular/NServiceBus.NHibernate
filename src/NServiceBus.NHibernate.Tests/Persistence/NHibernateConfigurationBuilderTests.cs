@@ -9,12 +9,36 @@ namespace NServiceBus.Persistence.NHibernate.Tests
     using Settings;
 
     [TestFixture]
-    public class NHibernateProperties
+    public class NHibernateConfigurationBuilderTests
     {
         private const string connectionString = @"Data Source=nsb;New=True;";
 
         [Test]
-        public void Should_assign_default_properties_to_all_persisters()
+        public void Should_fail_validation_if_no_connection_string_is_defined()
+        {
+            Assert.IsFalse(NHibernateConfigurationBuilder.ContainsRequiredProperties(new Dictionary<string, string>()));
+        }
+
+        [Test]
+        public void Should_pass_validation_if_connection_string_is_defined_literally()
+        {
+            Assert.IsTrue(NHibernateConfigurationBuilder.ContainsRequiredProperties(new Dictionary<string, string>
+                                                                                                  {
+                                                                                                      {"connection.connection_string", "aString"}
+                                                                                                  }));
+        }
+
+        [Test]
+        public void Should_pass_validation_if_connection_string_is_defined_by_name()
+        {
+            Assert.IsTrue(NHibernateConfigurationBuilder.ContainsRequiredProperties(new Dictionary<string, string>
+                                                                                                  {
+                                                                                                      {"connection.connection_string_name", "aString"}
+                                                                                                  }));
+        }
+
+        [Test]
+        public void Should_assign_default_properties()
         {
             NHibernateSettingRetriever.AppSettings = () => new NameValueCollection();
             NHibernateSettingRetriever.ConnectionStrings = () => new ConnectionStringSettingsCollection
@@ -22,21 +46,16 @@ namespace NServiceBus.Persistence.NHibernate.Tests
                     new ConnectionStringSettings("NServiceBus/Persistence", connectionString)
                 };
 
-            var config = new ConfigureNHibernate(new SettingsHolder());
+            var builder = new NHibernateConfigurationBuilder(new SettingsHolder(), "NotUsed", "NotUsed");
 
             var expected = new Dictionary<string, string>
                 {
-                     {"dialect", ConfigureNHibernate.DefaultDialect},
+                     {"dialect", NHibernateConfigurationBuilder.DefaultDialect},
                      {"connection.connection_string", connectionString}
                    
                 };
 
-            CollectionAssert.IsSubsetOf(expected, config.DistributorPersisterProperties);
-            CollectionAssert.IsSubsetOf(expected, config.GatewayDeduplicationProperties);
-            CollectionAssert.IsSubsetOf(expected, config.OutboxProperties);
-            CollectionAssert.IsSubsetOf(expected, config.SagaPersisterProperties);
-            CollectionAssert.IsSubsetOf(expected, config.SubscriptionStorageProperties);
-            CollectionAssert.IsSubsetOf(expected, config.TimeoutPersisterProperties);
+            CollectionAssert.IsSubsetOf(expected, builder.Build().Configuration.Properties);
         }
 
         [Test]
@@ -50,28 +69,18 @@ namespace NServiceBus.Persistence.NHibernate.Tests
                                                  "timeout_connection_string")
                 };
 
-            var config = new ConfigureNHibernate(new SettingsHolder());
+            var builder = new NHibernateConfigurationBuilder(new SettingsHolder(),"Timeout","NotUsed");
 
-            var expectedForTimeout = new Dictionary<string, string>
+            var expected = new Dictionary<string, string>
                 {
                    {"connection.connection_string", "timeout_connection_string"}
                 };
 
-            var expectedDefault = new Dictionary<string, string>
-                {
-                    {"connection.connection_string", connectionString}
-                };
-
-            CollectionAssert.IsSubsetOf(expectedDefault, config.DistributorPersisterProperties);
-            CollectionAssert.IsSubsetOf(expectedDefault, config.GatewayDeduplicationProperties);
-            CollectionAssert.IsSubsetOf(expectedDefault, config.OutboxProperties);
-            CollectionAssert.IsSubsetOf(expectedDefault, config.SagaPersisterProperties);
-            CollectionAssert.IsSubsetOf(expectedDefault, config.SubscriptionStorageProperties);
-            CollectionAssert.IsSubsetOf(expectedForTimeout, config.TimeoutPersisterProperties);
+            CollectionAssert.IsSubsetOf(expected, builder.Build().Configuration.Properties);
         }
 
         [Test]
-        public void Should_assign_all_optional_properties_to_all_persisters()
+        public void Should_assign_all_optional_properties()
         {
             NHibernateSettingRetriever.AppSettings = () => new NameValueCollection
                 {
@@ -84,7 +93,7 @@ namespace NServiceBus.Persistence.NHibernate.Tests
                     new ConnectionStringSettings("NServiceBus/Persistence", connectionString)
                 };
 
-            var config = new ConfigureNHibernate(new SettingsHolder());
+            var builder = new NHibernateConfigurationBuilder(new SettingsHolder(), "NotUsed", "NotUsed");
 
             var expected = new Dictionary<string, string>
                 {
@@ -93,12 +102,7 @@ namespace NServiceBus.Persistence.NHibernate.Tests
                     {"connection.driver_class", "driver_class"},
                 };
 
-            CollectionAssert.IsSubsetOf(expected, config.DistributorPersisterProperties);
-            CollectionAssert.IsSubsetOf(expected, config.GatewayDeduplicationProperties);
-            CollectionAssert.IsSubsetOf(expected, config.OutboxProperties);
-            CollectionAssert.IsSubsetOf(expected, config.SagaPersisterProperties);
-            CollectionAssert.IsSubsetOf(expected, config.SubscriptionStorageProperties);
-            CollectionAssert.IsSubsetOf(expected, config.TimeoutPersisterProperties);
+            CollectionAssert.IsSubsetOf(expected, builder.Build().Configuration.Properties);
         }
 
         [Test]
@@ -114,19 +118,14 @@ namespace NServiceBus.Persistence.NHibernate.Tests
                 {
                     new ConnectionStringSettings("NServiceBus/Persistence", connectionString)
                 };
-            var config = new ConfigureNHibernate(new SettingsHolder());
+            var builder = new NHibernateConfigurationBuilder(new SettingsHolder(), "NotUsed","NotUsed");
 
             var expected = new Dictionary<string, string>
                 {
                     {"connection.connection_string", connectionString},
                 };
 
-            CollectionAssert.IsSubsetOf(expected, config.DistributorPersisterProperties);
-            CollectionAssert.IsSubsetOf(expected, config.GatewayDeduplicationProperties);
-            CollectionAssert.IsSubsetOf(expected, config.OutboxProperties);
-            CollectionAssert.IsSubsetOf(expected, config.SagaPersisterProperties);
-            CollectionAssert.IsSubsetOf(expected, config.SubscriptionStorageProperties);
-            CollectionAssert.IsSubsetOf(expected, config.TimeoutPersisterProperties);
+            CollectionAssert.IsSubsetOf(expected, builder.Build().Configuration.Properties);
         }
 
         [Test]
@@ -227,11 +226,8 @@ namespace NServiceBus.Persistence.NHibernate.Tests
                     new ConnectionStringSettings("NServiceBus/Persistence", "specified")
                 };
 
-                var config = new ConfigureNHibernate(new SettingsHolder());
-                var configuration =
-                    ConfigureNHibernate.CreateConfigurationWith(config.DistributorPersisterProperties);
-
-                return configuration.Properties;
+                var builder = new NHibernateConfigurationBuilder(new SettingsHolder(), "NotUsed", "NotUsed");
+                return builder.Build().Configuration.Properties;
             }
         }
 
@@ -239,12 +235,8 @@ namespace NServiceBus.Persistence.NHibernate.Tests
         {
             public IDictionary<string, string> Execute()
             {
-
-                var config = new ConfigureNHibernate(new SettingsHolder());
-                var configuration =
-                    ConfigureNHibernate.CreateConfigurationWith(config.DistributorPersisterProperties);
-
-                return configuration.Properties;
+                var builder = new NHibernateConfigurationBuilder(new SettingsHolder(), "NotUsed", "NotUsed");
+                return builder.Build().Configuration.Properties;
             }
         }
     }
