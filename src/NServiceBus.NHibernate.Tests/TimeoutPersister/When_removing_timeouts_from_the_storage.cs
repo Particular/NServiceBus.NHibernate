@@ -2,6 +2,8 @@ namespace NServiceBus.TimeoutPersisters.NHibernate.Tests
 {
     using System;
     using System.Collections.Generic;
+    using System.Threading;
+    using System.Transactions;
     using NUnit.Framework;
     using Support;
     using Timeout.Core;
@@ -10,7 +12,7 @@ namespace NServiceBus.TimeoutPersisters.NHibernate.Tests
     public class When_removing_timeouts_from_the_storage : InMemoryDBFixture
     {
         [Test]
-        public void Should_return_the_correct_headers()
+        public void TryRemove_should_return_the_correct_headers()
         {
             var headers = new Dictionary<string, string>
                           {
@@ -38,7 +40,7 @@ namespace NServiceBus.TimeoutPersisters.NHibernate.Tests
         }
 
         [Test]
-        public void Should_remove_timeouts_by_id()
+        public void TryRemove_should_remove_timeouts_by_id()
         {
             var t1 = new TimeoutData
                      {
@@ -79,7 +81,63 @@ namespace NServiceBus.TimeoutPersisters.NHibernate.Tests
         }
 
         [Test]
-        public void Should_remove_timeouts_by_sagaid()
+        public void TryRemove_should_return_false_when_timeout_already_deleted()
+        {
+            var timeout = new TimeoutData();
+
+            persister.Add(timeout);
+
+            Assert.IsTrue(persister.TryRemove(timeout.Id));
+            Assert.IsFalse(persister.TryRemove(timeout.Id));
+        }
+
+        [Test]
+        public void TryRemove_should_work_with_concurrent_transactions()
+        {
+            var timeout = new TimeoutData();
+
+            persister.Add(timeout);
+
+            var t1EnteredTx = new AutoResetEvent(false);
+            var t2EnteredTx = new AutoResetEvent(false);
+            bool? t1Result = null;
+            bool? t2Result = null;
+
+            var t1 = new Thread(() =>
+            {
+                using (var tx = new TransactionScope())
+                {
+                    t1EnteredTx.Set();
+                    t2EnteredTx.WaitOne();
+                    t1Result = persister.TryRemove(timeout.Id);
+                    tx.Complete();
+                }
+            });
+            var t2 = new Thread(() =>
+            {
+                using (var tx = new TransactionScope())
+                {
+                    t2EnteredTx.Set();
+                    t1EnteredTx.WaitOne();
+                    t2Result = persister.TryRemove(timeout.Id);
+                    tx.Complete();
+                }
+            });
+
+            t1.Start();
+            t2.Start();
+            t1.Join(TimeSpan.FromSeconds(10));
+            t2.Join(TimeSpan.FromSeconds(10));
+
+            Assert.IsTrue(t1Result.HasValue && t2Result.HasValue);
+
+            // one delete should succeed, the other one shouldn't
+            Assert.IsTrue(t1Result.Value || t2Result.Value);
+            Assert.IsFalse(t1Result.Value && t2Result.Value);
+        }
+
+        [Test]
+        public void RemiveTimeoutBy_should_remove_timeouts_by_sagaid()
         {
             var sagaId1 = Guid.NewGuid();
             var sagaId2 = Guid.NewGuid();

@@ -14,7 +14,7 @@ namespace NServiceBus.TimeoutPersisters.NHibernate
     /// <summary>
     /// Timeout storage implementation for NHibernate.
     /// </summary>
-    public class TimeoutStorage : IPersistTimeouts
+    public class TimeoutStorage : IPersistTimeouts, IPersistTimeoutsV2
     {
         /// <summary>
         /// The current <see cref="ISessionFactory"/>.
@@ -187,6 +187,43 @@ namespace NServiceBus.TimeoutPersisters.NHibernate
             }
 
             return serializer.SerializeObject(data);
+        }
+
+        public TimeoutData Peek(string timeoutId)
+        {
+            TimeoutData timeoutData = null;
+
+            using (var conn = SessionFactory.GetConnection())
+            using (var session = SessionFactory.OpenStatelessSessionEx(conn))
+            using (var tx = session.BeginAmbientTransactionAware(IsolationLevel.ReadCommitted))
+            {
+                var te = session.Get<TimeoutEntity>(new Guid(timeoutId));
+
+                if (te != null)
+                {
+                    timeoutData = new TimeoutData
+                    {
+                        CorrelationId = te.CorrelationId,
+                        Destination = te.Destination,
+                        Id = te.Id.ToString(),
+                        SagaId = te.SagaId,
+                        State = te.State,
+                        Time = te.Time,
+                        Headers = ConvertStringToDictionary(te.Headers),
+                        OwningTimeoutManager = te.Endpoint
+                    };
+                }
+
+                tx.Commit();
+            }
+
+            return timeoutData;
+        }
+
+        public bool TryRemove(string timeoutId)
+        {
+            TimeoutData timeoutData;
+            return this.TryRemove(timeoutId, out timeoutData);
         }
 
         static readonly JsonMessageSerializer serializer = new JsonMessageSerializer(null);
