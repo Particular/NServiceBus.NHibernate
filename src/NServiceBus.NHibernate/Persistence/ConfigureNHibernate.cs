@@ -245,6 +245,7 @@ PM> Install-Package System.Data.SQLite.{1}
                 return new Dictionary<string, string>(properties);
             }
 
+            // ReSharper disable once UseObjectOrCollectionInitializer
             var overriddenProperties = new Dictionary<string, string>(properties);
             overriddenProperties[Environment.ConnectionString] = connectionStringOverride;
 
