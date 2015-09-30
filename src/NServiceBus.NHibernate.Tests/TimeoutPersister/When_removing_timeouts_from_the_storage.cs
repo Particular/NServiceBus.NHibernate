@@ -22,15 +22,15 @@ namespace NServiceBus.TimeoutPersisters.NHibernate.Tests
                           };
 
             var timeout = new TimeoutData
-                          {
-                              Time = DateTime.UtcNow.AddHours(-1),
-                              CorrelationId = "boo",
-                              Destination = new Address("timeouts", RuntimeEnvironment.MachineName),
-                              SagaId = Guid.NewGuid(),
-                              State = new byte[] {1, 1, 133, 200},
-                              Headers = headers,
-                              OwningTimeoutManager = Configure.EndpointName,
-                          };
+            {
+                Time = DateTime.UtcNow.AddHours(-1),
+                CorrelationId = "boo",
+                Destination = new Address("timeouts", RuntimeEnvironment.MachineName),
+                SagaId = Guid.NewGuid(),
+                State = new byte[] { 1, 1, 133, 200 },
+                Headers = headers,
+                OwningTimeoutManager = Configure.EndpointName,
+            };
             persister.Add(timeout);
 
             TimeoutData timeoutData;
@@ -43,23 +43,23 @@ namespace NServiceBus.TimeoutPersisters.NHibernate.Tests
         public void TryRemove_should_remove_timeouts_by_id()
         {
             var t1 = new TimeoutData
-                     {
-                         Time = DateTime.Now.AddYears(-1),
-                         OwningTimeoutManager = Configure.EndpointName,
-                         Headers = new Dictionary<string, string>
+            {
+                Time = DateTime.Now.AddYears(-1),
+                OwningTimeoutManager = Configure.EndpointName,
+                Headers = new Dictionary<string, string>
                                    {
                                        {"Header1", "Value1"}
                                    }
-                     };
+            };
             var t2 = new TimeoutData
-                     {
-                         Time = DateTime.Now.AddYears(-1),
-                         OwningTimeoutManager = Configure.EndpointName,
-                         Headers = new Dictionary<string, string>
+            {
+                Time = DateTime.Now.AddYears(-1),
+                OwningTimeoutManager = Configure.EndpointName,
+                Headers = new Dictionary<string, string>
                                    {
                                        {"Header1", "Value1"}
                                    }
-                     };
+            };
 
             persister.Add(t1);
             persister.Add(t2);
@@ -94,7 +94,10 @@ namespace NServiceBus.TimeoutPersisters.NHibernate.Tests
         [Test]
         public void TryRemove_should_work_with_concurrent_transactions()
         {
-            var timeout = new TimeoutData();
+            var timeout = new TimeoutData
+            {
+                Time = DateTime.Now
+            };
 
             persister.Add(timeout);
 
@@ -105,7 +108,10 @@ namespace NServiceBus.TimeoutPersisters.NHibernate.Tests
 
             var t1 = new Thread(() =>
             {
-                using (var tx = new TransactionScope())
+                using (var tx = new TransactionScope(TransactionScopeOption.Required, new TransactionOptions
+                {
+                    IsolationLevel = IsolationLevel.ReadCommitted
+                }))
                 {
                     t1EnteredTx.Set();
                     t2EnteredTx.WaitOne();
@@ -113,9 +119,13 @@ namespace NServiceBus.TimeoutPersisters.NHibernate.Tests
                     tx.Complete();
                 }
             });
+
             var t2 = new Thread(() =>
             {
-                using (var tx = new TransactionScope())
+                using (var tx = new TransactionScope(TransactionScopeOption.Required, new TransactionOptions
+                {
+                    IsolationLevel = IsolationLevel.ReadCommitted
+                }))
                 {
                     t2EnteredTx.Set();
                     t1EnteredTx.WaitOne();
@@ -126,8 +136,8 @@ namespace NServiceBus.TimeoutPersisters.NHibernate.Tests
 
             t1.Start();
             t2.Start();
-            t1.Join(TimeSpan.FromSeconds(10));
-            t2.Join(TimeSpan.FromSeconds(10));
+            t1.Join(TimeSpan.FromSeconds(30));
+            t2.Join(TimeSpan.FromSeconds(30));
 
             Assert.IsTrue(t1Result.HasValue && t2Result.HasValue);
 
@@ -137,30 +147,30 @@ namespace NServiceBus.TimeoutPersisters.NHibernate.Tests
         }
 
         [Test]
-        public void RemiveTimeoutBy_should_remove_timeouts_by_sagaid()
+        public void RemoveTimeoutBy_should_remove_timeouts_by_sagaid()
         {
             var sagaId1 = Guid.NewGuid();
             var sagaId2 = Guid.NewGuid();
             var t1 = new TimeoutData
-                     {
-                         SagaId = sagaId1,
-                         Time = DateTime.Now.AddYears(1),
-                         OwningTimeoutManager = Configure.EndpointName,
-                         Headers = new Dictionary<string, string>
+            {
+                SagaId = sagaId1,
+                Time = DateTime.Now.AddYears(1),
+                OwningTimeoutManager = Configure.EndpointName,
+                Headers = new Dictionary<string, string>
                                    {
                                        {"Header1", "Value1"}
                                    }
-                     };
+            };
             var t2 = new TimeoutData
-                     {
-                         SagaId = sagaId2,
-                         Time = DateTime.Now.AddYears(1),
-                         OwningTimeoutManager = Configure.EndpointName,
-                         Headers = new Dictionary<string, string>
+            {
+                SagaId = sagaId2,
+                Time = DateTime.Now.AddYears(1),
+                OwningTimeoutManager = Configure.EndpointName,
+                Headers = new Dictionary<string, string>
                                    {
                                        {"Header1", "Value1"}
                                    }
-                     };
+            };
 
             persister.Add(t1);
             persister.Add(t2);

@@ -80,7 +80,6 @@ namespace NServiceBus.TimeoutPersisters.NHibernate.Tests
             Assert.AreEqual(timeoutData.SagaId, result.SagaId);
             Assert.AreEqual(timeoutData.State, result.State);
             Assert.AreEqual(timeoutData.Headers, result.Headers);
-            Assert.AreEqual(timeoutData.OwningTimeoutManager, result.OwningTimeoutManager);
         }
 
         [Test]

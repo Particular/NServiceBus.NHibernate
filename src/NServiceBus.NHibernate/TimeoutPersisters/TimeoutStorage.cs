@@ -120,16 +120,7 @@ namespace NServiceBus.TimeoutPersisters.NHibernate
                     return false;
                 }
 
-                timeoutData = new TimeoutData
-                    {
-                        CorrelationId = te.CorrelationId,
-                        Destination = te.Destination,
-                        Id = te.Id.ToString(),
-                        SagaId = te.SagaId,
-                        State = te.State,
-                        Time = te.Time,
-                        Headers = ConvertStringToDictionary(te.Headers),
-                    };
+                timeoutData = MapToTimeoutData(te);
 
                 var queryString = string.Format("delete {0} where Id = :id",
                                         typeof(TimeoutEntity));
@@ -197,27 +188,31 @@ namespace NServiceBus.TimeoutPersisters.NHibernate
             using (var session = SessionFactory.OpenStatelessSessionEx(conn))
             using (var tx = session.BeginAmbientTransactionAware(IsolationLevel.ReadCommitted))
             {
-                var te = session.Get<TimeoutEntity>(new Guid(timeoutId));
+                var te = session.Get<TimeoutEntity>(new Guid(timeoutId), LockMode.Upgrade);
 
                 if (te != null)
                 {
-                    timeoutData = new TimeoutData
-                    {
-                        CorrelationId = te.CorrelationId,
-                        Destination = te.Destination,
-                        Id = te.Id.ToString(),
-                        SagaId = te.SagaId,
-                        State = te.State,
-                        Time = te.Time,
-                        Headers = ConvertStringToDictionary(te.Headers),
-                        OwningTimeoutManager = te.Endpoint
-                    };
+                    timeoutData = MapToTimeoutData(te);
                 }
 
                 tx.Commit();
             }
 
             return timeoutData;
+        }
+
+        static TimeoutData MapToTimeoutData(TimeoutEntity te)
+        {
+            return new TimeoutData
+            {
+                CorrelationId = te.CorrelationId,
+                Destination = te.Destination,
+                Id = te.Id.ToString(),
+                SagaId = te.SagaId,
+                State = te.State,
+                Time = te.Time,
+                Headers = ConvertStringToDictionary(te.Headers),
+            };
         }
 
         public bool TryRemove(string timeoutId)
