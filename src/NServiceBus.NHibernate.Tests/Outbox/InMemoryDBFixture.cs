@@ -13,22 +13,19 @@ namespace NServiceBus.NHibernate.Tests.Outbox
     using NServiceBus.Outbox;
     using NUnit.Framework;
 
-
     abstract class InMemoryDBFixture
     {
-        protected OutboxPersister persister;
-
-#if USE_SQLSERVER
-        private readonly string connectionString = @"Data Source=.\SQLEXPRESS;Initial Catalog=nservicebus;Integrated Security=True;";
-        private const string dialect = "NHibernate.Dialect.MsSql2012Dialect";
-#else
-        private readonly string connectionString = String.Format(@"Data Source={0};Version=3;New=True;", Path.GetTempFileName());
-        private const string dialect = "NHibernate.Dialect.SQLiteDialect";
-#endif
-
         [SetUp]
         public void Setup()
         {
+#if USE_SQLSERVER
+            connectionString = @"Data Source=.\SQLEXPRESS;Initial Catalog=nservicebus;Integrated Security=True;";
+            dialect = "NHibernate.Dialect.MsSql2012Dialect";
+#else
+            connectionString = String.Format(@"Data Source={0};Version=3;New=True;", Path.GetTempFileName());
+            dialect = "NHibernate.Dialect.SQLiteDialect";
+#endif
+
             var mapper = new ModelMapper();
             mapper.AddMapping<OutboxEntityMap>();
 
@@ -58,10 +55,18 @@ namespace NServiceBus.NHibernate.Tests.Outbox
         [TearDown]
         public void TearDown()
         {
+            Console.WriteLine("TearDown");
             Session.Close();
             SessionFactory.Close();
+
+            Session = null;
+            SessionFactory = null;
+            persister = null;
         }
 
+        protected OutboxPersister persister;
+        string connectionString;
+        string dialect;
         protected ISession Session;
         protected ISessionFactory SessionFactory;
     }
