@@ -49,7 +49,8 @@ namespace NServiceBus.NHibernate.Tests.Outbox
 
             persister = new OutboxPersister
             {
-                StorageSessionProvider = new FakeSessionProvider(SessionFactory, Session)
+                StorageSessionProvider = new FakeSessionProvider(SessionFactory, Session),
+                EndpointName = "TestEndpoint"
             };
 
         }
