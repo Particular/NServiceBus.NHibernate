@@ -71,7 +71,7 @@ namespace NServiceBus.NHibernate.Tests.Outbox
 
             using (var session = SessionFactory.OpenSession())
             {
-                var result = session.QueryOver<OutboxRecord>().Where(o => o.MessageId == id)
+                var result = session.QueryOver<OutboxRecord>().Where(o => o.MessageId == "TestEndpoint/" + id)
                     .SingleOrDefault();
 
                 Assert.True(result.Dispatched);
@@ -105,7 +105,7 @@ namespace NServiceBus.NHibernate.Tests.Outbox
                 var result = session.QueryOver<OutboxRecord>().List();
                     
                 Assert.AreEqual(1, result.Count);
-                Assert.AreEqual("NotDispatched", result[0].MessageId);
+                Assert.AreEqual("TestEndpoint/NotDispatched", result[0].MessageId);
             }
         }
     }
