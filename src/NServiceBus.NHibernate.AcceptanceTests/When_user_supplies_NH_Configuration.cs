@@ -39,7 +39,7 @@
                     var cfg = new NHibernate.Cfg.Configuration();
                     cfg.SetProperty(NHibernate.Cfg.Environment.Dialect, typeof(NHibernate.Dialect.MsSql2012Dialect).FullName);
                     cfg.SetProperty(NHibernate.Cfg.Environment.ConnectionDriver, typeof(NHibernate.Driver.Sql2008ClientDriver).FullName);
-                    cfg.SetProperty(NHibernate.Cfg.Environment.ConnectionString, @"Server=localhost\sqlexpress;Database=nservicebus;Trusted_Connection=True;");
+                    cfg.SetProperty(NHibernate.Cfg.Environment.ConnectionString, ConfigureNHibernatePersistence.ConnectionString);
 
                     c.UsePersistence<NHibernatePersistence>().UseConfiguration(cfg);
                 });
