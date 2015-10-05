@@ -35,7 +35,7 @@
         /// </example>
         /// <param name="config">The configuration object.</param>
         /// <returns>The configuration object.</returns>
-        [ObsoleteEx(RemoveInVersion = "7", TreatAsErrorFromVersion = "5.0", Replacement = "builder.UsePersistence<NHibernatePersistence>().For(Storage.Sagas)")]
+        [ObsoleteEx(RemoveInVersion = "7", TreatAsErrorFromVersion = "5.0", ReplacementTypeOrMember = "builder.UsePersistence<NHibernatePersistence>().For(Storage.Sagas)")]
 // ReSharper disable UnusedParameter.Global
         public static Configure UseNHibernateSagaPersister(this Configure config)
 // ReSharper restore UnusedParameter.Global
@@ -71,7 +71,7 @@
         /// <param name="config">The configuration object.</param>
         /// <param name="tableNamingConvention">Convention to use for naming tables.</param>
         /// <returns>The configuration object.</returns>
-        [ObsoleteEx(RemoveInVersion = "7", TreatAsErrorFromVersion = "5.0", Replacement = "builder.UsePersistence<NHibernatePersistence>().For(Storage.Sagas).SagaTableNamingConvention(tableNamingConvention)")]
+        [ObsoleteEx(RemoveInVersion = "7", TreatAsErrorFromVersion = "5.0", ReplacementTypeOrMember = "builder.UsePersistence<NHibernatePersistence>().For(Storage.Sagas).SagaTableNamingConvention(tableNamingConvention)")]
 // ReSharper disable UnusedParameter.Global
         public static Configure UseNHibernateSagaPersister(this Configure config, Func<Type, string> tableNamingConvention)
 // ReSharper restore UnusedParameter.Global
@@ -86,7 +86,7 @@
         /// <param name="config">The <see cref="Configure" /> object.</param>
         /// <param name="configuration">The <see cref="Configuration" /> allows the application to specify properties and mapping documents to be used when creating a <see cref="ISessionFactory" />.</param>
         /// <returns>The <see cref="Configure" /> object.</returns>
-        [ObsoleteEx(RemoveInVersion = "7", TreatAsErrorFromVersion = "5.0", Replacement = "builder.UsePersistence<NHibernatePersistence>().For(Storage.Sagas).UseConfiguration(configuration)")]
+        [ObsoleteEx(RemoveInVersion = "7", TreatAsErrorFromVersion = "5.0", ReplacementTypeOrMember = "builder.UsePersistence<NHibernatePersistence>().For(Storage.Sagas).UseConfiguration(configuration)")]
 // ReSharper disable UnusedParameter.Global
         public static Configure UseNHibernateSagaPersister(this Configure config, NHibernate.Cfg.Configuration configuration)
 // ReSharper restore UnusedParameter.Global
@@ -102,7 +102,7 @@
         /// <param name="configuration">The <see cref="Configuration" /> allows the application to specify properties and mapping documents to be used when creating a <see cref="ISessionFactory" />.</param>
         /// <param name="tableNamingConvention">Convention to use for naming tables.</param>
         /// <returns>The <see cref="Configure" /> object.</returns>
-        [ObsoleteEx(RemoveInVersion = "7", TreatAsErrorFromVersion = "5.0", Replacement = "builder.UsePersistence<NHibernatePersistence>().For(Storage.Sagas).UseConfiguration(configuration).SagaTableNamingConvention(tableNamingConvention)")]
+        [ObsoleteEx(RemoveInVersion = "7", TreatAsErrorFromVersion = "5.0", ReplacementTypeOrMember = "builder.UsePersistence<NHibernatePersistence>().For(Storage.Sagas).UseConfiguration(configuration).SagaTableNamingConvention(tableNamingConvention)")]
 // ReSharper disable UnusedParameter.Global
         public static Configure UseNHibernateSagaPersister(this Configure config, NHibernate.Cfg.Configuration configuration, Func<Type, string> tableNamingConvention)
 // ReSharper restore UnusedParameter.Global
