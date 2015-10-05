@@ -54,7 +54,7 @@
         }
 
         [Serializable]
-        [TimeToBeReceived("00:00:01")]
+        [TimeToBeReceived("00:00:000001")]
         public class MyMessage : IMessage
         {
         }

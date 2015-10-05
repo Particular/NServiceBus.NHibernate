@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -145,7 +145,7 @@
     <Compile Include="App_Packages\NServiceBus.AcceptanceTests\Transactions\When_receiving_a_message_with_transactions_disabled.cs" />
     <Compile Include="App_Packages\NServiceBus.AcceptanceTests\Transactions\When_sending_a_message_from_a_non_transactional_endpoint_with_a_ambient_transaction_enabled.cs" />
     <Compile Include="App_Packages\NServiceBus.AcceptanceTests\Transactions\When_sending_messages_within_an_ambient_transaction.cs" />
-    <Compile Include="App_Packages\NServiceBus.AcceptanceTests\Versioning\When_multiple_versions_of_a_message_is_published.cs" />
+    <Compile Include="App_Packages\NServiceBus.AcceptanceTests\Versioning\When_publishing_multiversioned_message.cs" />
     <Compile Include="Config.cs" />
     <Compile Include="Issue_67.cs" />
     <Compile Include="When_saga_contains_nested_collection_without_parent_relation.cs" />
