@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using NServiceBus.Unicast.Subscriptions.NHibernate;
     using ObjectBuilder.Common;
     using ObjectBuilder.Common.Config;
     using Persistence.InMemory.SagaPersister;
@@ -143,6 +144,12 @@
             if (persister.Contains(typeof(MsmqSubscriptionStorage).FullName))
             {
                 return config.MsmqSubscriptionStorage();
+            }
+
+            if (persister.Contains("NServiceBus.Unicast.Subscriptions.NHibernate.CachedSubscriptionStorage")
+                || persister.Contains(typeof(SubscriptionStorage).FullName))
+            {
+                return config.UseNHibernateSubscriptionPersister();
             }
 
             CallConfigureForPersister(config, persister);
