@@ -104,7 +104,7 @@ namespace NServiceBus.TimeoutPersisters.NHibernate.Tests
             var t1EnteredTx = new AutoResetEvent(false);
             var t2EnteredTx = new AutoResetEvent(false);
 
-            var task1 = Task.Factory.StartNew(() =>
+            var task1 = Task.Run(() =>
             {
                 using (var tx = new TransactionScope(TransactionScopeOption.Required, new TransactionOptions
                 {
@@ -119,7 +119,7 @@ namespace NServiceBus.TimeoutPersisters.NHibernate.Tests
                 }
             });
 
-            var task2 = Task.Factory.StartNew(() =>
+            var task2 = Task.Run(() =>
             {
                 using (var tx = new TransactionScope(TransactionScopeOption.Required, new TransactionOptions
                 {
@@ -134,8 +134,7 @@ namespace NServiceBus.TimeoutPersisters.NHibernate.Tests
                 }
             });
 
-            Assert.True(task1.Wait(TimeSpan.FromSeconds(30)));
-            Assert.True(task2.Wait(TimeSpan.FromSeconds(30)));
+            Assert.True(Task.WaitAll(new Task[] { task1, task2}, TimeSpan.FromSeconds(30)));
 
             // one delete should succeed, the other one shouldn't
             Assert.IsTrue(task1.Result || task2.Result);
