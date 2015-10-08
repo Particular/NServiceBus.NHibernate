@@ -125,9 +125,6 @@
     <Compile Include="App_Packages\NSB.AcceptanceTests.5.1.3\Exceptions\Cant_convert_to_TransportMessage\When_cant_convert_to_TransportMessage_SuppressedDTC.cs" />
     <Compile Include="App_Packages\NSB.AcceptanceTests.5.1.3\Exceptions\Message_without_an_id.cs" />
     <Compile Include="App_Packages\NSB.AcceptanceTests.5.1.3\Exceptions\StackTraceAssert.cs" />
-    <Compile Include="App_Packages\NSB.AcceptanceTests.5.1.3\Exceptions\When_handler_and_Uow_End_throws.cs" />
-    <Compile Include="App_Packages\NSB.AcceptanceTests.5.1.3\Exceptions\When_handler_throws.cs" />
-    <Compile Include="App_Packages\NSB.AcceptanceTests.5.1.3\Exceptions\When_handler_throws_AggregateException.cs" />
     <Compile Include="App_Packages\NSB.AcceptanceTests.5.1.3\Exceptions\When_handler_throws_serialization_exception.cs" />
     <Compile Include="App_Packages\NSB.AcceptanceTests.5.1.3\Exceptions\When_serialization_throws.cs" />
     <Compile Include="App_Packages\NSB.AcceptanceTests.5.1.3\Exceptions\When_Uow_Begin_and_different_End_throws.cs" />
