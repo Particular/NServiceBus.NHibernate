@@ -11,7 +11,7 @@ namespace NServiceBus.TimeoutPersisters.NHibernate
     using Serializers.Json;
     using Timeout.Core;
 
-    class TimeoutPersister : IPersistTimeouts
+    class TimeoutPersister : IPersistTimeouts, IPersistTimeoutsV2
     {
         public ISessionFactory SessionFactory { get; set; }
 
@@ -137,6 +137,57 @@ namespace NServiceBus.TimeoutPersisters.NHibernate
             }
         }
 
+        public bool TryRemove(string timeoutId)
+        {
+            TimeoutData timeoutData;
+            return TryRemove(timeoutId, out timeoutData);
+        }
+
+        public TimeoutData Peek(string timeoutId)
+        {
+            IDbConnection connection;
+
+            if (TryGetConnection(out connection))
+            {
+                return TryGetTimeout(Guid.Parse(timeoutId), connection);
+            }
+
+            using (connection = SessionFactory.GetConnection())
+            {
+                return TryGetTimeout(Guid.Parse(timeoutId), connection);
+            }
+        }
+
+        static TimeoutData MapToTimeoutData(TimeoutEntity te)
+        {
+            return new TimeoutData
+            {
+                Destination = te.Destination,
+                Id = te.Id.ToString(),
+                SagaId = te.SagaId,
+                State = te.State,
+                Time = te.Time,
+                Headers = ConvertStringToDictionary(te.Headers),
+            };
+        }
+
+        TimeoutData TryGetTimeout(Guid timeoutId, IDbConnection connection)
+        {
+            using (var session = SessionFactory.OpenStatelessSessionEx(connection))
+            {
+                using (var tx = session.BeginAmbientTransactionAware(IsolationLevel.ReadCommitted))
+                {
+                    var te = session.Get<TimeoutEntity>(timeoutId, LockMode.Upgrade);
+
+                    tx.Commit();
+
+                    return te != null 
+                        ? MapToTimeoutData(te) 
+                        : null;
+                }
+            }
+        }
+
         bool TryRemoveTimeoutEntity(Guid timeoutId, IDbConnection connection, out TimeoutData timeoutData)
         {
             bool found;
@@ -154,15 +205,7 @@ namespace NServiceBus.TimeoutPersisters.NHibernate
                         return false;
                     }
 
-                    timeoutData = new TimeoutData
-                    {
-                        Destination = te.Destination,
-                        Id = te.Id.ToString(),
-                        SagaId = te.SagaId,
-                        State = te.State,
-                        Time = te.Time,
-                        Headers = ConvertStringToDictionary(te.Headers),
-                    };
+                    timeoutData = MapToTimeoutData(te);
 
                     var queryString = string.Format("delete {0} where Id = :id", typeof(TimeoutEntity));
 
