@@ -7,47 +7,47 @@
     using PubSub;
     using ScenarioDescriptors;
 
-    public class When_multiple_versions_of_a_message_is_published : NServiceBusAcceptanceTest
+    public class When_publishing_multiversioned_message : NServiceBusAcceptanceTest
     {
         [Test]
         public void Should_deliver_is_to_both_v1_and_vX_subscribers()
         {
             Scenario.Define<Context>()
-                    .WithEndpoint<V2Publisher>(b =>
-                        b.Given((bus, context) => Subscriptions.OnEndpointSubscribed(s =>
-                            {
-                                if (s.SubscriberReturnAddress.Queue.Contains("V1Subscriber"))
-                                    context.V1Subscribed = true;
+                .WithEndpoint<V2Publisher>(b =>
+                    b.Given((bus, context) => Subscriptions.OnEndpointSubscribed(s =>
+                    {
+                        if (s.SubscriberReturnAddress.Queue.Contains("V1Subscriber"))
+                            context.V1Subscribed = true;
 
-                                if (s.SubscriberReturnAddress.Queue.Contains("V2Subscriber"))
-                                    context.V2Subscribed = true;
-                            })
-                            )
-                             .When(c => c.V1Subscribed && c.V2Subscribed, (bus, c) => bus.Publish<V2Event>(e =>
-                                 {
-                                     e.SomeData = 1;
-                                     e.MoreInfo = "dasd";
-                                 })))
-                    .WithEndpoint<V1Subscriber>(b => b.Given((bus,c) =>
+                        if (s.SubscriberReturnAddress.Queue.Contains("V2Subscriber"))
+                            context.V2Subscribed = true;
+                    }))
+                        .When(c => c.V1Subscribed && c.V2Subscribed, (bus, c) => bus.Publish<V2Event>(e =>
                         {
-                            bus.Subscribe<V1Event>();
-                            if (!Feature.IsEnabled<MessageDrivenSubscriptions>())
-                                c.V1Subscribed = true;
-                        }))
-                    .WithEndpoint<V2Subscriber>(b => b.Given((bus,c) =>
-                        {
-                            bus.Subscribe<V2Event>();
-                            if (!Feature.IsEnabled<MessageDrivenSubscriptions>())
-                                c.V2Subscribed = true;
-                        }))
-                    .Done(c => c.V1SubscriberGotTheMessage && c.V2SubscriberGotTheMessage)
-                    .Repeat(r =>//broken for active mq until #1098 is fixed
-                                    r.For<AllSerializers>(Serializers.Binary)) //versioning isn't supported for binary serialization
-                    .Should(c =>
-                        {
-                            //put asserts in here if needed
-                        })
-                    .Run();
+                            e.SomeData = 1;
+                            e.MoreInfo = "dasd";
+                        })))
+                .WithEndpoint<V1Subscriber>(b => b.Given((bus, c) =>
+                {
+                    bus.Subscribe<V1Event>();
+                    if (!Feature.IsEnabled<MessageDrivenSubscriptions>())
+                        c.V1Subscribed = true;
+                }))
+                .WithEndpoint<V2Subscriber>(b => b.Given((bus, c) =>
+                {
+                    bus.Subscribe<V2Event>();
+                    if (!Feature.IsEnabled<MessageDrivenSubscriptions>())
+                        c.V2Subscribed = true;
+                }))
+                .Done(c => c.V1SubscriberGotTheMessage && c.V2SubscriberGotTheMessage)
+                .Repeat(r => //broken for active mq until #1098 is fixed
+                    r.For<AllSerializers>(Serializers.Binary)) //versioning isn't supported for binary serialization
+                .Should(c =>
+                {
+                    Assert.IsTrue(c.V1SubscriberGotTheMessage);
+                    Assert.IsTrue(c.V2SubscriberGotTheMessage);
+                })
+                .Run();
         }
 
         public class Context : ScenarioContext

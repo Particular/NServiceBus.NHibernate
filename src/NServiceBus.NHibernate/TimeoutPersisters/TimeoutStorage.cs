@@ -14,7 +14,7 @@ namespace NServiceBus.TimeoutPersisters.NHibernate
     /// <summary>
     /// Timeout storage implementation for NHibernate.
     /// </summary>
-    public class TimeoutStorage : IPersistTimeouts
+    public class TimeoutStorage : IPersistTimeouts, IPersistTimeoutsV2
     {
         /// <summary>
         /// The current <see cref="ISessionFactory"/>.
@@ -120,16 +120,7 @@ namespace NServiceBus.TimeoutPersisters.NHibernate
                     return false;
                 }
 
-                timeoutData = new TimeoutData
-                    {
-                        CorrelationId = te.CorrelationId,
-                        Destination = te.Destination,
-                        Id = te.Id.ToString(),
-                        SagaId = te.SagaId,
-                        State = te.State,
-                        Time = te.Time,
-                        Headers = ConvertStringToDictionary(te.Headers),
-                    };
+                timeoutData = MapToTimeoutData(te);
 
                 var queryString = string.Format("delete {0} where Id = :id",
                                         typeof(TimeoutEntity));
@@ -187,6 +178,47 @@ namespace NServiceBus.TimeoutPersisters.NHibernate
             }
 
             return serializer.SerializeObject(data);
+        }
+
+        public TimeoutData Peek(string timeoutId)
+        {
+            TimeoutData timeoutData = null;
+
+            using (var conn = SessionFactory.GetConnection())
+            using (var session = SessionFactory.OpenStatelessSessionEx(conn))
+            using (var tx = session.BeginAmbientTransactionAware(IsolationLevel.ReadCommitted))
+            {
+                var te = session.Get<TimeoutEntity>(new Guid(timeoutId), LockMode.Upgrade);
+
+                if (te != null)
+                {
+                    timeoutData = MapToTimeoutData(te);
+                }
+
+                tx.Commit();
+            }
+
+            return timeoutData;
+        }
+
+        static TimeoutData MapToTimeoutData(TimeoutEntity te)
+        {
+            return new TimeoutData
+            {
+                CorrelationId = te.CorrelationId,
+                Destination = te.Destination,
+                Id = te.Id.ToString(),
+                SagaId = te.SagaId,
+                State = te.State,
+                Time = te.Time,
+                Headers = ConvertStringToDictionary(te.Headers)
+            };
+        }
+
+        public bool TryRemove(string timeoutId)
+        {
+            TimeoutData timeoutData;
+            return this.TryRemove(timeoutId, out timeoutData);
         }
 
         static readonly JsonMessageSerializer serializer = new JsonMessageSerializer(null);

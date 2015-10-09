@@ -44,16 +44,14 @@
       <HintPath>..\packages\NHibernate.4.0.1.4000\lib\net40\NHibernate.dll</HintPath>
     </Reference>
     <Reference Include="NServiceBus, Version=4.4.0.0, Culture=neutral, PublicKeyToken=9fc386479f8a226c, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\NServiceBus.Interfaces.4.4.2\lib\net40\NServiceBus.dll</HintPath>
+      <HintPath>..\packages\NServiceBus.Interfaces.4.4.8\lib\net40\NServiceBus.dll</HintPath>
     </Reference>
     <Reference Include="NServiceBus.AcceptanceTesting, Version=4.4.2.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\NServiceBus.AcceptanceTesting.4.4.2\lib\net40\NServiceBus.AcceptanceTesting.dll</HintPath>
     </Reference>
     <Reference Include="NServiceBus.Core, Version=4.4.0.0, Culture=neutral, PublicKeyToken=9fc386479f8a226c, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\NServiceBus.4.4.2\lib\net40\NServiceBus.Core.dll</HintPath>
+      <HintPath>..\packages\NServiceBus.4.4.8\lib\net40\NServiceBus.Core.dll</HintPath>
     </Reference>
     <Reference Include="nunit.framework, Version=2.6.3.13283, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -147,7 +145,7 @@
     <Compile Include="App_Packages\NServiceBus.AcceptanceTests\Transactions\When_receiving_a_message_with_transactions_disabled.cs" />
     <Compile Include="App_Packages\NServiceBus.AcceptanceTests\Transactions\When_sending_a_message_from_a_non_transactional_endpoint_with_a_ambient_transaction_enabled.cs" />
     <Compile Include="App_Packages\NServiceBus.AcceptanceTests\Transactions\When_sending_messages_within_an_ambient_transaction.cs" />
-    <Compile Include="App_Packages\NServiceBus.AcceptanceTests\Versioning\When_multiple_versions_of_a_message_is_published.cs" />
+    <Compile Include="App_Packages\NServiceBus.AcceptanceTests\Versioning\When_publishing_multiversioned_message.cs" />
     <Compile Include="Config.cs" />
     <Compile Include="Issue_67.cs" />
     <Compile Include="When_saga_contains_nested_collection_without_parent_relation.cs" />
