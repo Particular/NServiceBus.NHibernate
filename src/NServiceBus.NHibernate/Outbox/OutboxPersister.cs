@@ -14,9 +14,16 @@
     {
         public IStorageSessionProvider StorageSessionProvider { get; set; }
         public SessionFactoryProvider SessionFactoryProvider { get; set; }
+        public string EndpointName { get; set; }
 
         public bool TryGet(string messageId, out OutboxMessage message)
         {
+            object[] possibleIds = new[]
+            {
+                EndpointQualifiedMessageId(messageId),
+                messageId,
+            };
+
             using (new TransactionScope(TransactionScopeOption.Suppress))
             {
                 OutboxRecord result;
@@ -27,7 +34,8 @@
                     {
                         //Explicitly using ICriteria instead of QueryOver for performance reasons.
                         //It seems QueryOver uses quite a bit reflection and that takes longer.
-                        result = session.CreateCriteria<OutboxRecord>().Add(Expression.Eq("MessageId", messageId))
+                        result = session.CreateCriteria<OutboxRecord>()
+                            .Add(Expression.In("MessageId", possibleIds))
                             .UniqueResult<OutboxRecord>();
 
                         tx.Commit();
@@ -61,7 +69,7 @@
 
             StorageSessionProvider.ExecuteInTransaction(x => x.Save(new OutboxRecord
             {
-                MessageId = messageId,
+                MessageId = EndpointQualifiedMessageId(messageId),
                 Dispatched = false,
                 TransportOperations = ConvertObjectToString(operations)
             }));
@@ -75,10 +83,11 @@
                 {
                     using (var tx = session.BeginTransaction(IsolationLevel.ReadCommitted))
                     {
-                        var queryString = string.Format("update {0} set Dispatched = true, DispatchedAt = :date where MessageId = :messageid And Dispatched = false",
+                        var queryString = string.Format("update {0} set Dispatched = true, DispatchedAt = :date where MessageId IN ( :messageid, :qualifiedMsgId ) And Dispatched = false",
                             typeof(OutboxRecord));
                         session.CreateQuery(queryString)
                             .SetString("messageid", messageId)
+                            .SetString("qualifiedMsgId", EndpointQualifiedMessageId(messageId))
                             .SetDateTime("date", DateTime.UtcNow)
                             .ExecuteUpdate();
 
@@ -96,13 +105,11 @@
                 {
                     using (var tx = session.BeginTransaction(IsolationLevel.ReadCommitted))
                     {
-                        var result = session.QueryOver<OutboxRecord>().Where(o => o.Dispatched && o.DispatchedAt < dateTime)
-                            .List();
+                        var queryString = string.Format("delete from {0} where Dispatched = true And DispatchedAt < :date", typeof(OutboxRecord));
 
-                        foreach (var record in result)
-                        {
-                            session.Delete(record);
-                        }
+                        session.CreateQuery(queryString)
+                            .SetDateTime("date", dateTime)
+                            .ExecuteUpdate();
 
                         tx.Commit();
                     }
@@ -128,6 +135,11 @@
             }
 
             return serializer.SerializeObject(operations);
+        }
+
+        string EndpointQualifiedMessageId(string messageId)
+        {
+            return this.EndpointName + "/" + messageId;
         }
 
         static readonly JsonMessageSerializer serializer = new JsonMessageSerializer(null);

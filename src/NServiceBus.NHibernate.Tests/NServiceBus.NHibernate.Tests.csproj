@@ -74,6 +74,7 @@
   <ItemGroup>
     <Compile Include="Outbox\FakeDbConnectionProvider.cs" />
     <Compile Include="Outbox\InMemoryDBFixture.cs" />
+    <Compile Include="Outbox\When_handling_outbox_msgs_unqualified_by_endpoint_name.cs" />
     <Compile Include="Outbox\When_adding_outbox_messages.cs" />
     <Compile Include="Persistence\NHibernateConfigurationBuilderTests.cs" />
     <Compile Include="SagaPersister\FakeConfigurationSource.cs" />
