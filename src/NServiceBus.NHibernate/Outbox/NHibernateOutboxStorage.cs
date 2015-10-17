@@ -41,7 +41,7 @@ namespace NServiceBus.Features
             config.AddMapping(mapper.CompileMappingForAllExplicitlyAddedEntities());
         }
 
-        class OutboxCleaner:FeatureStartupTask
+        class OutboxCleaner:FeatureStartupTask, IDisposable
         {
             public OutboxPersister OutboxPersister { get; set; }
  
@@ -85,6 +85,8 @@ namespace NServiceBus.Features
                     cleanupTimer.Dispose(waitHandle);
 
                     waitHandle.WaitOne();
+
+                    cleanupTimer = null;
                 }
             }
 
@@ -92,10 +94,14 @@ namespace NServiceBus.Features
             {
                 OutboxPersister.RemoveEntriesOlderThan(DateTime.UtcNow - timeToKeepDeduplicationData);
             }
+
+            public void Dispose()
+            {
+                if (cleanupTimer != null)
+                    cleanupTimer.Dispose();
+            }
  
-// ReSharper disable NotAccessedField.Local
             Timer cleanupTimer;
-// ReSharper restore NotAccessedField.Local
             TimeSpan timeToKeepDeduplicationData;
             TimeSpan frequencyToRunDeduplicationDataCleanup;
         }
