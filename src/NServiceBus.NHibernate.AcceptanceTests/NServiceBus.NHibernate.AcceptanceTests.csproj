@@ -104,14 +104,6 @@
     <Compile Include="App_Packages\NSB.AcceptanceTests.5.0.0\EndpointTemplates\ContextAppender.cs" />
     <Compile Include="App_Packages\NSB.AcceptanceTests.5.0.0\EndpointTemplates\DefaultPublisher.cs" />
     <Compile Include="App_Packages\NSB.AcceptanceTests.5.0.0\EndpointTemplates\DefaultServer.cs" />
-    <Compile Include="App_Packages\NSB.AcceptanceTests.5.0.0\Exceptions\StackTraceAssert.cs" />
-    <Compile Include="App_Packages\NSB.AcceptanceTests.5.0.0\Exceptions\When_handler_and_Uow_End_throws.cs" />
-    <Compile Include="App_Packages\NSB.AcceptanceTests.5.0.0\Exceptions\When_handler_throws.cs" />
-    <Compile Include="App_Packages\NSB.AcceptanceTests.5.0.0\Exceptions\When_handler_throws_AggregateException.cs" />
-    <Compile Include="App_Packages\NSB.AcceptanceTests.5.0.0\Exceptions\When_serialization_throws.cs" />
-    <Compile Include="App_Packages\NSB.AcceptanceTests.5.0.0\Exceptions\When_Uow_Begin_and_different_End_throws.cs" />
-    <Compile Include="App_Packages\NSB.AcceptanceTests.5.0.0\Exceptions\When_Uow_Begin_throws.cs" />
-    <Compile Include="App_Packages\NSB.AcceptanceTests.5.0.0\Exceptions\When_Uow_End_throws.cs" />
     <Compile Include="App_Packages\NSB.AcceptanceTests.5.0.0\HostInformation\When_a_message_is_received.cs" />
     <Compile Include="App_Packages\NSB.AcceptanceTests.5.0.0\Mutators\Issue_1980.cs" />
     <Compile Include="App_Packages\NSB.AcceptanceTests.5.0.0\Mutators\When_defining_outgoing_message_mutators.cs" />
