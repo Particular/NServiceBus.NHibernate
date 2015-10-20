@@ -44,7 +44,11 @@ namespace NServiceBus.Features
 
         class OutboxCleaner:FeatureStartupTask
         {
-            public OutboxPersister OutboxPersister { get; set; }
+            public OutboxCleaner(OutboxPersister outboxPersister, CriticalError criticalError)
+            {
+                this.outboxPersister = outboxPersister;
+                this.criticalError = criticalError;
+            }
  
             protected override void OnStart()
             {
@@ -91,12 +95,28 @@ namespace NServiceBus.Features
 
             void PerformCleanup(object state)
             {
-                OutboxPersister.RemoveEntriesOlderThan(DateTime.UtcNow - timeToKeepDeduplicationData);
+                try
+                {
+                    outboxPersister.RemoveEntriesOlderThan(DateTime.UtcNow - timeToKeepDeduplicationData);
+                    cleanupFailures = 0;
+                }
+                catch (Exception ex)
+                {
+                    cleanupFailures++;
+                    if (cleanupFailures >= 10)
+                    {
+                        criticalError.Raise("Failed to clean expired Outbox records after 10 consecutive unsuccessful attempts. The most likely cause of this is connectivity issues with your database.", ex);
+                        throw;
+                    }
+                }
             }
  
 // ReSharper disable NotAccessedField.Local
             Timer cleanupTimer;
 // ReSharper restore NotAccessedField.Local
+            OutboxPersister outboxPersister;
+            CriticalError criticalError;
+            int cleanupFailures;
             TimeSpan timeToKeepDeduplicationData;
             TimeSpan frequencyToRunDeduplicationDataCleanup;
         }
