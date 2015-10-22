@@ -83,11 +83,11 @@
                 {
                     using (var tx = session.BeginTransaction(IsolationLevel.ReadCommitted))
                     {
-                        var queryString = string.Format("update {0} set Dispatched = true, DispatchedAt = :date where MessageId IN ( :messageid, :qualifiedMsgId ) And Dispatched = false",
+                        var queryString = string.Format("update {0} set Dispatched = true, DispatchedAt = :date where MessageId IN ( :messageid, :qualifiedMessageId ) And Dispatched = false",
                             typeof(OutboxRecord));
                         session.CreateQuery(queryString)
                             .SetString("messageid", messageId)
-                            .SetString("qualifiedMsgId", EndpointQualifiedMessageId(messageId))
+                            .SetString("qualifiedMessageId", EndpointQualifiedMessageId(messageId))
                             .SetDateTime("date", DateTime.UtcNow)
                             .ExecuteUpdate();
 
