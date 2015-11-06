@@ -210,6 +210,7 @@
     <Compile Include="App_Packages\NSB.AcceptanceTests.5.2.1\Volatile\When_sending_to_non_durable_endpoint.cs" />
     <Compile Include="ConfigureNHibernatePersistence.cs" />
     <Compile Include="Issue_67.cs" />
+    <Compile Include="When_outbox_is_enabled.cs" />
     <Compile Include="When_user_supplies_NH_Configuration.cs" />
     <Compile Include="When_using_hbms.cs" />
     <Compile Include="When_saga_contains_nested_collection_without_parent_relation.cs" />

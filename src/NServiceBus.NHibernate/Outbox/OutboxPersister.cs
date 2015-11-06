@@ -18,8 +18,7 @@
 
         public bool TryGet(string messageId, out OutboxMessage message)
         {
-            object[] possibleIds = new[]
-            {
+            object[] possibleIds = {
                 EndpointQualifiedMessageId(messageId),
                 messageId,
             };
@@ -35,7 +34,7 @@
                         //Explicitly using ICriteria instead of QueryOver for performance reasons.
                         //It seems QueryOver uses quite a bit reflection and that takes longer.
                         result = session.CreateCriteria<OutboxRecord>()
-                            .Add(Expression.In("MessageId", possibleIds))
+                            .Add(Restrictions.In("MessageId", possibleIds))
                             .UniqueResult<OutboxRecord>();
 
                         tx.Commit();
@@ -48,11 +47,12 @@
                 }
 
                 message = new OutboxMessage(result.MessageId);
-
-                var operations = ConvertStringToObject(result.TransportOperations);
-                message.TransportOperations.AddRange(operations.Select(t => new TransportOperation(t.MessageId,
-                    t.Options, t.Message, t.Headers)));
-
+                if (!result.Dispatched)
+                {
+                    var operations = ConvertStringToObject(result.TransportOperations);
+                    message.TransportOperations.AddRange(operations.Select(t => new TransportOperation(t.MessageId,
+                        t.Options, t.Message, t.Headers)));
+                }
                 return true;
             }
         }
