@@ -59,6 +59,8 @@ namespace NServiceBus.Persistence.NHibernate
 
         void InnerInvoke(BehaviorContext context, Action next, Func<IDbConnection> connectionRetriever)
         {
+            Lazy<ITransaction> lazyTransaction = null;
+
             var lazySession = new Lazy<ISession>(() =>
             {
                 var session = SessionCreator != null
@@ -69,9 +71,11 @@ namespace NServiceBus.Persistence.NHibernate
 
                 if (Transaction.Current == null)
                 {
-                    var tx = session.BeginTransaction();
-                    context.Set(LazyNHibernateTransactionKey, tx);
+                    lazyTransaction = new Lazy<ITransaction>(() => session.BeginTransaction());
+                    lazyTransaction.Value.ToString();
+                    context.Set(LazyNHibernateTransactionKey, lazyTransaction);
                 }
+
                 return session;
             });
 
@@ -83,9 +87,9 @@ namespace NServiceBus.Persistence.NHibernate
                 if (lazySession.IsValueCreated)
                 {
                     lazySession.Value.Flush();
-                    ITransaction tx;
-                    if (context.TryGet(LazyNHibernateTransactionKey, out tx))
+                    if (lazyTransaction != null && lazyTransaction.IsValueCreated)
                     {
+                        var tx = lazyTransaction.Value;
                         tx.Commit();
                         tx.Dispose();
                     }
@@ -95,9 +99,9 @@ namespace NServiceBus.Persistence.NHibernate
             {
                 if (lazySession.IsValueCreated)
                 {
-                    ITransaction tx;
-                    if (context.TryGet(LazyNHibernateTransactionKey, out tx))
+                    if (lazyTransaction != null && lazyTransaction.IsValueCreated)
                     {
+                        var tx = lazyTransaction.Value;
                         tx.Dispose();
                     }
                     lazySession.Value.Dispose();
