@@ -1,17 +1,17 @@
 namespace NServiceBus.Unicast.Subscriptions.NHibernate.Tests
 {
     using System.IO;
+    using global::NHibernate;
     using global::NHibernate.Cfg;
     using global::NHibernate.Dialect;
     using global::NHibernate.Mapping.ByCode;
     using global::NHibernate.Tool.hbm2ddl;
-    using MessageDrivenSubscriptions;
     using NUnit.Framework;
 
     class InMemoryDBFixture
     {
-        protected ISubscriptionStorage storage;
-        protected SubscriptionStorageSessionProvider subscriptionStorageSessionProvider;
+        protected SubscriptionPersister storage;
+        protected ISessionFactory SessionFactory;
 
         [SetUp]
         public void SetupContext()
@@ -20,7 +20,7 @@ namespace NServiceBus.Unicast.Subscriptions.NHibernate.Tests
                 .DataBaseIntegration(x =>
                 {
                     x.Dialect<SQLiteDialect>();
-                    x.ConnectionString = string.Format(@"Data Source={0};Version=3;New=True;", Path.GetTempFileName());
+                    x.ConnectionString = $@"Data Source={Path.GetTempFileName()};Version=3;New=True;";
                 });
 
             var mapper = new ModelMapper();
@@ -30,9 +30,8 @@ namespace NServiceBus.Unicast.Subscriptions.NHibernate.Tests
 
             new SchemaExport(cfg).Create(false, true);
 
-            subscriptionStorageSessionProvider = new SubscriptionStorageSessionProvider(cfg.BuildSessionFactory());
-
-            storage = new SubscriptionPersister(subscriptionStorageSessionProvider);
+            SessionFactory = cfg.BuildSessionFactory();
+            storage = new SubscriptionPersister(SessionFactory);
         }
     }
 }

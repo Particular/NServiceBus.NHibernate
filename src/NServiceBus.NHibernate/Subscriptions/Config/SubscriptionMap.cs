@@ -23,6 +23,11 @@ namespace NServiceBus.Unicast.Subscriptions.NHibernate.Config
                              x.Property(p => p.MessageType, map => map.Column(columnMapper));
 
                          });
+            Property(p => p.LogicalEndpoint, map =>
+            {
+                map.Column(columnMapper);
+                map.NotNullable(false);
+            });
             Property(p => p.Version, map => map.Column(columnMapper));
             Property(p => p.TypeName, map =>
             {

@@ -2,30 +2,42 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Threading.Tasks;
     using AcceptanceTesting;
     using EndpointTemplates;
     using NUnit.Framework;
-    using Saga;
     using ScenarioDescriptors;
 
-    public class When_saga_contains_nested_collection_without_parent_relation : NServiceBusAcceptanceTest
+    // When_saga_contains_nested_collection_without_parent_relation - name getting too long for MSMQ
+    public class When_saga_w_nested_coll_no_parent_rel : NServiceBusAcceptanceTest
     {
+        [Test]
+        public async Task Should_complete()
+        {
+            await Scenario.Define<Context>(c => c.Id = Guid.NewGuid())
+                .WithEndpoint<NHNestedCollNoParentRelationEP>(b => b.When((bus, context) => bus.SendLocal(new Message1 { SomeId = context.Id })))
+                .Done(c => c.SagaCompleted)
+                .Repeat(r => r.For(Transports.Default))
+                .Run()
+                .ConfigureAwait(false);
+        }
+
         public class Context : ScenarioContext
         {
             public Guid Id { get; set; }
             public bool SagaCompleted { get; set; }
         }
 
-        public class SagaEndpoint : EndpointConfigurationBuilder
+        public class NHNestedCollNoParentRelationEP : EndpointConfigurationBuilder
         {
-            public SagaEndpoint()
+            public NHNestedCollNoParentRelationEP()
             {
                 EndpointSetup<DefaultServer>();
             }
 
-            public class TestSaga : Saga<TestSagaData>, IHandleMessages<Message2>, IAmStartedByMessages<Message1>
+            public class NHNestedCollectionWithoutParentRelationSaga : Saga<NHNestedCollectionWithoutParentRelationSagaData>, IHandleMessages<Message2>, IAmStartedByMessages<Message1>
             {
-                public void Handle(Message1 message)
+                public Task Handle(Message1 message, IMessageHandlerContext context)
                 {
                     Data.SomeId = message.SomeId;
                     Data.RelatedData = new List<ChildData>
@@ -48,19 +60,19 @@
                         },
                     };
 
-                    Bus.SendLocal(new Message2
+                    return context.SendLocal(new Message2
                     {
                         SomeId = message.SomeId
                     });
                 }
 
-                public void Handle(Message2 message)
+                public Task Handle(Message2 message, IMessageHandlerContext context)
                 {
                     MarkAsComplete();
-                    Bus.SendLocal(new SagaCompleted());
+                    return context.SendLocal(new SagaCompleted());
                 }
 
-                protected override void ConfigureHowToFindSaga(SagaPropertyMapper<TestSagaData> mapper)
+                protected override void ConfigureHowToFindSaga(SagaPropertyMapper<NHNestedCollectionWithoutParentRelationSagaData> mapper)
                 {
                     mapper.ConfigureMapping<Message2>(m => m.SomeId).ToSaga(s => s.SomeId);
                     mapper.ConfigureMapping<Message1>(m => m.SomeId).ToSaga(s => s.SomeId);
@@ -72,15 +84,16 @@
         {
             public Context Context { get; set; }
 
-            public void Handle(SagaCompleted message)
+            public Task Handle(SagaCompleted message, IMessageHandlerContext context)
             {
                 Context.SagaCompleted = true;
+
+                return Task.FromResult(0);
             }
         }
 
-        public class TestSagaData : IContainSagaData
+        public class NHNestedCollectionWithoutParentRelationSagaData : IContainSagaData
         {
-            [Unique]
             public virtual Guid SomeId { get; set; }
             public virtual IList<ChildData> RelatedData { get; set; }
             public virtual Guid Id { get; set; }
@@ -111,20 +124,5 @@
         {
         }
 
-        [Test]
-        public void Should_complete()
-        {
-            Scenario.Define(() => new Context
-            {
-                Id = Guid.NewGuid()
-            })
-                .WithEndpoint<SagaEndpoint>(b => b.Given((bus, context) => bus.SendLocal(new Message1
-                {
-                    SomeId = context.Id
-                })))
-                .Done(c => c.SagaCompleted)
-                .Repeat(r => r.For(Transports.Default))
-                .Run();
-        }
     }
 }

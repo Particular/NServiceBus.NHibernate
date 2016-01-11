@@ -1,34 +1,65 @@
 ﻿namespace NServiceBus.SagaPersisters.NHibernate.Tests
 {
     using System;
-    using global::NHibernate.Exceptions;
+    using System.Threading.Tasks;
+    using NServiceBus.Extensibility;
+    using NServiceBus.Persistence.NHibernate;
+    using NServiceBus.Sagas;
     using NUnit.Framework;
-    using Saga;
 
     [TestFixture]
-    class When_persisting_a_saga_with_a_unique_property : InMemoryFixture<SagaWithUniqueProperty>
+    class When_persisting_a_saga_with_a_unique_property : InMemoryFixture<SomeSaga>
     {
         [Test]
-        public void The_database_should_enforce_the_uniqueness()
+        public async Task The_database_should_enforce_the_uniqueness()
         {
-
-            var id = Guid.NewGuid();
-
-            ((ISagaPersister)SagaPersister).Get<SagaWithUniqueProperty>("UniqueString", "whatever");
-
-            SagaPersister.Save(new SagaWithUniqueProperty
+            bool failed = false;
+            using (var session = SessionFactory.OpenSession())
+            using (var transaction = session.BeginTransaction())
             {
-                Id = id,
-                UniqueString = "whatever"
-            });
+                var correlationProperty = new SagaCorrelationProperty("UniqueString", "whatever");
+                var storageSession = new NHibernateNativeTransactionSynchronizedStorageSession(session, transaction, false);
 
-            SagaPersister.Save(new SagaWithUniqueProperty
-            {
-                Id = Guid.NewGuid(),
-                UniqueString = "whatever"
-            });
+                await SagaPersister.Save(new SagaWithUniqueProperty
+                {
+                    Id = Guid.NewGuid(),
+                    UniqueString = "whatever"
+                }, correlationProperty, storageSession, new ContextBag()).ConfigureAwait(false);
 
-            Assert.Throws<GenericADOException>(FlushSession);
+                await SagaPersister.Save(new SagaWithUniqueProperty
+                {
+                    Id = Guid.NewGuid(),
+                    UniqueString = "whatever"
+                }, correlationProperty, storageSession, new ContextBag()).ConfigureAwait(false);
+
+                try
+                {
+                    transaction.Commit();
+                }
+                catch (Exception)
+                {
+                    failed = true;
+                }
+            }
+            Assert.IsTrue(failed);
+        }
+    }
+
+    class SomeSaga : Saga<SagaWithUniqueProperty>, IAmStartedByMessages<IMessage>
+    {
+        protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaWithUniqueProperty> mapper)
+        {
+            mapper.ConfigureMapping<Message>(m => m.UniqueString).ToSaga(s => s.UniqueString);
+        }
+
+        private class Message
+        {
+            public string UniqueString { get; set; }
+        }
+
+        public Task Handle(IMessage message, IMessageHandlerContext context)
+        {
+            throw new NotImplementedException();
         }
     }
 
@@ -41,7 +72,6 @@
 
         public virtual string OriginalMessageId { get; set; }
 
-        [Unique]
         public virtual string UniqueString { get; set; }
     }
 

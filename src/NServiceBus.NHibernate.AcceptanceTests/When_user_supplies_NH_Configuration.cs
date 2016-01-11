@@ -1,26 +1,25 @@
 ﻿namespace NServiceBus.AcceptanceTests.Sagas
 {
     using System;
+    using System.Threading.Tasks;
     using EndpointTemplates;
     using AcceptanceTesting;
     using NServiceBus.Persistence;
-    using NServiceBus.Saga;
     using NUnit.Framework;
 
     public class When_user_supplies_NH_Configuration : NServiceBusAcceptanceTest
     {
         [Test]
-        public void Should_use_user_supplied_NH_Configuration_and_connection_string()
+        public async Task Should_use_user_supplied_NH_Configuration_and_connection_string()
         {
-            var context = new Context();
-
-            Scenario.Define(context)
-                .WithEndpoint<MyEndpoint>(b => b.Given(bus => bus.SendLocal(new Message1
+            var context = await Scenario.Define<Context>()
+                .WithEndpoint<MyEndpoint>(b => b.When(bus => bus.SendLocal(new Message1
                 {
                     SomeId = Guid.NewGuid()
                 })))
                 .Done(c => c.Completed)
-                .Run();
+                .Run()
+                .ConfigureAwait(false);
 
             Assert.IsTrue(context.Completed);
         }
@@ -39,7 +38,7 @@
                     var cfg = new NHibernate.Cfg.Configuration();
                     cfg.SetProperty(NHibernate.Cfg.Environment.Dialect, typeof(NHibernate.Dialect.MsSql2012Dialect).FullName);
                     cfg.SetProperty(NHibernate.Cfg.Environment.ConnectionDriver, typeof(NHibernate.Driver.Sql2008ClientDriver).FullName);
-                    cfg.SetProperty(NHibernate.Cfg.Environment.ConnectionString, @"Server=localhost\sqlexpress;Database=nservicebus;Trusted_Connection=True;");
+                    cfg.SetProperty(NHibernate.Cfg.Environment.ConnectionString, ConfigureNHibernatePersistence.ConnectionString);
 
                     c.UsePersistence<NHibernatePersistence>().UseConfiguration(cfg);
                 });
@@ -53,33 +52,34 @@
                 }
             }
 
-            public class TestSaga : Saga<TestSagaData>, IAmStartedByMessages<Message1>, IHandleMessages<Message2>
+            public class Saga13 : Saga<Saga13Data>, IAmStartedByMessages<Message1>, IHandleMessages<Message2>
             {
                 public Context Context { get; set; }
 
-                public void Handle(Message1 message)
+                public Task Handle(Message1 message, IMessageHandlerContext context)
                 {
                     Data.SomeId = message.SomeId;
-                    Bus.SendLocal(new Message2
+                    return context.SendLocal(new Message2
                     {
                         SomeId = message.SomeId
                     });
                 }
 
-                public void Handle(Message2 _)
+                public Task Handle(Message2 _, IMessageHandlerContext context)
                 {
                     MarkAsComplete();
                     Context.Completed = true;
+                    return Task.FromResult(0);
                 }
 
-                protected override void ConfigureHowToFindSaga(SagaPropertyMapper<TestSagaData> mapper)
+                protected override void ConfigureHowToFindSaga(SagaPropertyMapper<Saga13Data> mapper)
                 {
                     mapper.ConfigureMapping<Message1>(m => m.SomeId).ToSaga(s => s.SomeId);
                     mapper.ConfigureMapping<Message2>(m => m.SomeId).ToSaga(s => s.SomeId);
                 }
             }
 
-            public class TestSagaData : IContainSagaData
+            public class Saga13Data : IContainSagaData
             {
                 public virtual Guid Id { get; set; }
                 public virtual string Originator { get; set; }

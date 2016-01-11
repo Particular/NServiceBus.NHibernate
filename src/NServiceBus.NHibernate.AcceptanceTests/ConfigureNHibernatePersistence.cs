@@ -1,11 +1,37 @@
-﻿using NServiceBus;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+using NServiceBus;
+using NServiceBus.AcceptanceTesting.Support;
 using NServiceBus.Persistence;
 
-public class ConfigureNHibernatePersistence
+public class ConfigureNHibernatePersistence : IConfigureTestExecution
 {
-    public void Configure(BusConfiguration config)
+    public Task Configure(BusConfiguration configuration, IDictionary<string, string> settings)
     {
-        config.UsePersistence<NHibernatePersistence>()
-            .ConnectionString(@"Server=localhost\sqlexpress;Database=nservicebus;Trusted_Connection=True;");
+        configuration.UsePersistence<NHibernatePersistence>()
+             .ConnectionString(ConnectionString);
+
+        return Task.FromResult(0);
     }
+
+    public Task Cleanup()
+    {
+        return Task.FromResult(0);
+    }
+
+    public static string ConnectionString
+    {
+        get
+        {
+            string envVar = System.Environment.GetEnvironmentVariable("NH_ACC_TEST_CONNSTR");
+            if (!string.IsNullOrEmpty(envVar))
+            {
+                return envVar;
+            }
+            
+            return defaultConnStr;
+        }
+    }
+
+    const string defaultConnStr = @"Server=localhost\sqlexpress;Database=nservicebus;Trusted_Connection=True;";
 }

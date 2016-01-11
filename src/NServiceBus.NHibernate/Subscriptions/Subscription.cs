@@ -6,6 +6,7 @@ namespace NServiceBus.Unicast.Subscriptions.NHibernate
     class Subscription
     {
         public virtual string SubscriberEndpoint { get; set; }
+        public virtual string LogicalEndpoint { get; set; }
         public virtual string MessageType { get; set; }
         public virtual string Version { get; set; }
         public virtual string TypeName { get; set; }

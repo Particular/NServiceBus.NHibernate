@@ -2,10 +2,14 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
 {
     using System;
     using System.Linq;
+    using global::NHibernate.Cfg;
     using global::NHibernate.Engine;
     using global::NHibernate.Id;
     using global::NHibernate.Impl;
     using global::NHibernate.Persister.Entity;
+    using NServiceBus.Features;
+    using NServiceBus.Sagas;
+    using NServiceBus.Settings;
     using NUnit.Framework;
 
     [TestFixture]
@@ -17,9 +21,28 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
         [SetUp]
         public void SetUp()
         {
-            sessionFactory = SessionFactoryHelper.Build();
+            var builder = new NHibernateSagaStorage();
+            var properties = SQLiteConfiguration.InMemory();
 
-            persisterForTestSaga = sessionFactory.GetEntityPersisterFor<TestSaga>();
+            var configuration = new Configuration().AddProperties(properties);
+            var settings = new SettingsHolder();
+
+            var metaModel = new SagaMetadataCollection();
+            var types = new [] {typeof(TestSaga), typeof(TestSagaData), typeof(TestComponent), typeof(PolymorphicPropertyBase),
+                typeof(AlsoDerivedFromTestSagaWithTableNameAttributeActualSaga), typeof(AlsoDerivedFromTestSagaWithTableNameAttribute),
+                typeof(DerivedFromTestSagaWithTableNameAttributeActualSaga), typeof(DerivedFromTestSagaWithTableNameAttribute),
+                typeof(TestSagaWithTableNameAttributeActualSaga), typeof(TestSagaWithTableNameAttribute),
+                typeof(SagaWithVersionedPropertyAttributeActualSaga), typeof(SagaWithVersionedPropertyAttribute),
+                typeof(SagaWithoutVersionedPropertyAttributeActualSaga), typeof(SagaWithoutVersionedPropertyAttribute)
+            };
+            metaModel.Initialize(types);
+            settings.Set<SagaMetadataCollection>(metaModel);
+
+            settings.Set("TypesToScan", types);
+            builder.ApplyMappings(settings, configuration);
+            sessionFactory = configuration.BuildSessionFactory() as SessionFactoryImpl;
+
+            persisterForTestSaga = sessionFactory.GetEntityPersisterFor<TestSagaData>();
         }
 
         [Test]

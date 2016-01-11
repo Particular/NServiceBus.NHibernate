@@ -1,22 +1,19 @@
 namespace NServiceBus.TimeoutPersisters.NHibernate.Tests
 {
-    using System;
     using System.Collections.Generic;
     using System.IO;
     using Config;
     using global::NHibernate;
     using global::NHibernate.Mapping.ByCode;
     using global::NHibernate.Tool.hbm2ddl;
-    using NServiceBus.NHibernate.Tests.Outbox;
     using NUnit.Framework;
-    using Persistence.NHibernate;
 
     abstract class InMemoryDBFixture
     {
         protected TimeoutPersister persister;
         protected ISessionFactory sessionFactory;
 
-        private readonly string connectionString = String.Format(@"Data Source={0};Version=3;New=True;", Path.GetTempFileName());
+        private readonly string connectionString = $@"Data Source={Path.GetTempFileName()};Version=3;New=True;";
         private const string dialect = "NHibernate.Dialect.SQLiteDialect";
 
         [SetUp]
@@ -37,12 +34,7 @@ namespace NServiceBus.TimeoutPersisters.NHibernate.Tests
 
             sessionFactory = configuration.BuildSessionFactory();
 
-            persister = new TimeoutPersister
-            {
-                SessionFactory = sessionFactory,
-                DbConnectionProvider = new FakeDbConnectionProvider(sessionFactory.GetConnection()),
-                EndpointName = "MyTestEndpoint"
-            };
+            persister = new TimeoutPersister("MyTestEndpoint", sessionFactory);
         }
     }
 }

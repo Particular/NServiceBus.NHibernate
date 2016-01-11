@@ -2,78 +2,50 @@ namespace NServiceBus.SagaPersisters.NHibernate
 {
     using System;
     using System.Linq;
+    using System.Threading.Tasks;
     using global::NHibernate;
     using global::NHibernate.Criterion;
-    using Persistence.NHibernate;
-    using Saga;
+    using NServiceBus.Extensibility;
+    using NServiceBus.Persistence;
+    using NServiceBus.Sagas;
 
-    /// <summary>
-    /// Saga persister implementation using NHibernate.
-    /// </summary>
     class SagaPersister : ISagaPersister
     {
-        
-        public SagaPersister(IStorageSessionProvider storageSessionProvider)
+        public Task Save(IContainSagaData saga, SagaCorrelationProperty correlationProperty, SynchronizedStorageSession session, ContextBag context)
         {
-            this.storageSessionProvider = storageSessionProvider;
+            session.Session().Save(saga);
+            return Task.FromResult(0);
         }
 
-      
-        /// <summary>
-        /// Saves the given saga entity using the current session of the
-        /// injected session factory.
-        /// </summary>
-        /// <param name="saga">the saga entity that will be saved.</param>
-        public void Save(IContainSagaData saga)
+
+        public Task Update(IContainSagaData saga, SynchronizedStorageSession session, ContextBag context)
         {
-            storageSessionProvider.ExecuteInTransaction(x => x.Save(saga));
+            session.Session().Update(saga);
+            return Task.FromResult(0);
         }
 
-        
-        /// <summary>
-        /// Updates the given saga entity using the current session of the
-        /// injected session factory.
-        /// </summary>
-        /// <param name="saga">the saga entity that will be updated.</param>
-        public void Update(IContainSagaData saga)
+        public Task<T> Get<T>(Guid sagaId, SynchronizedStorageSession session, ContextBag context) where T : IContainSagaData
         {
-            storageSessionProvider.ExecuteInTransaction(x => x.Update(saga));
+            var result = session.Session().Get<T>(sagaId, GetLockModeForSaga<T>());
+            return Task.FromResult(result);
         }
 
-        /// <summary>
-        /// Gets a saga entity from the injected session factory's current session
-        /// using the given saga id.
-        /// </summary>
-        /// <param name="sagaId">The saga id to use in the lookup.</param>
-        /// <returns>The saga entity if found, otherwise null.</returns>
-        public T Get<T>(Guid sagaId) where T : IContainSagaData
+        Task<T> ISagaPersister.Get<T>(string property, object value, SynchronizedStorageSession session, ContextBag context)
         {
-            var result = default(T);
-            storageSessionProvider.ExecuteInTransaction(x => result = x.Get<T>(sagaId, GetLockModeForSaga<T>()));
-            return result;
+            var result = session.Session().CreateCriteria(typeof(T))
+                .SetLockMode(GetLockModeForSaga<T>())
+                .Add(Restrictions.Eq(property, value))
+                .UniqueResult<T>();
+
+            return Task.FromResult(result);
+        }
+        public Task Complete(IContainSagaData saga, SynchronizedStorageSession session, ContextBag context)
+        {
+            session.Session().Delete(saga);
+            return Task.FromResult(0);
         }
 
-        T ISagaPersister.Get<T>(string property, object value)
-        {
-            var result = default(T);
-            storageSessionProvider.ExecuteInTransaction(x => result = x.CreateCriteria(typeof(T))
-                 .SetLockMode(GetLockModeForSaga<T>())
-                 .Add(Restrictions.Eq(property, value))
-                .UniqueResult<T>());
-            return result;
-        }
-
-        /// <summary>
-        /// Deletes the given saga from the injected session factory's
-        /// current session.
-        /// </summary>
-        /// <param name="saga">The saga entity that will be deleted.</param>
-        public void Complete(IContainSagaData saga)
-        {
-            storageSessionProvider.ExecuteInTransaction(x => x.Delete(saga));
-        }
-
-        LockMode GetLockModeForSaga<T>()
+        static LockMode GetLockModeForSaga<T>()
         {
             var explicitLockModeAttribute = typeof(T).GetCustomAttributes(typeof(LockModeAttribute), false).SingleOrDefault();
 
@@ -102,7 +74,5 @@ namespace NServiceBus.SagaPersisters.NHibernate
 
             }
         }
-
-        readonly IStorageSessionProvider storageSessionProvider;
     }
 }

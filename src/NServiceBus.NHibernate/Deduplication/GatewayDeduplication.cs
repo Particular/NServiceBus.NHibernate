@@ -2,28 +2,33 @@
 {
     using System;
     using System.Data;
+    using System.Threading.Tasks;
     using Config;
     using Gateway.Deduplication;
     using global::NHibernate;
     using global::NHibernate.Exceptions;
-    using Persistence.NHibernate;
+    using NServiceBus.Extensibility;
 
     class GatewayDeduplication : IDeduplicateMessages
     {
-        public ISessionFactory SessionFactory { get; set; }
+        readonly ISessionFactory sessionFactory;
 
-        public bool DeduplicateMessage(string clientId, DateTime timeReceived)
+        public GatewayDeduplication(ISessionFactory sessionFactory)
         {
-            using (var conn = SessionFactory.GetConnection())
-            using (var session = SessionFactory.OpenSessionEx(conn))
-            using (var tx = session.BeginAmbientTransactionAware(IsolationLevel.ReadCommitted))
+            this.sessionFactory = sessionFactory;
+        }
+
+        public Task<bool> DeduplicateMessage(string clientId, DateTime timeReceived, ContextBag context)
+        {
+            using (var session = sessionFactory.OpenSession())
+            using (var tx = session.BeginTransaction(IsolationLevel.ReadCommitted))
             {
                 var gatewayMessage = session.Get<DeduplicationMessage>(clientId);
 
                 if (gatewayMessage != null)
                 {
                     tx.Commit();
-                    return false;
+                    return Task.FromResult(false);
                 }
 
                 gatewayMessage = new DeduplicationMessage
@@ -40,11 +45,11 @@
                 catch (GenericADOException)
                 {
                     tx.Rollback();
-                    return false;
+                    return Task.FromResult(false);
                 }
             }
 
-            return true;
+            return Task.FromResult(true);
         }
     }
 }

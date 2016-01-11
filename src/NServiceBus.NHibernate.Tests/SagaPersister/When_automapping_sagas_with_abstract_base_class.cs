@@ -1,11 +1,12 @@
 namespace NServiceBus.SagaPersisters.NHibernate.Tests
 {
     using System;
+    using System.Threading.Tasks;
     using Features;
     using global::NHibernate.Cfg;
     using global::NHibernate.Impl;
+    using NServiceBus.Sagas;
     using NUnit.Framework;
-    using Saga;
     using Settings;
 
     [TestFixture]
@@ -20,8 +21,15 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
             var properties = SQLiteConfiguration.InMemory();
 
             var configuration = new Configuration().AddProperties(properties);
+            var types = new[] { typeof(SagaWithAbstractBaseClassActualSaga), typeof(SagaWithAbstractBaseClass), typeof(ContainSagaData), typeof(MyOwnAbstractBase) };
+
+            SagaMetadataCollection allMetadata = new SagaMetadataCollection();
+            allMetadata.Initialize(types);
+
             var settings = new SettingsHolder();
-            settings.Set("TypesToScan", new[] { typeof(SagaWithAbstractBaseClass), typeof(ContainSagaData), typeof(MyOwnAbstractBase) });
+            settings.Set("TypesToScan", types);
+            settings.Set<SagaMetadataCollection>(allMetadata);
+
             builder.ApplyMappings(settings, configuration);
             sessionFactory = configuration.BuildSessionFactory() as SessionFactoryImpl;
         }
@@ -34,6 +42,18 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
 
             Assert.IsNotNull(persister);
         }       
+    }
+
+    public class SagaWithAbstractBaseClassActualSaga : Saga<SagaWithAbstractBaseClass>, IAmStartedByMessages<IMessage>
+    {
+        protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaWithAbstractBaseClass> mapper)
+        {
+        }
+
+        public Task Handle(IMessage message, IMessageHandlerContext context)
+        {
+            throw new NotImplementedException();
+        }
     }
     
     public class SagaWithAbstractBaseClass : MyOwnAbstractBase

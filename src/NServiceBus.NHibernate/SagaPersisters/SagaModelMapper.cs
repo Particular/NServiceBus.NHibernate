@@ -9,24 +9,26 @@ namespace NServiceBus.SagaPersisters.NHibernate.AutoPersistence
     using global::NHibernate.Cfg.MappingSchema;
     using global::NHibernate.Mapping.ByCode;
     using global::NHibernate.Type;
-    using Saga;
+    using NServiceBus.Sagas;
 
     class SagaModelMapper
     {
         readonly Func<Type, string> tableNamingConvention;
 
-        public SagaModelMapper(IEnumerable<Type> typesToScan)
-            : this(typesToScan, DefaultTableNameConvention)
+        public SagaModelMapper(SagaMetadataCollection allMetadata, IEnumerable<Type> typesToScan)
+            : this(allMetadata, typesToScan, DefaultTableNameConvention)
         {
             
         }
 
-        public SagaModelMapper(IEnumerable<Type> typesToScan, Func<Type,string> tableNamingConvention)
+        public SagaModelMapper(SagaMetadataCollection allMetadata, IEnumerable<Type> typesToScan, Func<Type, string> tableNamingConvention)
         {
             this.tableNamingConvention = tableNamingConvention;
             Mapper = new ConventionModelMapper();
 
             this.typesToScan = typesToScan.ToList();
+
+            this.sagaMetaModel = allMetadata;
 
             sagaEntities =
                 this.typesToScan.Where(t => typeof(IContainSagaData).IsAssignableFrom(t) && !t.IsInterface).ToList();
@@ -36,7 +38,7 @@ namespace NServiceBus.SagaPersisters.NHibernate.AutoPersistence
             Mapper.IsTablePerClass((type, b) => false);
             Mapper.IsTablePerConcreteClass((type, b) => sagaEntities.Contains(type));
             Mapper.IsTablePerClassHierarchy((type, b) => false);
-            Mapper.IsEntity((type, mapped) => entityTypes.Contains(type));
+            Mapper.IsEntity((type, mapped) => entityTypes.ContainsKey(type));
             Mapper.IsArray((info, b) => false);
             Mapper.IsBag((info, b) =>
             {
@@ -155,9 +157,14 @@ namespace NServiceBus.SagaPersisters.NHibernate.AutoPersistence
                 }
             }
 
-            if (type.LocalMember.GetCustomAttributes(typeof(UniqueAttribute), false).Any())
+            SagaMetadata sagaMetadata;
+            if (type.LocalMember.DeclaringType != null && entityTypes.TryGetValue(type.LocalMember.DeclaringType, out sagaMetadata))
             {
-                map.Unique(true);
+                SagaMetadata.CorrelationPropertyMetadata correlationProperty;
+                if (sagaMetadata.TryGetCorrelationProperty(out correlationProperty) && correlationProperty.Name == type.LocalMember.Name)
+                {
+                    map.Unique(true);
+                }
             }
 
             var propertyInfo = type.LocalMember as PropertyInfo;
@@ -199,7 +206,7 @@ namespace NServiceBus.SagaPersisters.NHibernate.AutoPersistence
 
         public HbmMapping Compile()
         {
-            var hbmMapping = Mapper.CompileMappingFor(entityTypes);
+            var hbmMapping = Mapper.CompileMappingFor(entityTypes.Keys);
 
             ApplyOptimisticLockingOnMapping(hbmMapping);
 
@@ -237,20 +244,23 @@ namespace NServiceBus.SagaPersisters.NHibernate.AutoPersistence
 
         void PopulateTypesThatShouldBeAutoMapped()
         {
-            foreach (var rootEntity in sagaEntities)
+            foreach (var sagaMetadata in sagaMetaModel)
             {
-                AddEntitiesToBeMapped(rootEntity);
+                if (typesToScan.Contains(sagaMetadata.SagaEntityType))
+                {
+                    AddEntitiesToBeMapped(sagaMetadata, sagaMetadata.SagaEntityType);
+                }
             }
         }
 
-        void AddEntitiesToBeMapped(Type rootEntity)
+        void AddEntitiesToBeMapped(SagaMetadata sagaMetadata, Type rootEntity)
         {
-            if (entityTypes.Contains(rootEntity))
+            if (entityTypes.ContainsKey(rootEntity))
             {
                 return;
             }
 
-            entityTypes.Add(rootEntity);
+            entityTypes.Add(rootEntity, sagaMetadata);
 
             var propertyInfos = rootEntity.GetProperties();
                 
@@ -258,7 +268,7 @@ namespace NServiceBus.SagaPersisters.NHibernate.AutoPersistence
             {
                 if (propertyInfo.PropertyType.GetProperty("Id") != null)
                 {
-                    AddEntitiesToBeMapped(propertyInfo.PropertyType);
+                    AddEntitiesToBeMapped(sagaMetadata, propertyInfo.PropertyType);
                 }
 
                 if (propertyInfo.PropertyType.IsGenericType)
@@ -267,7 +277,7 @@ namespace NServiceBus.SagaPersisters.NHibernate.AutoPersistence
 
                     if (args[0].GetProperty("Id") != null)
                     {
-                        AddEntitiesToBeMapped(args[0]);
+                        AddEntitiesToBeMapped(sagaMetadata, args[0]);
                     }
                 }
 
@@ -281,14 +291,14 @@ namespace NServiceBus.SagaPersisters.NHibernate.AutoPersistence
 
             foreach (var derivedType in derivedTypes)
             {
-                AddEntitiesToBeMapped(derivedType);
+                AddEntitiesToBeMapped(sagaMetadata, derivedType);
             }
 
             var superClasses = typesToScan.Where(t => t.IsAssignableFrom(rootEntity));
 
             foreach (var superClass in superClasses)
             {
-                AddEntitiesToBeMapped(superClass);
+                AddEntitiesToBeMapped(sagaMetadata, superClass);
             }
         }
 
@@ -304,8 +314,9 @@ namespace NServiceBus.SagaPersisters.NHibernate.AutoPersistence
             return attributes.Any();
         }
 
-        List<Type> entityTypes = new List<Type>();
+        Dictionary<Type, SagaMetadata> entityTypes = new Dictionary<Type, SagaMetadata>();
         readonly List<Type> sagaEntities;
-        List<Type> typesToScan;
+        readonly List<Type> typesToScan;
+        readonly SagaMetadataCollection sagaMetaModel;
     }
 }

@@ -1,38 +1,29 @@
 namespace NServiceBus.SagaPersisters.NHibernate.Tests
 {
     using System;
-    using System.Collections.Generic;
-    using System.Linq;
     using Features;
     using global::NHibernate.Cfg;
     using global::NHibernate.Impl;
-    using Saga;
+    using NServiceBus.Sagas;
     using Settings;
 
     public static class SessionFactoryHelper
     {
-        public static SessionFactoryImpl Build()
+        public static SessionFactoryImpl Build(Type[] types)
         {
-            var types = Types();
-
             var builder = new NHibernateSagaStorage();
             var properties = SQLiteConfiguration.InMemory();
 
             var configuration = new Configuration().AddProperties(properties);
             var settings = new SettingsHolder();
+
+            var metaModel = new SagaMetadataCollection();
+            metaModel.Initialize(types);
+            settings.Set<SagaMetadataCollection>(metaModel);
+
             settings.Set("TypesToScan", types);
             builder.ApplyMappings(settings, configuration);
             return configuration.BuildSessionFactory() as SessionFactoryImpl;
-        }
-
-        public static List<Type> Types()
-        {
-            var assemblyContainingSagas = typeof(TestSaga).Assembly;
-            var types = assemblyContainingSagas.GetTypes().ToList();
-            types.Add(typeof(ContainSagaData));
-            types.Remove(typeof(MyDerivedClassWithRowVersion));
-
-            return types;
         }
     }
 }

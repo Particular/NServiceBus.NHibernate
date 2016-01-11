@@ -2,9 +2,9 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
 {
     using System;
     using System.Collections.Generic;
+    using System.Threading.Tasks;
     using global::NHibernate.Impl;
     using NUnit.Framework;
-    using Saga;
 
     [TestFixture]
     public class When_autoMapping_sagas_with_nested_types
@@ -14,7 +14,18 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
         [SetUp]
         public void SetUp()
         {
-            sessionFactory = SessionFactoryHelper.Build();
+            sessionFactory = SessionFactoryHelper.Build(
+                new[]
+                {
+                    typeof(TestSaga2),
+                    typeof(TestSaga2ActualSaga),
+                    typeof(ContainSagaData),
+                    typeof(SagaWithNestedTypeActualSaga),
+                    typeof(SagaWithNestedType),
+                    typeof(SagaWithNestedType.Customer),
+                    typeof(SagaWithNestedSagaData),
+                    typeof(SagaWithNestedSagaData.NestedSagaData)
+                });
         }
 
         [Test]
@@ -48,6 +59,19 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
         {
 
         }
+
+        public class TestSaga2ActualSaga : Saga<TestSaga2>, IAmStartedByMessages<IMessage>
+        {
+
+            protected override void ConfigureHowToFindSaga(SagaPropertyMapper<TestSaga2> mapper)
+            {
+            }
+
+            public Task Handle(IMessage message, IMessageHandlerContext context)
+            {
+                throw new NotImplementedException();
+            }
+        }
     }
 
     public class SagaWithNestedType : IContainSagaData
@@ -66,7 +90,19 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
         }
     }
 
-    public class SagaWithNestedSagaData
+    public class SagaWithNestedTypeActualSaga : Saga<SagaWithNestedType>, IAmStartedByMessages<IMessage>
+    {
+        protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaWithNestedType> mapper)
+        {
+        }
+
+        public Task Handle(IMessage message, IMessageHandlerContext context)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public class SagaWithNestedSagaData : Saga<SagaWithNestedSagaData.NestedSagaData>, IAmStartedByMessages<IMessage>
     {
         public class NestedSagaData : IContainSagaData
         {
@@ -74,6 +110,15 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
             public virtual string Originator { get; set; }
             public virtual string OriginalMessageId { get; set; }
 
-        } 
+        }
+
+        protected override void ConfigureHowToFindSaga(SagaPropertyMapper<NestedSagaData> mapper)
+        {
+        }
+
+        public Task Handle(IMessage message, IMessageHandlerContext context)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

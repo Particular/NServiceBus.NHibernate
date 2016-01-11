@@ -1,22 +1,31 @@
-﻿namespace NServiceBus.Outbox
+﻿namespace NServiceBus.Persistence.NHibernate
 {
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Threading.Tasks;
     using System.Transactions;
+    using global::NHibernate;
     using global::NHibernate.Criterion;
-    using NHibernate;
-    using Persistence.NHibernate;
+    using NServiceBus.Extensibility;
+    using NServiceBus.Outbox;
+    using NServiceBus.Outbox.NHibernate;
     using Serializers.Json;
     using IsolationLevel = System.Data.IsolationLevel;
 
     class OutboxPersister : IOutboxStorage
     {
-        public IStorageSessionProvider StorageSessionProvider { get; set; }
-        public SessionFactoryProvider SessionFactoryProvider { get; set; }
-        public string EndpointName { get; set; }
+        static readonly JsonMessageSerializer serializer = new JsonMessageSerializer(null);
+        ISessionFactory sessionFactory;
+        string endpointName;
 
-        public bool TryGet(string messageId, out OutboxMessage message)
+        public OutboxPersister(ISessionFactory sessionFactory, string endpointName)
+        {
+            this.sessionFactory = sessionFactory;
+            this.endpointName = endpointName;
+        }
+
+        public Task<OutboxMessage> Get(string messageId, ContextBag context)
         {
             object[] possibleIds = {
                 EndpointQualifiedMessageId(messageId),
@@ -26,8 +35,7 @@
             using (new TransactionScope(TransactionScopeOption.Suppress))
             {
                 OutboxRecord result;
-                message = null;
-                using (var session = SessionFactoryProvider.SessionFactory.OpenStatelessSession())
+                using (var session = sessionFactory.OpenStatelessSession())
                 {
                     using (var tx = session.BeginTransaction(IsolationLevel.ReadCommitted))
                     {
@@ -43,48 +51,45 @@
 
                 if (result == null)
                 {
-                    return false;
+                    return Task.FromResult<OutboxMessage>(null);
                 }
+                var transportOperations = ConvertStringToObject(result.TransportOperations)
+                    .Select(t => new TransportOperation(t.MessageId, t.Options, t.Message, t.Headers))
+                    .ToList();
 
-                message = new OutboxMessage(result.MessageId);
-                if (!result.Dispatched)
-                {
-                    var operations = ConvertStringToObject(result.TransportOperations);
-                    message.TransportOperations.AddRange(operations.Select(t => new TransportOperation(t.MessageId,
-                        t.Options, t.Message, t.Headers)));
-                }
-                return true;
+                var message = new OutboxMessage(result.MessageId,transportOperations);
+                return Task.FromResult(message);
             }
         }
 
-        public void Store(string messageId, IEnumerable<TransportOperation> transportOperations)
+        public Task Store(OutboxMessage outboxMessage, OutboxTransaction transaction, ContextBag context)
         {
-            var operations = transportOperations.Select(t => new OutboxOperation
+            var operations = outboxMessage.TransportOperations.Select(t => new OutboxOperation
             {
                 Message = t.Body,
                 Headers = t.Headers,
                 MessageId = t.MessageId,
                 Options = t.Options,
             });
-
-            StorageSessionProvider.ExecuteInTransaction(x => x.Save(new OutboxRecord
+            var nhibernateTransaction = (NHibernateOutboxTransaction) transaction;
+            nhibernateTransaction.Session.Save(new OutboxRecord
             {
-                MessageId = EndpointQualifiedMessageId(messageId),
+                MessageId = EndpointQualifiedMessageId(outboxMessage.MessageId),
                 Dispatched = false,
                 TransportOperations = ConvertObjectToString(operations)
-            }));
+            });
+            return Task.FromResult(0);
         }
 
-        public void SetAsDispatched(string messageId)
+        public Task SetAsDispatched(string messageId, ContextBag context)
         {
             using (new TransactionScope(TransactionScopeOption.Suppress))
             {
-                using (var session = SessionFactoryProvider.SessionFactory.OpenStatelessSession())
+                using (var session = sessionFactory.OpenStatelessSession())
                 {
                     using (var tx = session.BeginTransaction(IsolationLevel.ReadCommitted))
                     {
-                        var queryString = string.Format("update {0} set Dispatched = true, DispatchedAt = :date where MessageId IN ( :messageid, :qualifiedMessageId ) And Dispatched = false",
-                            typeof(OutboxRecord));
+                        var queryString = $"update {typeof(OutboxRecord)} set Dispatched = true, DispatchedAt = :date where MessageId IN ( :messageid, :qualifiedMessageId ) And Dispatched = false";
                         session.CreateQuery(queryString)
                             .SetString("messageid", messageId)
                             .SetString("qualifiedMessageId", EndpointQualifiedMessageId(messageId))
@@ -95,13 +100,24 @@
                     }
                 }
             }
+
+            return Task.FromResult(0);
+        }
+
+        public Task<OutboxTransaction> BeginTransaction(ContextBag context)
+        {
+            var session = sessionFactory.OpenSession();
+            var transaction = session.BeginTransaction();
+
+            OutboxTransaction result = new NHibernateOutboxTransaction(session, transaction);
+            return Task.FromResult(result);
         }
 
         public void RemoveEntriesOlderThan(DateTime dateTime)
         {
             using (new TransactionScope(TransactionScopeOption.Suppress))
             {
-                using (var session = SessionFactoryProvider.SessionFactory.OpenStatelessSession())
+                using (var session = sessionFactory.OpenStatelessSession())
                 {
                     using (var tx = session.BeginTransaction(IsolationLevel.ReadCommitted))
                     {
@@ -139,9 +155,7 @@
 
         string EndpointQualifiedMessageId(string messageId)
         {
-            return this.EndpointName + "/" + messageId;
+            return endpointName + "/" + messageId;
         }
-
-        static readonly JsonMessageSerializer serializer = new JsonMessageSerializer(null);
     }
 }

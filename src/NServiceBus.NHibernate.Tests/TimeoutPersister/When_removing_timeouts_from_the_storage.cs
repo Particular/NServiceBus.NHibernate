@@ -2,45 +2,18 @@ namespace NServiceBus.TimeoutPersisters.NHibernate.Tests
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
-    using System.Transactions;
+    using NServiceBus.Extensibility;
     using NUnit.Framework;
-    using Support;
     using Timeout.Core;
 
     [TestFixture]
     class When_removing_timeouts_from_the_storage : InMemoryDBFixture
     {
         [Test]
-        public void TryRemove_should_return_the_correct_headers()
-        {
-            var headers = new Dictionary<string, string>
-                          {
-                              {"Bar", "34234"},
-                              {"Foo", "aString1"},
-                              {"Super", "aString2"}
-                          };
-
-            var timeout = new TimeoutData
-            {
-                Time = DateTime.UtcNow.AddHours(-1),
-                Destination = new Address("timeouts", RuntimeEnvironment.MachineName),
-                SagaId = Guid.NewGuid(),
-                State = new byte[] { 1, 1, 133, 200 },
-                Headers = headers,
-                OwningTimeoutManager = "MyTestEndpoint",
-            };
-            persister.Add(timeout);
-
-            TimeoutData timeoutData;
-            persister.TryRemove(timeout.Id, out timeoutData);
-
-            CollectionAssert.AreEqual(headers, timeoutData.Headers);
-        }
-
-        [Test]
-        public void TryRemove_should_remove_timeouts_by_id()
+        public async Task TryRemove_should_remove_timeouts_by_id()
         {
             var t1 = new TimeoutData
             {
@@ -61,15 +34,14 @@ namespace NServiceBus.TimeoutPersisters.NHibernate.Tests
                                    }
             };
 
-            persister.Add(t1);
-            persister.Add(t2);
+            await persister.Add(t1, new ContextBag()).ConfigureAwait(false);
+            await persister.Add(t2, new ContextBag()).ConfigureAwait(false);
 
-            DateTime nextTimeToRunQuery;
-            var timeouts = persister.GetNextChunk(DateTime.UtcNow.AddYears(-3), out nextTimeToRunQuery);
+            var timeouts = await persister.GetNextChunk(DateTime.UtcNow.AddYears(-3)).ConfigureAwait(false);
 
-            foreach (var timeout in timeouts)
+            foreach (var timeout in timeouts.DueTimeouts)
             {
-                var timeoutRemoved = persister.TryRemove(timeout.Item1);
+                var timeoutRemoved = await persister.TryRemove(timeout.Id, new ContextBag()).ConfigureAwait(false);
                 Assert.IsTrue(timeoutRemoved);
             }
 
@@ -81,126 +53,62 @@ namespace NServiceBus.TimeoutPersisters.NHibernate.Tests
         }
 
         [Test]
-        public void TryRemove_should_remove_timeouts_by_id_and_return_removed_timeout()
-        {
-            var t1 = new TimeoutData
-            {
-                Time = DateTime.Now.AddYears(-1),
-                OwningTimeoutManager = "MyTestEndpoint",
-                Headers = new Dictionary<string, string>
-                                   {
-                                       {"Header1", "Value1"}
-                                   }
-            };
-            var t2 = new TimeoutData
-            {
-                Time = DateTime.Now.AddYears(-1),
-                OwningTimeoutManager = "MyTestEndpoint",
-                Headers = new Dictionary<string, string>
-                                   {
-                                       {"Header1", "Value1"}
-                                   }
-            };
-
-            persister.Add(t1);
-            persister.Add(t2);
-
-            DateTime nextTimeToRunQuery;
-            var timeouts = persister.GetNextChunk(DateTime.UtcNow.AddYears(-3), out nextTimeToRunQuery);
-
-            foreach (var timeout in timeouts)
-            {
-                TimeoutData timeoutData;
-                var timeoutRemoved = persister.TryRemove(timeout.Item1, out timeoutData);
-                Assert.IsTrue(timeoutRemoved);
-                Assert.IsNotNull(timeoutData);
-            }
-
-            using (var session = sessionFactory.OpenSession())
-            {
-                Assert.Null(session.Get<TimeoutEntity>(new Guid(t1.Id)));
-                Assert.Null(session.Get<TimeoutEntity>(new Guid(t2.Id)));
-            }
-        }
-
-        [Test]
-        public void TryRemove_should_return_false_when_timeout_already_deleted()
+        public async Task TryRemove_should_return_false_when_timeout_already_deleted()
         {
             var timeout = new TimeoutData();
 
-            persister.Add(timeout);
+            await persister.Add(timeout, new ContextBag()).ConfigureAwait(false);
 
-            Assert.IsTrue(persister.TryRemove(timeout.Id));
-            Assert.IsFalse(persister.TryRemove(timeout.Id));
+            Assert.IsTrue(await persister.TryRemove(timeout.Id, new ContextBag()).ConfigureAwait(false));
+            Assert.IsFalse(await persister.TryRemove(timeout.Id, new ContextBag()).ConfigureAwait(false));
         }
 
         [Test]
-        public void TryRemove_should_return_false_and_no_timeout_when_timeout_already_deleted()
+        public async Task Peek_should_return_no_timeout_when_timeout_already_deleted()
         {
             var timeout = new TimeoutData();
 
-            persister.Add(timeout);
+            await persister.Add(timeout, new ContextBag()).ConfigureAwait(false);
 
-            Assert.IsTrue(persister.TryRemove(timeout.Id));
+            Assert.IsTrue(await persister.TryRemove(timeout.Id, new ContextBag()).ConfigureAwait(false));
 
-            TimeoutData timeoutData;
-            var timeoutRemoved = persister.TryRemove(timeout.Id, out timeoutData);
-            Assert.IsFalse(timeoutRemoved);
+            var timeoutData = await persister.Peek(timeout.Id, new ContextBag()).ConfigureAwait(false);
             Assert.IsNull(timeoutData);
         }
 
         [Test]
-        public void TryRemove_should_work_with_concurrent_transactions()
+        public async Task TryRemove_should_work_with_concurrent_transactions()
         {
             var timeout = new TimeoutData
             {
                 Time = DateTime.Now
             };
 
-            persister.Add(timeout);
+            await persister.Add(timeout, new ContextBag()).ConfigureAwait(false);
 
             var t1EnteredTx = new AutoResetEvent(false);
             var t2EnteredTx = new AutoResetEvent(false);
 
             var task1 = Task.Run(() =>
             {
-                using (var tx = new TransactionScope(TransactionScopeOption.Required, new TransactionOptions
-                {
-                    IsolationLevel = IsolationLevel.ReadCommitted
-                }))
-                {
-                    t1EnteredTx.Set();
-                    t2EnteredTx.WaitOne();
-                    var result = persister.TryRemove(timeout.Id);
-                    tx.Complete();
-                    return result;
-                }
+                t1EnteredTx.Set();
+                t2EnteredTx.WaitOne();
+                return persister.TryRemove(timeout.Id, new ContextBag());
             });
 
             var task2 = Task.Run(() =>
             {
-                using (var tx = new TransactionScope(TransactionScopeOption.Required, new TransactionOptions
-                {
-                    IsolationLevel = IsolationLevel.ReadCommitted
-                }))
-                {
-                    t2EnteredTx.Set();
-                    t1EnteredTx.WaitOne();
-                    var result = persister.TryRemove(timeout.Id);
-                    tx.Complete();
-                    return result;
-                }
+                t2EnteredTx.Set();
+                t1EnteredTx.WaitOne();
+                return persister.TryRemove(timeout.Id, new ContextBag());
             });
 
-            Assert.IsTrue(Task.WaitAll(new[] { task1, task2 }, TimeSpan.FromSeconds(30)));
-
-            // one delete should succeed, the other one shouldn't
-            Assert.IsTrue(task1.Result || task2.Result);
-            Assert.IsFalse(task1.Result && task2.Result);
+            var results = await Task.WhenAll(task1, task2).ConfigureAwait(false);
+            Assert.IsTrue(results.Single(x => x));
         }
 
         [Test]
-        public void RemoveTimeoutBy_should_remove_timeouts_by_sagaid()
+        public async Task RemoveTimeoutBy_should_remove_timeouts_by_sagaid()
         {
             var sagaId1 = Guid.NewGuid();
             var sagaId2 = Guid.NewGuid();
@@ -225,15 +133,16 @@ namespace NServiceBus.TimeoutPersisters.NHibernate.Tests
                                    }
             };
 
-            persister.Add(t1);
-            persister.Add(t2);
+            await persister.Add(t1, new ContextBag()).ConfigureAwait(false);
+            await persister.Add(t2, new ContextBag()).ConfigureAwait(false);
 
-            persister.RemoveTimeoutBy(sagaId1);
-            persister.RemoveTimeoutBy(sagaId2);
+            await persister.RemoveTimeoutBy(sagaId1, new ContextBag()).ConfigureAwait(false);
+            await persister.RemoveTimeoutBy(sagaId2, new ContextBag()).ConfigureAwait(false);
 
             using (var session = sessionFactory.OpenSession())
             {
-                Assert.Null(session.Get<TimeoutEntity>(new Guid(t1.Id)));
+                var timeoutEntity = session.Get<TimeoutEntity>(new Guid(t1.Id));
+                Assert.Null(timeoutEntity);
                 Assert.Null(session.Get<TimeoutEntity>(new Guid(t2.Id)));
             }
         }

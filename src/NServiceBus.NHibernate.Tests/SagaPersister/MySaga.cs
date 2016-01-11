@@ -1,7 +1,6 @@
 namespace NServiceBus.SagaPersisters.NHibernate.Tests
 {
     using System;
-    using Saga;
 
     public class MySaga : Saga<MySagaData>
     {

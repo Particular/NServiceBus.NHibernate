@@ -3,73 +3,78 @@ namespace NServiceBus.NHibernate.Tests.Outbox
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using System.Threading;
+    using System.Threading.Tasks;
+    using NServiceBus.Extensibility;
     using NServiceBus.Outbox;
     using NServiceBus.Outbox.NHibernate;
-    using NServiceBus.Persistence.NHibernate;
     using NUnit.Framework;
-    using SagaPersisters.NHibernate.Tests;
 
     [TestFixture]
     class When_adding_outbox_messages : InMemoryDBFixture
     {
         [Test]
-        [ExpectedException]
-        public void Should_throw_if__trying_to_insert_same_messageid()
+        public async Task Should_throw_if_trying_to_insert_same_messageid()
         {
+            bool failed = false;
             using (var session = SessionFactory.OpenSession())
+            using (var transaction = session.BeginTransaction())
             {
-                persister.StorageSessionProvider = new FakeSessionProvider(SessionFactory, session);
-                persister.SessionFactoryProvider = new SessionFactoryProvider(SessionFactory);
-                persister.Store("MySpecialId", Enumerable.Empty<TransportOperation>());
-                persister.Store("MySpecialId", Enumerable.Empty<TransportOperation>());
-
-                session.Flush();
+                await persister.Store(new OutboxMessage("MySpecialId", new List<TransportOperation>()), new NHibernateOutboxTransaction(session, transaction), new ContextBag());
+                transaction.Commit();
             }
+            try
+            {
+                using (var session = SessionFactory.OpenSession())
+                using (var transaction = session.BeginTransaction())
+                {
+                    await persister.Store(new OutboxMessage("MySpecialId", new List<TransportOperation>()), new NHibernateOutboxTransaction(session, transaction), new ContextBag());
+                    transaction.Commit();
+                }
+            }
+            catch (Exception)
+            {
+                failed = true;
+            }
+            Assert.IsTrue(failed);
         }
 
         [Test]
-        public void Should_save_with_not_dispatched()
+        public async Task Should_save_with_not_dispatched()
         {
             var id = Guid.NewGuid().ToString("N");
             using (var session = SessionFactory.OpenSession())
+            using (var transaction = session.BeginTransaction())
             {
-                persister.StorageSessionProvider = new FakeSessionProvider(SessionFactory, session);
-                persister.SessionFactoryProvider = new SessionFactoryProvider(SessionFactory);
-                persister.Store(id, new List<TransportOperation>
+                await persister.Store(new OutboxMessage(id, new List<TransportOperation>
                 {
                     new TransportOperation(id, new Dictionary<string, string>(), new byte[1024*5], new Dictionary<string, string>()),
-                });
-
-                session.Flush();
+                }), new NHibernateOutboxTransaction(session, transaction), new ContextBag());
+                transaction.Commit();
             }
 
-            OutboxMessage result;
-            persister.TryGet(id, out result);
-
+            var result = await persister.Get(id, new ContextBag());
             var operation = result.TransportOperations.Single();
 
             Assert.AreEqual(id, operation.MessageId);
         }
 
         [Test]
-        public void Should_update_dispatched_flag()
+        public async Task Should_update_dispatched_flag()
         {
             var id = Guid.NewGuid().ToString("N");
 
             using (var session = SessionFactory.OpenSession())
+            using (var transaction = session.BeginTransaction())
             {
-                persister.StorageSessionProvider = new FakeSessionProvider(SessionFactory, session);
-                persister.SessionFactoryProvider = new SessionFactoryProvider(SessionFactory);
-                persister.Store(id, new List<TransportOperation>
+                await persister.Store(new OutboxMessage(id, new List<TransportOperation>
                 {
                     new TransportOperation(id, new Dictionary<string, string>(), new byte[1024*5], new Dictionary<string, string>()),
-                });
+                }), new NHibernateOutboxTransaction(session, transaction), new ContextBag());
 
-                session.Flush();
+                transaction.Commit();
             }
 
-            persister.SetAsDispatched(id);
+            await persister.SetAsDispatched(id, new ContextBag());
 
             using (var session = SessionFactory.OpenSession())
             {
@@ -81,32 +86,30 @@ namespace NServiceBus.NHibernate.Tests.Outbox
         }
 
         [Test]
-        public void Should_delete_all_OutboxRecords_that_have_been_dispatched()
+        public async Task Should_delete_all_OutboxRecords_that_have_been_dispatched()
         {
             var id = Guid.NewGuid().ToString("N");
-            
+
             using (var session = SessionFactory.OpenSession())
+            using (var transaction = session.BeginTransaction())
             {
-                persister.StorageSessionProvider = new FakeSessionProvider(SessionFactory, session);
-                persister.SessionFactoryProvider = new SessionFactoryProvider(SessionFactory);
-                persister.Store("NotDispatched", Enumerable.Empty<TransportOperation>());
-                persister.Store(id, new List<TransportOperation>
+                await persister.Store(new OutboxMessage("NotDispatched", new List<TransportOperation>()), new NHibernateOutboxTransaction(session, transaction), new ContextBag());
+                await persister.Store(new OutboxMessage(id, new List<TransportOperation>
                 {
                     new TransportOperation(id, new Dictionary<string, string>(), new byte[1024*5], new Dictionary<string, string>()),
-                });
+                }), new NHibernateOutboxTransaction(session, transaction), new ContextBag());
 
-                session.Flush();
+                transaction.Commit();
             }
 
-            persister.SetAsDispatched(id);
-            Thread.Sleep(TimeSpan.FromSeconds(1)); //Need to wait for dispatch logic to finish
+            await persister.SetAsDispatched(id, new ContextBag());
 
             persister.RemoveEntriesOlderThan(DateTime.UtcNow.AddMinutes(1));
 
             using (var session = SessionFactory.OpenSession())
             {
                 var result = session.QueryOver<OutboxRecord>().List();
-                    
+
                 Assert.AreEqual(1, result.Count);
                 Assert.AreEqual("TestEndpoint/NotDispatched", result[0].MessageId);
             }

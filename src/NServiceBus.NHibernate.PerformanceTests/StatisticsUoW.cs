@@ -2,13 +2,14 @@
 {
     using System;
     using System.Threading;
+    using System.Threading.Tasks;
     using System.Transactions;
     using NServiceBus;
     using NServiceBus.UnitOfWork;
 
     class StatisticsUoW : IManageUnitsOfWork, INeedInitialization
     {
-        public void Begin()
+        public Task Begin()
         {
             if (!Statistics.First.HasValue)
             {
@@ -22,6 +23,8 @@
             //{
             //    Transaction.Current.EnlistDurable(Guid.NewGuid(), enlistment, EnlistmentOptions.None);
             //}static readonly TwoPhaseCommitEnlistment enlistment = new TwoPhaseCommitEnlistment();  
+
+            return Task.FromResult(9);
         }
 
         void OnCompleted(object sender, TransactionEventArgs e)
@@ -40,16 +43,19 @@
             Interlocked.Increment(ref Statistics.NumberOfMessages);
         }
 
-        public void End(Exception ex = null)
+        public Task End(Exception ex = null)
         {
             if (ex != null)
             {
                 Interlocked.Increment(ref Statistics.NumberOfRetries);
-                return;
+                return Task.FromResult(0);
             }
-                
-            if(Transaction.Current == null)
+
+            if (Transaction.Current == null)
+            {
                 RecordSuccess();
+            }
+            return Task.FromResult(0);
         }
 
         public void Customize(BusConfiguration builder)
