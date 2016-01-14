@@ -38,7 +38,7 @@ public class ConfigureNHibernatePersistence
     {
         using (var provider = new MD5CryptoServiceProvider())
         {
-            var inputBytes = Encoding.Default.GetBytes(String.Concat(data));
+            var inputBytes = Encoding.Default.GetBytes(string.Concat(data));
             var hashBytes = provider.ComputeHash(inputBytes);
             // generate a guid from the hash:
             return "A" + new Guid(hashBytes).ToString("N").Substring(0, 20);

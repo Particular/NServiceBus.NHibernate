@@ -13,7 +13,7 @@
         [Test]
         public async Task The_database_should_enforce_the_uniqueness()
         {
-            bool failed = false;
+            var failed = false;
             using (var session = SessionFactory.OpenSession())
             using (var transaction = session.BeginTransaction())
             {

@@ -12,7 +12,7 @@ namespace NServiceBus.SagaPersisters.NHibernate
     /// If not specified we use <see cref="LockModes.Upgrade"/>.
     /// For more information about lock modes see http://www.nhforge.org/doc/nh/en/#transactions-locking
     /// </remarks>
-    [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = true)]
+    [AttributeUsage(AttributeTargets.Class)]
     public sealed class LockModeAttribute : Attribute
     {
         /// <summary>

@@ -23,7 +23,7 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
             var configuration = new Configuration().AddProperties(properties);
             var types = new[] { typeof(SagaWithAbstractBaseClassActualSaga), typeof(SagaWithAbstractBaseClass), typeof(ContainSagaData), typeof(MyOwnAbstractBase) };
 
-            SagaMetadataCollection allMetadata = new SagaMetadataCollection();
+            var allMetadata = new SagaMetadataCollection();
             allMetadata.Initialize(types);
 
             var settings = new SettingsHolder();

@@ -4,23 +4,14 @@ namespace NServiceBus.Persistence.NHibernate
 
     class NHibernateConfiguration
     {
-        readonly Configuration configuration;
-        readonly string connectionString;
-
         public NHibernateConfiguration(Configuration configuration, string connectionString)
         {
-            this.configuration = configuration;
-            this.connectionString = connectionString;
+            Configuration = configuration;
+            ConnectionString = connectionString;
         }
 
-        public Configuration Configuration
-        {
-            get { return configuration; }
-        }
+        public Configuration Configuration { get; }
 
-        public string ConnectionString
-        {
-            get { return connectionString; }
-        }
+        public string ConnectionString { get; }
     }
 }

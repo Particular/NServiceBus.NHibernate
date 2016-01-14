@@ -23,7 +23,7 @@ public class ConfigureNHibernatePersistence : IConfigureTestExecution
     {
         get
         {
-            string envVar = System.Environment.GetEnvironmentVariable("NH_ACC_TEST_CONNSTR");
+            var envVar = System.Environment.GetEnvironmentVariable("NH_ACC_TEST_CONNSTR");
             if (!string.IsNullOrEmpty(envVar))
             {
                 return envVar;

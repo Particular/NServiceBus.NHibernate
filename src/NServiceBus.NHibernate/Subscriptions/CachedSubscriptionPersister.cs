@@ -35,7 +35,7 @@ namespace NServiceBus.Unicast.Subscriptions.NHibernate
         {
             var types = messageTypes.ToList();
             var typeNames = types.Select(mt => mt.TypeName).ToArray();
-            var key = String.Join(",", typeNames);
+            var key = string.Join(",", typeNames);
             Tuple<DateTimeOffset, IEnumerable<Subscriber>> cacheItem;
             var cacheItemFound = cache.TryGetValue(key, out cacheItem);
 

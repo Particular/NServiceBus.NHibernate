@@ -8,7 +8,6 @@ namespace NServiceBus.TimeoutPersisters.NHibernate
     using System.Transactions;
     using global::NHibernate;
     using NServiceBus.Extensibility;
-    using Persistence.NHibernate;
     using Serializers.Json;
     using Timeout.Core;
     using IsolationLevel = System.Data.IsolationLevel;
@@ -32,36 +31,34 @@ namespace NServiceBus.TimeoutPersisters.NHibernate
             {
                 var now = DateTime.UtcNow;
                 using (var session = SessionFactory.OpenStatelessSession())
+                using (var tx = session.BeginTransaction(IsolationLevel.ReadCommitted))
                 {
-                    using (var tx = session.BeginTransaction(IsolationLevel.ReadCommitted))
-                    {
-                        var results = session.QueryOver<TimeoutEntity>()
-                            .Where(x => x.Endpoint == EndpointName)
-                            .And(x => x.Time >= startSlice && x.Time <= now)
-                            .OrderBy(x => x.Time).Asc
-                            .Select(x => x.Id, x => x.Time)
-                            .List<object[]>()
-                            .Select(p =>
-                            {
-                                var id = (Guid)p[0];
-                                var dueTime = (DateTime)p[1];
-                                return new TimeoutsChunk.Timeout(id.ToString(), dueTime);
-                            })
-                            .ToList();
+                    var results = session.QueryOver<TimeoutEntity>()
+                        .Where(x => x.Endpoint == EndpointName)
+                        .And(x => x.Time >= startSlice && x.Time <= now)
+                        .OrderBy(x => x.Time).Asc
+                        .Select(x => x.Id, x => x.Time)
+                        .List<object[]>()
+                        .Select(p =>
+                        {
+                            var id = (Guid) p[0];
+                            var dueTime = (DateTime) p[1];
+                            return new TimeoutsChunk.Timeout(id.ToString(), dueTime);
+                        })
+                        .ToList();
 
-                        //Retrieve next time we need to run query
-                        var startOfNextChunk = session.QueryOver<TimeoutEntity>()
-                            .Where(x => x.Endpoint == EndpointName)
-                            .Where(x => x.Time > now)
-                            .OrderBy(x => x.Time).Asc
-                            .Take(1)
-                            .SingleOrDefault();
+                    //Retrieve next time we need to run query
+                    var startOfNextChunk = session.QueryOver<TimeoutEntity>()
+                        .Where(x => x.Endpoint == EndpointName)
+                        .Where(x => x.Time > now)
+                        .OrderBy(x => x.Time).Asc
+                        .Take(1)
+                        .SingleOrDefault();
 
-                        var nextTimeToRunQuery = startOfNextChunk?.Time ?? DateTime.UtcNow.AddMinutes(10);
+                    var nextTimeToRunQuery = startOfNextChunk?.Time ?? DateTime.UtcNow.AddMinutes(10);
 
-                        tx.Commit();
-                        return Task.FromResult(new TimeoutsChunk(results, nextTimeToRunQuery));
-                    }
+                    tx.Commit();
+                    return Task.FromResult(new TimeoutsChunk(results, nextTimeToRunQuery));
                 }
             }
         }
@@ -182,7 +179,7 @@ namespace NServiceBus.TimeoutPersisters.NHibernate
 
         static Dictionary<string, string> ConvertStringToDictionary(string data)
         {
-            if (String.IsNullOrEmpty(data))
+            if (string.IsNullOrEmpty(data))
             {
                 return new Dictionary<string, string>();
             }

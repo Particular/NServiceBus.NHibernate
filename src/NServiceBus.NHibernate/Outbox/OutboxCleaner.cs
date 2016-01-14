@@ -4,7 +4,6 @@ namespace NServiceBus.Features
     using System.Configuration;
     using System.Threading;
     using System.Threading.Tasks;
-    using NServiceBus.Outbox;
     using NServiceBus.Persistence.NHibernate;
 
     class OutboxCleaner : FeatureStartupTask

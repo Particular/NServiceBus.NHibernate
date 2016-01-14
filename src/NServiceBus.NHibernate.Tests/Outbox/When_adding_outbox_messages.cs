@@ -15,7 +15,7 @@ namespace NServiceBus.NHibernate.Tests.Outbox
         [Test]
         public async Task Should_throw_if_trying_to_insert_same_messageid()
         {
-            bool failed = false;
+            var failed = false;
             using (var session = SessionFactory.OpenSession())
             using (var transaction = session.BeginTransaction())
             {

@@ -135,7 +135,7 @@
 
         static IEnumerable<OutboxOperation> ConvertStringToObject(string data)
         {
-            if (String.IsNullOrEmpty(data))
+            if (string.IsNullOrEmpty(data))
             {
                 return Enumerable.Empty<OutboxOperation>();
             }

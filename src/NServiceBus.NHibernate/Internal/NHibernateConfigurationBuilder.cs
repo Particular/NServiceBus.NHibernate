@@ -75,7 +75,7 @@ namespace NServiceBus.Persistence.NHibernate
                     configurationProperties[match.Groups[1].Value] = appSettingsSection[appSetting];
                 }
             }
-            if (!String.IsNullOrEmpty(defaultConnectionString))
+            if (!string.IsNullOrEmpty(defaultConnectionString))
             {
                 configurationProperties[Environment.ConnectionString] = defaultConnectionString;
             }
@@ -162,7 +162,7 @@ For most scenarios the 'NServiceBus/Persistence' connection string is the best o
         {
             var connectionStringOverride = GetConnectionStringOrNull("NServiceBus/Persistence/NHibernate/"+connectionStringSuffix);
 
-            if (String.IsNullOrEmpty(connectionStringOverride))
+            if (string.IsNullOrEmpty(connectionStringOverride))
             {
                 return new Dictionary<string, string>(configurationProperties);
             }

@@ -31,18 +31,9 @@ namespace NServiceBus.TimeoutPersisters.NHibernate.Installer
             formatter = (PropertiesHelper.GetBoolean(Environment.FormatSql, configProperties, true) ? FormatStyle.Ddl : FormatStyle.None).Formatter;
         }
 
-        /// <summary>
-        ///     Returns a List of all Exceptions which occured during the export.
-        /// </summary>
-        /// <returns></returns>
-        public IList<Exception> Exceptions
-        {
-            get { return exceptions; }
-        }
+        // List of all Exceptions which occured during the export.
+        public IList<Exception> Exceptions => exceptions;
 
-        /// <summary>
-        ///     Execute the schema updates
-        /// </summary>
         public void Execute(bool script, bool doUpdate)
         {
             if (script)
@@ -104,9 +95,9 @@ namespace NServiceBus.TimeoutPersisters.NHibernate.Installer
                     typeof(MsSql2012Dialect).FullName,
                 };
 
-                for (var j = 0; j < updateSQL.Length; j++)
+                foreach (var item in updateSQL)
                 {
-                    var sql = updateSQL[j];
+                    var sql = item;
 
                     if (dialectScopes.Contains(dialect.GetType().FullName))
                     {
@@ -118,10 +109,7 @@ namespace NServiceBus.TimeoutPersisters.NHibernate.Installer
 
                     try
                     {
-                        if (scriptAction != null)
-                        {
-                            scriptAction(formatted);
-                        }
+                        scriptAction?.Invoke(formatted);
                         if (doUpdate)
                         {
                             log.Debug(sql);
@@ -147,10 +135,7 @@ namespace NServiceBus.TimeoutPersisters.NHibernate.Installer
             {
                 try
                 {
-                    if (stmt != null)
-                    {
-                        stmt.Dispose();
-                    }
+                    stmt?.Dispose();
                     connectionHelper.Release();
                 }
                 catch (Exception e)
@@ -161,11 +146,11 @@ namespace NServiceBus.TimeoutPersisters.NHibernate.Installer
             }
         }
 
-        static readonly IInternalLogger log = LoggerProvider.LoggerFor(typeof(OptimizedSchemaUpdate));
-        readonly Configuration configuration;
-        readonly IConnectionHelper connectionHelper;
-        readonly Dialect dialect;
-        readonly List<Exception> exceptions;
+        static IInternalLogger log = LoggerProvider.LoggerFor(typeof(OptimizedSchemaUpdate));
+        Configuration configuration;
+        IConnectionHelper connectionHelper;
+        Dialect dialect;
+        List<Exception> exceptions;
         IFormatter formatter;
     }
 }

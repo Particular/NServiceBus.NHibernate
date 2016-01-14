@@ -28,7 +28,7 @@ namespace NServiceBus.SagaPersisters.NHibernate.AutoPersistence
 
             this.typesToScan = typesToScan.ToList();
 
-            this.sagaMetaModel = allMetadata;
+            sagaMetaModel = allMetadata;
 
             sagaEntities =
                 this.typesToScan.Where(t => typeof(IContainSagaData).IsAssignableFrom(t) && !t.IsInterface).ToList();
@@ -54,7 +54,7 @@ namespace NServiceBus.SagaPersisters.NHibernate.AutoPersistence
             Mapper.BeforeMapManyToOne += ApplyManyToOneConvention;
         }
 
-        public ConventionModelMapper Mapper { get; private set; }
+        public ConventionModelMapper Mapper { get; }
 
         void ApplyClassConvention(IModelInspector mi, Type type, IClassAttributesMapper map)
         {
@@ -101,7 +101,7 @@ namespace NServiceBus.SagaPersisters.NHibernate.AutoPersistence
             if (tableAttribute != null)
             {
                 map.Table(tableAttribute.TableName);
-                if (!String.IsNullOrEmpty(tableAttribute.Schema))
+                if (!string.IsNullOrEmpty(tableAttribute.Schema))
                 {
                     map.Schema(tableAttribute.Schema);
                 }
@@ -135,7 +135,7 @@ namespace NServiceBus.SagaPersisters.NHibernate.AutoPersistence
             if (tableAttribute != null)
             {
                 map.Table(tableAttribute.TableName);
-                if (!String.IsNullOrEmpty(tableAttribute.Schema))
+                if (!string.IsNullOrEmpty(tableAttribute.Schema))
                 {
                     map.Schema(tableAttribute.Schema);
                 }
@@ -172,7 +172,7 @@ namespace NServiceBus.SagaPersisters.NHibernate.AutoPersistence
             {
                 if (propertyInfo.PropertyType == typeof(byte[]))
                 {
-                    map.Length(Int32.MaxValue);
+                    map.Length(int.MaxValue);
                 }
 
                 return;
@@ -181,7 +181,7 @@ namespace NServiceBus.SagaPersisters.NHibernate.AutoPersistence
             var fieldInfo = type.LocalMember as FieldInfo;
             if (fieldInfo != null && fieldInfo.FieldType == typeof(byte[]))
             {
-                map.Length(Int32.MaxValue);
+                map.Length(int.MaxValue);
             }
         }
 
