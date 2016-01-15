@@ -27,7 +27,7 @@
 
         public class Context : ScenarioContext
         {
-            public string SomeId { get; set; }
+            public Guid SomeId { get; set; }
             public bool Done { get; set; }
         }
 
@@ -68,7 +68,7 @@
 
             public class NullCorrPropertySagaData : IContainSagaData
             {
-                public virtual string SomeId { get; set; }
+                public virtual Guid SomeId { get; set; }
                 public virtual Guid Id { get; set; }
                 public virtual string Originator { get; set; }
                 public virtual string OriginalMessageId { get; set; }

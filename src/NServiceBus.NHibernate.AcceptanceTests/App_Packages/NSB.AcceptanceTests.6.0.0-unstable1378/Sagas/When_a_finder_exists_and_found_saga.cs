@@ -1,6 +1,5 @@
 ﻿namespace NServiceBus.AcceptanceTests.Sagas
 {
-    using System;
     using System.Threading.Tasks;
     using NServiceBus.AcceptanceTesting;
     using NServiceBus.AcceptanceTests.EndpointTemplates;
@@ -10,7 +9,6 @@
     using NServiceBus.Sagas;
     using NUnit.Framework;
 
-    //This test had to be updated in L52 in order to wotk with NHibernate.
     [TestFixture]
     public class When_a_finder_exists_and_found_saga
     {
@@ -46,13 +44,10 @@
                 public Task<TestSaga08.SagaData08> FindBy(SomeOtherMessage message, SynchronizedStorageSession storageSession, ReadOnlyContextBag context)
                 {
                     Context.FinderUsed = true;
-                    var saga = new TestSaga08.SagaData08
+                    return Task.FromResult(new TestSaga08.SagaData08
                     {
-                        Id = Guid.NewGuid(),
                         Property = "jfbsjdfbsdjh"
-                    };
-                    storageSession.Session().Save(saga);
-                    return Task.FromResult(saga);
+                    });
                 }
             }
 
