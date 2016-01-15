@@ -1,20 +1,24 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Security.Cryptography;
 using System.Text;
+using System.Threading.Tasks;
 using NServiceBus;
+using NServiceBus.AcceptanceTesting.Support;
 using NServiceBus.Persistence;
 using NServiceBus.Persistence.NHibernate;
 
-public class ConfigureNHibernatePersistence
+public class ConfigureNHibernatePersistence : IConfigureTestExecution
 {
-    public void Configure(BusConfiguration config)
+    public Task Configure(BusConfiguration config, IDictionary<string, string> settings)
     {
         NHibernateSettingRetriever.AppSettings = () => new NameValueCollection
         {
             {"NServiceBus/Persistence/NHibernate/connection.driver_class", "NHibernate.Driver.OracleDataClientDriver"},
             {"NServiceBus/Persistence/NHibernate/dialect", "NHibernate.Dialect.Oracle10gDialect"}
         };
+
         config.UsePersistence<NHibernatePersistence>()
             .ConnectionString(@"Data Source=XE;User Id=particular;Password=Welcome1")
             .SagaTableNamingConvention(type =>
@@ -28,10 +32,13 @@ public class ConfigureNHibernatePersistence
 
                 return tablename;
             });
+
+        return Task.FromResult(0);
     }
 
-    public void Cleanup()
+    public Task Cleanup()
     {
+        return Task.FromResult(0);
     }
 
     static string Create(params object[] data)
