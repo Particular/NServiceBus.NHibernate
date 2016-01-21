@@ -17,8 +17,8 @@ namespace NServiceBus.Persistence.NHibernate
 
     class NHibernateConfigurationBuilder
     {
-        static readonly Regex PropertyRetrievalRegex = new Regex(@"NServiceBus/Persistence/NHibernate/([\W\w]+)$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
-        private static ConnectionStringSettingsCollection connectionStringSettingsCollection;
+        static Regex PropertyRetrievalRegex = new Regex(@"NServiceBus/Persistence/NHibernate/([\W\w]+)$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+        static ConnectionStringSettingsCollection connectionStringSettingsCollection;
         public const string DefaultDialect = "NHibernate.Dialect.MsSql2008Dialect";
 
         readonly Configuration configuration;

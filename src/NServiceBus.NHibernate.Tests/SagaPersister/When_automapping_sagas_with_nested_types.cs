@@ -9,7 +9,7 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
     [TestFixture]
     public class When_autoMapping_sagas_with_nested_types
     {
-        private SessionFactoryImpl sessionFactory;
+        SessionFactoryImpl sessionFactory;
 
         [SetUp]
         public void SetUp()

@@ -13,8 +13,8 @@ namespace NServiceBus.TimeoutPersisters.NHibernate.Tests
         protected TimeoutPersister persister;
         protected ISessionFactory sessionFactory;
 
-        private readonly string connectionString = $@"Data Source={Path.GetTempFileName()};Version=3;New=True;";
-        private const string dialect = "NHibernate.Dialect.SQLiteDialect";
+        string connectionString = $@"Data Source={Path.GetTempFileName()};Version=3;New=True;";
+        const string dialect = "NHibernate.Dialect.SQLiteDialect";
 
         [SetUp]
         public void Setup()

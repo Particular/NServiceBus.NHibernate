@@ -111,38 +111,34 @@ namespace NServiceBus.Unicast.Subscriptions.NHibernate
         public void Init()
         {
             using (new TransactionScope(TransactionScopeOption.Suppress))
+            using (var session = sessionFactory.OpenStatelessSession())
+            using (var tx = session.BeginTransaction(IsolationLevel.ReadCommitted))
             {
-                using (var session = sessionFactory.OpenStatelessSession())
+                var v2XSubscriptions = session.QueryOver<Subscription>()
+                    .Where(s => s.TypeName == null)
+                    .List();
+                if (v2XSubscriptions.Count == 0)
                 {
-                    using (var tx = session.BeginTransaction(IsolationLevel.ReadCommitted))
-                    {
-                        var v2XSubscriptions = session.QueryOver<Subscription>()
-                            .Where(s => s.TypeName == null)
-                            .List();
-                        if (v2XSubscriptions.Count == 0)
-                        {
-                            return;
-                        }
-
-                        Logger.DebugFormat("Found {0} v2X subscriptions going to upgrade", v2XSubscriptions.Count);
-
-                        foreach (var v2XSubscription in v2XSubscriptions)
-                        {
-                            var mt = new MessageType(v2XSubscription.MessageType);
-                            v2XSubscription.Version = mt.Version.ToString();
-                            v2XSubscription.TypeName = mt.TypeName;
-
-                            session.Update(v2XSubscription);
-                        }
-
-                        tx.Commit();
-                        Logger.InfoFormat("{0} v2X subscriptions upgraded", v2XSubscriptions.Count);
-                    }
+                    return;
                 }
+
+                Logger.DebugFormat("Found {0} v2X subscriptions going to upgrade", v2XSubscriptions.Count);
+
+                foreach (var v2XSubscription in v2XSubscriptions)
+                {
+                    var mt = new MessageType(v2XSubscription.MessageType);
+                    v2XSubscription.Version = mt.Version.ToString();
+                    v2XSubscription.TypeName = mt.TypeName;
+
+                    session.Update(v2XSubscription);
+                }
+
+                tx.Commit();
+                Logger.InfoFormat("{0} v2X subscriptions upgraded", v2XSubscriptions.Count);
             }
         }
 
-        private class SubscriptionByTransportAddressComparer : IEqualityComparer<Subscription>
+        class SubscriptionByTransportAddressComparer : IEqualityComparer<Subscription>
         {
             public bool Equals(Subscription x, Subscription y)
             {
