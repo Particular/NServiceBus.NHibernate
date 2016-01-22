@@ -22,7 +22,7 @@
                 .Done(c => c.Done || c.Exceptions.Any())
                 .Run();
 
-            Assert.AreEqual(context.SomeId, id.ToString());
+            Assert.AreEqual(context.SomeId, id);
         }
 
         public class Context : ScenarioContext
