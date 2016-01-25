@@ -1,5 +1,6 @@
 namespace NServiceBus.Unicast.Subscriptions.NHibernate.Tests
 {
+    using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
     using NServiceBus.Extensibility;
@@ -22,11 +23,12 @@ namespace NServiceBus.Unicast.Subscriptions.NHibernate.Tests
 
             storage.Init();
 
-            var subscriptionsForMessageType = (await storage.GetSubscriberAddressesForMessage(MessageTypes.MessageB, new ContextBag()).ConfigureAwait(false)).ToArray();
+            var messageTypes = new List<MessageType> { MessageTypes.MessageB };
+            var subscribers = (await storage.GetSubscriberAddressesForMessage(messageTypes, new ContextBag()).ConfigureAwait(false)).ToArray();
 
-            Assert.AreEqual(1, subscriptionsForMessageType.Length);
-            Assert.AreEqual(TestClients.ClientA.Endpoint, subscriptionsForMessageType.First().Endpoint);
-            Assert.AreEqual(TestClients.ClientA.TransportAddress, subscriptionsForMessageType.First().TransportAddress);
+            Assert.AreEqual(1, subscribers.Length);
+            Assert.AreEqual(TestClients.ClientA.Endpoint, subscribers.First().Endpoint);
+            Assert.AreEqual(TestClients.ClientA.TransportAddress, subscribers.First().TransportAddress);
         }
     }
 }

@@ -17,21 +17,21 @@ namespace NServiceBus.Unicast.Subscriptions.NHibernate
             this.expiration = expiration;
         }
 
-        public override Task Subscribe(Subscriber subscriber, IReadOnlyCollection<MessageType> messageTypes, ContextBag context)
+        public override Task Subscribe(Subscriber subscriber, MessageType messageType, ContextBag context)
         {
-            base.Subscribe(subscriber, messageTypes, context);
+            base.Subscribe(subscriber, messageType, context);
             cache.Clear();
             return Task.FromResult(0);
         }
 
-        public override Task Unsubscribe(Subscriber address, IReadOnlyCollection<MessageType> messageTypes, ContextBag context)
+        public override Task Unsubscribe(Subscriber address, MessageType messageType, ContextBag context)
         {
-            base.Unsubscribe(address, messageTypes, context);
+            base.Unsubscribe(address, messageType, context);
             cache.Clear();
             return Task.FromResult(0);
         }
 
-        public async override Task<IEnumerable<Subscriber>> GetSubscriberAddressesForMessage(IReadOnlyCollection<MessageType> messageTypes, ContextBag context)
+        public override async Task<IEnumerable<Subscriber>> GetSubscriberAddressesForMessage(IEnumerable<MessageType> messageTypes, ContextBag context)
         {
             var types = messageTypes.ToList();
             var typeNames = types.Select(mt => mt.TypeName).ToArray();
@@ -56,7 +56,7 @@ namespace NServiceBus.Unicast.Subscriptions.NHibernate
             return cacheItem.Item2;
         }
 
-        static readonly ConcurrentDictionary<string, Tuple<DateTimeOffset, IEnumerable<Subscriber>>> cache = new ConcurrentDictionary<string, Tuple<DateTimeOffset, IEnumerable<Subscriber>>>();
+        static ConcurrentDictionary<string, Tuple<DateTimeOffset, IEnumerable<Subscriber>>> cache = new ConcurrentDictionary<string, Tuple<DateTimeOffset, IEnumerable<Subscriber>>>();
         TimeSpan expiration;
     }
 }

@@ -25,10 +25,10 @@ namespace NServiceBus.Unicast.Subscriptions.NHibernate.Tests
     }
     public class MessageTypes
     {
-        public static IReadOnlyCollection<MessageType> MessageA = new[] { new MessageType(typeof(MessageA).FullName, new Version(1, 0, 0, 0)) };
-        public static IReadOnlyCollection<MessageType> MessageAv2 = new[] { new MessageType(typeof(MessageA).FullName,new Version(2,0,0,0)) };
-        public static IReadOnlyCollection<MessageType> MessageAv11 = new[] { new MessageType(typeof(MessageA).FullName, new Version(1, 1, 0, 0)) };
-        public static IReadOnlyCollection<MessageType> MessageB = new[] { new MessageType(typeof(MessageB)) };
+        public static MessageType MessageA = new MessageType(typeof(MessageA).FullName, new Version(1, 0, 0, 0));
+        public static MessageType MessageAv2 = new MessageType(typeof(MessageA).FullName,new Version(2,0,0,0));
+        public static MessageType MessageAv11 = new MessageType(typeof(MessageA).FullName, new Version(1, 1, 0, 0));
+        public static MessageType MessageB = new MessageType(typeof(MessageB)) ;
         public static IReadOnlyCollection<MessageType> All = new[] { new MessageType(typeof(MessageA)), new MessageType(typeof(MessageB)) };
     }
 
