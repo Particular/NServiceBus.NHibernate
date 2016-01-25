@@ -6,6 +6,7 @@
     using AcceptanceTesting;
     using NUnit.Framework;
 
+    [TestFixture]
     public class When_a_existing_saga_instance_exists : NServiceBusAcceptanceTest
     {
         [Test]
