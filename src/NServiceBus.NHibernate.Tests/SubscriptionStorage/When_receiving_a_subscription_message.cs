@@ -10,9 +10,8 @@
         [Test]
         public async Task A_subscription_entry_should_be_added_to_the_database()
         {
-            var messageTypes = new[] { new MessageType(typeof(MessageA)), new MessageType(typeof(MessageB)) };
-
-            await storage.Subscribe(TestClients.ClientA, messageTypes, new ContextBag());
+            await storage.Subscribe(TestClients.ClientA, new MessageType(typeof(MessageA)), new ContextBag());
+            await storage.Subscribe(TestClients.ClientA, new MessageType(typeof(MessageB)), new ContextBag());
 
             using (var session = SessionFactory.OpenSession())
             {

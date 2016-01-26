@@ -11,7 +11,7 @@ namespace NServiceBus.Persistence.NHibernate.Tests
     [TestFixture]
     public class NHibernateConfigurationBuilderTests
     {
-        private const string connectionString = @"Data Source=nsb;New=True;";
+        const string connectionString = @"Data Source=nsb;New=True;";
 
         [Test]
         public void Should_fail_validation_if_no_connection_string_is_defined()

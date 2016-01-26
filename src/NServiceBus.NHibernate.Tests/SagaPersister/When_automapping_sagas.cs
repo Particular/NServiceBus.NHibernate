@@ -15,8 +15,8 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
     [TestFixture]
     public class When_autoMapping_sagas
     {
-        private IEntityPersister persisterForTestSaga;
-        private SessionFactoryImpl sessionFactory;
+        IEntityPersister persisterForTestSaga;
+        SessionFactoryImpl sessionFactory;
 
         [SetUp]
         public void SetUp()

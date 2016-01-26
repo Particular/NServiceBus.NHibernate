@@ -52,7 +52,7 @@
             mapper.ConfigureMapping<Message>(m => m.UniqueString).ToSaga(s => s.UniqueString);
         }
 
-        private class Message
+        class Message
         {
             public string UniqueString { get; set; }
         }

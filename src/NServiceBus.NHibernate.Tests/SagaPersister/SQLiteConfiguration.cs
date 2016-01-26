@@ -33,7 +33,7 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
             return cfg;
         }
 
-        private static IDictionary<string, string> Base()
+        static IDictionary<string, string> Base()
         {
             return new Dictionary<string, string>
                  {
