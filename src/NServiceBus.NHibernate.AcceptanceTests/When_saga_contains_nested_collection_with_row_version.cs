@@ -49,9 +49,9 @@
                 EndpointSetup<DefaultServer>(c => c.LimitMessageProcessingConcurrencyTo(1));
             }
 
-            public class NHNestedCollectionWithRowVersionSaga : Saga<NHNestedCollectionWithRowVersionSagaData>, IAmStartedByMessages<Message2>, IAmStartedByMessages<Message3>, IAmStartedByMessages<Message1>
+            public class NHNestedCollectionWithRowVersionSaga : Saga<NHNestedColRowVerSagaData>, IAmStartedByMessages<Message2>, IAmStartedByMessages<Message3>, IAmStartedByMessages<Message1>
             {
-                protected override void ConfigureHowToFindSaga(SagaPropertyMapper<NHNestedCollectionWithRowVersionSagaData> mapper)
+                protected override void ConfigureHowToFindSaga(SagaPropertyMapper<NHNestedColRowVerSagaData> mapper)
                 {
                     mapper.ConfigureMapping<Message2>(m => m.SomeId).ToSaga(s => s.SomeId);
                     mapper.ConfigureMapping<Message3>(m => m.SomeId).ToSaga(s => s.SomeId);
@@ -63,9 +63,9 @@
                     if (Data.RelatedData == null)
                     Data.RelatedData = new List<ChildData>
                                        {
-                                           new ChildData{NhNestedCollectionWithRowVersionSagaData = Data},
-                                           new ChildData{NhNestedCollectionWithRowVersionSagaData = Data},
-                                           new ChildData{NhNestedCollectionWithRowVersionSagaData = Data}
+                                           new ChildData{Parent = Data},
+                                           new ChildData{Parent = Data},
+                                           new ChildData{Parent = Data}
                                        };
                     if (Data.MessageOneReceived && Data.MessageTwoReceived && Data.MessageThreeReceived)
                     {
@@ -109,7 +109,7 @@
             }
         }
 
-        public class NHNestedCollectionWithRowVersionSagaData : IContainSagaData
+        public class NHNestedColRowVerSagaData : IContainSagaData
         {
             [RowVersion]
             public virtual DateTime Version { get; set; }
@@ -144,7 +144,7 @@
         public class ChildData
         {
             public virtual Guid Id { get; set; }
-            public virtual NHNestedCollectionWithRowVersionSagaData NhNestedCollectionWithRowVersionSagaData { get; set; }
+            public virtual NHNestedColRowVerSagaData Parent { get; set; }
         }
         [Serializable]
         public class SagaCompleted : IMessage
