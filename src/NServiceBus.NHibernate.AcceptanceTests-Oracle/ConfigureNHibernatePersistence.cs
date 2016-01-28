@@ -15,12 +15,12 @@ public class ConfigureNHibernatePersistence : IConfigureTestExecution
     {
         NHibernateSettingRetriever.AppSettings = () => new NameValueCollection
         {
-            {"NServiceBus/Persistence/NHibernate/connection.driver_class", "NHibernate.Driver.OracleDataClientDriver"},
+            {"NServiceBus/Persistence/NHibernate/connection.driver_class", "NHibernate.Driver.OracleManagedDataClientDriver"},
             {"NServiceBus/Persistence/NHibernate/dialect", "NHibernate.Dialect.Oracle10gDialect"}
         };
 
         config.UsePersistence<NHibernatePersistence>()
-            .ConnectionString(@"Data Source=XE;User Id=particular;Password=Welcome1")
+            .ConnectionString(@"Data Source=XE;User Id=particular;Password=Welcome1;Enlist=dynamic")
             .SagaTableNamingConvention(type =>
             {
                 var tablename = DefaultTableNameConvention(type);
