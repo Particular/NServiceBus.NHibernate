@@ -33,7 +33,7 @@ The following exception(s) were thrown:
 
 TSql Script:
 {1}";
-                throw new Exception(string.Format(errorMessage, aggregate, sb));
+                throw new Exception(string.Format(errorMessage, aggregate.Flatten(), sb));
             }
 
             return Task.FromResult(0);
