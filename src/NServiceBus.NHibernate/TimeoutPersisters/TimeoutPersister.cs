@@ -8,14 +8,12 @@ namespace NServiceBus.TimeoutPersisters.NHibernate
     using System.Transactions;
     using global::NHibernate;
     using NServiceBus.Extensibility;
-    using Serializers.Json;
+    using NServiceBus.Persistence.NHibernate;
     using Timeout.Core;
     using IsolationLevel = System.Data.IsolationLevel;
 
     class TimeoutPersister : IPersistTimeouts, IQueryTimeouts
     {
-        static readonly JsonMessageSerializer serializer = new JsonMessageSerializer(null);
-
         ISessionFactory SessionFactory;
         string EndpointName;
 
@@ -184,7 +182,7 @@ namespace NServiceBus.TimeoutPersisters.NHibernate
                 return new Dictionary<string, string>();
             }
 
-            return (Dictionary<string, string>)serializer.DeserializeObject(data, typeof(Dictionary<string, string>));
+            return ObjectSerializer.DeSerialize<Dictionary<string, string>>(data);
         }
 
         static string ConvertDictionaryToString(ICollection data)
@@ -194,7 +192,7 @@ namespace NServiceBus.TimeoutPersisters.NHibernate
                 return null;
             }
 
-            return serializer.SerializeObject(data);
+            return ObjectSerializer.Serialize(data);
         }
 
     }
