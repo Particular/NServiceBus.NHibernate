@@ -25,8 +25,6 @@
             var publish = (args[5].ToLower() == "publishmessages");
             var concurrency = int.Parse(args[7]);
 
-            TransportConfigOverride.MaximumConcurrencyLevel = numberOfThreads;
-
             var numberOfMessages = int.Parse(args[1]);
 
             var endpointName = "PerformanceTest";
@@ -46,9 +44,11 @@
                 endpointName += ".outbox";
             }
 
-            var config = new BusConfiguration();
+            var config = new EndpointConfiguration();
+            
             config.EndpointName(endpointName);
             config.UseTransport<MsmqTransport>().Transactions(suppressDTC ? TransportTransactionMode.SendsAtomicWithReceive : TransportTransactionMode.TransactionScope);
+            config.LimitMessageProcessingConcurrencyTo(numberOfThreads);
             config.EnableInstallers();
 
             switch (args[2].ToLower())
@@ -101,25 +101,25 @@
 
         class Loader : IWantToRunWhenBusStartsAndStops
         {
-            Func<IBusSession, Task> loadAction;
+            Func<IMessageSession, Task> loadAction;
 
-            public Loader(Func<IBusSession, Task> loadAction)
+            public Loader(Func<IMessageSession, Task> loadAction)
             {
                 this.loadAction = loadAction;
             }
 
-            public Task Start(IBusSession session)
+            public Task Start(IMessageSession session)
             {
                 return loadAction(session);
             }
 
-            public Task Stop(IBusSession session)
+            public Task Stop(IMessageSession session)
             {
                 return Task.FromResult(0);
             }
         }
 
-        static async Task PerformTest(string[] args, BusConfiguration config, bool saga, int numberOfMessages, string endpointName, int concurrency, bool publish, int numberOfThreads, bool outbox, bool twoPhaseCommit)
+        static async Task PerformTest(string[] args, EndpointConfiguration config, bool saga, int numberOfMessages, string endpointName, int concurrency, bool publish, int numberOfThreads, bool outbox, bool twoPhaseCommit)
         {
             var startableBus = await Endpoint.Create(config).ConfigureAwait(false);
 
@@ -148,7 +148,7 @@
                 args[5]);
         }
 
-        static async Task SeedSagaMessages(IBusSession bus, int numberOfMessages, string inputQueue, int concurrency)
+        static async Task SeedSagaMessages(IMessageSession bus, int numberOfMessages, string inputQueue, int concurrency)
         {
             for (var i = 0; i < numberOfMessages / concurrency; i++)
             {
@@ -162,7 +162,7 @@
             }
         }
 
-        static async Task<TimeSpan> SeedInputQueue(IBusSession bus, int numberOfMessages, string inputQueue, int numberOfThreads, bool createTransaction, bool twoPhaseCommit)
+        static async Task<TimeSpan> SeedInputQueue(IMessageSession bus, int numberOfMessages, string inputQueue, int numberOfThreads, bool createTransaction, bool twoPhaseCommit)
         {
             var sw = new Stopwatch();
             sw.Start();
@@ -195,7 +195,7 @@
             return sw.Elapsed;
         }
 
-        static async Task<TimeSpan> PublishEvents(IBusSession bus, int numberOfMessages, int numberOfThreads, bool createTransaction)
+        static async Task<TimeSpan> PublishEvents(IMessageSession bus, int numberOfMessages, int numberOfThreads, bool createTransaction)
         {
             var sw = new Stopwatch();
             sw.Start();

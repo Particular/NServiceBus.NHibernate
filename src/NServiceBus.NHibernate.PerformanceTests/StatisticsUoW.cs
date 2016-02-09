@@ -58,7 +58,7 @@
             return Task.FromResult(0);
         }
 
-        public void Customize(BusConfiguration builder)
+        public void Customize(EndpointConfiguration builder)
         {
             builder.RegisterComponents(c=> c.ConfigureComponent<StatisticsUoW>(DependencyLifecycle.InstancePerUnitOfWork));
         }
