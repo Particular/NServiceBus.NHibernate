@@ -1,7 +1,6 @@
 namespace NServiceBus.TimeoutPersisters.NHibernate
 {
     using System;
-    using System.Collections;
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
@@ -185,7 +184,7 @@ namespace NServiceBus.TimeoutPersisters.NHibernate
             return ObjectSerializer.DeSerialize<Dictionary<string, string>>(data);
         }
 
-        static string ConvertDictionaryToString(ICollection data)
+        static string ConvertDictionaryToString(Dictionary<string, string> data)
         {
             if (data == null || data.Count == 0)
             {
