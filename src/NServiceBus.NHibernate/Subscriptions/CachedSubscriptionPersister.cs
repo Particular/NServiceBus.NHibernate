@@ -11,7 +11,7 @@ namespace NServiceBus.Unicast.Subscriptions.NHibernate
 
     class CachedSubscriptionPersister : SubscriptionPersister
     {
-        public CachedSubscriptionPersister(ISessionFactory sessionFactory, TimeSpan expiration) 
+        public CachedSubscriptionPersister(ISessionFactory sessionFactory, TimeSpan expiration)
             : base(sessionFactory)
         {
             this.expiration = expiration;
@@ -44,7 +44,7 @@ namespace NServiceBus.Unicast.Subscriptions.NHibernate
                 return cacheItem.Item2;
             }
 
-            var baseSubscribers = await base.GetSubscriberAddressesForMessage(types, context);
+            var baseSubscribers = await base.GetSubscriberAddressesForMessage(types, context).ConfigureAwait(false);
 
             cacheItem = new Tuple<DateTimeOffset, IEnumerable<Subscriber>>(
                 DateTimeOffset.UtcNow,
