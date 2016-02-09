@@ -6,7 +6,7 @@ using NServiceBus.Persistence;
 
 public class ConfigureNHibernatePersistence : IConfigureTestExecution
 {
-    public Task Configure(BusConfiguration configuration, IDictionary<string, string> settings)
+    public Task Configure(EndpointConfiguration configuration, IDictionary<string, string> settings)
     {
         configuration.UsePersistence<NHibernatePersistence>()
              .ConnectionString(ConnectionString);
