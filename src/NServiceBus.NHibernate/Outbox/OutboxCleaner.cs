@@ -15,7 +15,7 @@ namespace NServiceBus.Features
             OutboxPersister = outboxPersister;
         }
 
-        protected override Task OnStart(IBusSession busSession)
+        protected override Task OnStart(IMessageSession busSession)
         {
             var configValue = ConfigurationManager.AppSettings.Get("NServiceBus/Outbox/NHibernate/TimeToKeepDeduplicationData");
 
@@ -44,7 +44,7 @@ namespace NServiceBus.Features
             return Task.FromResult(true);
         }
 
-        protected override Task OnStop(IBusSession busSession)
+        protected override Task OnStop(IMessageSession busSession)
         {
             using (var waitHandle = new ManualResetEvent(false))
             {

@@ -5,14 +5,12 @@
 
     class TransportConfigOverride : IProvideConfiguration<TransportConfig>
     {
-        public static int MaximumConcurrencyLevel;
         public TransportConfig GetConfiguration()
         {
-            return new TransportConfig
-                {
-                    MaximumConcurrencyLevel = MaximumConcurrencyLevel,
-                    MaxRetries = 10
-                };
+            return new TransportConfig()
+            {
+                MaxRetries = 10
+            };
         }
     }
 }
