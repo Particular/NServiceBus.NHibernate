@@ -46,7 +46,7 @@
 
             public class ConfigurePersistence
             {
-                public void Configure(BusConfiguration bc)
+                public void Configure(EndpointConfiguration ec)
                 {
                     //NOOP - not setting the ConnectionString here to check if it will be picked up from the user-specified Configuration.
                 }

@@ -10,12 +10,10 @@
     using NServiceBus.Extensibility;
     using NServiceBus.Outbox;
     using NServiceBus.Outbox.NHibernate;
-    using Serializers.Json;
     using IsolationLevel = System.Data.IsolationLevel;
 
     class OutboxPersister : IOutboxStorage
     {
-        static readonly JsonMessageSerializer serializer = new JsonMessageSerializer(null);
         ISessionFactory sessionFactory;
         string endpointName;
 
@@ -140,7 +138,7 @@
                 return Enumerable.Empty<OutboxOperation>();
             }
 
-            return (IEnumerable<OutboxOperation>)serializer.DeserializeObject(data, typeof(IEnumerable<OutboxOperation>));
+            return ObjectSerializer.DeSerialize<IEnumerable<OutboxOperation>>(data);
         }
 
         static string ConvertObjectToString(IEnumerable<OutboxOperation> operations)
@@ -150,7 +148,7 @@
                 return null;
             }
 
-            return serializer.SerializeObject(operations);
+            return ObjectSerializer.Serialize(operations);
         }
 
         string EndpointQualifiedMessageId(string messageId)
