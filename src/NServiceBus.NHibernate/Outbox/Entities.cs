@@ -12,6 +12,7 @@ namespace NServiceBus.Outbox.NHibernate
         public virtual string TransportOperations { get; set; }
     }
 
+    [Serializable]
     class OutboxOperation
     {
         public string MessageId { get; set; }
