@@ -49,6 +49,10 @@
       <HintPath>..\packages\Iesi.Collections.4.0.1.4000\lib\net40\Iesi.Collections.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Newtonsoft.Json, Version=4.5.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.5.0.6\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="NHibernate, Version=4.0.0.4000, Culture=neutral, PublicKeyToken=aa95f207798dfdb4, processorArchitecture=MSIL">
       <HintPath>..\packages\NHibernate.4.0.4.4000\lib\net40\NHibernate.dll</HintPath>
       <Private>True</Private>
@@ -79,6 +83,7 @@
   <ItemGroup>
     <Compile Include="Outbox\FakeDbConnectionProvider.cs" />
     <Compile Include="Outbox\InMemoryDBFixture.cs" />
+    <Compile Include="Outbox\When_deserializing_outbox_messages.cs" />
     <Compile Include="Outbox\When_adding_outbox_messages.cs" />
     <Compile Include="Persistence\NHibernateConfigurationBuilderTests.cs" />
     <Compile Include="SagaPersister\FakeConfigurationSource.cs" />
