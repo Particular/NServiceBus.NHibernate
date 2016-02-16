@@ -11,7 +11,7 @@ using NServiceBus.Persistence.NHibernate;
 
 public class ConfigureNHibernatePersistence : IConfigureTestExecution
 {
-    public Task Configure(BusConfiguration config, IDictionary<string, string> settings)
+    public Task Configure(EndpointConfiguration config, IDictionary<string, string> settings)
     {
         NHibernateSettingRetriever.AppSettings = () => new NameValueCollection
         {

@@ -2,10 +2,14 @@ namespace NServiceBus.TimeoutPersisters.NHibernate.Tests
 {
     using System;
     using System.Collections.Generic;
+    using System.Data.SqlClient;
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
+    using System.Transactions;
+    using global::NHibernate.Impl;
     using NServiceBus.Extensibility;
+    using NServiceBus.Transports;
     using NUnit.Framework;
     using Timeout.Core;
 
@@ -53,9 +57,95 @@ namespace NServiceBus.TimeoutPersisters.NHibernate.Tests
         }
 
         [Test]
+        public async Task When_in_transaction_scope_add_should_to_commit_until_scope_is_complete()
+        {
+            var data = new TimeoutData
+            {
+                Time = DateTime.Now.AddYears(-1),
+                OwningTimeoutManager = "MyTestEndpoint",
+            };
+
+            var contextBag = new ContextBag();
+
+            using (new TransactionScope())
+            {
+                var transaction = new TransportTransaction();
+                transaction.Set(Transaction.Current);
+                contextBag.Set(transaction);
+                await persister.Add(data, contextBag).ConfigureAwait(false);
+            }
+
+            using (var session = sessionFactory.OpenSession())
+            {
+                Assert.Null(session.Get<TimeoutEntity>(new Guid(data.Id)));
+            }
+        }
+
+        [Test][Explicit("SQL Server specific")]
+        public async Task When_in_transaction_scope_with_sql_connection_should_hook_up_to_that_connection()
+        {
+            var data = new TimeoutData
+            {
+                Time = DateTime.Now,
+                OwningTimeoutManager = "MyTestEndpoint",
+            };
+
+            var contextBag = new ContextBag();
+
+            using (var tx = new TransactionScope())
+            {
+                var connection = (SqlConnection) ((SessionFactoryImpl) sessionFactory).ConnectionProvider.GetConnection();
+
+                var transaction = new TransportTransaction();
+                transaction.Set(Transaction.Current);
+                transaction.Set(connection);
+                contextBag.Set(transaction);
+                await persister.Add(data, contextBag).ConfigureAwait(false);
+
+                Assert.AreEqual(Guid.Empty, Transaction.Current.TransactionInformation.DistributedIdentifier);
+
+                tx.Complete();
+            }
+
+            using (var session = sessionFactory.OpenSession())
+            {
+                Assert.NotNull(session.Get<TimeoutEntity>(new Guid(data.Id)));
+            }
+        }
+
+        [Test]
+        public async Task When_in_transaction_scope_add_should_commit_when_scope_is_complete()
+        {
+            var data = new TimeoutData
+            {
+                Time = DateTime.Now.AddYears(-1),
+                OwningTimeoutManager = "MyTestEndpoint",
+            };
+
+            var contextBag = new ContextBag();
+
+            using (var tx = new TransactionScope())
+            {
+                var transaction = new TransportTransaction();
+                transaction.Set(Transaction.Current);
+                contextBag.Set(transaction);
+                await persister.Add(data, contextBag).ConfigureAwait(false);
+                tx.Complete();
+            }
+
+            using (var session = sessionFactory.OpenSession())
+            {
+                Assert.NotNull(session.Get<TimeoutEntity>(new Guid(data.Id)));
+            }
+        }
+
+        [Test]
         public async Task TryRemove_should_return_false_when_timeout_already_deleted()
         {
-            var timeout = new TimeoutData();
+            var timeout = new TimeoutData()
+            {
+                Time = DateTime.Now
+            };
 
             await persister.Add(timeout, new ContextBag()).ConfigureAwait(false);
 
@@ -66,7 +156,10 @@ namespace NServiceBus.TimeoutPersisters.NHibernate.Tests
         [Test]
         public async Task Peek_should_return_no_timeout_when_timeout_already_deleted()
         {
-            var timeout = new TimeoutData();
+            var timeout = new TimeoutData()
+            {
+                Time = DateTime.Now
+            };
 
             await persister.Add(timeout, new ContextBag()).ConfigureAwait(false);
 

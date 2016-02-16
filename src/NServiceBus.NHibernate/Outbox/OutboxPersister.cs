@@ -10,12 +10,10 @@
     using NServiceBus.Extensibility;
     using NServiceBus.Outbox;
     using NServiceBus.Outbox.NHibernate;
-    using Serializers.Json;
     using IsolationLevel = System.Data.IsolationLevel;
 
     class OutboxPersister : IOutboxStorage
     {
-        static readonly JsonMessageSerializer serializer = new JsonMessageSerializer(null);
         ISessionFactory sessionFactory;
         string endpointName;
 
@@ -57,7 +55,7 @@
                     .Select(t => new TransportOperation(t.MessageId, t.Options, t.Message, t.Headers))
                     .ToList();
 
-                var message = new OutboxMessage(result.MessageId,transportOperations);
+                var message = new OutboxMessage(result.MessageId, transportOperations);
                 return Task.FromResult(message);
             }
         }
@@ -71,7 +69,7 @@
                 MessageId = t.MessageId,
                 Options = t.Options,
             });
-            var nhibernateTransaction = (NHibernateOutboxTransaction) transaction;
+            var nhibernateTransaction = (NHibernateOutboxTransaction)transaction;
             nhibernateTransaction.Session.Save(new OutboxRecord
             {
                 MessageId = EndpointQualifiedMessageId(outboxMessage.MessageId),
@@ -140,7 +138,7 @@
                 return Enumerable.Empty<OutboxOperation>();
             }
 
-            return (IEnumerable<OutboxOperation>)serializer.DeserializeObject(data, typeof(IEnumerable<OutboxOperation>));
+            return ObjectSerializer.DeSerialize<IEnumerable<OutboxOperation>>(data);
         }
 
         static string ConvertObjectToString(IEnumerable<OutboxOperation> operations)
@@ -150,7 +148,7 @@
                 return null;
             }
 
-            return serializer.SerializeObject(operations);
+            return ObjectSerializer.Serialize(operations);
         }
 
         string EndpointQualifiedMessageId(string messageId)
