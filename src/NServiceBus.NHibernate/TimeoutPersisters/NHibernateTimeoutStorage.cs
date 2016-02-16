@@ -41,7 +41,14 @@ namespace NServiceBus.Features
             }
 
             context.Container.ConfigureComponent(b => new Installer.SchemaUpdater(installAction), DependencyLifecycle.SingleInstance);
-            context.Container.ConfigureComponent(b => new TimeoutPersister(context.Settings.EndpointName().ToString(), config.Configuration.BuildSessionFactory()), DependencyLifecycle.SingleInstance);
+            context.Container.ConfigureComponent(b =>
+            {
+                var sessionFactory = config.Configuration.BuildSessionFactory();
+                return new TimeoutPersister(
+                    context.Settings.EndpointName().ToString(),
+                    sessionFactory,
+                    new NHibernateSynchronizedStorageAdapter(sessionFactory), new NHibernateSynchronizedStorage(sessionFactory));
+            }, DependencyLifecycle.SingleInstance);
         }
 
         static bool RunInstaller(FeatureConfigurationContext context)
