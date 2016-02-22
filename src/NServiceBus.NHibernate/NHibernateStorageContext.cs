@@ -45,10 +45,10 @@ namespace NServiceBus.Persistence.NHibernate
             {
                 using (var command = Connection.CreateCommand())
                 {
-                    Lazy<ITransaction> lazy;
-                    if (pipelineExecutor.CurrentContext.TryGet(string.Format("LazyNHibernateTransaction-{0}", connectionString), out lazy))
+                    ITransaction transaction;
+                    if (pipelineExecutor.CurrentContext.TryGet(string.Format("LazyNHibernateTransaction-{0}", connectionString), out transaction))
                     {
-                        lazy.Value.Enlist(command);
+                        transaction.Enlist(command);
                         return command.Transaction;
                     }
                 }
@@ -80,10 +80,10 @@ namespace NServiceBus.Persistence.NHibernate
         {
             get
             {
-                Lazy<ITransaction> lazy;
-                if (pipelineExecutor.CurrentContext.TryGet(string.Format("LazyNHibernateTransaction-{0}", connectionString), out lazy))
+                ITransaction transaction;
+                if (pipelineExecutor.CurrentContext.TryGet(string.Format("LazyNHibernateTransaction-{0}", connectionString), out transaction))
                 {
-                    return lazy.Value;
+                    return transaction;
                 }
 
                 throw new InvalidOperationException("No transaction available");
