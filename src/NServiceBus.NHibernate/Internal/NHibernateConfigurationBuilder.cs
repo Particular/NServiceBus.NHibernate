@@ -167,8 +167,10 @@ For most scenarios the 'NServiceBus/Persistence' connection string is the best o
                 return new Dictionary<string, string>(configurationProperties);
             }
 
-            var overriddenProperties = new Dictionary<string, string>(configurationProperties);
-            overriddenProperties[Environment.ConnectionString] = connectionStringOverride;
+            var overriddenProperties = new Dictionary<string, string>(configurationProperties)
+            {
+                [Environment.ConnectionString] = connectionStringOverride
+            };
 
             return overriddenProperties;
         }

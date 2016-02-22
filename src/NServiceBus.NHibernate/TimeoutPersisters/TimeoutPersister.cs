@@ -11,7 +11,7 @@ namespace NServiceBus.TimeoutPersisters.NHibernate
     using Serializers.Json;
     using Timeout.Core;
 
-    class TimeoutPersister : IPersistTimeouts
+    class TimeoutPersister : IPersistTimeouts, IPersistTimeoutsV2
     {
         public ISessionFactory SessionFactory { get; set; }
 
@@ -148,35 +148,85 @@ namespace NServiceBus.TimeoutPersisters.NHibernate
                 using (var tx = session.BeginAmbientTransactionAware(IsolationLevel.ReadCommitted))
                 {
                     var te = session.Get<TimeoutEntity>(timeoutId, LockMode.Upgrade);
+                    timeoutData = MapToTimeoutData(te);
 
-                    if (te == null)
+                    if (timeoutData == null)
                     {
                         tx.Commit();
-                        timeoutData = null;
                         return false;
                     }
 
-                    timeoutData = new TimeoutData
-                    {
-                        Destination = te.Destination,
-                        Id = te.Id.ToString(),
-                        SagaId = te.SagaId,
-                        State = te.State,
-                        Time = te.Time,
-                        Headers = ConvertStringToDictionary(te.Headers),
-                    };
 
-                    var queryString = string.Format("delete {0} where Id = :id", typeof(TimeoutEntity));
-
-                    session.CreateQuery(queryString)
-                        .SetParameter("id", timeoutId)
-                        .ExecuteUpdate();
-                    
+                    session.Delete(te);
                     tx.Commit();
                 }
             }
 
             return true;
+        }
+
+        public bool TryRemove(string timeoutId)
+        {
+            IDbConnection connection;
+
+            if (TryGetConnection(out connection))
+            {
+                return TryRemoveTimeoutEntity(Guid.Parse(timeoutId), connection);
+            }
+
+            using (connection = SessionFactory.GetConnection())
+            {
+                return TryRemoveTimeoutEntity(Guid.Parse(timeoutId), connection);
+            }
+        }
+
+        bool TryRemoveTimeoutEntity(Guid timeoutId, IDbConnection connection)
+        {
+            using (var session = SessionFactory.OpenStatelessSessionEx(connection))
+            {
+                using (var tx = session.BeginAmbientTransactionAware(IsolationLevel.ReadCommitted))
+                {
+                    var queryString = string.Format("delete {0} where Id = :id", typeof(TimeoutEntity));
+
+                    var found = session.CreateQuery(queryString)
+                        .SetParameter("id", timeoutId)
+                        .ExecuteUpdate() > 0;
+
+                    tx.Commit();
+
+                    return found;
+                }
+            }
+        }
+
+        public TimeoutData Peek(string timeoutId)
+        {
+            IDbConnection connection;
+
+            if (TryGetConnection(out connection))
+            {
+                return TryGetTimeout(Guid.Parse(timeoutId), connection);
+            }
+
+            using (connection = SessionFactory.GetConnection())
+            {
+                return TryGetTimeout(Guid.Parse(timeoutId), connection);
+            }
+        }
+
+        TimeoutData TryGetTimeout(Guid timeoutId, IDbConnection connection)
+        {
+            using (var session = SessionFactory.OpenStatelessSessionEx(connection))
+            {
+                using (var tx = session.BeginAmbientTransactionAware(IsolationLevel.ReadCommitted))
+                {
+                    var te = session.Get<TimeoutEntity>(timeoutId, LockMode.Upgrade);
+                    var timeout = MapToTimeoutData(te);
+
+                    tx.Commit();
+                    return timeout;
+                }
+            }
         }
 
         /// <summary>
@@ -205,14 +255,31 @@ namespace NServiceBus.TimeoutPersisters.NHibernate
             return DbConnectionProvider.TryGetConnection(out connection, ConnectionString);
         }
 
+        static TimeoutData MapToTimeoutData(TimeoutEntity te)
+        {
+            if (te == null)
+            {
+                return null;
+            }
+
+            return new TimeoutData
+            {
+                Destination = te.Destination,
+                Id = te.Id.ToString(),
+                SagaId = te.SagaId,
+                State = te.State,
+                Time = te.Time,
+                Headers = ConvertStringToDictionary(te.Headers),
+            };
+        }
+
         void RemoveTimeoutEntityBySagaId(Guid sagaId, IDbConnection connection)
         {
             using (var session = SessionFactory.OpenStatelessSessionEx(connection))
             {
                 using (var tx = session.BeginAmbientTransactionAware(IsolationLevel.ReadCommitted))
                 {
-                    var queryString = string.Format("delete {0} where SagaId = :sagaid",
-                        typeof(TimeoutEntity));
+                    var queryString = $"delete {typeof(TimeoutEntity)} where SagaId = :sagaid";
                     session.CreateQuery(queryString)
                         .SetParameter("sagaid", sagaId)
                         .ExecuteUpdate();
@@ -229,7 +296,7 @@ namespace NServiceBus.TimeoutPersisters.NHibernate
                 return new Dictionary<string, string>();
             }
 
-            return (Dictionary<string, string>)serializer.DeserializeObject(data, typeof(Dictionary<string, string>));
+            return (Dictionary<string, string>) serializer.DeserializeObject(data, typeof(Dictionary<string, string>));
         }
 
         static string ConvertDictionaryToString(ICollection data)
@@ -243,6 +310,5 @@ namespace NServiceBus.TimeoutPersisters.NHibernate
         }
 
         static readonly JsonMessageSerializer serializer = new JsonMessageSerializer(null);
-
     }
 }
