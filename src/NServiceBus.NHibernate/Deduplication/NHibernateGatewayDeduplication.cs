@@ -1,8 +1,11 @@
 namespace NServiceBus.Features
 {
+    using System;
+    using System.Threading.Tasks;
     using Deduplication.NHibernate.Config;
     using Deduplication.NHibernate;
     using Deduplication.NHibernate.Installer;
+    using NHibernate.Tool.hbm2ddl;
     using Persistence.NHibernate;
 
     /// <summary>
@@ -27,16 +30,25 @@ namespace NServiceBus.Features
             builder.AddMappings<DeduplicationMessageMap>();
             var config = builder.Build();
 
-            context.Container.ConfigureComponent<Installer>(DependencyLifecycle.SingleInstance)
-                .ConfigureProperty(x => x.Configuration, RunInstaller(context) ? new Installer.ConfigWrapper(config.Configuration) : null);
+            Func<string, Task> installAction = _ => Task.FromResult(0);
 
+            if (RunInstaller(context))
+            {
+                installAction = identity =>
+                {
+                    new SchemaUpdate(config.Configuration).Execute(false, true);
+
+                    return Task.FromResult(0);
+                };
+            }
+            context.Container.ConfigureComponent(b => new Installer.SchemaUpdater(installAction), DependencyLifecycle.SingleInstance);
             context.Container.ConfigureComponent(b => new GatewayDeduplication(config.Configuration.BuildSessionFactory()), DependencyLifecycle.SingleInstance);
         }
 
         static bool RunInstaller(FeatureConfigurationContext context)
         {
-            return context.Settings.Get<bool>(context.Settings.HasSetting("NHibernate.GatewayDeduplication.AutoUpdateSchema") 
-                ? "NHibernate.GatewayDeduplication.AutoUpdateSchema" 
+            return context.Settings.Get<bool>(context.Settings.HasSetting("NHibernate.GatewayDeduplication.AutoUpdateSchema")
+                ? "NHibernate.GatewayDeduplication.AutoUpdateSchema"
                 : "NHibernate.Common.AutoUpdateSchema");
         }
     }

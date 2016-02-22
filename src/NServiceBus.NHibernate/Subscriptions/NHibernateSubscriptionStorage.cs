@@ -1,6 +1,8 @@
 namespace NServiceBus.Features
 {
     using System;
+    using System.Threading.Tasks;
+    using NHibernate.Tool.hbm2ddl;
     using Persistence.NHibernate;
     using Unicast.Subscriptions.MessageDrivenSubscriptions;
     using Unicast.Subscriptions.NHibernate;
@@ -32,19 +34,28 @@ namespace NServiceBus.Features
             builder.AddMappings<SubscriptionMap>();
             var config = builder.Build();
 
-            context.Container.ConfigureComponent<Installer>(DependencyLifecycle.SingleInstance)
-                .ConfigureProperty(x => x.Configuration, RunInstaller(context) ? new Installer.ConfigWrapper(config.Configuration) : null);
+            Func<string, Task> installAction = _ => Task.FromResult(0);
+
+            if (RunInstaller(context))
+            {
+                installAction = identity =>
+                {
+                    new SchemaUpdate(config.Configuration).Execute(false, true);
+
+                    return Task.FromResult(0);
+                };
+            }
+
+            context.Container.ConfigureComponent(b => new Installer.SchemaUpdater(installAction), DependencyLifecycle.SingleInstance);
 
             var sessionFactory = config.Configuration.BuildSessionFactory();
             if (context.Settings.HasSetting(CacheExpirationSettingsKey))
             {
-                var persister = new CachedSubscriptionPersister(sessionFactory, context.Settings.Get<TimeSpan>(CacheExpirationSettingsKey));
-                context.Container.RegisterSingleton<ISubscriptionStorage>(persister);
+                context.Container.ConfigureComponent<ISubscriptionStorage>(b => new CachedSubscriptionPersister(sessionFactory, context.Settings.Get<TimeSpan>(CacheExpirationSettingsKey)), DependencyLifecycle.SingleInstance);
             }
             else
             {
-                var persister = new SubscriptionPersister(sessionFactory);
-                context.Container.RegisterSingleton<ISubscriptionStorage>(persister);
+                context.Container.ConfigureComponent<ISubscriptionStorage>(b => new SubscriptionPersister(sessionFactory), DependencyLifecycle.SingleInstance);
             }
         }
 

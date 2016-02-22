@@ -2,35 +2,41 @@ namespace NServiceBus.TimeoutPersisters.NHibernate.Installer
 {
     using System;
     using System.Threading.Tasks;
-    using global::NHibernate.Cfg;
     using Installation;
+    using NServiceBus.ObjectBuilder;
 
     class Installer : INeedToInstallSomething
-    {        
-        public ConfigWrapper Configuration { get; set; }
+    {
+        public Installer(IConfigureComponents configureComponents, IBuilder builder)
+        {
+            // since the installers are registered even if the feature isn't enabled we need to make 
+            // this a no-op of there is no "schema updater" available 
+            if (configureComponents.HasComponent<SchemaUpdater>())
+            {
+                schemaUpdater = builder.Build<SchemaUpdater>();
+            }
+        }
 
         public Task Install(string identity)
         {
-            if (Configuration != null)
+            if (schemaUpdater == null)
             {
-                new OptimizedSchemaUpdate(Configuration.Value).Execute(false, true);
+                return Task.FromResult(0);
             }
 
-            return Task.FromResult(0);
+            return schemaUpdater.Execute(identity);
         }
 
-        public class ConfigWrapper
-        {
-            public Configuration Value { get; }
+        SchemaUpdater schemaUpdater;
 
-            public ConfigWrapper(Configuration value)
+        public class SchemaUpdater
+        {
+            public SchemaUpdater(Func<string, Task> execute)
             {
-                if (value == null)
-                {
-                    throw new ArgumentNullException(nameof(value));
-                }
-                Value = value;
+                Execute = execute;
             }
+
+            public Func<string, Task> Execute { get; }
         }
     }
 }

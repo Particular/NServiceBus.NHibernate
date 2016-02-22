@@ -1,5 +1,7 @@
 namespace NServiceBus.Features
 {
+    using System;
+    using System.Threading.Tasks;
     using Persistence.NHibernate;
     using TimeoutPersisters.NHibernate;
     using TimeoutPersisters.NHibernate.Config;
@@ -27,16 +29,25 @@ namespace NServiceBus.Features
             builder.AddMappings<TimeoutEntityMap>();
             var config = builder.Build();
 
-            context.Container.ConfigureComponent<Installer>(DependencyLifecycle.SingleInstance)
-                .ConfigureProperty(x => x.Configuration, RunInstaller(context) ? new Installer.ConfigWrapper(config.Configuration) : null);
+            Func<string,Task> installAction = _ => Task.FromResult(0);
 
+            if (RunInstaller(context))
+            {
+                installAction = identity =>
+                {
+                    new OptimizedSchemaUpdate(config.Configuration).Execute(false, true);
+                    return Task.FromResult(0);
+                };
+            }
+
+            context.Container.ConfigureComponent(b => new Installer.SchemaUpdater(installAction), DependencyLifecycle.SingleInstance);
             context.Container.ConfigureComponent(b => new TimeoutPersister(context.Settings.EndpointName().ToString(), config.Configuration.BuildSessionFactory()), DependencyLifecycle.SingleInstance);
         }
 
         static bool RunInstaller(FeatureConfigurationContext context)
         {
-            return context.Settings.Get<bool>(context.Settings.HasSetting("NHibernate.Timeouts.AutoUpdateSchema") 
-                ? "NHibernate.Timeouts.AutoUpdateSchema" 
+            return context.Settings.Get<bool>(context.Settings.HasSetting("NHibernate.Timeouts.AutoUpdateSchema")
+                ? "NHibernate.Timeouts.AutoUpdateSchema"
                 : "NHibernate.Common.AutoUpdateSchema");
         }
     }
