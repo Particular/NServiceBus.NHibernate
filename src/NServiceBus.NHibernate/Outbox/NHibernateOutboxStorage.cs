@@ -106,7 +106,7 @@ namespace NServiceBus.Features
                     if (cleanupFailures >= 10)
                     {
                         criticalError.Raise("Failed to clean expired Outbox records after 10 consecutive unsuccessful attempts. The most likely cause of this is connectivity issues with your database.", ex);
-                        throw;
+                        cleanupFailures = 0;
                     }
                 }
             }
