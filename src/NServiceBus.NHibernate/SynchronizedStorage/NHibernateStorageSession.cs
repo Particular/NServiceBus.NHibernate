@@ -1,7 +1,12 @@
 namespace NServiceBus.Features
 {
+    using System;
+    using System.Linq;
+    using System.Text;
+    using System.Threading.Tasks;
     using NHibernate.Cfg;
     using NHibernate.Mapping.ByCode;
+    using NHibernate.Tool.hbm2ddl;
     using NServiceBus.Outbox.NHibernate;
     using Persistence.NHibernate;
     using Persistence.NHibernate.Installer;
@@ -49,8 +54,37 @@ namespace NServiceBus.Features
 
             var runInstaller = context.Settings.Get<bool>("NHibernate.Common.AutoUpdateSchema");
 
-            context.Container.ConfigureComponent<Installer>(DependencyLifecycle.SingleInstance)
-                .ConfigureProperty(x => x.Configuration, runInstaller ? new Installer.ConfigWrapper(config.Configuration) : null);
+            Func<string, Task> installAction = _ => Task.FromResult(0);
+
+            if (runInstaller)
+            {
+                installAction = identity =>
+                {
+                    var schemaUpdate = new SchemaUpdate(config.Configuration);
+                    var sb = new StringBuilder();
+                    schemaUpdate.Execute(s => sb.AppendLine(s), true);
+
+                    if (schemaUpdate.Exceptions.Any())
+                    {
+                        var aggregate = new AggregateException(schemaUpdate.Exceptions);
+
+                        var errorMessage = @"Schema update failed.
+The following exception(s) were thrown:
+{0}
+
+TSql Script:
+{1}";
+                        throw new Exception(string.Format(errorMessage, aggregate.Flatten(), sb));
+                    }
+
+
+
+                    return Task.FromResult(0);
+                };
+            }
+
+
+            context.Container.ConfigureComponent(b => new Installer.SchemaUpdater(installAction), DependencyLifecycle.SingleInstance);
         }
 
         void ApplyMappings(Configuration config)

@@ -2,13 +2,11 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
 {
     using System.Collections.Generic;
     using System.IO;
-    using System.Security.Principal;
     using AutoPersistence;
     using global::NHibernate;
     using global::NHibernate.Tool.hbm2ddl;
     using NServiceBus.Sagas;
     using NUnit.Framework;
-    using Persistence.NHibernate.Installer;
 
     class InMemoryFixture<T> where T : Saga
     {
@@ -41,8 +39,6 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
             new SchemaUpdate(configuration).Execute(false, true);
 
             SagaPersister = new SagaPersister();
-        
-            new Installer().Install(WindowsIdentity.GetCurrent().Name);
         }
 
         [TearDown]
