@@ -19,6 +19,11 @@ namespace NServiceBus.TimeoutPersisters.NHibernate
         public string EndpointName { get; set; }
         public string ConnectionString { get; set; }
 
+        public TimeSpan TimeoutsCleanupQueryPeriod { get; set; }
+        public TimeSpan TimeoutsCleanupExecutionInterval { get; set; }
+
+        private DateTime lastTimeoutsCleanupExecution = DateTime.MinValue;
+
         /// <summary>
         ///     Retrieves the next range of timeouts that are due.
         /// </summary>
@@ -28,6 +33,14 @@ namespace NServiceBus.TimeoutPersisters.NHibernate
         public IEnumerable<Tuple<string, DateTime>> GetNextChunk(DateTime startSlice, out DateTime nextTimeToRunQuery)
         {
             var now = DateTime.UtcNow;
+
+            //Every TimeoutsCleanupExecutionInterval we extend the query window back in time to make
+            //sure we will pick-up any missed timeouts which might exists due to TimeoutManager timeoute storeage race-condition
+            if (lastTimeoutsCleanupExecution.Add(TimeoutsCleanupExecutionInterval) < now)
+            {
+                lastTimeoutsCleanupExecution = now;
+                startSlice = startSlice.Subtract(TimeoutsCleanupQueryPeriod);
+            }
 
             using (var conn = SessionFactory.GetConnection())
             {

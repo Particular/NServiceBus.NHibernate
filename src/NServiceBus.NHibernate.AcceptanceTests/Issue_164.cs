@@ -8,6 +8,7 @@
     using NServiceBus.AcceptanceTests.EndpointTemplates;
     using NServiceBus.Config;
     using NServiceBus.Config.ConfigurationSource;
+    using NServiceBus.Configuration.AdvanceExtensibility;
     using NServiceBus.Features;
     using NServiceBus.Persistence;
     using NServiceBus.Timeout.Core;
@@ -20,6 +21,8 @@
         [Test]
         public void Timeout_does_not_get_stuck_when_persister_commit_takes_longer_than_dispatch_of_another_later_timeout()
         {
+            //TODO: trick TM to query timeouts for frequently. Tweak GetNextChuns in adapter
+            //TODO: make clean-up interval and clean-up period configurable and override it in this test
             var ctx = new Context();
 
             Scenario.Define(ctx)
@@ -46,6 +49,8 @@
                     }))
                 .Done(c => c.CommandAReceived)
                 .Run();
+
+            Assert.IsTrue(ctx.CommandAReceived);
         }
 
         public class Context : ScenarioContext
@@ -63,7 +68,10 @@
             {
                 EndpointSetup<DefaultPublisher>(b =>
                 {
-                    b.UsePersistence<ChaosPersister>();
+                    b.UsePersistence<DelayingNHibernatePersister>();
+                    b.GetSettings().Set("NHibernate.Timeouts.CleanupExecutionInterval", TimeSpan.FromSeconds(10));
+                    b.GetSettings().Set("NHibernate.Timeouts.CleanupQueryPeriod", TimeSpan.FromMinutes(10));
+
                     b.PurgeOnStartup(true);
                 });
             }
@@ -103,9 +111,9 @@
         {
         }
 
-        public class ChaosPersister : PersistenceDefinition
+        public class DelayingNHibernatePersister : PersistenceDefinition
         {
-            public ChaosPersister()
+            public DelayingNHibernatePersister()
             {
                 Supports(Storage.Timeouts, s => s.EnableFeatureByDefault<DelayingTimeoutStorage>());
             }
@@ -124,6 +132,9 @@
             public IEnumerable<Tuple<string, DateTime>> GetNextChunk(DateTime startSlice, out DateTime nextTimeToRunQuery)
             {
                 var result = OriginalPersister.GetNextChunk(startSlice, out nextTimeToRunQuery);
+
+                //We want to force Timeout Manager to query more often to make test complete faster
+                nextTimeToRunQuery = DateTime.UtcNow.AddSeconds(10);
 
                 return result;
             }

@@ -1,9 +1,11 @@
 namespace NServiceBus.Features
 {
+    using System;
     using NHibernate.Cfg;
     using Persistence.NHibernate;
     using TimeoutPersisters.NHibernate;
     using TimeoutPersisters.NHibernate.Config;
+    using Environment = NHibernate.Cfg.Environment;
 
     /// <summary>
     /// NHibernate Timeout Storage.
@@ -54,10 +56,18 @@ namespace NServiceBus.Features
                 }
             }
 
+            var timeoutsClenaupExecutionInterval = 
+                context.Settings.GetOrDefault<TimeSpan?>("NHibernate.Timeouts.CleanupExecutionInterval") ?? TimeSpan.FromMinutes(2);
+
+            var timeoutsCleanupQueryPeriod =
+                context.Settings.GetOrDefault<TimeSpan?>("NHibernate.Timeouts.CleanupQueryPeriod") ?? TimeSpan.FromMinutes(5);
+
             context.Container.ConfigureComponent<TimeoutPersister>(DependencyLifecycle.SingleInstance)
                 .ConfigureProperty(p => p.ConnectionString, connString)
                 .ConfigureProperty(p => p.SessionFactory, configuration.BuildSessionFactory())
-                .ConfigureProperty(p => p.EndpointName, context.Settings.EndpointName());
+                .ConfigureProperty(p => p.EndpointName, context.Settings.EndpointName())
+                .ConfigureProperty(p => p.TimeoutsCleanupExecutionInterval, timeoutsClenaupExecutionInterval)
+                .ConfigureProperty(p => p.TimeoutsCleanupQueryPeriod, timeoutsCleanupQueryPeriod);
         }
 
         static bool RunInstaller(FeatureConfigurationContext context)
