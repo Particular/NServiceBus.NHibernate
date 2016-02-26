@@ -15,10 +15,10 @@
 
     public class Issue_164 : NServiceBusAcceptanceTest
     {
-        private static string CommandTagHeader = "Chaos.HeaderName";
+        private static string CommandTagHeader = "TestTag.HeaderName";
 
         [Test]
-        public void Subscribers_retry_with_SLR()
+        public void Timeout_does_not_get_stuck_when_persister_commit_takes_longer_than_dispatch_of_another_later_timeout()
         {
             var ctx = new Context();
 
@@ -26,32 +26,35 @@
                 .WithEndpoint<Endpoint>(b =>
                     b.When(bus =>
                     {
-                        ctx.MessageATag = "MessageA: " + Guid.NewGuid().ToString();
-                        ctx.MessageBTag = "MessageB: " + Guid.NewGuid().ToString();
+                        ctx.CommandATag = "MessageA: " + Guid.NewGuid().ToString();
+                        ctx.CommandBTag = "MessageB: " + Guid.NewGuid().ToString();
 
-                        var deliverCommandAAt = DateTime.UtcNow.AddSeconds(5);
-                        var deliverCommandBAt = deliverCommandAAt.AddSeconds(1);
+                        var messageADelay = TimeSpan.FromSeconds(5);
+                        var messageBDelay = TimeSpan.FromSeconds(6);
+
+                        var now = DateTime.UtcNow;
+                        var deliverCommandAAt = now.Add(messageADelay);
+                        var deliverCommandBAt = now.Add(messageBDelay);
 
                         var commandA = new Command();
-                        bus.SetMessageHeader(commandA, CommandTagHeader, ctx.MessageATag);
+                        bus.SetMessageHeader(commandA, CommandTagHeader, ctx.CommandATag);
                         bus.Defer(deliverCommandAAt, commandA);
 
                         var commandB = new Command();
-                        bus.SetMessageHeader(commandB, CommandTagHeader, ctx.MessageBTag);
+                        bus.SetMessageHeader(commandB, CommandTagHeader, ctx.CommandBTag);
                         bus.Defer(deliverCommandBAt, commandB);
-
                     }))
-                .Done(c => c.MessageAReceived)
+                .Done(c => c.CommandAReceived)
                 .Run();
         }
 
         public class Context : ScenarioContext
         {
-            public bool MessageAReceived { get; set; }
+            public bool CommandAReceived { get; set; }
 
-            public string MessageATag { get; set; }
+            public string CommandATag { get; set; }
 
-            public string MessageBTag { get; set; }
+            public string CommandBTag { get; set; }
         }
 
         public class Endpoint : EndpointConfigurationBuilder
@@ -87,9 +90,9 @@
 
                 public void Handle(Command message)
                 {
-                    if (Bus.GetMessageHeader(message, CommandTagHeader) == Context.MessageATag)
+                    if (Bus.GetMessageHeader(message, CommandTagHeader) == Context.CommandATag)
                     {
-                        TestContext.MessageAReceived = true;
+                        TestContext.CommandAReceived = true;
                     }
                 }
             }
@@ -104,11 +107,11 @@
         {
             public ChaosPersister()
             {
-                Supports(Storage.Timeouts, s => s.EnableFeatureByDefault<ChaosTimeoutStorage>());
+                Supports(Storage.Timeouts, s => s.EnableFeatureByDefault<DelayingTimeoutStorage>());
             }
         }
 
-        public class ChaosTimeoutPersister : IPersistTimeouts
+        public class DelayingTimeoutPersister : IPersistTimeouts
         {
             private ManualResetEvent waitWithMessageACommit = new ManualResetEvent(false);
 
@@ -127,7 +130,7 @@
 
             public void Add(TimeoutData timeout)
             {
-                if (timeout.Headers[CommandTagHeader] == Context.MessageATag)
+                if (timeout.Headers[CommandTagHeader] == Context.CommandATag)
                 {
                     waitWithMessageACommit.WaitOne();
                 }
@@ -139,7 +142,8 @@
             {
                 var result = OriginalPersister.TryRemove(timeoutId, out timeoutData);
 
-                if (timeoutData != null && timeoutData.Headers[CommandTagHeader] == Context.MessageBTag)
+                if (timeoutData != null &&timeoutData.Headers.ContainsKey(CommandTagHeader) && 
+                    timeoutData.Headers[CommandTagHeader] == Context.CommandBTag)
                 {
                     waitWithMessageACommit.Set();
                 }
@@ -153,9 +157,9 @@
             }
         }
 
-        public class ChaosTimeoutStorage : NHibernateTimeoutStorage
+        public class DelayingTimeoutStorage : NHibernateTimeoutStorage
         {
-            public ChaosTimeoutStorage()
+            public DelayingTimeoutStorage()
             {
                 DependsOn<TimeoutManager>();
                 DependsOn<NHibernateDBConnectionProvider>();
@@ -165,7 +169,7 @@
             {
                 base.Setup(context);
 
-                context.Container.ConfigureComponent<ChaosTimeoutPersister>(DependencyLifecycle.SingleInstance);
+                context.Container.ConfigureComponent<DelayingTimeoutPersister>(DependencyLifecycle.SingleInstance);
             }
         }
     }
