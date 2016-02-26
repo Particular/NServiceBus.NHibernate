@@ -7,19 +7,28 @@ namespace NServiceBus.TimeoutPersisters.NHibernate
     using System.Transactions;
     using global::NHibernate;
     using NServiceBus.Extensibility;
+    using NServiceBus.Persistence;
     using NServiceBus.Persistence.NHibernate;
+    using NServiceBus.Transports;
     using Timeout.Core;
     using IsolationLevel = System.Data.IsolationLevel;
 
     class TimeoutPersister : IPersistTimeouts, IQueryTimeouts
     {
         ISessionFactory SessionFactory;
+        ISynchronizedStorageAdapter transportTransactionAdapter;
+        ISynchronizedStorage synchronizedStorage;
         string EndpointName;
 
-        public TimeoutPersister(string endpointName, ISessionFactory sessionFactory)
+        public TimeoutPersister(string endpointName,
+            ISessionFactory sessionFactory,
+            ISynchronizedStorageAdapter transportTransactionAdapter,
+            ISynchronizedStorage synchronizedStorage)
         {
             EndpointName = endpointName;
             SessionFactory = sessionFactory;
+            this.transportTransactionAdapter = transportTransactionAdapter;
+            this.synchronizedStorage = synchronizedStorage;
         }
 
         public Task<TimeoutsChunk> GetNextChunk(DateTime startSlice)
@@ -38,8 +47,8 @@ namespace NServiceBus.TimeoutPersisters.NHibernate
                         .List<object[]>()
                         .Select(p =>
                         {
-                            var id = (Guid) p[0];
-                            var dueTime = (DateTime) p[1];
+                            var id = (Guid)p[0];
+                            var dueTime = (DateTime)p[1];
                             return new TimeoutsChunk.Timeout(id.ToString(), dueTime);
                         })
                         .ToList();
@@ -60,54 +69,47 @@ namespace NServiceBus.TimeoutPersisters.NHibernate
             }
         }
 
-        public Task Add(TimeoutData timeout, ContextBag context)
+        public async Task Add(TimeoutData timeout, ContextBag context)
         {
-            using (new TransactionScope(TransactionScopeOption.Suppress))
+            var timeoutId = Guid.NewGuid();
+            using (var session = await OpenSession(context).ConfigureAwait(false))
             {
-                var timeoutId = Guid.NewGuid();
-
-                using (var session = SessionFactory.OpenSession())
-                using (var tx = session.BeginTransaction(IsolationLevel.ReadCommitted))
+                session.Session().Save(new TimeoutEntity
                 {
-                    session.Save(new TimeoutEntity
-                    {
-                        Id = timeoutId,
-                        Destination = timeout.Destination,
-                        SagaId = timeout.SagaId,
-                        State = timeout.State,
-                        Time = timeout.Time,
-                        Headers = ConvertDictionaryToString(timeout.Headers),
-                        Endpoint = timeout.OwningTimeoutManager
-                    });
-                    tx.Commit();
-                }
-
-                timeout.Id = timeoutId.ToString();
-                return Task.FromResult(0);
+                    Id = timeoutId,
+                    Destination = timeout.Destination,
+                    SagaId = timeout.SagaId,
+                    State = timeout.State,
+                    Time = timeout.Time,
+                    Headers = ConvertDictionaryToString(timeout.Headers),
+                    Endpoint = timeout.OwningTimeoutManager
+                });
+                await session.CompleteAsync().ConfigureAwait(false);
             }
+
+            timeout.Id = timeoutId.ToString();
         }
 
-        public Task<bool> TryRemove(string timeoutId, ContextBag context)
+        public async Task<bool> TryRemove(string timeoutId, ContextBag context)
         {
             var id = Guid.Parse(timeoutId);
-            using (new TransactionScope(TransactionScopeOption.Suppress))
+            bool found;
+            using (var session = await OpenSession(context).ConfigureAwait(false))
             {
-                using (var session = SessionFactory.OpenStatelessSession())
-                {
-                    using (var tx = session.BeginTransaction(IsolationLevel.ReadCommitted))
-                    {
-                        var queryString = $"delete {typeof(TimeoutEntity)} where Id = :id";
-
-                        var found = session.CreateQuery(queryString)
-                            .SetParameter("id", id)
-                            .ExecuteUpdate() > 0;
-
-                        tx.Commit();
-
-                        return Task.FromResult(found);
-                    }
-                }
+                var queryString = $"delete {typeof(TimeoutEntity)} where Id = :id";
+                found = session.Session().CreateQuery(queryString).SetParameter("id", id).ExecuteUpdate() > 0;
+                await session.CompleteAsync().ConfigureAwait(false);
             }
+
+            return found;
+        }
+
+        async Task<CompletableSynchronizedStorageSession> OpenSession(ContextBag context)
+        {
+            var transportTransaction = context.GetOrCreate<TransportTransaction>();
+            var session = await transportTransactionAdapter.TryAdapt(transportTransaction, context).ConfigureAwait(false)
+                ?? await synchronizedStorage.OpenSession(context).ConfigureAwait(false);
+            return session;
         }
 
         public Task RemoveTimeoutBy(Guid sagaId, ContextBag context)
@@ -132,26 +134,18 @@ namespace NServiceBus.TimeoutPersisters.NHibernate
             }
         }
 
-        public Task<TimeoutData> Peek(string timeoutId, ContextBag context)
+        public async Task<TimeoutData> Peek(string timeoutId, ContextBag context)
         {
-            using (new TransactionScope(TransactionScopeOption.Suppress))
+            using (var session = await OpenSession(context).ConfigureAwait(false))
             {
                 var id = Guid.Parse(timeoutId);
-                using (var session = SessionFactory.OpenStatelessSession())
-                {
-                    using (var tx = session.BeginTransaction(IsolationLevel.ReadCommitted))
-                    {
-                        var te = session.QueryOver<TimeoutEntity>()
-                            .Where(x => x.Id == id)
-                            .List()
-                            .SingleOrDefault();
+                var te = session.Session().QueryOver<TimeoutEntity>()
+                    .Where(x => x.Id == id)
+                    .List()
+                    .SingleOrDefault();
 
-                        var timeout = MapToTimeoutData(te);
-
-                        tx.Commit();
-                        return Task.FromResult(timeout);
-                    }
-                }
+                var timeout = MapToTimeoutData(te);
+                return timeout;
             }
         }
 
