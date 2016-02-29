@@ -49,6 +49,9 @@
                 message = new OutboxMessage(result.MessageId);
                 if (!result.Dispatched)
                 {
+                    // Needs to remain here due to backward compatibility
+                    // where TransportOperation were not cleared after
+                    // marked as dispatched.
                     var operations = ConvertStringToObject(result.TransportOperations);
                     message.TransportOperations.AddRange(operations.Select(t => new TransportOperation(t.MessageId,
                         t.Options, t.Message, t.Headers)));
@@ -83,8 +86,7 @@
                 {
                     using (var tx = session.BeginTransaction(IsolationLevel.ReadCommitted))
                     {
-                        var queryString = string.Format("update {0} set Dispatched = true, DispatchedAt = :date where MessageId IN ( :messageid, :qualifiedMessageId ) And Dispatched = false",
-                            typeof(OutboxRecord));
+                        var queryString = $"update {typeof(OutboxRecord).Name} set Dispatched = true, DispatchedAt = :date, TransportOperations = NULL where MessageId IN ( :messageid, :qualifiedMessageId ) And Dispatched = false";
                         session.CreateQuery(queryString)
                             .SetString("messageid", messageId)
                             .SetString("qualifiedMessageId", EndpointQualifiedMessageId(messageId))
@@ -105,7 +107,7 @@
                 {
                     using (var tx = session.BeginTransaction(IsolationLevel.ReadCommitted))
                     {
-                        var queryString = string.Format("delete from {0} where Dispatched = true And DispatchedAt < :date", typeof(OutboxRecord));
+                        var queryString = $"delete from {typeof(OutboxRecord).Name} where Dispatched = true And DispatchedAt < :date";
 
                         session.CreateQuery(queryString)
                             .SetDateTime("date", dateTime)
