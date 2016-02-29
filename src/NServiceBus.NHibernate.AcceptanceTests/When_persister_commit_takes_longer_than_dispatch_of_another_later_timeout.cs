@@ -14,30 +14,25 @@
     using NServiceBus.Timeout.Core;
     using NUnit.Framework;
 
-    public class Issue_164 : NServiceBusAcceptanceTest
+    public class When_persister_commit_takes_longer_than_dispatch_of_another_later_timeout : NServiceBusAcceptanceTest
     {
         private static string CommandTagHeader = "TestTag.HeaderName";
 
         [Test]
-        public void Timeout_does_not_get_stuck_when_persister_commit_takes_longer_than_dispatch_of_another_later_timeout()
+        public void Should_deliver_timeout()
         {
-            //TODO: trick TM to query timeouts for frequently. Tweak GetNextChuns in adapter
-            //TODO: make clean-up interval and clean-up period configurable and override it in this test
             var ctx = new Context();
 
             Scenario.Define(ctx)
                 .WithEndpoint<Endpoint>(b =>
                     b.When(bus =>
                     {
-                        ctx.CommandATag = "MessageA: " + Guid.NewGuid().ToString();
-                        ctx.CommandBTag = "MessageB: " + Guid.NewGuid().ToString();
-
-                        var messageADelay = TimeSpan.FromSeconds(5);
-                        var messageBDelay = TimeSpan.FromSeconds(6);
+                        ctx.CommandATag = Guid.NewGuid().ToString();
+                        ctx.CommandBTag = Guid.NewGuid().ToString();
 
                         var now = DateTime.UtcNow;
-                        var deliverCommandAAt = now.Add(messageADelay);
-                        var deliverCommandBAt = now.Add(messageBDelay);
+                        var deliverCommandAAt = now.AddSeconds(5);
+                        var deliverCommandBAt = now.AddSeconds(6);
 
                         var commandA = new Command();
                         bus.SetMessageHeader(commandA, CommandTagHeader, ctx.CommandATag);
@@ -82,8 +77,7 @@
                 {
                     return new TransportConfig
                     {
-                        MaximumConcurrencyLevel = 10,
-                        MaximumMessageThroughputPerSecond = 10
+                        MaximumConcurrencyLevel = 10
                     };
                 }
             }

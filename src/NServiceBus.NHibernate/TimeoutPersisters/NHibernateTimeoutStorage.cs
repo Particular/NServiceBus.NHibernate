@@ -56,7 +56,7 @@ namespace NServiceBus.Features
                 }
             }
 
-            var timeoutsClenaupExecutionInterval = 
+            var timeoutsCleanupExecutionInterval = 
                 context.Settings.GetOrDefault<TimeSpan?>("NHibernate.Timeouts.CleanupExecutionInterval") ?? TimeSpan.FromMinutes(2);
 
             var timeoutsCleanupQueryPeriod =
@@ -66,7 +66,7 @@ namespace NServiceBus.Features
                 .ConfigureProperty(p => p.ConnectionString, connString)
                 .ConfigureProperty(p => p.SessionFactory, configuration.BuildSessionFactory())
                 .ConfigureProperty(p => p.EndpointName, context.Settings.EndpointName())
-                .ConfigureProperty(p => p.TimeoutsCleanupExecutionInterval, timeoutsClenaupExecutionInterval)
+                .ConfigureProperty(p => p.TimeoutsCleanupExecutionInterval, timeoutsCleanupExecutionInterval)
                 .ConfigureProperty(p => p.TimeoutsCleanupQueryPeriod, timeoutsCleanupQueryPeriod);
         }
 
