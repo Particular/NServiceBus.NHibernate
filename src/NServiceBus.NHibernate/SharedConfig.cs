@@ -74,12 +74,10 @@
         /// </summary>
         /// <param name="persistenceConfiguration"></param>
         /// <param name="timeoutCleanupExecutionInterval">The minimal time between each cleanup.</param>
-        /// <param name="timeoutCleanupQueryPeriod">The period by which timeout query will be extended into past.</param>
         /// <returns></returns>
-        public static PersistenceExtentions<NHibernatePersistence> ConfigureTimeoutManagerCleanup(this PersistenceExtentions<NHibernatePersistence> persistenceConfiguration, TimeSpan timeoutCleanupExecutionInterval, TimeSpan timeoutCleanupQueryPeriod)
+        public static PersistenceExtentions<NHibernatePersistence> ConfigureTimeoutManagerCleanup(this PersistenceExtentions<NHibernatePersistence> persistenceConfiguration, TimeSpan timeoutCleanupExecutionInterval)
         {
             persistenceConfiguration.GetSettings().Set("NHibernate.Timeouts.CleanupExecutionInterval", timeoutCleanupExecutionInterval);
-            persistenceConfiguration.GetSettings().Set("NHibernate.Timeouts.CleanupQueryPeriod", timeoutCleanupQueryPeriod);
 
             return persistenceConfiguration;
         } 

@@ -4,6 +4,7 @@ namespace NServiceBus.TimeoutPersisters.NHibernate
     using System.Collections;
     using System.Collections.Generic;
     using System.Data;
+    using System.Data.SqlTypes;
     using System.Linq;
     using global::NHibernate;
     using Outbox;
@@ -18,8 +19,6 @@ namespace NServiceBus.TimeoutPersisters.NHibernate
         public IDbConnectionProvider DbConnectionProvider { get; set; }
         public string EndpointName { get; set; }
         public string ConnectionString { get; set; }
-
-        public TimeSpan TimeoutsCleanupQueryPeriod { get; set; }
         public TimeSpan TimeoutsCleanupExecutionInterval { get; set; }
 
         private DateTime lastTimeoutsCleanupExecution = DateTime.MinValue;
@@ -39,7 +38,9 @@ namespace NServiceBus.TimeoutPersisters.NHibernate
             if (lastTimeoutsCleanupExecution.Add(TimeoutsCleanupExecutionInterval) < now)
             {
                 lastTimeoutsCleanupExecution = now;
-                startSlice = startSlice.Subtract(TimeoutsCleanupQueryPeriod);
+                
+                //We cannot use DateTime.MinValue as sql supports dates only back to 1 January 1753
+                startSlice = SqlDateTime.MinValue.Value;
             }
 
             using (var conn = SessionFactory.GetConnection())

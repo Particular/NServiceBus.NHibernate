@@ -65,7 +65,6 @@
                 {
                     b.UsePersistence<DelayingNHibernatePersister>();
                     b.GetSettings().Set("NHibernate.Timeouts.CleanupExecutionInterval", TimeSpan.FromSeconds(10));
-                    b.GetSettings().Set("NHibernate.Timeouts.CleanupQueryPeriod", TimeSpan.FromMinutes(10));
 
                     b.PurgeOnStartup(true);
                 });
