@@ -68,18 +68,5 @@
             persistenceConfiguration.GetSettings().Set("NHibernate.SessionCreator", callback);
             return persistenceConfiguration;
         }
-
-        /// <summary>
-        /// Instructs the NHibernate persistence to override default timeout cleanup task.
-        /// </summary>
-        /// <param name="persistenceConfiguration"></param>
-        /// <param name="timeoutCleanupExecutionInterval">The minimal time between each cleanup.</param>
-        /// <returns></returns>
-        public static PersistenceExtentions<NHibernatePersistence> ConfigureTimeoutManagerCleanup(this PersistenceExtentions<NHibernatePersistence> persistenceConfiguration, TimeSpan timeoutCleanupExecutionInterval)
-        {
-            persistenceConfiguration.GetSettings().Set("NHibernate.Timeouts.CleanupExecutionInterval", timeoutCleanupExecutionInterval);
-
-            return persistenceConfiguration;
-        } 
     }
 }
