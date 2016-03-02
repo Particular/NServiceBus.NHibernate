@@ -68,6 +68,7 @@
             public virtual string OriginalMessageId { get; set; }
             public virtual string LargeText { get; set; }
             public virtual Guid SomeId { get; set; }
+            public virtual int Version { get; set; }
         }
 
         [Serializable]

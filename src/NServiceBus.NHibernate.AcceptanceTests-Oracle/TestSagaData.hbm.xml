@@ -4,9 +4,10 @@
     <id name="Id" type="Guid">
       <generator class="assigned" />
     </id>
+    <version name="Version" />
     <property name="Originator" />
     <property name="OriginalMessageId" />
-    <property name="LargeText" type="StringClob" />
+    <property name="LargeText" type="StringClob" />    
     <property name="SomeId" unique="true" />
   </class>
 </hibernate-mapping>

@@ -44,10 +44,12 @@
                 public Task<TestSaga08.SagaData08> FindBy(SomeOtherMessage message, SynchronizedStorageSession storageSession, ReadOnlyContextBag context)
                 {
                     Context.FinderUsed = true;
-                    return Task.FromResult(new TestSaga08.SagaData08
+                    var saga = Task.FromResult(new TestSaga08.SagaData08
                     {
                         Property = "jfbsjdfbsdjh"
                     });
+                    storageSession.Session().Save(saga);
+                    return saga;
                 }
             }
 
