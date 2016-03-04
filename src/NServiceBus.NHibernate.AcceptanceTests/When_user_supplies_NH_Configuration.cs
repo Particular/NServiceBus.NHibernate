@@ -6,7 +6,6 @@
     using NServiceBus.Persistence;
     using NServiceBus.Saga;
     using NUnit.Framework;
-    using NHibernate = global::NHibernate;
 
     public class When_user_supplies_NH_Configuration : NServiceBusAcceptanceTest
     {

@@ -209,7 +209,6 @@
     <Compile Include="App_Packages\NSB.AcceptanceTests.5.2.1\Versioning\When_multiple_versions_of_a_message_is_published.cs" />
     <Compile Include="App_Packages\NSB.AcceptanceTests.5.2.1\Volatile\When_sending_to_non_durable_endpoint.cs" />
     <Compile Include="ConfigureNHibernatePersistence.cs" />
-    <Compile Include="When_persister_commit_takes_longer_than_dispatch_of_another_later_timeout.cs" />
     <Compile Include="Issue_67.cs" />
     <Compile Include="When_outbox_is_enabled.cs" />
     <Compile Include="When_using_NHibernate_persistence_without_DTC.cs" />
