@@ -4,6 +4,7 @@
     using System.Threading.Tasks;
     using NServiceBus.AcceptanceTesting;
     using NServiceBus.AcceptanceTests.EndpointTemplates;
+    using NServiceBus.Config;
     using NServiceBus.Features;
     using NUnit.Framework;
 
@@ -54,14 +55,18 @@
         {
             public Publisher1()
             {
-                EndpointSetup<DefaultPublisher>(b => b.OnEndpointSubscribed<Context>((args, context) =>
-               {
-                   context.AddTrace("Publisher1 OnEndpointSubscribed " + args.MessageType);
-                   if (args.MessageType.Contains(typeof(IMyEvent).Name))
-                   {
-                       context.Publisher1HasASubscriberForIMyEvent = true;
-                   }
-               }));
+                EndpointSetup<DefaultPublisher>(b =>
+                {
+                    b.OnEndpointSubscribed<Context>((args, context) =>
+                    {
+                        context.AddTrace("Publisher1 OnEndpointSubscribed " + args.MessageType);
+                        if (args.MessageType.Contains(typeof(IMyEvent).Name))
+                        {
+                            context.Publisher1HasASubscriberForIMyEvent = true;
+                        }
+                    });
+                    b.EnableFeature<FirstLevelRetries>();
+                }).WithConfig<TransportConfig>(c => { c.MaxRetries = 2; });
             }
         }
 
@@ -69,15 +74,19 @@
         {
             public Publisher2()
             {
-                EndpointSetup<DefaultPublisher>(b => b.OnEndpointSubscribed<Context>((args, context) =>
+                EndpointSetup<DefaultPublisher>(b =>
                 {
-                    context.AddTrace("Publisher2 OnEndpointSubscribed " + args.MessageType);
-
-                    if (args.MessageType.Contains(typeof(MyEvent2).Name))
+                    b.OnEndpointSubscribed<Context>((args, context) =>
                     {
-                        context.Publisher2HasDetectedASubscriberForEvent2 = true;
-                    }
-                }));
+                        context.AddTrace("Publisher2 OnEndpointSubscribed " + args.MessageType);
+
+                        if (args.MessageType.Contains(typeof(MyEvent2).Name))
+                        {
+                            context.Publisher2HasDetectedASubscriberForEvent2 = true;
+                        }
+                    });
+                    b.EnableFeature<FirstLevelRetries>();
+                }).WithConfig<TransportConfig>(c => { c.MaxRetries = 2; });
             }
         }
 

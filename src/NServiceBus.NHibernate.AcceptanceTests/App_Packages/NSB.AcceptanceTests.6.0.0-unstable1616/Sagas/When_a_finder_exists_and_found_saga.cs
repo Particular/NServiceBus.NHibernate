@@ -1,5 +1,6 @@
 ﻿namespace NServiceBus.AcceptanceTests.Sagas
 {
+    using System;
     using System.Threading.Tasks;
     using NServiceBus.AcceptanceTesting;
     using NServiceBus.AcceptanceTests.EndpointTemplates;
@@ -44,12 +45,13 @@
                 public Task<TestSaga08.SagaData08> FindBy(SomeOtherMessage message, SynchronizedStorageSession storageSession, ReadOnlyContextBag context)
                 {
                     Context.FinderUsed = true;
-                    var saga = Task.FromResult(new TestSaga08.SagaData08
+                    var saga = new TestSaga08.SagaData08
                     {
-                        Property = "jfbsjdfbsdjh"
-                    });
+                        Property = "jfbsjdfbsdjh",
+                        Id = Guid.NewGuid()
+                    };
                     storageSession.Session().Save(saga);
-                    return saga;
+                    return Task.FromResult(saga);
                 }
             }
 

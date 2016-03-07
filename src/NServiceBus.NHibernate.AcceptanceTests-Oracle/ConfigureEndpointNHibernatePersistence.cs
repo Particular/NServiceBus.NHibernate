@@ -21,7 +21,8 @@ public class ConfigureEndpointNHibernatePersistence : IConfigureEndpointTestExec
         NHibernateSettingRetriever.AppSettings = () => new NameValueCollection
         {
             {"NServiceBus/Persistence/NHibernate/connection.driver_class", "NHibernate.Driver.OracleManagedDataClientDriver"},
-            {"NServiceBus/Persistence/NHibernate/dialect", "NHibernate.Dialect.Oracle10gDialect"}
+            {"NServiceBus/Persistence/NHibernate/dialect", "NHibernate.Dialect.Oracle10gDialect"},
+            {"NServiceBus/Persistence/NHibernate/show_sql", "true"}
         };
 
         config.UsePersistence<NHibernatePersistence>()
