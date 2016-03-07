@@ -40,7 +40,7 @@
                         //Explicitly using ICriteria instead of QueryOver for performance reasons.
                         //It seems QueryOver uses quite a bit reflection and that takes longer.
                         result = session.CreateCriteria<OutboxRecord>()
-                            .Add(Restrictions.In("MessageId", possibleIds))
+                            .Add(Restrictions.In(nameof(OutboxRecord.MessageId), possibleIds))
                             .UniqueResult<OutboxRecord>();
 
                         tx.Commit();
@@ -50,6 +50,10 @@
                 if (result == null)
                 {
                     return Task.FromResult<OutboxMessage>(null);
+                }
+                if (result.Dispatched)
+                {
+                    return Task.FromResult(new OutboxMessage(result.MessageId, new TransportOperation[0]));
                 }
                 var transportOperations = ConvertStringToObject(result.TransportOperations)
                     .Select(t => new TransportOperation(t.MessageId, t.Options, t.Message, t.Headers))
@@ -87,7 +91,7 @@
                 {
                     using (var tx = session.BeginTransaction(IsolationLevel.ReadCommitted))
                     {
-                        var queryString = $"update {typeof(OutboxRecord)} set Dispatched = true, DispatchedAt = :date where MessageId IN ( :messageid, :qualifiedMessageId ) And Dispatched = false";
+                        var queryString = $"update {typeof(OutboxRecord).Name} set Dispatched = true, DispatchedAt = :date, TransportOperations = NULL where MessageId IN ( :messageid, :qualifiedMessageId ) And Dispatched = false";
                         session.CreateQuery(queryString)
                             .SetString("messageid", messageId)
                             .SetString("qualifiedMessageId", EndpointQualifiedMessageId(messageId))
@@ -119,7 +123,7 @@
                 {
                     using (var tx = session.BeginTransaction(IsolationLevel.ReadCommitted))
                     {
-                        var queryString = string.Format("delete from {0} where Dispatched = true And DispatchedAt < :date", typeof(OutboxRecord));
+                        var queryString = $"delete from {typeof(OutboxRecord).Name} where Dispatched = true And DispatchedAt < :date";
 
                         session.CreateQuery(queryString)
                             .SetDateTime("date", dateTime)

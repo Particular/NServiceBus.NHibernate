@@ -108,6 +108,7 @@
     <Compile Include="TimeoutPersister\InMemoryDBFixture.cs" />
     <Compile Include="TimeoutPersister\When_fetching_timeouts_from_storage.cs" />
     <Compile Include="TimeoutPersister\When_removing_timeouts_from_the_storage.cs" />
+    <Compile Include="Outbox\When_getting_outbox_messages.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="hibernate.cfg.xml">
