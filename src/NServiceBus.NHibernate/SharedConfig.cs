@@ -47,9 +47,9 @@
         /// </summary>
         /// <param name="persistenceConfiguration"></param>
         /// <returns></returns>
+        [ObsoleteEx(RemoveInVersion = "8", TreatAsErrorFromVersion = "7", ReplacementTypeOrMember = "IMessageHandlerContext.SynchronizedStorageSession.Session")]
         public static PersistenceExtentions<NHibernatePersistence> RegisterManagedSessionInTheContainer(this PersistenceExtentions<NHibernatePersistence> persistenceConfiguration)
         {
-            persistenceConfiguration.GetSettings().Set("NHibernate.RegisterManagedSession", true);
             return persistenceConfiguration;
         }
 
@@ -59,13 +59,9 @@
         /// <param name="persistenceConfiguration"></param>
         /// <param name="callback"></param>
         /// <returns></returns>
+        [ObsoleteEx(RemoveInVersion = "8", TreatAsErrorFromVersion = "7", Message = "This is no longer supported. You can still provide your NHibernate Configuration object.")]
         public static PersistenceExtentions<NHibernatePersistence> UseCustomSessionCreationMethod(this PersistenceExtentions<NHibernatePersistence> persistenceConfiguration, Func<ISessionFactory, string, ISession> callback)
         {
-            if (callback == null)
-            {
-                throw new ArgumentNullException("callback");
-            }
-            persistenceConfiguration.GetSettings().Set("NHibernate.SessionCreator", callback);
             return persistenceConfiguration;
         }
     }
