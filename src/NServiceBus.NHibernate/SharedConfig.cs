@@ -50,7 +50,7 @@
         [ObsoleteEx(RemoveInVersion = "8", TreatAsErrorFromVersion = "7", ReplacementTypeOrMember = "IMessageHandlerContext.SynchronizedStorageSession.Session")]
         public static PersistenceExtentions<NHibernatePersistence> RegisterManagedSessionInTheContainer(this PersistenceExtentions<NHibernatePersistence> persistenceConfiguration)
         {
-            return persistenceConfiguration;
+            throw new NotImplementedException();
         }
 
         /// <summary>
@@ -62,7 +62,7 @@
         [ObsoleteEx(RemoveInVersion = "8", TreatAsErrorFromVersion = "7", Message = "This is no longer supported. You can still provide your NHibernate Configuration object.")]
         public static PersistenceExtentions<NHibernatePersistence> UseCustomSessionCreationMethod(this PersistenceExtentions<NHibernatePersistence> persistenceConfiguration, Func<ISessionFactory, string, ISession> callback)
         {
-            return persistenceConfiguration;
+            throw new NotImplementedException();
         }
     }
 }
