@@ -59,7 +59,7 @@ namespace NServiceBus.NHibernate.Tests.Outbox
         }
 
         [Test]
-        public async Task Should_update_dispatched_flag()
+        public async Task Should_update_dispatched_flag_and_clear_the_operations()
         {
             var id = Guid.NewGuid().ToString("N");
 
@@ -82,6 +82,7 @@ namespace NServiceBus.NHibernate.Tests.Outbox
                     .SingleOrDefault();
 
                 Assert.True(result.Dispatched);
+                Assert.IsNull(result.TransportOperations);
             }
         }
 
