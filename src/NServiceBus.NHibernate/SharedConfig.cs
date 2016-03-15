@@ -59,7 +59,7 @@
         /// <param name="persistenceConfiguration"></param>
         /// <param name="callback"></param>
         /// <returns></returns>
-        [ObsoleteEx(RemoveInVersion = "8", TreatAsErrorFromVersion = "7", Message = "This is no longer supported. You can still provide your NHibernate Configuration object.")]
+        [ObsoleteEx(RemoveInVersion = "8", TreatAsErrorFromVersion = "7", Message = "Custom session creation is no longer supported. Entity mapping can be done through providing custom NHibernate Configuration object on endpoint initialization.")]
         public static PersistenceExtentions<NHibernatePersistence> UseCustomSessionCreationMethod(this PersistenceExtentions<NHibernatePersistence> persistenceConfiguration, Func<ISessionFactory, string, ISession> callback)
         {
             throw new NotImplementedException();
