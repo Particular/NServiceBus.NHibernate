@@ -47,7 +47,10 @@
         /// </summary>
         /// <param name="persistenceConfiguration"></param>
         /// <returns></returns>
-        [ObsoleteEx(RemoveInVersion = "8", TreatAsErrorFromVersion = "7", ReplacementTypeOrMember = "IMessageHandlerContext.SynchronizedStorageSession.Session")]
+        [ObsoleteEx(
+            RemoveInVersion = "8", 
+            TreatAsErrorFromVersion = "7", 
+            ReplacementTypeOrMember = "IMessageHandlerContext.SynchronizedStorageSession.Session")]
         public static PersistenceExtentions<NHibernatePersistence> RegisterManagedSessionInTheContainer(this PersistenceExtentions<NHibernatePersistence> persistenceConfiguration)
         {
             throw new NotImplementedException();
@@ -59,7 +62,10 @@
         /// <param name="persistenceConfiguration"></param>
         /// <param name="callback"></param>
         /// <returns></returns>
-        [ObsoleteEx(RemoveInVersion = "8", TreatAsErrorFromVersion = "7", Message = "Custom session creation is no longer supported. Entity mapping can be done through providing custom NHibernate Configuration object on endpoint initialization.")]
+        [ObsoleteEx(
+            RemoveInVersion = "8", 
+            TreatAsErrorFromVersion = "7", 
+            Message = "Custom session creation is no longer supported. Entity mapping can be done through providing custom NHibernate Configuration object on endpoint initialization.")]
         public static PersistenceExtentions<NHibernatePersistence> UseCustomSessionCreationMethod(this PersistenceExtentions<NHibernatePersistence> persistenceConfiguration, Func<ISessionFactory, string, ISession> callback)
         {
             throw new NotImplementedException();

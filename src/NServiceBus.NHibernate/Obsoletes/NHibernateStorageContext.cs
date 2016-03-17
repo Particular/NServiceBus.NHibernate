@@ -7,7 +7,10 @@ namespace NServiceBus.Persistence.NHibernate
     /// <summary>
     /// Provides users with access to the current NHibernate <see cref="ITransaction"/>, <see cref="IDbConnection"/> and <see cref="ISession"/>. 
     /// </summary>
-    [ObsoleteEx(RemoveInVersion = "8", TreatAsErrorFromVersion = "7", ReplacementTypeOrMember = "IMessageHandlingContext.StorageSession")]
+    [ObsoleteEx(
+        RemoveInVersion = "8", 
+        TreatAsErrorFromVersion = "7", 
+        ReplacementTypeOrMember = "IMessageHandlingContext.StorageSession")]
     public class NHibernateStorageContext
     {
         /// <summary>
