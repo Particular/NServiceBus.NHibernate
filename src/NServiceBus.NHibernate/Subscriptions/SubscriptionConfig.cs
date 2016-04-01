@@ -16,7 +16,7 @@ namespace NServiceBus.Persistence.NHibernate
         /// <param name="persistenceConfiguration"></param>
         public static PersistenceExtentions<NHibernatePersistence> DisableSubscriptionStorageSchemaUpdate(this PersistenceExtentions<NHibernatePersistence> persistenceConfiguration)
         {
-            persistenceConfiguration.GetSettings().Set(NHibernateSubscriptionStorage.AutoupdateschemaSettingsKey, false);
+            persistenceConfiguration.GetSettings().Set(NHibernateSubscriptionStorageFeature.AutoupdateschemaSettingsKey, false);
             return persistenceConfiguration;
         }
 
@@ -39,7 +39,7 @@ namespace NServiceBus.Persistence.NHibernate
         /// <param name="expiration">The period of time to cache subscriptions list for.</param>
         public static PersistenceExtentions<NHibernatePersistence> EnableCachingForSubscriptionStorage(this PersistenceExtentions<NHibernatePersistence> persistenceConfiguration, TimeSpan expiration)
         {
-            persistenceConfiguration.GetSettings().Set(NHibernateSubscriptionStorage.CacheExpirationSettingsKey, expiration);
+            persistenceConfiguration.GetSettings().Set(NHibernateSubscriptionStorageFeature.CacheExpirationSettingsKey, expiration);
             return persistenceConfiguration;
         }
     }

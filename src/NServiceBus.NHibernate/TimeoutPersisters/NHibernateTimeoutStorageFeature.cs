@@ -7,22 +7,13 @@ namespace NServiceBus.Features
     using TimeoutPersisters.NHibernate.Config;
     using TimeoutPersisters.NHibernate.Installer;
 
-    /// <summary>
-    /// NHibernate Timeout Storage.
-    /// </summary>
-    public class NHibernateTimeoutStorage : Feature
+    class NHibernateTimeoutStorageFeature : Feature
     {
-        /// <summary>
-        /// Creates an instance of <see cref="NHibernateTimeoutStorage"/>.
-        /// </summary>
-        public NHibernateTimeoutStorage()
+        public NHibernateTimeoutStorageFeature()
         {
             DependsOn<TimeoutManager>();
         }
 
-        /// <summary>
-        /// Called when the feature should perform its initialization. This call will only happen if the feature is enabled.
-        /// </summary>
         protected override void Setup(FeatureConfigurationContext context)
         {
             var builder = new NHibernateConfigurationBuilder(context.Settings, "Timeout", "NHibernate.Timeouts.Configuration", "StorageConfiguration");
