@@ -5,7 +5,7 @@ namespace NServiceBus.Features
     using Deduplication.NHibernate.Config;
     using Deduplication.NHibernate;
     using Deduplication.NHibernate.Installer;
-    using NHibernate.Tool.hbm2ddl;
+    using global::NHibernate.Tool.hbm2ddl;
     using Persistence.NHibernate;
 
     /// <summary>

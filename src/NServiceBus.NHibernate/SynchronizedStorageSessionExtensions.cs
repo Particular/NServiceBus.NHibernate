@@ -1,7 +1,7 @@
 ﻿namespace NServiceBus
 {
     using System;
-    using NHibernate;
+    using global::NHibernate;
     using NServiceBus.Persistence;
 
     /// <summary>

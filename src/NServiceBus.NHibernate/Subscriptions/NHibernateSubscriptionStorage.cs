@@ -2,7 +2,7 @@ namespace NServiceBus.Features
 {
     using System;
     using System.Threading.Tasks;
-    using NHibernate.Tool.hbm2ddl;
+    using global::NHibernate.Tool.hbm2ddl;
     using Persistence.NHibernate;
     using Unicast.Subscriptions.MessageDrivenSubscriptions;
     using Unicast.Subscriptions.NHibernate;
