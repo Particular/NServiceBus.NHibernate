@@ -4,9 +4,9 @@ namespace NServiceBus.Features
     using System.Linq;
     using System.Text;
     using System.Threading.Tasks;
-    using NHibernate.Cfg;
-    using NHibernate.Mapping.ByCode;
-    using NHibernate.Tool.hbm2ddl;
+    using global::NHibernate.Cfg;
+    using global::NHibernate.Mapping.ByCode;
+    using global::NHibernate.Tool.hbm2ddl;
     using NServiceBus.Outbox.NHibernate;
     using Persistence.NHibernate;
     using Persistence.NHibernate.Installer;

@@ -1,6 +1,6 @@
 ﻿namespace NServiceBus
 {
-    using NHibernate;
+    using global::NHibernate;
 
     interface INHibernateSynchronizedStorageSession
     {
