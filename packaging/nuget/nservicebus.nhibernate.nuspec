@@ -13,7 +13,7 @@
     <description>NHibernate integration for NServiceBus</description>
     <releaseNotes></releaseNotes>
     <copyright>$copyright$</copyright>
-    <tags>$tags$</tags>
+    <tags>nservicebus servicebus msmq cqrs publish subscribe</tags>
     <dependencies>
       <dependency id="Iesi.Collections" version="[4.0.1.4000, 5.0.0)" />
       <dependency id="NHibernate" version="[4.0.4.4000, 5.0.0)" />
