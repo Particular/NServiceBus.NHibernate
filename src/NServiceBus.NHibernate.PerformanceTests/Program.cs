@@ -8,10 +8,12 @@
     using System.Threading.Tasks;
     using System.Transactions;
     using NServiceBus;
+    using NServiceBus.Configuration.AdvanceExtensibility;
     using NServiceBus.Features;
     using NServiceBus.Persistence.NHibernate;
     using Saga;
 
+    
     internal class Program
     {
         static void Main(string[] args)
@@ -43,8 +45,7 @@
                 endpointName += ".outbox";
             }
 
-            var config = new EndpointConfiguration();
-            config.EndpointName(endpointName);
+            var config = new EndpointConfiguration(endpointName);
             config.UseTransport<MsmqTransport>().Transactions(suppressDTC ? TransportTransactionMode.SendsAtomicWithReceive : TransportTransactionMode.TransactionScope);
             config.LimitMessageProcessingConcurrencyTo(numberOfThreads);
             config.EnableInstallers();
@@ -75,8 +76,8 @@
             {
                 config.EnableOutbox();
             }
-
-            config.RunWhenEndpointStartsAndStops(new Loader(async session =>
+            config.EnableFeature<LoaderFeature>();
+            config.GetSettings().Set<Loader>(new Loader(async session =>
             {
                 if (saga)
                 {
@@ -92,12 +93,39 @@
                     Statistics.SendTimeNoTx = await SeedInputQueue(session, numberOfMessages / 2, endpointName, numberOfThreads, false, twoPhaseCommit).ConfigureAwait(false);
                     Statistics.SendTimeWithTx = await SeedInputQueue(session, numberOfMessages / 2, endpointName, numberOfThreads, !outbox, twoPhaseCommit).ConfigureAwait(false);
                 }
-                }));
-
-                PerformTest(args, config, saga, numberOfMessages, endpointName, concurrency, publish, numberOfThreads, outbox, twoPhaseCommit).GetAwaiter().GetResult();
+            }));
+            PerformTest(args, config, saga, numberOfMessages, endpointName, concurrency, publish, numberOfThreads, outbox, twoPhaseCommit).GetAwaiter().GetResult();
         }
 
-        class Loader : IWantToRunWhenBusStartsAndStops
+        class LoaderFeature : Feature
+        {
+            protected override void Setup(FeatureConfigurationContext context)
+            {
+                context.RegisterStartupTask(new LoaderTask(context.Settings.Get<Loader>()));
+            }
+
+            class LoaderTask : FeatureStartupTask
+            {
+                Loader loader;
+
+                public LoaderTask(Loader loader)
+                {
+                    this.loader = loader;
+                }
+
+                protected override Task OnStart(IMessageSession session)
+                {
+                    return loader.Load(session);
+                }
+
+                protected override Task OnStop(IMessageSession session)
+                {
+                    return Task.FromResult(0);
+                }
+            }
+        }
+
+        class Loader
         {
             Func<IMessageSession, Task> loadAction;
 
@@ -106,21 +134,15 @@
                 this.loadAction = loadAction;
             }
 
-            public Task Start(IMessageSession session)
+            public Task Load(IMessageSession session)
             {
                 return loadAction(session);
-            }
-
-            public Task Stop(IMessageSession session)
-            {
-                return Task.FromResult(0);
             }
         }
 
         static async Task PerformTest(string[] args, EndpointConfiguration config, bool saga, int numberOfMessages, string endpointName, int concurrency, bool publish, int numberOfThreads, bool outbox, bool twoPhaseCommit)
         {
             var startableBus = await Endpoint.Create(config).ConfigureAwait(false);
-
 
             Statistics.StartTime = DateTime.Now;
 
@@ -134,7 +156,6 @@
             DumpSetting(args);
             Statistics.Dump();
         }
-
 
         static void DumpSetting(string[] args)
         {
@@ -165,28 +186,28 @@
             var sw = new Stopwatch();
             sw.Start();
             var tasks = Enumerable.Range(0, numberOfThreads)
-                .Select(i => Task.Factory.StartNew( async () =>
-            {
-                for (var j = 0; j < numberOfMessages/numberOfThreads; i++)
-                {
-                    var message = CreateMessage();
-                    message.TwoPhaseCommit = twoPhaseCommit;
-                    message.Id = j;
+                .Select(i => Task.Factory.StartNew(async () =>
+           {
+               for (var j = 0; j < numberOfMessages / numberOfThreads; i++)
+               {
+                   var message = CreateMessage();
+                   message.TwoPhaseCommit = twoPhaseCommit;
+                   message.Id = j;
 
-                    if (createTransaction)
-                    {
-                        using (var tx = new TransactionScope())
-                        {
-                            await bus.Send(inputQueue, message).ConfigureAwait(false);
-                            tx.Complete();
-                        }
-                    }
-                    else
-                    {
-                        await bus.Send(inputQueue, message).ConfigureAwait(false);
-                    }
-                }   
-            }, CancellationToken.None, TaskCreationOptions.LongRunning, TaskScheduler.Default)).ToArray();
+                   if (createTransaction)
+                   {
+                       using (var tx = new TransactionScope())
+                       {
+                           await bus.Send(inputQueue, message).ConfigureAwait(false);
+                           tx.Complete();
+                       }
+                   }
+                   else
+                   {
+                       await bus.Send(inputQueue, message).ConfigureAwait(false);
+                   }
+               }
+           }, CancellationToken.None, TaskCreationOptions.LongRunning, TaskScheduler.Default)).ToArray();
 
             await Task.WhenAll(tasks).ConfigureAwait(false);
             sw.Stop();
@@ -200,7 +221,7 @@
             var tasks = Enumerable.Range(0, numberOfThreads)
                 .Select(i => Task.Factory.StartNew(async () =>
                 {
-                    for (var j = 0; j < numberOfMessages/numberOfThreads; i++)
+                    for (var j = 0; j < numberOfMessages / numberOfThreads; i++)
                     {
                         if (createTransaction)
                         {

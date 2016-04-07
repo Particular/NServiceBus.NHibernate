@@ -1,20 +1,18 @@
 namespace NServiceBus.Persistence.NHibernate.Installer
 {
     using System;
+    using System.Linq;
     using System.Threading.Tasks;
     using Installation;
     using NServiceBus.ObjectBuilder;
 
     class Installer : INeedToInstallSomething
     {
-        public Installer(IConfigureComponents configureComponents, IBuilder builder)
+        public Installer(IBuilder builder)
         {
             // since the installers are registered even if the feature isn't enabled we need to make 
             // this a no-op of there is no "schema updater" available 
-            if (configureComponents.HasComponent<SchemaUpdater>())
-            {
-                schemaUpdater = builder.Build<SchemaUpdater>();
-            }
+            schemaUpdater = builder.BuildAll<SchemaUpdater>().FirstOrDefault();
         }
 
         public Task Install(string identity)
