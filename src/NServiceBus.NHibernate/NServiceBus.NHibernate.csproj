@@ -92,7 +92,7 @@
     <Compile Include="Internal\ObjectSerializer.cs" />
     <Compile Include="SynchronizedStorage\INHibernateSynchronizedStorageSession.cs" />
     <Compile Include="SynchronizedStorage\NHibernateAmbientTransactionSynchronizedStorageSession.cs" />
-    <Compile Include="Obsoletes\NHibernateStorageContext.cs" />
+    <Compile Include="Obsoletes\obsoletes.cs" />
     <Compile Include="Deduplication\DeduplicationConfig.cs" />
     <Compile Include="Deduplication\NHibernateGatewayDeduplication.cs" />
     <Compile Include="NHibernatePersistence.cs" />
@@ -113,7 +113,7 @@
     <Compile Include="InternalsVisibleTo.cs" />
     <Compile Include="Outbox\OutboxCleaner.cs" />
     <Compile Include="SagaPersisters\NHibernateSagaStorage.cs" />
-    <Compile Include="SynchronizedStorage\NHibernateStorageSession.cs" />
+    <Compile Include="SynchronizedStorage\NHibernateSynchronizedStorageFeature.cs" />
     <Compile Include="Outbox\IDbConnectionProvider.cs" />
     <Compile Include="Outbox\Entities.cs" />
     <Compile Include="Outbox\EntityMappings.cs" />
@@ -127,13 +127,13 @@
     <Compile Include="SagaPersisters\SagaPersister.cs" />
     <Compile Include="SynchronizedStorage\SharedMappings.cs" />
     <Compile Include="Subscriptions\CachedSubscriptionPersister.cs" />
-    <Compile Include="Subscriptions\NHibernateSubscriptionStorage.cs" />
+    <Compile Include="Subscriptions\NHibernateSubscriptionStorageFeature.cs" />
     <Compile Include="Subscriptions\SubscriptionConfig.cs" />
     <Compile Include="SynchronizedStorageSessionExtensions.cs" />
     <Compile Include="TimeoutPersisters\TimeoutEntityMap.cs" />
     <Compile Include="TimeoutPersisters\Installer\Installer.cs" />
     <Compile Include="TimeoutPersisters\OptimizedSchemaUpdate.cs" />
-    <Compile Include="TimeoutPersisters\NHibernateTimeoutStorage.cs" />
+    <Compile Include="TimeoutPersisters\NHibernateTimeoutStorageFeature.cs" />
     <Compile Include="TimeoutPersisters\TimeoutConfig.cs" />
     <Compile Include="TimeoutPersisters\TimeoutEntity.cs" />
     <Compile Include="TimeoutPersisters\TimeoutPersister.cs" />

@@ -1,0 +1,151 @@
+﻿namespace NServiceBus.Features
+{
+    
+    [System.ObsoleteAttribute("This feature class was not intented to be used by end users. It\'s equivalent cann" +
+        "ot be disabled in version 7. Will be removed in version 8.0.0.", true)]
+    public class NHibernateDBConnectionProvider
+    {
+        public NHibernateDBConnectionProvider() { }
+    }
+    public class NHibernateGatewayDeduplication : NServiceBus.Features.Feature
+    {
+        public NHibernateGatewayDeduplication() { }
+        protected override void Setup(NServiceBus.Features.FeatureConfigurationContext context) { }
+    }
+    [System.ObsoleteAttribute("Feature classes are not exposed any more. To enable only the outbox storage use e" +
+        "ndpointConfiguration.UsePersistence<NHibernatePersistence, StorageType.Outbox>. " +
+        "Will be removed in version 8.0.0.", true)]
+    public class NHibernateOutboxStorage
+    {
+        public NHibernateOutboxStorage() { }
+    }
+    public class NHibernateSagaStorage : NServiceBus.Features.Feature
+    {
+        public NHibernateSagaStorage() { }
+        protected override void Setup(NServiceBus.Features.FeatureConfigurationContext context) { }
+    }
+    [System.ObsoleteAttribute("This feature class was not intenced to be used by end users. It\'s equivalent cann" +
+        "ot be disabled in version 7. Will be removed in version 8.0.0.", true)]
+    public class NHibernateStorageSession
+    {
+        public NHibernateStorageSession() { }
+    }
+    [System.ObsoleteAttribute("Feature classes are not exposed any more. To enable only the subscription storage" +
+        " use endpointConfiguration.UsePersistence<NHibernatePersistence, StorageType.Sub" +
+        "scriptions>. Will be removed in version 8.0.0.", true)]
+    public class NHibernateSubscriptionStorage
+    {
+        public NHibernateSubscriptionStorage() { }
+    }
+    [System.ObsoleteAttribute("Feature classes are not exposed any more. To enable only the timeouts storage use" +
+        " endpointConfiguration.UsePersistence<NHibernatePersistence, StorageType.Timeout" +
+        "s>. Will be removed in version 8.0.0.", true)]
+    public class NHibernateTimeoutStorage
+    {
+        public NHibernateTimeoutStorage() { }
+    }
+}
+namespace NServiceBus
+{
+    
+    public class NHibernatePersistence : NServiceBus.Persistence.PersistenceDefinition
+    {
+        public NHibernatePersistence() { }
+    }
+    public class static SynchronizedStorageSessionExtensions
+    {
+        public static NHibernate.ISession Session(this NServiceBus.Persistence.SynchronizedStorageSession session) { }
+    }
+}
+namespace NServiceBus.Persistence.NHibernate
+{
+    
+    public class static DeduplicationConfig
+    {
+        public static NServiceBus.PersistenceExtentions<NServiceBus.NHibernatePersistence> DisableGatewayDeduplicationSchemaUpdate(this NServiceBus.PersistenceExtentions<NServiceBus.NHibernatePersistence> persistenceConfiguration) { }
+        public static NServiceBus.PersistenceExtentions<NServiceBus.NHibernatePersistence> UseGatewayDeduplicationConfiguration(this NServiceBus.PersistenceExtentions<NServiceBus.NHibernatePersistence> persistenceConfiguration, NHibernate.Cfg.Configuration configuration) { }
+    }
+    public class static NHibernateSettingRetriever
+    {
+        public static System.Func<System.Collections.Specialized.NameValueCollection> AppSettings { get; set; }
+        public static System.Func<System.Configuration.ConnectionStringSettingsCollection> ConnectionStrings { get; set; }
+    }
+    [System.ObsoleteAttribute("Please use `IMessageHandlingContext.StorageSession()` instead. Will be removed in" +
+        " version 8.0.0.", true)]
+    public class NHibernateStorageContext
+    {
+        public NHibernateStorageContext() { }
+    }
+    public class static SagaConfig
+    {
+        public static NServiceBus.PersistenceExtentions<NServiceBus.NHibernatePersistence> SagaTableNamingConvention(this NServiceBus.PersistenceExtentions<NServiceBus.NHibernatePersistence> persistenceConfiguration, System.Func<System.Type, string> tableNamingConvention) { }
+    }
+    public class static SubscriptionConfig
+    {
+        public static NServiceBus.PersistenceExtentions<NServiceBus.NHibernatePersistence> DisableSubscriptionStorageSchemaUpdate(this NServiceBus.PersistenceExtentions<NServiceBus.NHibernatePersistence> persistenceConfiguration) { }
+        public static NServiceBus.PersistenceExtentions<NServiceBus.NHibernatePersistence> EnableCachingForSubscriptionStorage(this NServiceBus.PersistenceExtentions<NServiceBus.NHibernatePersistence> persistenceConfiguration, System.TimeSpan expiration) { }
+        public static NServiceBus.PersistenceExtentions<NServiceBus.NHibernatePersistence> UseSubscriptionStorageConfiguration(this NServiceBus.PersistenceExtentions<NServiceBus.NHibernatePersistence> persistenceConfiguration, NHibernate.Cfg.Configuration configuration) { }
+    }
+    public class static TimeoutConfig
+    {
+        public static NServiceBus.PersistenceExtentions<NServiceBus.NHibernatePersistence> DisableTimeoutStorageSchemaUpdate(this NServiceBus.PersistenceExtentions<NServiceBus.NHibernatePersistence> persistenceConfiguration) { }
+        public static NServiceBus.PersistenceExtentions<NServiceBus.NHibernatePersistence> UseTimeoutStorageConfiguration(this NServiceBus.PersistenceExtentions<NServiceBus.NHibernatePersistence> persistenceConfiguration, NHibernate.Cfg.Configuration configuration) { }
+    }
+}
+namespace NServiceBus.Persistence
+{
+    
+    public class static SharedConfig
+    {
+        public static NServiceBus.PersistenceExtentions<NServiceBus.NHibernatePersistence> ConnectionString(this NServiceBus.PersistenceExtentions<NServiceBus.NHibernatePersistence> persistenceConfiguration, string connectionString) { }
+        public static NServiceBus.PersistenceExtentions<NServiceBus.NHibernatePersistence> DisableSchemaUpdate(this NServiceBus.PersistenceExtentions<NServiceBus.NHibernatePersistence> persistenceConfiguration) { }
+        [System.ObsoleteAttribute("Please use `IMessageHandlerContext.SynchronizedStorageSession.Session` instead. W" +
+            "ill be removed in version 8.0.0.", true)]
+        public static NServiceBus.PersistenceExtentions<NServiceBus.NHibernatePersistence> RegisterManagedSessionInTheContainer(this NServiceBus.PersistenceExtentions<NServiceBus.NHibernatePersistence> persistenceConfiguration) { }
+        public static NServiceBus.PersistenceExtentions<NServiceBus.NHibernatePersistence> UseConfiguration(this NServiceBus.PersistenceExtentions<NServiceBus.NHibernatePersistence> persistenceConfiguration, NHibernate.Cfg.Configuration configuration) { }
+        [System.ObsoleteAttribute("Custom session creation is no longer supported. Entity mapping can be done throug" +
+            "h providing custom NHibernate Configuration object on endpoint initialization. W" +
+            "ill be removed in version 8.0.0.", true)]
+        public static NServiceBus.PersistenceExtentions<NServiceBus.NHibernatePersistence> UseCustomSessionCreationMethod(this NServiceBus.PersistenceExtentions<NServiceBus.NHibernatePersistence> persistenceConfiguration, System.Func<NHibernate.ISessionFactory, string, NHibernate.ISession> callback) { }
+    }
+}
+namespace NServiceBus.SagaPersisters.NHibernate
+{
+    
+    [System.AttributeUsageAttribute(System.AttributeTargets.Class | System.AttributeTargets.All)]
+    public sealed class LockModeAttribute : System.Attribute
+    {
+        public LockModeAttribute(NServiceBus.SagaPersisters.NHibernate.LockModes lockModeToUse) { }
+        public NServiceBus.SagaPersisters.NHibernate.LockModes RequestedLockMode { get; }
+    }
+    public enum LockModes
+    {
+        None = 1,
+        Read = 2,
+        Upgrade = 3,
+        UpgradeNoWait = 4,
+        Write = 5,
+        Force = 6,
+    }
+    [System.AttributeUsageAttribute(System.AttributeTargets.Property | System.AttributeTargets.All)]
+    public class RowVersionAttribute : System.Attribute
+    {
+        public RowVersionAttribute() { }
+    }
+    [System.AttributeUsageAttribute(System.AttributeTargets.Class | System.AttributeTargets.All)]
+    public class TableNameAttribute : System.Attribute
+    {
+        public TableNameAttribute(string tableName) { }
+        public string Schema { get; set; }
+        public string TableName { get; }
+    }
+}
+namespace NServiceBus.Testing
+{
+    
+    public class TestingNHibernateSynchronizedStorageSession : NServiceBus.INHibernateSynchronizedStorageSession, NServiceBus.Persistence.SynchronizedStorageSession
+    {
+        public TestingNHibernateSynchronizedStorageSession(NHibernate.ISession session) { }
+        public NHibernate.ISession Session { get; }
+    }
+}

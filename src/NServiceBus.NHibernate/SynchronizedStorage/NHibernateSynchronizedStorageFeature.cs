@@ -11,20 +11,14 @@ namespace NServiceBus.Features
     using Persistence.NHibernate;
     using Persistence.NHibernate.Installer;
 
-    /// <summary>
-    /// NHibernate Storage Session.
-    /// </summary>
-    public class NHibernateStorageSession : Feature
+    class NHibernateSynchronizedStorageFeature : Feature
     {
-        internal NHibernateStorageSession()
+        internal NHibernateSynchronizedStorageFeature()
         {
             Defaults(s => s.SetDefault<SharedMappings>(new SharedMappings()));
             DependsOnOptionally<Outbox>();
         }
 
-        /// <summary>
-        /// Called when the feature should perform its initialization. This call will only happen if the feature is enabled.
-        /// </summary>
         protected override void Setup(FeatureConfigurationContext context)
         {
             var builder = new NHibernateConfigurationBuilder(context.Settings, "Saga", "StorageConfiguration");
@@ -43,8 +37,6 @@ namespace NServiceBus.Features
 
             context.Container.ConfigureComponent(b => new NHibernateSynchronizedStorage(sessionFactory), DependencyLifecycle.SingleInstance);
             context.Container.ConfigureComponent(b => new NHibernateSynchronizedStorageAdapter(sessionFactory), DependencyLifecycle.SingleInstance);
-            //Legacy
-            context.Container.ConfigureComponent(b => new NHibernateStorageContext(), DependencyLifecycle.InstancePerUnitOfWork);
 
             if (outboxEnabled)
             {

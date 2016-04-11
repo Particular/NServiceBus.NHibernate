@@ -18,13 +18,13 @@
                 s.SetDefault("NHibernate.Common.AutoUpdateSchema", true);
 
                 //we can always enable these ones since they will only enable if the outbox or sagas are on
-                s.EnableFeatureByDefault<NHibernateStorageSession>();
+                s.EnableFeatureByDefault<NHibernateSynchronizedStorageFeature>();
             });
            
             Supports<StorageType.GatewayDeduplication>(s => s.EnableFeatureByDefault<NHibernateGatewayDeduplication>());
-            Supports<StorageType.Timeouts>(s => s.EnableFeatureByDefault<NHibernateTimeoutStorage>());
+            Supports<StorageType.Timeouts>(s => s.EnableFeatureByDefault<NHibernateTimeoutStorageFeature>());
             Supports<StorageType.Sagas>(s => s.EnableFeatureByDefault<NHibernateSagaStorage>());
-            Supports<StorageType.Subscriptions>(s => s.EnableFeatureByDefault<NHibernateSubscriptionStorage>());
+            Supports<StorageType.Subscriptions>(s => s.EnableFeatureByDefault<NHibernateSubscriptionStorageFeature>());
             Supports<StorageType.Outbox>(s => { });
         }
     }
