@@ -30,7 +30,7 @@ namespace NServiceBus.SagaPersisters.NHibernate
         Upgrade = 3,
         /// <summary>
         /// Attempt to obtain an upgrade lock, using an Oracle-style
-        /// <c>SELECT ... FOR UPGRADE NOWAIT</c>. 
+        /// <c>SELECT ... FOR UPDATE NOWAIT</c>. 
         /// </summary>
         /// <remarks>
         /// The semantics of this lock mode, once obtained, are the same as <c>Upgrade</c>
