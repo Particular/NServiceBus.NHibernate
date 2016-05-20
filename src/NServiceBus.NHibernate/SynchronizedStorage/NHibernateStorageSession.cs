@@ -18,8 +18,13 @@ namespace NServiceBus.Features
     {
         internal NHibernateStorageSession()
         {
-            Defaults(s => s.SetDefault<SharedMappings>(new SharedMappings()));
             DependsOnOptionally<Outbox>();
+
+            Defaults(s => s.SetDefault<SharedMappings>(new SharedMappings()));
+
+            // since the installers are registered even if the feature isn't enabled we need to make 
+            // this a no-op of there is no "schema updater" available
+            Defaults(c => c.Set<Installer.SchemaUpdater>(new Installer.SchemaUpdater()));
         }
 
         /// <summary>
@@ -54,11 +59,9 @@ namespace NServiceBus.Features
 
             var runInstaller = context.Settings.Get<bool>("NHibernate.Common.AutoUpdateSchema");
 
-            Func<string, Task> installAction = _ => Task.FromResult(0);
-
             if (runInstaller)
             {
-                installAction = identity =>
+                context.Settings.Get<Installer.SchemaUpdater>().Execute = identity =>
                 {
                     var schemaUpdate = new SchemaUpdate(config.Configuration);
                     var sb = new StringBuilder();
@@ -82,9 +85,6 @@ TSql Script:
                     return Task.FromResult(0);
                 };
             }
-
-
-            context.Container.ConfigureComponent(b => new Installer.SchemaUpdater(installAction), DependencyLifecycle.SingleInstance);
         }
 
         void ApplyMappings(Configuration config)

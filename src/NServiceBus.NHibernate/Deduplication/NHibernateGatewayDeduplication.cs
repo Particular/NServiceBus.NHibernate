@@ -1,6 +1,5 @@
 namespace NServiceBus.Features
 {
-    using System;
     using System.Threading.Tasks;
     using Deduplication.NHibernate.Config;
     using Deduplication.NHibernate;
@@ -19,6 +18,10 @@ namespace NServiceBus.Features
         public NHibernateGatewayDeduplication()
         {
             DependsOn("NServiceBus.Features.Gateway");
+
+            // since the installers are registered even if the feature isn't enabled we need to make 
+            // this a no-op of there is no "schema updater" available
+            Defaults(c => c.Set<Installer.SchemaUpdater>(new Installer.SchemaUpdater()));
         }
 
         /// <summary>
@@ -30,18 +33,15 @@ namespace NServiceBus.Features
             builder.AddMappings<DeduplicationMessageMap>();
             var config = builder.Build();
 
-            Func<string, Task> installAction = _ => Task.FromResult(0);
-
             if (RunInstaller(context))
             {
-                installAction = identity =>
+                context.Settings.Get<Installer.SchemaUpdater>().Execute = identity =>
                 {
                     new SchemaUpdate(config.Configuration).Execute(false, true);
 
                     return Task.FromResult(0);
                 };
             }
-            context.Container.ConfigureComponent(b => new Installer.SchemaUpdater(installAction), DependencyLifecycle.SingleInstance);
             context.Container.ConfigureComponent(b => new GatewayDeduplication(config.Configuration.BuildSessionFactory()), DependencyLifecycle.SingleInstance);
         }
 
