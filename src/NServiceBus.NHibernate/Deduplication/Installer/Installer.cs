@@ -9,7 +9,7 @@
     {
         public Installer(ReadOnlySettings settings)
         {
-            schemaUpdater = settings.Get<SchemaUpdater>();
+            settings.TryGet(out schemaUpdater);
         }
 
         public Task Install(string identity)

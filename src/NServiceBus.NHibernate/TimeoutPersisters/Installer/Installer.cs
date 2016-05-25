@@ -9,11 +9,16 @@ namespace NServiceBus.TimeoutPersisters.NHibernate.Installer
     {
         public Installer(ReadOnlySettings settings)
         {
-            schemaUpdater = settings.Get<SchemaUpdater>();
+            settings.TryGet(out schemaUpdater);
         }
 
         public Task Install(string identity)
         {
+            if (schemaUpdater == null)
+            {
+                return Task.FromResult(0);
+            }
+
             return schemaUpdater.Execute(identity);
         }
 
