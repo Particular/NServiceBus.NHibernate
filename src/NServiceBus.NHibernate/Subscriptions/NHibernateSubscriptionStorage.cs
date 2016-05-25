@@ -23,6 +23,10 @@ namespace NServiceBus.Features
         public NHibernateSubscriptionStorage()
         {
             DependsOn<MessageDrivenSubscriptions>();
+
+            // since the installers are registered even if the feature isn't enabled we need to make 
+            // this a no-op of there is no "schema updater" available
+            Defaults(c => c.Set<Installer.SchemaUpdater>(new Installer.SchemaUpdater()));
         }
 
         /// <summary>
@@ -34,19 +38,15 @@ namespace NServiceBus.Features
             builder.AddMappings<SubscriptionMap>();
             var config = builder.Build();
 
-            Func<string, Task> installAction = _ => Task.FromResult(0);
-
             if (RunInstaller(context))
             {
-                installAction = identity =>
+                context.Settings.Get<Installer.SchemaUpdater>().Execute = identity =>
                 {
                     new SchemaUpdate(config.Configuration).Execute(false, true);
 
                     return Task.FromResult(0);
                 };
             }
-
-            context.Container.ConfigureComponent(b => new Installer.SchemaUpdater(installAction), DependencyLifecycle.SingleInstance);
 
             var sessionFactory = config.Configuration.BuildSessionFactory();
             if (context.Settings.HasSetting(CacheExpirationSettingsKey))

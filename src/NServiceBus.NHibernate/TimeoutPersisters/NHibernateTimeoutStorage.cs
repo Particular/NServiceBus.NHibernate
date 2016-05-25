@@ -1,6 +1,5 @@
 namespace NServiceBus.Features
 {
-    using System;
     using System.Threading.Tasks;
     using Persistence.NHibernate;
     using TimeoutPersisters.NHibernate;
@@ -18,6 +17,10 @@ namespace NServiceBus.Features
         public NHibernateTimeoutStorage()
         {
             DependsOn<TimeoutManager>();
+
+            // since the installers are registered even if the feature isn't enabled we need to make 
+            // this a no-op of there is no "schema updater" available
+            Defaults(c => c.Set<Installer.SchemaUpdater>(new Installer.SchemaUpdater()));
         }
 
         /// <summary>
@@ -29,18 +32,15 @@ namespace NServiceBus.Features
             builder.AddMappings<TimeoutEntityMap>();
             var config = builder.Build();
 
-            Func<string,Task> installAction = _ => Task.FromResult(0);
-
-            if (RunInstaller(context))
+             if (RunInstaller(context))
             {
-                installAction = identity =>
+                context.Settings.Get<Installer.SchemaUpdater>().Execute = identity =>
                 {
                     new OptimizedSchemaUpdate(config.Configuration).Execute(false, true);
                     return Task.FromResult(0);
                 };
             }
 
-            context.Container.ConfigureComponent(b => new Installer.SchemaUpdater(installAction), DependencyLifecycle.SingleInstance);
             context.Container.ConfigureComponent(b =>
             {
                 var sessionFactory = config.Configuration.BuildSessionFactory();

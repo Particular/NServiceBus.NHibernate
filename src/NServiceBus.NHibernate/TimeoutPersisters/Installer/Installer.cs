@@ -1,27 +1,19 @@
 namespace NServiceBus.TimeoutPersisters.NHibernate.Installer
 {
     using System;
-    using System.Linq;
     using System.Threading.Tasks;
     using Installation;
-    using NServiceBus.ObjectBuilder;
+    using NServiceBus.Settings;
 
     class Installer : INeedToInstallSomething
     {
-        public Installer(IBuilder builder)
+        public Installer(ReadOnlySettings settings)
         {
-            // since the installers are registered even if the feature isn't enabled we need to make 
-            // this a no-op of there is no "schema updater" available 
-            schemaUpdater = builder.BuildAll<SchemaUpdater>().FirstOrDefault();
+            schemaUpdater = settings.Get<SchemaUpdater>();
         }
 
         public Task Install(string identity)
         {
-            if (schemaUpdater == null)
-            {
-                return Task.FromResult(0);
-            }
-
             return schemaUpdater.Execute(identity);
         }
 
@@ -29,12 +21,12 @@ namespace NServiceBus.TimeoutPersisters.NHibernate.Installer
 
         public class SchemaUpdater
         {
-            public SchemaUpdater(Func<string, Task> execute)
+            public SchemaUpdater()
             {
-                Execute = execute;
+                Execute = _ => Task.FromResult(0);
             }
 
-            public Func<string, Task> Execute { get; }
+            public Func<string, Task> Execute { get; set; }
         }
     }
 }
