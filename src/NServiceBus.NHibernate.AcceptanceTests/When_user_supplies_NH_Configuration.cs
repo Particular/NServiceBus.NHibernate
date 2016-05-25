@@ -42,7 +42,7 @@
                     var cfg = new Configuration();
                     cfg.SetProperty(Environment.Dialect, typeof(MsSql2012Dialect).FullName);
                     cfg.SetProperty(Environment.ConnectionDriver, typeof(Sql2008ClientDriver).FullName);
-                    cfg.SetProperty(Environment.ConnectionString, ConfigureEndpointNHibernatePersistence.ConnectionString);
+                    cfg.SetProperty(Environment.ConnectionString, ConfigureEndpointSqlServerTransport.ConnectionString);
 
                     c.UsePersistence<NHibernatePersistence>().UseConfiguration(cfg);
                 });

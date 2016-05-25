@@ -10,7 +10,7 @@ public class ConfigureScenariosForNHibernatePersistence : IConfigureSupportedSce
     public IEnumerable<Type> UnsupportedScenarioDescriptorTypes { get; } = new List<Type>();
 }
 
-public class ConfigureEndpointNHibernatePersistence : IConfigureEndpointTestExecution
+public class ConfigureEndpointSqlServerTransport : IConfigureEndpointTestExecution
 {
     public static string ConnectionString
     {
