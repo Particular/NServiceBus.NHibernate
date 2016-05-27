@@ -15,6 +15,7 @@ namespace NServiceBus.Persistence.NHibernate
         /// <param name="tableNamingConvention">Convention to use for naming tables.</param>
         public static PersistenceExtentions<NHibernatePersistence> SagaTableNamingConvention(this PersistenceExtentions<NHibernatePersistence> persistenceConfiguration, Func<Type, string> tableNamingConvention)
         {
+            //TODO
             persistenceConfiguration.GetSettings().Set("NHibernate.Sagas.TableNamingConvention", tableNamingConvention);
             return persistenceConfiguration;
         }

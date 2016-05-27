@@ -5,6 +5,8 @@ namespace NServiceBus.Persistence.NHibernate
     using global::NHibernate.Cfg;
     using NServiceBus.Features;
 
+    //TODO
+
     /// <summary>
     /// Subscription configuration extensions.
     /// </summary>
