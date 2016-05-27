@@ -5,6 +5,8 @@
     using global::NHibernate;
     using global::NHibernate.Cfg;
 
+    //TODO
+
     /// <summary>
     /// Shared configuration extensions.
     /// </summary>
@@ -15,7 +17,7 @@
         /// </summary>
         /// <param name="persistenceConfiguration"></param>
         /// <param name="connectionString">The connection string to use.</param>
-        public static PersistenceExtentions<NHibernatePersistence> ConnectionString(this PersistenceExtentions<NHibernatePersistence> persistenceConfiguration, string connectionString) 
+        public static PersistenceExtentions<NHibernatePersistence> ConnectionString(this PersistenceExtentions<NHibernatePersistence> persistenceConfiguration, string connectionString)
         {
             persistenceConfiguration.GetSettings().Set("NHibernate.Common.ConnectionString", connectionString);
             return persistenceConfiguration;
@@ -48,8 +50,8 @@
         /// <param name="persistenceConfiguration"></param>
         /// <returns></returns>
         [ObsoleteEx(
-            RemoveInVersion = "8", 
-            TreatAsErrorFromVersion = "7", 
+            RemoveInVersion = "8",
+            TreatAsErrorFromVersion = "7",
             ReplacementTypeOrMember = "IMessageHandlerContext.SynchronizedStorageSession.Session")]
         public static PersistenceExtentions<NHibernatePersistence> RegisterManagedSessionInTheContainer(this PersistenceExtentions<NHibernatePersistence> persistenceConfiguration)
         {
@@ -63,8 +65,8 @@
         /// <param name="callback"></param>
         /// <returns></returns>
         [ObsoleteEx(
-            RemoveInVersion = "8", 
-            TreatAsErrorFromVersion = "7", 
+            RemoveInVersion = "8",
+            TreatAsErrorFromVersion = "7",
             Message = "Custom session creation is no longer supported. Entity mapping can be done through providing custom NHibernate Configuration object on endpoint initialization.")]
         public static PersistenceExtentions<NHibernatePersistence> UseCustomSessionCreationMethod(this PersistenceExtentions<NHibernatePersistence> persistenceConfiguration, Func<ISessionFactory, string, ISession> callback)
         {
