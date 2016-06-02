@@ -45,19 +45,19 @@
         }
     }
 
-    class SomeSaga : Saga<SagaWithUniqueProperty>, IAmStartedByMessages<IMessage>
+    class Message
+    {
+        public string UniqueString { get; set; }
+    }
+
+    class SomeSaga : Saga<SagaWithUniqueProperty>, IAmStartedByMessages<Message>
     {
         protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaWithUniqueProperty> mapper)
         {
             mapper.ConfigureMapping<Message>(m => m.UniqueString).ToSaga(s => s.UniqueString);
         }
 
-        class Message
-        {
-            public string UniqueString { get; set; }
-        }
-
-        public Task Handle(IMessage message, IMessageHandlerContext context)
+        public Task Handle(Message message, IMessageHandlerContext context)
         {
             throw new NotImplementedException();
         }

@@ -71,7 +71,6 @@
                 protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaData08> mapper)
                 {
                     mapper.ConfigureMapping<StartSagaMessage>(saga => saga.Property).ToSaga(saga => saga.Property);
-                    // Mapping not required for SomeOtherMessage because CustomFinder used
                 }
 
                 public class SagaData08 : ContainSagaData

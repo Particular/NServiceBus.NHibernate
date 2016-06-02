@@ -65,6 +65,7 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
 
             protected override void ConfigureHowToFindSaga(SagaPropertyMapper<TestSaga2> mapper)
             {
+                mapper.ConfigureMapping<IMessage>(m => m.GetHashCode()).ToSaga(s => s.Id);
             }
 
             public Task Handle(IMessage message, IMessageHandlerContext context)
@@ -94,6 +95,7 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
     {
         protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaWithNestedType> mapper)
         {
+            mapper.ConfigureMapping<IMessage>(m => m.GetHashCode()).ToSaga(s => s.Id);
         }
 
         public Task Handle(IMessage message, IMessageHandlerContext context)
@@ -114,6 +116,7 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
 
         protected override void ConfigureHowToFindSaga(SagaPropertyMapper<NestedSagaData> mapper)
         {
+            mapper.ConfigureMapping<IMessage>(m => m.GetHashCode()).ToSaga(s => s.Id);
         }
 
         public Task Handle(IMessage message, IMessageHandlerContext context)

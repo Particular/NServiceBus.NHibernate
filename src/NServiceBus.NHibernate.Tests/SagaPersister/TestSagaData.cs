@@ -8,6 +8,7 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
     {
         protected override void ConfigureHowToFindSaga(SagaPropertyMapper<TestSagaData> mapper)
         {
+            mapper.ConfigureMapping<IMessage>(m => m.GetHashCode()).ToSaga(s => s.Id);
         }
 
         public Task Handle(IMessage message, IMessageHandlerContext context)
@@ -106,6 +107,7 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
     {
         protected override void ConfigureHowToFindSaga(SagaPropertyMapper<TestSagaWithTableNameAttribute> mapper)
         {
+            mapper.ConfigureMapping<IMessage>(m => m.GetHashCode()).ToSaga(s => s.Id);
         }
 
         public Task Handle(IMessage message, IMessageHandlerContext context)
@@ -121,6 +123,7 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
     {
         protected override void ConfigureHowToFindSaga(SagaPropertyMapper<DerivedFromTestSagaWithTableNameAttribute> mapper)
         {
+            mapper.ConfigureMapping<IMessage>(m => m.GetHashCode()).ToSaga(s => s.Id);
         }
 
         public Task Handle(IMessage message, IMessageHandlerContext context)
@@ -137,6 +140,7 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
     {
         protected override void ConfigureHowToFindSaga(SagaPropertyMapper<AlsoDerivedFromTestSagaWithTableNameAttribute> mapper)
         {
+            mapper.ConfigureMapping<IMessage>(m => m.GetHashCode()).ToSaga(s => s.Id);
         }
 
         public Task Handle(IMessage message, IMessageHandlerContext context)
@@ -168,6 +172,7 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
     {
         protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaWithVersionedPropertyAttribute> mapper)
         {
+            mapper.ConfigureMapping<IMessage>(m => m.GetHashCode()).ToSaga(s => s.Id);
         }
 
         public Task Handle(IMessage message, IMessageHandlerContext context)
@@ -180,6 +185,7 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
     {
         protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaWithoutVersionedPropertyAttribute> mapper)
         {
+            mapper.ConfigureMapping<IMessage>(m => m.GetHashCode()).ToSaga(s => s.Id);
         }
 
         public Task Handle(IMessage message, IMessageHandlerContext context)
