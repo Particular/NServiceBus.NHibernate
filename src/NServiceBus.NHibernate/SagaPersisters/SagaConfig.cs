@@ -1,7 +1,6 @@
 namespace NServiceBus.Persistence.NHibernate
 {
     using System;
-    using System.Threading.Tasks;
     using Configuration.AdvanceExtensibility;
 
     /// <summary>
