@@ -259,6 +259,10 @@ namespace NServiceBus.SagaPersisters.NHibernate.AutoPersistence
             {
                 return;
             }
+            if (rootEntity.IsAbstract && rootEntity != typeof(ContainSagaData))
+            {
+                return; //We skip user abstract classes
+            }
 
             entityTypes.Add(rootEntity, sagaMetadata);
 
