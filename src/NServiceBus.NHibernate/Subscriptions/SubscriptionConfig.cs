@@ -14,7 +14,7 @@ namespace NServiceBus.Persistence.NHibernate
         /// Disables automatic schema update.
         /// </summary>
         /// <param name="persistenceConfiguration"></param>
-        public static PersistenceExtentions<NHibernatePersistence> DisableSubscriptionStorageSchemaUpdate(this PersistenceExtentions<NHibernatePersistence> persistenceConfiguration)
+        public static PersistenceExtensions<NHibernatePersistence> DisableSubscriptionStorageSchemaUpdate(this PersistenceExtensions<NHibernatePersistence> persistenceConfiguration)
         {
             persistenceConfiguration.GetSettings().Set(NHibernateSubscriptionStorage.AutoupdateschemaSettingsKey, false);
             return persistenceConfiguration;
@@ -25,7 +25,7 @@ namespace NServiceBus.Persistence.NHibernate
         /// </summary>
         /// <param name="persistenceConfiguration"></param>
         /// <param name="configuration">The <see cref="Configuration"/> object.</param>
-        public static PersistenceExtentions<NHibernatePersistence> UseSubscriptionStorageConfiguration(this PersistenceExtentions<NHibernatePersistence> persistenceConfiguration, Configuration configuration)
+        public static PersistenceExtensions<NHibernatePersistence> UseSubscriptionStorageConfiguration(this PersistenceExtensions<NHibernatePersistence> persistenceConfiguration, Configuration configuration)
         {
             persistenceConfiguration.GetSettings().Set("NHibernate.Subscriptions.Configuration", configuration);
             return persistenceConfiguration;
@@ -37,7 +37,7 @@ namespace NServiceBus.Persistence.NHibernate
         /// </summary>
         /// <param name="persistenceConfiguration"></param>
         /// <param name="expiration">The period of time to cache subscriptions list for.</param>
-        public static PersistenceExtentions<NHibernatePersistence> EnableCachingForSubscriptionStorage(this PersistenceExtentions<NHibernatePersistence> persistenceConfiguration, TimeSpan expiration)
+        public static PersistenceExtensions<NHibernatePersistence> EnableCachingForSubscriptionStorage(this PersistenceExtensions<NHibernatePersistence> persistenceConfiguration, TimeSpan expiration)
         {
             persistenceConfiguration.GetSettings().Set(NHibernateSubscriptionStorage.CacheExpirationSettingsKey, expiration);
             return persistenceConfiguration;

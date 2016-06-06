@@ -31,6 +31,7 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
     {
         protected override void ConfigureHowToFindSaga(SagaPropertyMapper<MyDerivedClassWithRowVersion> mapper)
         {
+            mapper.ConfigureMapping<IMessage>(m => m.GetHashCode()).ToSaga(s => s.Id);
         }
 
         public Task Handle(IMessage message, IMessageHandlerContext context)

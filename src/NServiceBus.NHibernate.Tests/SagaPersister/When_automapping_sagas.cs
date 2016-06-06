@@ -152,10 +152,9 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
         [Test]
         public void Versioned_Property_should_override_optimistic_lock()
         {
-
           var persister1 = sessionFactory.GetEntityPersisterFor<SagaWithVersionedPropertyAttribute>();
           var persister2 = sessionFactory.GetEntityPersisterFor<SagaWithoutVersionedPropertyAttribute>();
-        
+
           Assert.True(persister1.IsVersioned);
           Assert.False(persister1.EntityMetamodel.IsDynamicUpdate);
           Assert.AreEqual(Versioning.OptimisticLock.Version, persister1.EntityMetamodel.OptimisticLockMode);

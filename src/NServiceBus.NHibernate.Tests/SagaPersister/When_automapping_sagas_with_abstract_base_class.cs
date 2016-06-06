@@ -41,13 +41,14 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
                    ClassMetadata as global::NHibernate.Persister.Entity.UnionSubclassEntityPersister;
 
             Assert.IsNotNull(persister);
-        }       
+        }
     }
 
     public class SagaWithAbstractBaseClassActualSaga : Saga<SagaWithAbstractBaseClass>, IAmStartedByMessages<IMessage>
     {
         protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaWithAbstractBaseClass> mapper)
         {
+            mapper.ConfigureMapping<IMessage>(m => m.GetHashCode()).ToSaga(s => s.Id);
         }
 
         public Task Handle(IMessage message, IMessageHandlerContext context)
@@ -55,7 +56,7 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
             throw new NotImplementedException();
         }
     }
-    
+
     public class SagaWithAbstractBaseClass : MyOwnAbstractBase
     {
         public virtual Guid OrderId { get; set; }
@@ -67,5 +68,5 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
         public virtual string Originator { get; set; }
         public virtual string OriginalMessageId { get; set; }
     }
-   
+
 }

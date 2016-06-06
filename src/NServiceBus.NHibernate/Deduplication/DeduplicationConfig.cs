@@ -12,7 +12,7 @@ namespace NServiceBus.Persistence.NHibernate
         /// Disables automatic schema update.
         /// </summary>
         /// <param name="persistenceConfiguration"></param>
-        public static PersistenceExtentions<NHibernatePersistence> DisableGatewayDeduplicationSchemaUpdate(this PersistenceExtentions<NHibernatePersistence> persistenceConfiguration)
+        public static PersistenceExtensions<NHibernatePersistence> DisableGatewayDeduplicationSchemaUpdate(this PersistenceExtensions<NHibernatePersistence> persistenceConfiguration)
         {
             persistenceConfiguration.GetSettings().Set("NHibernate.GatewayDeduplication.AutoUpdateSchema", false);
             return persistenceConfiguration;
@@ -23,7 +23,7 @@ namespace NServiceBus.Persistence.NHibernate
         /// </summary>
         /// <param name="persistenceConfiguration"></param>
         /// <param name="configuration">The <see cref="Configuration"/> object.</param>
-        public static PersistenceExtentions<NHibernatePersistence> UseGatewayDeduplicationConfiguration(this PersistenceExtentions<NHibernatePersistence> persistenceConfiguration, Configuration configuration)
+        public static PersistenceExtensions<NHibernatePersistence> UseGatewayDeduplicationConfiguration(this PersistenceExtensions<NHibernatePersistence> persistenceConfiguration, Configuration configuration)
         {
             persistenceConfiguration.GetSettings().Set("NHibernate.GatewayDeduplication.Configuration", configuration);
             return persistenceConfiguration;

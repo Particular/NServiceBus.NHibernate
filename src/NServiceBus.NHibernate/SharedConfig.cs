@@ -15,7 +15,7 @@
         /// </summary>
         /// <param name="persistenceConfiguration"></param>
         /// <param name="connectionString">The connection string to use.</param>
-        public static PersistenceExtentions<NHibernatePersistence> ConnectionString(this PersistenceExtentions<NHibernatePersistence> persistenceConfiguration, string connectionString) 
+        public static PersistenceExtensions<NHibernatePersistence> ConnectionString(this PersistenceExtensions<NHibernatePersistence> persistenceConfiguration, string connectionString)
         {
             persistenceConfiguration.GetSettings().Set("NHibernate.Common.ConnectionString", connectionString);
             return persistenceConfiguration;
@@ -25,7 +25,7 @@
         /// Disables automatic schema update.
         /// </summary>
         /// <param name="persistenceConfiguration"></param>
-        public static PersistenceExtentions<NHibernatePersistence> DisableSchemaUpdate(this PersistenceExtentions<NHibernatePersistence> persistenceConfiguration)
+        public static PersistenceExtensions<NHibernatePersistence> DisableSchemaUpdate(this PersistenceExtensions<NHibernatePersistence> persistenceConfiguration)
         {
             persistenceConfiguration.GetSettings().Set("NHibernate.Common.AutoUpdateSchema", false);
             return persistenceConfiguration;
@@ -36,7 +36,7 @@
         /// </summary>
         /// <param name="persistenceConfiguration"></param>
         /// <param name="configuration">The <see cref="Configuration"/> object.</param>
-        public static PersistenceExtentions<NHibernatePersistence> UseConfiguration(this PersistenceExtentions<NHibernatePersistence> persistenceConfiguration, Configuration configuration)
+        public static PersistenceExtensions<NHibernatePersistence> UseConfiguration(this PersistenceExtensions<NHibernatePersistence> persistenceConfiguration, Configuration configuration)
         {
             persistenceConfiguration.GetSettings().Set("StorageConfiguration", configuration);
             return persistenceConfiguration;
@@ -48,10 +48,10 @@
         /// <param name="persistenceConfiguration"></param>
         /// <returns></returns>
         [ObsoleteEx(
-            RemoveInVersion = "8", 
-            TreatAsErrorFromVersion = "7", 
+            RemoveInVersion = "8",
+            TreatAsErrorFromVersion = "7",
             ReplacementTypeOrMember = "IMessageHandlerContext.SynchronizedStorageSession.Session")]
-        public static PersistenceExtentions<NHibernatePersistence> RegisterManagedSessionInTheContainer(this PersistenceExtentions<NHibernatePersistence> persistenceConfiguration)
+        public static PersistenceExtensions<NHibernatePersistence> RegisterManagedSessionInTheContainer(this PersistenceExtensions<NHibernatePersistence> persistenceConfiguration)
         {
             throw new NotImplementedException();
         }
@@ -63,10 +63,10 @@
         /// <param name="callback"></param>
         /// <returns></returns>
         [ObsoleteEx(
-            RemoveInVersion = "8", 
-            TreatAsErrorFromVersion = "7", 
+            RemoveInVersion = "8",
+            TreatAsErrorFromVersion = "7",
             Message = "Custom session creation is no longer supported. Entity mapping can be done through providing custom NHibernate Configuration object on endpoint initialization.")]
-        public static PersistenceExtentions<NHibernatePersistence> UseCustomSessionCreationMethod(this PersistenceExtentions<NHibernatePersistence> persistenceConfiguration, Func<ISessionFactory, string, ISession> callback)
+        public static PersistenceExtensions<NHibernatePersistence> UseCustomSessionCreationMethod(this PersistenceExtensions<NHibernatePersistence> persistenceConfiguration, Func<ISessionFactory, string, ISession> callback)
         {
             throw new NotImplementedException();
         }
