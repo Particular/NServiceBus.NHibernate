@@ -56,6 +56,10 @@
       <HintPath>..\packages\NServiceBus.6.0.0-beta0007\lib\net452\NServiceBus.Core.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="NServiceBus.Transport.SQLServer, Version=3.0.0.0, Culture=neutral, PublicKeyToken=9fc386479f8a226c, processorArchitecture=MSIL">
+      <HintPath>..\packages\NServiceBus.SqlServer.3.0.0-beta0002\lib\net452\NServiceBus.Transport.SQLServer.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="nunit.framework, Version=3.2.1.0, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">
       <HintPath>..\packages\NUnit.3.2.1\lib\net45\nunit.framework.dll</HintPath>
       <Private>True</Private>
@@ -74,6 +78,12 @@
     <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\NServiceBus.NHibernate.AcceptanceTests\ConfigureEndpointSqlServerTransport.cs">
+      <Link>ConfigureEndpointSqlServerTransport.cs</Link>
+    </Compile>
+    <Compile Include="..\NServiceBus.NHibernate.AcceptanceTests\EndpointConfigurer.cs">
+      <Link>EndpointConfigurer.cs</Link>
+    </Compile>
     <Compile Include="..\NServiceBus.NHibernate.AcceptanceTests\When_saga_contains_nested_collection.cs">
       <Link>When_saga_contains_nested_collection.cs</Link>
     </Compile>
