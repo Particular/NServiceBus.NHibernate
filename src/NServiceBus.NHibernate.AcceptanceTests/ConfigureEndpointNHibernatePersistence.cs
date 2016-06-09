@@ -10,8 +10,10 @@ public class ConfigureScenariosForNHibernatePersistence : IConfigureSupportedSce
     public IEnumerable<Type> UnsupportedScenarioDescriptorTypes { get; } = new List<Type>();
 }
 
-public class ConfigureEndpointNHibernatePersistence : IConfigureEndpointTestExecution
+public abstract class EndpointConfigurer : IConfigureEndpointTestExecution
 {
+    const string defaultConnStr = @"Server=localhost\SqlExpress;Database=nservicebus;Trusted_Connection=True;";
+
     public static string ConnectionString
     {
         get
@@ -26,18 +28,34 @@ public class ConfigureEndpointNHibernatePersistence : IConfigureEndpointTestExec
         }
     }
 
-    public Task Configure(string endpointName, EndpointConfiguration configuration, RunSettings settings)
+    public abstract Task Configure(string endpointName, EndpointConfiguration configuration, RunSettings settings);
+
+    public Task Cleanup()
+    {
+        return Task.FromResult(0);
+    }
+}
+
+public class ConfigureEndpointSqlServerTransport : EndpointConfigurer
+{
+    public override Task Configure(string endpointName, EndpointConfiguration configuration, RunSettings settings)
+    {
+        configuration.UseTransport<SqlServerTransport>()
+            .ConnectionString(ConnectionString);
+        configuration.UsePersistence<NHibernatePersistence>()
+            .ConnectionString(ConnectionString);
+
+        return Task.FromResult(0);
+    }
+}
+
+public class ConfigureEndpointNHibernatePersistence : EndpointConfigurer
+{
+    public override Task Configure(string endpointName, EndpointConfiguration configuration, RunSettings settings)
     {
         configuration.UsePersistence<NHibernatePersistence>()
             .ConnectionString(ConnectionString);
 
         return Task.FromResult(0);
     }
-
-    public Task Cleanup()
-    {
-        return Task.FromResult(0);
-    }
-
-    const string defaultConnStr = @"Server=localhost\sqlexpress;Database=nservicebus;Trusted_Connection=True;";
 }
