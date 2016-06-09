@@ -5,6 +5,7 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
     using Features;
     using global::NHibernate.Cfg;
     using global::NHibernate.Impl;
+    using global::NHibernate.Persister.Entity;
     using NServiceBus.Sagas;
     using NUnit.Framework;
     using Settings;
@@ -37,10 +38,15 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
         [Test]
         public void Should_not_generate_join_table_for_base_class()
         {
-            var persister = sessionFactory.GetEntityPersister(typeof(SagaWithAbstractBaseClass).FullName).
-                   ClassMetadata as global::NHibernate.Persister.Entity.UnionSubclassEntityPersister;
+            var persister = sessionFactory.GetEntityPersister(typeof(SagaWithAbstractBaseClass).FullName);
+            Assert.IsInstanceOf<UnionSubclassEntityPersister>(persister);
+        }
 
-            Assert.IsNotNull(persister);
+        [Test]
+        public void Concrete_class_persister_includes_all_properties_from_abstract_base_classes()
+        {
+            var persister = sessionFactory.GetEntityPersister(typeof(SagaWithAbstractBaseClass).FullName);
+            CollectionAssert.AreEquivalent(new[] { "AbstractBaseProp", "OrderId", "Originator", "OriginalMessageId" }, persister.PropertyNames);
         }
     }
 
@@ -62,11 +68,8 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
         public virtual Guid OrderId { get; set; }
     }
 
-    public abstract class MyOwnAbstractBase : IContainSagaData
+    public abstract class MyOwnAbstractBase : ContainSagaData
     {
-        public virtual Guid Id { get; set; }
-        public virtual string Originator { get; set; }
-        public virtual string OriginalMessageId { get; set; }
+        public virtual string AbstractBaseProp { get; set; }
     }
-
 }
