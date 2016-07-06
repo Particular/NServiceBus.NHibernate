@@ -1,7 +1,6 @@
 ﻿namespace NServiceBus.Persistence.NHibernate
 {
     using System;
-    using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
     using System.Transactions;
@@ -14,9 +13,6 @@
 
     class OutboxPersister : IOutboxStorage
     {
-        ISessionFactory sessionFactory;
-        string endpointName;
-
         public OutboxPersister(ISessionFactory sessionFactory, string endpointName)
         {
             this.sessionFactory = sessionFactory;
@@ -25,9 +21,10 @@
 
         public Task<OutboxMessage> Get(string messageId, ContextBag context)
         {
-            object[] possibleIds = {
+            object[] possibleIds =
+            {
                 EndpointQualifiedMessageId(messageId),
-                messageId,
+                messageId
             };
 
             using (new TransactionScope(TransactionScopeOption.Suppress))
@@ -53,11 +50,17 @@
                 }
                 if (result.Dispatched)
                 {
-                    return Task.FromResult(new OutboxMessage(result.MessageId, new TransportOperation[0]));
+                    return Task.FromResult(new OutboxMessage(result.MessageId, emptyTransportOperations));
                 }
-                var transportOperations = ConvertStringToObject(result.TransportOperations)
-                    .Select(t => new TransportOperation(t.MessageId, t.Options, t.Message, t.Headers))
-                    .ToArray();
+                var outboxOperations = ConvertStringToObject(result.TransportOperations);
+
+                var transportOperations = new TransportOperation[outboxOperations.Length];
+                var index = 0;
+                foreach (var operation in outboxOperations)
+                {
+                    transportOperations[index] = new TransportOperation(operation.MessageId, operation.Options, operation.Message, operation.Headers);
+                    index++;
+                }
 
                 var message = new OutboxMessage(result.MessageId, transportOperations);
                 return Task.FromResult(message);
@@ -66,14 +69,21 @@
 
         public Task Store(OutboxMessage outboxMessage, OutboxTransaction transaction, ContextBag context)
         {
-            var operations = outboxMessage.TransportOperations.Select(t => new OutboxOperation
+            var operations = new OutboxOperation[outboxMessage.TransportOperations.Length];
+            var index = 0;
+            foreach (var operation in outboxMessage.TransportOperations)
             {
-                Message = t.Body,
-                Headers = t.Headers,
-                MessageId = t.MessageId,
-                Options = t.Options,
-            });
-            var nhibernateTransaction = (NHibernateOutboxTransaction)transaction;
+                operations[index] = new OutboxOperation
+                {
+                    Message = operation.Body,
+                    Headers = operation.Headers,
+                    MessageId = operation.MessageId,
+                    Options = operation.Options
+                };
+                index++;
+            }
+
+            var nhibernateTransaction = (NHibernateOutboxTransaction) transaction;
             nhibernateTransaction.Session.Save(new OutboxRecord
             {
                 MessageId = EndpointQualifiedMessageId(outboxMessage.MessageId),
@@ -135,17 +145,17 @@
             }
         }
 
-        static IEnumerable<OutboxOperation> ConvertStringToObject(string data)
+        static OutboxOperation[] ConvertStringToObject(string data)
         {
             if (string.IsNullOrEmpty(data))
             {
-                return Enumerable.Empty<OutboxOperation>();
+                return emptyOutboxOperations;
             }
 
-            return ObjectSerializer.DeSerialize<IEnumerable<OutboxOperation>>(data);
+            return ObjectSerializer.DeSerialize<OutboxOperation[]>(data);
         }
 
-        static string ConvertObjectToString(IEnumerable<OutboxOperation> operations)
+        static string ConvertObjectToString(OutboxOperation[] operations)
         {
             if (operations == null || !operations.Any())
             {
@@ -157,7 +167,13 @@
 
         string EndpointQualifiedMessageId(string messageId)
         {
-            return endpointName + "/" + messageId;
+            return $"{endpointName}/{messageId}";
         }
+
+        string endpointName;
+        ISessionFactory sessionFactory;
+
+        static OutboxOperation[] emptyOutboxOperations = new OutboxOperation[0];
+        static TransportOperation[] emptyTransportOperations = new TransportOperation[0];
     }
 }
