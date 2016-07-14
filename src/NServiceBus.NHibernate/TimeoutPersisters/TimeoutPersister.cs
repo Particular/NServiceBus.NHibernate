@@ -55,8 +55,7 @@ namespace NServiceBus.TimeoutPersisters.NHibernate
 
                     //Retrieve next time we need to run query
                     var startOfNextChunk = session.QueryOver<TimeoutEntity>()
-                        .Where(x => x.Endpoint == EndpointName)
-                        .Where(x => x.Time > now)
+                        .Where(x => x.Endpoint == EndpointName && x.Time > now)
                         .OrderBy(x => x.Time).Asc
                         .Take(1)
                         .SingleOrDefault();
