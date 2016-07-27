@@ -9,7 +9,7 @@ namespace NServiceBus.TimeoutPersisters.NHibernate.Tests
     using System.Transactions;
     using global::NHibernate.Impl;
     using NServiceBus.Extensibility;
-    using NServiceBus.Transports;
+    using NServiceBus.Transport;
     using NUnit.Framework;
     using Timeout.Core;
 

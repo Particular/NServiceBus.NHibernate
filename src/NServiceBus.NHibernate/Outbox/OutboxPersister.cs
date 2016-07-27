@@ -57,7 +57,7 @@
                 }
                 var transportOperations = ConvertStringToObject(result.TransportOperations)
                     .Select(t => new TransportOperation(t.MessageId, t.Options, t.Message, t.Headers))
-                    .ToList();
+                    .ToArray();
 
                 var message = new OutboxMessage(result.MessageId, transportOperations);
                 return Task.FromResult(message);

@@ -50,7 +50,7 @@ namespace NServiceBus.NHibernate.Tests.Outbox
 
             var outboxMessage = await persister.Get(messageId, new ContextBag());
 
-            Assert.AreEqual(0, outboxMessage.TransportOperations.Count);
+            Assert.AreEqual(0, outboxMessage.TransportOperations.Length);
         }
     }
 }

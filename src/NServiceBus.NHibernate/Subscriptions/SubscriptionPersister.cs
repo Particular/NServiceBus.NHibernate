@@ -80,7 +80,7 @@ namespace NServiceBus.Unicast.Subscriptions.NHibernate
                 var results = tmp
                     .Where(s => messageTypes.Contains(new MessageType(s.TypeName, s.Version)))
                     .Distinct(SubscriptionComparer)
-                    .Select(s => new Subscriber(s.SubscriberEndpoint, s.LogicalEndpoint != null ? new EndpointName(s.LogicalEndpoint) : null))
+                    .Select(s => new Subscriber(s.SubscriberEndpoint, s.LogicalEndpoint))
                     .ToList();
 
                 tx.Commit();

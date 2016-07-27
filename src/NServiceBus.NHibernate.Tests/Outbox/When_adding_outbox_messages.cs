@@ -19,7 +19,7 @@ namespace NServiceBus.NHibernate.Tests.Outbox
             using (var session = SessionFactory.OpenSession())
             using (var transaction = session.BeginTransaction())
             {
-                await persister.Store(new OutboxMessage("MySpecialId", new List<TransportOperation>()), new NHibernateOutboxTransaction(session, transaction), new ContextBag());
+                await persister.Store(new OutboxMessage("MySpecialId", new TransportOperation[0]), new NHibernateOutboxTransaction(session, transaction), new ContextBag());
                 transaction.Commit();
             }
             try
@@ -27,7 +27,7 @@ namespace NServiceBus.NHibernate.Tests.Outbox
                 using (var session = SessionFactory.OpenSession())
                 using (var transaction = session.BeginTransaction())
                 {
-                    await persister.Store(new OutboxMessage("MySpecialId", new List<TransportOperation>()), new NHibernateOutboxTransaction(session, transaction), new ContextBag());
+                    await persister.Store(new OutboxMessage("MySpecialId", new TransportOperation[0]), new NHibernateOutboxTransaction(session, transaction), new ContextBag());
                     transaction.Commit();
                 }
             }
@@ -45,7 +45,7 @@ namespace NServiceBus.NHibernate.Tests.Outbox
             using (var session = SessionFactory.OpenSession())
             using (var transaction = session.BeginTransaction())
             {
-                await persister.Store(new OutboxMessage(id, new List<TransportOperation>
+                await persister.Store(new OutboxMessage(id, new[]
                 {
                     new TransportOperation(id, new Dictionary<string, string>(), new byte[1024*5], new Dictionary<string, string>()),
                 }), new NHibernateOutboxTransaction(session, transaction), new ContextBag());
@@ -66,7 +66,7 @@ namespace NServiceBus.NHibernate.Tests.Outbox
             using (var session = SessionFactory.OpenSession())
             using (var transaction = session.BeginTransaction())
             {
-                await persister.Store(new OutboxMessage(id, new List<TransportOperation>
+                await persister.Store(new OutboxMessage(id, new[]
                 {
                     new TransportOperation(id, new Dictionary<string, string>(), new byte[1024*5], new Dictionary<string, string>()),
                 }), new NHibernateOutboxTransaction(session, transaction), new ContextBag());
@@ -94,8 +94,8 @@ namespace NServiceBus.NHibernate.Tests.Outbox
             using (var session = SessionFactory.OpenSession())
             using (var transaction = session.BeginTransaction())
             {
-                await persister.Store(new OutboxMessage("NotDispatched", new List<TransportOperation>()), new NHibernateOutboxTransaction(session, transaction), new ContextBag());
-                await persister.Store(new OutboxMessage(id, new List<TransportOperation>
+                await persister.Store(new OutboxMessage("NotDispatched", new TransportOperation[0]), new NHibernateOutboxTransaction(session, transaction), new ContextBag());
+                await persister.Store(new OutboxMessage(id, new[]
                 {
                     new TransportOperation(id, new Dictionary<string, string>(), new byte[1024*5], new Dictionary<string, string>()),
                 }), new NHibernateOutboxTransaction(session, transaction), new ContextBag());
