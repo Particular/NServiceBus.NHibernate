@@ -9,7 +9,7 @@ namespace NServiceBus.TimeoutPersisters.NHibernate
     using NServiceBus.Extensibility;
     using NServiceBus.Persistence;
     using NServiceBus.Persistence.NHibernate;
-    using NServiceBus.Transports;
+    using NServiceBus.Transport;
     using Timeout.Core;
     using IsolationLevel = System.Data.IsolationLevel;
 
@@ -51,7 +51,7 @@ namespace NServiceBus.TimeoutPersisters.NHibernate
                             var dueTime = (DateTime)p[1];
                             return new TimeoutsChunk.Timeout(id.ToString(), dueTime);
                         })
-                        .ToList();
+                        .ToArray();
 
                     //Retrieve next time we need to run query
                     var startOfNextChunk = session.QueryOver<TimeoutEntity>()

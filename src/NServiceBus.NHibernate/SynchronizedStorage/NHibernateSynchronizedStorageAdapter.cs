@@ -9,7 +9,7 @@
     using NServiceBus.Outbox;
     using NServiceBus.Outbox.NHibernate;
     using NServiceBus.Persistence;
-    using NServiceBus.Transports;
+    using NServiceBus.Transport;
 
     class NHibernateSynchronizedStorageAdapter : ISynchronizedStorageAdapter
     {

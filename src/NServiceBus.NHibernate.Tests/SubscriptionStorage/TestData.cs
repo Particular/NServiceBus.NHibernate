@@ -2,7 +2,6 @@ namespace NServiceBus.Unicast.Subscriptions.NHibernate.Tests
 {
     using System;
     using System.Collections.Generic;
-    using NServiceBus.Routing;
     using NServiceBus.Unicast.Subscriptions.MessageDrivenSubscriptions;
 
     public interface ISomeInterface
@@ -35,8 +34,7 @@ namespace NServiceBus.Unicast.Subscriptions.NHibernate.Tests
     public class TestClients
     {
         public static readonly Subscriber ClientA =  new Subscriber("ClientA", null);
-        public static readonly Subscriber ClientB =  new Subscriber("ClientB", new EndpointName("EndpointB"));
+        public static readonly Subscriber ClientB =  new Subscriber("ClientB", "EndpointB");
         public static readonly Subscriber ClientC =  new Subscriber("ClientC", null);
     }
-    
 }
