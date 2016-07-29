@@ -9,7 +9,6 @@ namespace NServiceBus.Unicast.Subscriptions.NHibernate
     using Logging;
     using MessageDrivenSubscriptions;
     using NServiceBus.Extensibility;
-    using NServiceBus.Routing;
     using IsolationLevel = System.Data.IsolationLevel;
 
     class SubscriptionPersister : ISubscriptionStorage
@@ -33,7 +32,7 @@ namespace NServiceBus.Unicast.Subscriptions.NHibernate
                 session.SaveOrUpdate(new Subscription
                 {
                     SubscriberEndpoint = subscriber.TransportAddress,
-                    LogicalEndpoint = subscriber.Endpoint?.ToString(),
+                    LogicalEndpoint = subscriber.Endpoint,
                     MessageType = messageType.TypeName + "," + messageType.Version,
                     Version = messageType.Version.ToString(),
                     TypeName = messageType.TypeName

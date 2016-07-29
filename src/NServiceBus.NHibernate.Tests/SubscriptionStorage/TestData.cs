@@ -2,7 +2,6 @@ namespace NServiceBus.Unicast.Subscriptions.NHibernate.Tests
 {
     using System;
     using System.Collections.Generic;
-    using NServiceBus.Routing;
     using NServiceBus.Unicast.Subscriptions.MessageDrivenSubscriptions;
 
     public interface ISomeInterface
