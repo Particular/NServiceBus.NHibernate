@@ -74,7 +74,7 @@ namespace NServiceBus.Features
 
             if (context.Settings.GetOrDefault<bool>("NHibernate.RegisterManagedSession"))
             {
-                context.Container.ConfigureComponent(b => b.Build<NHibernateStorageContext>().Session, DependencyLifecycle.InstancePerCall);
+                context.Container.ConfigureComponent(b => b.Build<NHibernateStorageContext>().Session, DependencyLifecycle.InstancePerUnitOfWork);
             }
 
             context.Container.ConfigureComponent<Installer>(DependencyLifecycle.SingleInstance)
