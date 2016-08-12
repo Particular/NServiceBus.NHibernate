@@ -212,6 +212,7 @@
     <Compile Include="When_persister_commit_takes_longer_than_dispatch_of_another_later_timeout.cs" />
     <Compile Include="Issue_67.cs" />
     <Compile Include="When_outbox_is_enabled.cs" />
+    <Compile Include="When_registering_managed_session_in_container.cs" />
     <Compile Include="When_using_NHibernate_persistence_without_DTC.cs" />
     <Compile Include="When_user_supplies_NH_Configuration.cs" />
     <Compile Include="When_using_hbms.cs" />
