@@ -77,6 +77,7 @@
                 config.EnableOutbox();
             }
             config.EnableFeature<LoaderFeature>();
+            config.Recoverability().Immediate(setting => setting.NumberOfRetries(10));
             config.GetSettings().Set<Loader>(new Loader(async session =>
             {
                 if (saga)
