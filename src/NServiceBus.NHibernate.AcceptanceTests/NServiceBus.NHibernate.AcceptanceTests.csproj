@@ -301,7 +301,6 @@
     <Compile Include="App_Packages\NSB.AcceptanceTests.6.0.0-beta0007\Tx\When_sending_within_an_ambient_transaction.cs" />
     <Compile Include="App_Packages\NSB.AcceptanceTests.6.0.0-beta0007\UnicastPubSubExtensions.cs" />
     <Compile Include="App_Packages\NSB.AcceptanceTests.6.0.0-beta0007\Versioning\When_multiple_versions_of_a_message_is_published.cs" />
-    <Compile Include="App_Packages\NSB.AcceptanceTests.6.0.0-beta0007\Volatile\When_sending_to_non_durable_endpoint.cs" />
     <Compile Include="ConfigureEndpointNHibernatePersistence.cs" />
     <Compile Include="ConfigureEndpointSqlServerTransport.cs" />
     <Compile Include="EndpointConfigurer.cs" />
