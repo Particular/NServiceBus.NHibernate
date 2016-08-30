@@ -3,8 +3,8 @@
     using System;
     using System.Threading.Tasks;
     using NServiceBus.Extensibility;
-    using NServiceBus.Persistence.NHibernate;
     using NServiceBus.Sagas;
+    using NServiceBus.Testing;
     using NUnit.Framework;
 
     [TestFixture]
@@ -18,7 +18,7 @@
             using (var transaction = session.BeginTransaction())
             {
                 var correlationProperty = new SagaCorrelationProperty("UniqueString", "whatever");
-                var storageSession = new NHibernateNativeTransactionSynchronizedStorageSession(session, transaction, false);
+                var storageSession = new TestingNHibernateSynchronizedStorageSession(session);
 
                 await SagaPersister.Save(new SagaWithUniqueProperty
                 {
