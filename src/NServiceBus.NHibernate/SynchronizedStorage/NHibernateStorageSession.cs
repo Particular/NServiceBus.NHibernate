@@ -54,7 +54,7 @@ namespace NServiceBus.Features
             if (outboxEnabled)
             {
                 context.Container.ConfigureComponent(b => new OutboxPersister(sessionFactory, context.Settings.EndpointName().ToString()), DependencyLifecycle.SingleInstance);
-                context.RegisterStartupTask(b => new OutboxCleaner(b.Build<OutboxPersister>()));
+                context.RegisterStartupTask(b => new OutboxCleaner(b.Build<OutboxPersister>(), context.Settings));
             }
 
             var runInstaller = context.Settings.Get<bool>("NHibernate.Common.AutoUpdateSchema");

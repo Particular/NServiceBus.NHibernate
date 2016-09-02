@@ -83,6 +83,7 @@
   <ItemGroup>
     <Compile Include="Outbox\FakeDbConnectionProvider.cs" />
     <Compile Include="Outbox\InMemoryDBFixture.cs" />
+    <Compile Include="Outbox\OutboxApiExtensions.cs" />
     <Compile Include="Outbox\When_deserializing_outbox_messages.cs" />
     <Compile Include="Outbox\When_adding_outbox_messages.cs" />
     <Compile Include="Persistence\NHibernateConfigurationBuilderTests.cs" />

@@ -5,14 +5,16 @@ namespace NServiceBus.Features
     using System.Threading;
     using System.Threading.Tasks;
     using NServiceBus.Persistence.NHibernate;
+    using NServiceBus.Settings;
 
     class OutboxCleaner : FeatureStartupTask
     {
         public OutboxPersister OutboxPersister { get; }
 
-        public OutboxCleaner(OutboxPersister outboxPersister)
+        public OutboxCleaner(OutboxPersister outboxPersister, ReadOnlySettings settings)
         {
             OutboxPersister = outboxPersister;
+            this.settings = settings;
         }
 
         protected override Task OnStart(IMessageSession busSession)
@@ -21,7 +23,7 @@ namespace NServiceBus.Features
 
             if (configValue == null)
             {
-                timeToKeepDeduplicationData = TimeSpan.FromDays(7);
+                timeToKeepDeduplicationData = settings.GetOrDefault<TimeSpan?>("Outbox.TimeToKeepDeduplicationData") ?? TimeSpan.FromDays(7);
             }
             else if (!TimeSpan.TryParse(configValue, out timeToKeepDeduplicationData))
             {
@@ -32,7 +34,7 @@ namespace NServiceBus.Features
 
             if (configValue == null)
             {
-                frequencyToRunDeduplicationDataCleanup = TimeSpan.FromMinutes(1);
+                frequencyToRunDeduplicationDataCleanup = settings.GetOrDefault<TimeSpan?>("Outbox.FrequencyToRunDeduplicationDataCleanup") ?? TimeSpan.FromMinutes(1);
             }
             else if (!TimeSpan.TryParse(configValue, out frequencyToRunDeduplicationDataCleanup))
             {
@@ -66,5 +68,6 @@ namespace NServiceBus.Features
         // ReSharper restore NotAccessedField.Local
         TimeSpan timeToKeepDeduplicationData;
         TimeSpan frequencyToRunDeduplicationDataCleanup;
+        ReadOnlySettings settings;
     }
 }
