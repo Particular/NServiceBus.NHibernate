@@ -4,7 +4,6 @@ namespace NServiceBus.Features
     using System.Threading.Tasks;
     using global::NHibernate.Tool.hbm2ddl;
     using Persistence.NHibernate;
-    using Unicast.Subscriptions.MessageDrivenSubscriptions;
     using Unicast.Subscriptions.NHibernate;
     using Unicast.Subscriptions.NHibernate.Config;
     using Unicast.Subscriptions.NHibernate.Installer;
@@ -24,7 +23,7 @@ namespace NServiceBus.Features
         {
             DependsOn<MessageDrivenSubscriptions>();
 
-            // since the installers are registered even if the feature isn't enabled we need to make 
+            // since the installers are registered even if the feature isn't enabled we need to make
             // this a no-op of there is no "schema updater" available
             Defaults(c => c.Set<Installer.SchemaUpdater>(new Installer.SchemaUpdater()));
         }
@@ -51,11 +50,11 @@ namespace NServiceBus.Features
             var sessionFactory = config.Configuration.BuildSessionFactory();
             if (context.Settings.HasSetting(CacheExpirationSettingsKey))
             {
-                context.Container.ConfigureComponent<ISubscriptionStorage>(b => new CachedSubscriptionPersister(sessionFactory, context.Settings.Get<TimeSpan>(CacheExpirationSettingsKey)), DependencyLifecycle.SingleInstance);
+                context.Container.ConfigureComponent(b => new CachedSubscriptionPersister(sessionFactory, context.Settings.Get<TimeSpan>(CacheExpirationSettingsKey)), DependencyLifecycle.SingleInstance);
             }
             else
             {
-                context.Container.ConfigureComponent<ISubscriptionStorage>(b => new SubscriptionPersister(sessionFactory), DependencyLifecycle.SingleInstance);
+                context.Container.ConfigureComponent(b => new SubscriptionPersister(sessionFactory), DependencyLifecycle.SingleInstance);
             }
         }
 

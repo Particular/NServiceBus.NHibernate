@@ -11,7 +11,7 @@ namespace NServiceBus.Unicast.Subscriptions.NHibernate
     using NServiceBus.Extensibility;
     using IsolationLevel = System.Data.IsolationLevel;
 
-    class SubscriptionPersister : ISubscriptionStorage
+    class SubscriptionPersister : IInitializableSubscriptionStorage
     {
 
         static ILog Logger = LogManager.GetLogger(typeof(ISubscriptionStorage));
