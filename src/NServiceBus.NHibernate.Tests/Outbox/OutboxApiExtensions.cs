@@ -15,19 +15,19 @@
 
             var outbox = cfg.EnableOutbox();
 
-            outbox.SetTimeToKeepDeduplicationData(TimeSpan.FromMinutes(42));
+            NHibernateOutboxExtensions.TimeToKeepDeduplicationData(outbox, TimeSpan.FromMinutes(42));
 
             Assert.AreEqual(42, cfg.GetSettings().Get<TimeSpan>("Outbox.TimeToKeepDeduplicationData").Minutes);
         }
 
         [Test]
-        public void SetFrequencyToRunDeduplicationDataCleanup()
+        public void TestFrequencyToRunDeduplicationDataCleanup()
         {
             var cfg = new EndpointConfiguration("Test");
 
             var outbox = cfg.EnableOutbox();
 
-            outbox.SetFrequencyToRunDeduplicationDataCleanup(TimeSpan.FromMinutes(13));
+            outbox.FrequencyToRunDeduplicationDataCleanup(TimeSpan.FromMinutes(13));
 
             Assert.AreEqual(13, cfg.GetSettings().Get<TimeSpan>("Outbox.FrequencyToRunDeduplicationDataCleanup").Minutes);
         }

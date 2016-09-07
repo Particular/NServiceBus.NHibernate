@@ -1,46 +1,23 @@
 namespace NServiceBus.Features
 {
     using System;
-    using System.Configuration;
     using System.Threading;
     using System.Threading.Tasks;
     using NServiceBus.Persistence.NHibernate;
-    using NServiceBus.Settings;
 
     class OutboxCleaner : FeatureStartupTask
     {
         public OutboxPersister OutboxPersister { get; }
 
-        public OutboxCleaner(OutboxPersister outboxPersister, ReadOnlySettings settings)
+        public OutboxCleaner(OutboxPersister outboxPersister, TimeSpan timeToKeepDeduplicationData, TimeSpan frequencyToRunDeduplicationDataCleanup)
         {
             OutboxPersister = outboxPersister;
-            this.settings = settings;
+            this.timeToKeepDeduplicationData = timeToKeepDeduplicationData;
+            this.frequencyToRunDeduplicationDataCleanup = frequencyToRunDeduplicationDataCleanup;
         }
 
         protected override Task OnStart(IMessageSession busSession)
         {
-            var configValue = ConfigurationManager.AppSettings.Get("NServiceBus/Outbox/NHibernate/TimeToKeepDeduplicationData");
-
-            if (configValue == null)
-            {
-                timeToKeepDeduplicationData = settings.GetOrDefault<TimeSpan?>("Outbox.TimeToKeepDeduplicationData") ?? TimeSpan.FromDays(7);
-            }
-            else if (!TimeSpan.TryParse(configValue, out timeToKeepDeduplicationData))
-            {
-                throw new Exception("Invalid value in \"NServiceBus/Outbox/NHibernate/TimeToKeepDeduplicationData\" AppSetting. Please ensure it is a TimeSpan.");
-            }
-
-            configValue = ConfigurationManager.AppSettings.Get("NServiceBus/Outbox/NHibernate/FrequencyToRunDeduplicationDataCleanup");
-
-            if (configValue == null)
-            {
-                frequencyToRunDeduplicationDataCleanup = settings.GetOrDefault<TimeSpan?>("Outbox.FrequencyToRunDeduplicationDataCleanup") ?? TimeSpan.FromMinutes(1);
-            }
-            else if (!TimeSpan.TryParse(configValue, out frequencyToRunDeduplicationDataCleanup))
-            {
-                throw new Exception("Invalid value in \"NServiceBus/Outbox/NHibernate/FrequencyToRunDeduplicationDataCleanup\" AppSetting. Please ensure it is a TimeSpan.");
-            }
-
             cleanupTimer = new Timer(PerformCleanup, null, TimeSpan.FromMinutes(1), frequencyToRunDeduplicationDataCleanup);
 
             return Task.FromResult(true);
@@ -68,6 +45,5 @@ namespace NServiceBus.Features
         // ReSharper restore NotAccessedField.Local
         TimeSpan timeToKeepDeduplicationData;
         TimeSpan frequencyToRunDeduplicationDataCleanup;
-        ReadOnlySettings settings;
     }
 }

@@ -9,6 +9,12 @@
     /// </summary>
     public static class NHibernateOutboxExtensions
     {
+        internal const string TimeToKeepDeduplicationDataSettingsKey = "Outbox.TimeToKeepDeduplicationData";
+        internal const string FrequencyToRunDeduplicationDataCleanupSettingsKey = "Outbox.FrequencyToRunDeduplicationDataCleanup";
+
+        internal const string TimeToKeepDeduplicationDataAppSetting = "NServiceBus/Outbox/NHibernate/TimeToKeepDeduplicationData";
+        internal const string FrequencyToRunDeduplicationDataCleanupAppSetting = "NServiceBus/Outbox/NHibernate/FrequencyToRunDeduplicationDataCleanup";
+
         /// <summary>
         /// Sets the time to keep the deduplication data to the specified time span.
         /// </summary>
@@ -16,15 +22,14 @@
         /// <param name="timeToKeepDeduplicationData">The time to keep the deduplication data. 
         /// The cleanup process removes entries older than the specified time to keep deduplication data, therefore the time span cannot be negative</param>
         /// <returns>The configuration</returns>
-        public static OutboxSettings SetTimeToKeepDeduplicationData(this OutboxSettings configuration, TimeSpan timeToKeepDeduplicationData)
+        public static OutboxSettings TimeToKeepDeduplicationData(this OutboxSettings configuration, TimeSpan timeToKeepDeduplicationData)
         {
-            var now = DateTime.UtcNow;
-            if (now - timeToKeepDeduplicationData >= now)
+            if (timeToKeepDeduplicationData <= TimeSpan.Zero)
             {
                 throw new ArgumentException("Specify a non-negative TimeSpan. The cleanup process removes entries older than the specified time to keep deduplication data, therefore the time span cannot be negative.", "timeToKeepDeduplicationData");
             }
 
-            configuration.GetSettings().Set("Outbox.TimeToKeepDeduplicationData", timeToKeepDeduplicationData);
+            configuration.GetSettings().Set(TimeToKeepDeduplicationDataSettingsKey, timeToKeepDeduplicationData);
             return configuration;
         }
 
@@ -34,7 +39,7 @@
         /// <param name="configuration">The configuration being extended</param>
         /// <param name="frequencyToRunDeduplicationDataCleanup">The frequency to run the deduplication data cleanup task. By specifying a negative time span (-1) the cleanup task will never run.</param>
         /// <returns>The configuration</returns>
-        public static OutboxSettings SetFrequencyToRunDeduplicationDataCleanup(this OutboxSettings configuration, TimeSpan frequencyToRunDeduplicationDataCleanup)
+        public static OutboxSettings FrequencyToRunDeduplicationDataCleanup(this OutboxSettings configuration, TimeSpan frequencyToRunDeduplicationDataCleanup)
         {
             configuration.GetSettings().Set("Outbox.FrequencyToRunDeduplicationDataCleanup", frequencyToRunDeduplicationDataCleanup);
             return configuration;
