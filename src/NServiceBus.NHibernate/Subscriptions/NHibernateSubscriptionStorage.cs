@@ -48,14 +48,12 @@ namespace NServiceBus.Features
             }
 
             var sessionFactory = config.Configuration.BuildSessionFactory();
-            if (context.Settings.HasSetting(CacheExpirationSettingsKey))
-            {
-                context.Container.ConfigureComponent(b => new CachedSubscriptionPersister(sessionFactory, context.Settings.Get<TimeSpan>(CacheExpirationSettingsKey)), DependencyLifecycle.SingleInstance);
-            }
-            else
-            {
-                context.Container.ConfigureComponent(b => new SubscriptionPersister(sessionFactory), DependencyLifecycle.SingleInstance);
-            }
+            var persister = context.Settings.HasSetting(CacheExpirationSettingsKey) 
+                ? new CachedSubscriptionPersister(sessionFactory, context.Settings.Get<TimeSpan>(CacheExpirationSettingsKey)) 
+                : new SubscriptionPersister(sessionFactory);
+
+            context.Container.ConfigureComponent(b => persister, DependencyLifecycle.SingleInstance);
+            context.RegisterStartupTask(new SubscriptionPersisterInitTask(persister));
         }
 
         static bool RunInstaller(FeatureConfigurationContext context)
@@ -63,6 +61,27 @@ namespace NServiceBus.Features
             return context.Settings.Get<bool>(context.Settings.HasSetting(AutoupdateschemaSettingsKey)
                 ? AutoupdateschemaSettingsKey
                 : "NHibernate.Common.AutoUpdateSchema");
+        }
+
+        class SubscriptionPersisterInitTask : FeatureStartupTask
+        {
+            SubscriptionPersister persister;
+
+            public SubscriptionPersisterInitTask(SubscriptionPersister persister)
+            {
+                this.persister = persister;
+            }
+
+            protected override Task OnStart(IMessageSession session)
+            {
+                persister.Init();
+                return Task.FromResult(0);
+            }
+
+            protected override Task OnStop(IMessageSession session)
+            {
+                return Task.FromResult(0);
+            }
         }
     }
 }

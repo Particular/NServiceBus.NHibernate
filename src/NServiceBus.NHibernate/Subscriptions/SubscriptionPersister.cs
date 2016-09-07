@@ -11,7 +11,7 @@ namespace NServiceBus.Unicast.Subscriptions.NHibernate
     using NServiceBus.Extensibility;
     using IsolationLevel = System.Data.IsolationLevel;
 
-    class SubscriptionPersister : IInitializableSubscriptionStorage
+    class SubscriptionPersister : ISubscriptionStorage
     {
 
         static ILog Logger = LogManager.GetLogger(typeof(ISubscriptionStorage));
@@ -88,7 +88,7 @@ namespace NServiceBus.Unicast.Subscriptions.NHibernate
             }
         }
 
-        public void Init()
+        internal void Init()
         {
             using (new TransactionScope(TransactionScopeOption.Suppress))
             using (var session = sessionFactory.OpenStatelessSession())
