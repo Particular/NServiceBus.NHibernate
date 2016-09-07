@@ -91,6 +91,7 @@
     <Compile Include="Deduplication\NHibernateGatewayDeduplication.cs" />
     <Compile Include="NHibernatePersistence.cs" />
     <Compile Include="SagaPersisters\LockModes.cs" />
+    <Compile Include="SynchronizedStorage\NHibernateLazyNativeTransactionSynchronizedStorageSession.cs" />
     <Compile Include="SynchronizedStorage\TestingNHibernateSynchronizedStorageSession.cs" />
     <Compile Include="SynchronizedStorage\NHibernateNativeTransactionSynchronizedStorageSession.cs" />
     <Compile Include="Outbox\NHibernateOutboxTransaction.cs" />

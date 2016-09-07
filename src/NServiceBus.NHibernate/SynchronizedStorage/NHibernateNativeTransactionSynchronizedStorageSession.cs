@@ -8,11 +8,8 @@
     [SkipWeaving]
     class NHibernateNativeTransactionSynchronizedStorageSession : CompletableSynchronizedStorageSession, INHibernateSynchronizedStorageSession
     {
-        readonly bool ownsSession;
-
-        public NHibernateNativeTransactionSynchronizedStorageSession(ISession session, ITransaction transaction, bool ownsSession)
+        public NHibernateNativeTransactionSynchronizedStorageSession(ISession session, ITransaction transaction)
         {
-            this.ownsSession = ownsSession;
             Session = session;
             Transaction = transaction;
         }
@@ -22,20 +19,11 @@
 
         public Task CompleteAsync()
         {
-            if (ownsSession)
-            {
-                Transaction.Commit();
-                Transaction.Dispose();
-            }
             return Task.FromResult(0);
         }
 
         public void Dispose()
         {
-            if (ownsSession)
-            {
-                Session.Dispose();
-            }
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿namespace NServiceBus.Persistence.NHibernate
 {
+    using System;
     using System.Data;
     using System.Threading.Tasks;
     using global::NHibernate;
@@ -9,26 +10,38 @@
     [SkipWeaving]
     class NHibernateAmbientTransactionSynchronizedStorageSession : CompletableSynchronizedStorageSession, INHibernateSynchronizedStorageSession
     {
-        readonly IDbConnection connection;
-        readonly bool ownsConnection;
+        Func<IDbConnection> connectionFactory;
+        Func<IDbConnection, ISession> sessionFactory;
+        ISession session;
+        IDbConnection connection;
 
-        public NHibernateAmbientTransactionSynchronizedStorageSession(ISession session, IDbConnection connection, bool ownsConnection)
+        public NHibernateAmbientTransactionSynchronizedStorageSession(Func<IDbConnection> connectionFactory, Func<IDbConnection, ISession> sessionFactory)
         {
-            this.connection = connection;
-            this.ownsConnection = ownsConnection;
-            Session = session;
+            this.connectionFactory = connectionFactory;
+            this.sessionFactory = sessionFactory;
         }
 
-        public ISession Session { get; }
+        public ISession Session
+        {
+            get
+            {
+                if (connection == null)
+                {
+                    connection = connectionFactory();
+                }
+                if (session == null)
+                {
+                    session = sessionFactory(connection);
+                }
+                return session;
+            }
+        }
+
         public void Dispose()
         {
-            Session.Flush();
-            Session.Dispose();
-
-            if (ownsConnection)
-            {
-                connection.Dispose();
-            }
+            session?.Flush();
+            session?.Dispose();
+            connection?.Dispose();
         }
 
         public Task CompleteAsync()

@@ -16,10 +16,7 @@
 
         public Task<CompletableSynchronizedStorageSession> OpenSession(ContextBag contextBag)
         {
-            var session = sessionFactory.OpenSession();
-            var transaction = session.BeginTransaction();
-
-            CompletableSynchronizedStorageSession result = new NHibernateNativeTransactionSynchronizedStorageSession(session, transaction, true);
+            CompletableSynchronizedStorageSession result = new NHibernateLazyNativeTransactionSynchronizedStorageSession(() => sessionFactory.OpenSession());
             return Task.FromResult(result);
         }
     }
