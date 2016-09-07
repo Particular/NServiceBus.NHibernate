@@ -88,7 +88,7 @@ namespace NServiceBus.Unicast.Subscriptions.NHibernate
             }
         }
 
-        public void Init()
+        internal void Init()
         {
             using (new TransactionScope(TransactionScopeOption.Suppress))
             using (var session = sessionFactory.OpenStatelessSession())
