@@ -1,15 +1,18 @@
 namespace NServiceBus.Features
 {
     using System;
+    using System.Configuration;
     using System.Linq;
     using System.Text;
     using System.Threading.Tasks;
-    using global::NHibernate.Cfg;
     using global::NHibernate.Mapping.ByCode;
     using global::NHibernate.Tool.hbm2ddl;
+    using NServiceBus.NHibernate.Outbox;
     using NServiceBus.Outbox.NHibernate;
+    using NServiceBus.Settings;
     using Persistence.NHibernate;
     using Persistence.NHibernate.Installer;
+    using Configuration = global::NHibernate.Cfg.Configuration;
 
     /// <summary>
     /// NHibernate Storage Session.
@@ -54,7 +57,13 @@ namespace NServiceBus.Features
             if (outboxEnabled)
             {
                 context.Container.ConfigureComponent(b => new OutboxPersister(sessionFactory, context.Settings.EndpointName().ToString()), DependencyLifecycle.SingleInstance);
-                context.RegisterStartupTask(b => new OutboxCleaner(b.Build<OutboxPersister>()));
+
+                var timeToKeepDeduplicationData = GetConfiguredTimeSpan(context.Settings, TimeSpan.FromDays(7),
+                    NHibernateOutboxExtensions.TimeToKeepDeduplicationDataAppSetting, NHibernateOutboxExtensions.TimeToKeepDeduplicationDataSettingsKey);
+                var frequencyToRunDeduplicationDataCleanup = GetConfiguredTimeSpan(context.Settings, TimeSpan.FromMinutes(1),
+                    NHibernateOutboxExtensions.FrequencyToRunDeduplicationDataCleanupAppSetting, NHibernateOutboxExtensions.FrequencyToRunDeduplicationDataCleanupSettingsKey);
+
+                context.RegisterStartupTask(b => new OutboxCleaner(b.Build<OutboxPersister>(), timeToKeepDeduplicationData, frequencyToRunDeduplicationDataCleanup));
             }
 
             var runInstaller = context.Settings.Get<bool>("NHibernate.Common.AutoUpdateSchema");
@@ -93,6 +102,24 @@ TSql Script:
             mapper.AddMapping<OutboxEntityMap>();
 
             config.AddMapping(mapper.CompileMappingForAllExplicitlyAddedEntities());
+        }
+
+        static TimeSpan GetConfiguredTimeSpan(ReadOnlySettings settings, TimeSpan defaultValue, string appSettingsKey, string settingsKey)
+        {
+            var configValue = ConfigurationManager.AppSettings.Get(appSettingsKey);
+            TimeSpan result;
+
+            if (configValue == null)
+            {
+                return settings.GetOrDefault<TimeSpan?>(settingsKey) ?? defaultValue;
+            }
+
+            if (!TimeSpan.TryParse(configValue, out result))
+            {
+                throw new Exception($"Invalid value in '{appSettingsKey}' AppSetting. Please ensure it is a TimeSpan.");
+            }
+
+            return result;
         }
     }
 }
