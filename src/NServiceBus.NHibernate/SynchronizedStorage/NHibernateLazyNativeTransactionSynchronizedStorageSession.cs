@@ -8,40 +8,38 @@
     [SkipWeaving]
     class NHibernateLazyNativeTransactionSynchronizedStorageSession : CompletableSynchronizedStorageSession, INHibernateSynchronizedStorageSession
     {
-        Func<ISession> sessionFactory;
-        ISession session;
-        ITransaction transaction;
+        Lazy<ISession> session;
 
         public NHibernateLazyNativeTransactionSynchronizedStorageSession(Func<ISession> sessionFactory)
         {
-            this.sessionFactory = sessionFactory;
+            session =new Lazy<ISession>(() =>
+            {
+                var s = sessionFactory();
+                s.BeginTransaction();
+                return s;
+            });
         }
 
-        public ISession Session
-        {
-            get
-            {
-                if (session == null)
-                {
-                    session = sessionFactory();
-                    transaction = session.BeginTransaction();
-                }
-                return session;
-            }
-        }
+        public ISession Session => session.Value;
 
         public ITransaction Transaction => Session.Transaction;
 
         public Task CompleteAsync()
         {
-            transaction?.Commit();
-            transaction?.Dispose();
+            if (session.IsValueCreated)
+            {
+                Transaction.Commit();
+                Transaction.Dispose();
+            }
             return Task.FromResult(0);
         }
 
         public void Dispose()
         {
-            session?.Dispose();
+            if (session.IsValueCreated)
+            {
+              session.Value.Dispose();  
+            }
         }
     }
 }

@@ -8,40 +8,30 @@
     using NServiceBus.Persistence;
 
     [SkipWeaving]
-    class NHibernateAmbientTransactionSynchronizedStorageSession : CompletableSynchronizedStorageSession, INHibernateSynchronizedStorageSession
+    class NHibernateLazyAmbientTransactionSynchronizedStorageSession : CompletableSynchronizedStorageSession, INHibernateSynchronizedStorageSession
     {
-        Func<IDbConnection> connectionFactory;
-        Func<IDbConnection, ISession> sessionFactory;
-        ISession session;
-        IDbConnection connection;
+        Lazy<ISession> session;
+        Lazy<IDbConnection> connection;
 
-        public NHibernateAmbientTransactionSynchronizedStorageSession(Func<IDbConnection> connectionFactory, Func<IDbConnection, ISession> sessionFactory)
+        public NHibernateLazyAmbientTransactionSynchronizedStorageSession(Func<IDbConnection> connectionFactory, Func<IDbConnection, ISession> sessionFactory)
         {
-            this.connectionFactory = connectionFactory;
-            this.sessionFactory = sessionFactory;
+            connection = new Lazy<IDbConnection>(connectionFactory);
+            session = new Lazy<ISession>(() => sessionFactory(connection.Value));
         }
 
-        public ISession Session
-        {
-            get
-            {
-                if (connection == null)
-                {
-                    connection = connectionFactory();
-                }
-                if (session == null)
-                {
-                    session = sessionFactory(connection);
-                }
-                return session;
-            }
-        }
+        public ISession Session => session.Value;
 
         public void Dispose()
         {
-            session?.Flush();
-            session?.Dispose();
-            connection?.Dispose();
+            if (session.IsValueCreated)
+            {
+                session.Value.Flush();
+                session.Value.Dispose();
+            }
+            if (connection.IsValueCreated)
+            {
+                connection.Value.Dispose();
+            }
         }
 
         public Task CompleteAsync()
