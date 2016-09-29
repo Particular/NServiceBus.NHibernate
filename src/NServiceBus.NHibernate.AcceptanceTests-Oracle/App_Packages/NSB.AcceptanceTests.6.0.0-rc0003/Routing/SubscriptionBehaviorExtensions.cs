@@ -13,7 +13,18 @@ namespace NServiceBus.AcceptanceTests.Routing
             b.RegisterComponents(c => c.ConfigureComponent(builder =>
             {
                 var context = builder.Build<TContext>();
-                return new SubscriptionBehavior<TContext>(action, context, builder.Build<CriticalError>());
+                return new SubscriptionBehavior<TContext>(action, context, builder.Build<CriticalError>(), MessageIntentEnum.Subscribe);
+            }, DependencyLifecycle.InstancePerCall));
+        }
+
+        public static void OnEndpointUnsubscribed<TContext>(this EndpointConfiguration b, Action<SubscriptionEventArgs, TContext> action) where TContext : ScenarioContext
+        {
+            b.Pipeline.Register<SubscriptionBehavior<TContext>.Registration>();
+
+            b.RegisterComponents(c => c.ConfigureComponent(builder =>
+            {
+                var context = builder.Build<TContext>();
+                return new SubscriptionBehavior<TContext>(action, context, builder.Build<CriticalError>(), MessageIntentEnum.Unsubscribe);
             }, DependencyLifecycle.InstancePerCall));
         }
     }

@@ -11,11 +11,12 @@
 
     class SubscriptionBehavior<TContext> : Behavior<IIncomingPhysicalMessageContext> where TContext : ScenarioContext
     {
-        public SubscriptionBehavior(Action<SubscriptionEventArgs, TContext> action, TContext scenarioContext, CriticalError criticalError)
+        public SubscriptionBehavior(Action<SubscriptionEventArgs, TContext> action, TContext scenarioContext, CriticalError criticalError, MessageIntentEnum intentToHandle)
         {
             this.action = action;
             this.scenarioContext = scenarioContext;
             this.criticalError = criticalError;
+            this.intentToHandle = intentToHandle;
         }
 
         public override async Task Invoke(IIncomingPhysicalMessageContext context, Func<Task> next)
@@ -42,6 +43,11 @@
             {
                 criticalError.Raise("Error updating subscription store", lastError);
             }
+            var intent = (MessageIntentEnum)Enum.Parse(typeof(MessageIntentEnum), context.Message.Headers[Headers.MessageIntent], true);
+            if (intent != intentToHandle)
+            {
+                return;
+            }
             var subscriptionMessageType = GetSubscriptionMessageTypeFrom(context.Message);
             if (subscriptionMessageType != null)
             {
@@ -66,6 +72,7 @@
         Action<SubscriptionEventArgs, TContext> action;
         TContext scenarioContext;
         CriticalError criticalError;
+        MessageIntentEnum intentToHandle;
 
         internal class Registration : RegisterStep
         {
