@@ -18,7 +18,7 @@
             return Scenario.Define<Context>()
                 .WithEndpoint<ScaledOutPublisher>(b => b.CustomConfig(c => c.MakeInstanceUniquelyAddressable("1")))
                 .WithEndpoint<ScaledOutPublisher>(b => b.CustomConfig(c => c.MakeInstanceUniquelyAddressable("2")))
-                .WithEndpoint<Subscriber>(b => b.When(s => s.Subscribe<MyEvent>()))
+                .WithEndpoint<Subscriber>(b => b.When(c => c.EndpointsStarted, s => s.Subscribe<MyEvent>()))
                 .Done(c => c.PublisherReceivedSubscription.Count >= 2)
                 .Repeat(r => r.For<AllTransportsWithMessageDrivenPubSub>())
                 .Should(c =>

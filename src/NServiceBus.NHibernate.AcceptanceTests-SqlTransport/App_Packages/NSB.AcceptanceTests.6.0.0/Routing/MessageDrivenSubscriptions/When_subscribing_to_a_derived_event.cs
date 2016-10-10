@@ -18,7 +18,7 @@
                     await session.Publish<IBaseEvent>();
                     await session.Send(new Done());
                 }))
-                .WithEndpoint<Subscriber>(b => b.When(async (session, c) => await session.Subscribe<SpecificEvent>()))
+                .WithEndpoint<Subscriber>(b => b.When(c => c.EndpointsStarted, async (session, c) => await session.Subscribe<SpecificEvent>()))
                 .Done(c => c.Done)
                 .Repeat(r => r.For<AllTransportsWithMessageDrivenPubSub>())
                 .Should(c => Assert.IsFalse(c.SubscriberGotEvent))
