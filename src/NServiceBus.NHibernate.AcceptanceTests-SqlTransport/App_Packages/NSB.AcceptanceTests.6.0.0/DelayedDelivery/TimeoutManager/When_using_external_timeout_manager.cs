@@ -21,7 +21,7 @@
                 {
                     var options = new SendOptions();
 
-                    options.DelayDeliveryWith(TimeSpan.FromDays(5));
+                    options.DelayDeliveryWith(TimeSpan.FromMilliseconds(2000));
                     options.RouteToThisEndpoint();
 
                     return session.Send(new MyMessage(), options);
@@ -42,18 +42,10 @@
         {
             public Endpoint()
             {
-                var address = Conventions.EndpointNamingConvention(typeof(EndpointWithTimeoutManager));
+                var address = Conventions.EndpointNamingConvention(typeof(EndpointWithTimeoutManager)) + ".Timeouts";
 
                 EndpointSetup<DefaultServer>(config => config.DisableFeature<TimeoutManager>())
                     .WithConfig<UnicastBusConfig>(c => { c.TimeoutManagerAddress = address; });
-            }
-        }
-
-        public class EndpointWithTimeoutManager : EndpointConfigurationBuilder
-        {
-            public EndpointWithTimeoutManager()
-            {
-                EndpointSetup<DefaultServer>(config => config.EnableFeature<TimeoutManager>());
             }
 
             public class MyMessageHandler : IHandleMessages<MyMessage>
@@ -66,6 +58,14 @@
                     Context.WasCalled = true;
                     return Task.FromResult(0);
                 }
+            }
+        }
+
+        public class EndpointWithTimeoutManager : EndpointConfigurationBuilder
+        {
+            public EndpointWithTimeoutManager()
+            {
+                EndpointSetup<DefaultServer>(config => config.EnableFeature<TimeoutManager>());
             }
         }
 
