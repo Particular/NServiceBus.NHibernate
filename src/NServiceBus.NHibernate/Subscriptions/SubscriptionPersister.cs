@@ -1,11 +1,13 @@
 namespace NServiceBus.Unicast.Subscriptions.NHibernate
 {
+    using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
     using System.Transactions;
     using global::NHibernate;
     using global::NHibernate.Criterion;
+    using global::NHibernate.Exceptions;
     using Logging;
     using MessageDrivenSubscriptions;
     using NServiceBus.Extensibility;
@@ -25,6 +27,37 @@ namespace NServiceBus.Unicast.Subscriptions.NHibernate
 
         public virtual Task Subscribe(Subscriber subscriber, MessageType messageType, ContextBag context)
         {
+            const int MaxRetries = 5;
+
+            for (var attempt = 1; attempt <= MaxRetries; ++attempt)
+            {
+                try
+                {
+                    StoreSubscription(subscriber, messageType);
+                    return Task.FromResult(0);
+                }
+                catch (GenericADOException)
+                {
+                    // A unique constraint violation exception is possible at this point in a scale-out scenario.
+
+                    if (attempt < MaxRetries)
+                    {
+                        // An exception will be swallowed here to allow for a retry.
+                        Logger.DebugFormat("Error occured when storing subscription of endpoint '{0}' to message '{1}'. The operation will be retried.", subscriber.Endpoint, messageType);
+                    }
+                    else
+                    {
+                        // This was the last attempt, give up.
+                        throw;
+                    }
+                }
+            }
+
+            throw new Exception($"Internal error occured when storing subscription of endpoint '{subscriber.Endpoint}' to message '{messageType}'.");
+        }
+
+        void StoreSubscription(Subscriber subscriber, MessageType messageType)
+        {
             using (new TransactionScope(TransactionScopeOption.Suppress))
             using (var session = sessionFactory.OpenSession())
             using (var tx = session.BeginTransaction(IsolationLevel.ReadCommitted))
@@ -39,7 +72,6 @@ namespace NServiceBus.Unicast.Subscriptions.NHibernate
                 });
                 tx.Commit();
             }
-            return Task.FromResult(0);
         }
 
         public virtual Task Unsubscribe(Subscriber address, MessageType messageType, ContextBag context)
