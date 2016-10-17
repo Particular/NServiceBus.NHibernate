@@ -15,6 +15,7 @@ namespace NServiceBus.Unicast.Subscriptions.NHibernate
 
     class SubscriptionPersister : ISubscriptionStorage
     {
+        const int MaxRetries = 5;
 
         static ILog Logger = LogManager.GetLogger(typeof(ISubscriptionStorage));
         static IEqualityComparer<Subscription> SubscriptionComparer = new SubscriptionByTransportAddressComparer();
@@ -27,8 +28,6 @@ namespace NServiceBus.Unicast.Subscriptions.NHibernate
 
         public virtual Task Subscribe(Subscriber subscriber, MessageType messageType, ContextBag context)
         {
-            const int MaxRetries = 5;
-
             for (var attempt = 1; attempt <= MaxRetries; ++attempt)
             {
                 try
@@ -76,6 +75,35 @@ namespace NServiceBus.Unicast.Subscriptions.NHibernate
 
         public virtual Task Unsubscribe(Subscriber address, MessageType messageType, ContextBag context)
         {
+            for (var attempt = 1; attempt <= MaxRetries; ++attempt)
+            {
+                try
+                {
+                    DeleteSubscription(address, messageType);
+                    return Task.FromResult(0);
+                }
+                catch (GenericADOException)
+                {
+                    // An aborted transaction is possible at this point in a scale-out scenario.
+
+                    if (attempt < MaxRetries)
+                    {
+                        // An exception will be swallowed here to allow for a retry.
+                        Logger.DebugFormat("Error occured when deleting subscription of endpoint '{0}' to message '{1}'. The operation will be retried.", address.Endpoint, messageType);
+                    }
+                    else
+                    {
+                        // This was the last attempt, give up.
+                        throw;
+                    }
+                }
+            }
+
+            throw new Exception($"Internal error occured when deleting subscription of endpoint '{address.Endpoint}' to message '{messageType}'.");
+        }
+
+        void DeleteSubscription(Subscriber address, MessageType messageType)
+        {
             var messageTypes = new List<MessageType> { messageType };
             using (new TransactionScope(TransactionScopeOption.Suppress))
             using (var session = sessionFactory.OpenSession())
@@ -95,7 +123,6 @@ namespace NServiceBus.Unicast.Subscriptions.NHibernate
 
                 tx.Commit();
             }
-            return Task.FromResult(0);
         }
 
         public virtual Task<IEnumerable<Subscriber>> GetSubscriberAddressesForMessage(IEnumerable<MessageType> messageTypes, ContextBag context)
