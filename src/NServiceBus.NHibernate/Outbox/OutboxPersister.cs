@@ -12,7 +12,8 @@
     using NServiceBus.Outbox.NHibernate;
     using IsolationLevel = System.Data.IsolationLevel;
 
-    class OutboxPersister : IOutboxStorage
+    class OutboxPersister<TEntity> : INHibernateOutboxStorage
+        where TEntity : class, IOutboxRecord, new()
     {
         ISessionFactory sessionFactory;
         string endpointName;
@@ -32,16 +33,16 @@
 
             using (new TransactionScope(TransactionScopeOption.Suppress))
             {
-                OutboxRecord result;
+                TEntity result;
                 using (var session = sessionFactory.OpenStatelessSession())
                 {
                     using (var tx = session.BeginTransaction(IsolationLevel.ReadCommitted))
                     {
                         //Explicitly using ICriteria instead of QueryOver for performance reasons.
                         //It seems QueryOver uses quite a bit reflection and that takes longer.
-                        result = session.CreateCriteria<OutboxRecord>()
-                            .Add(Restrictions.In(nameof(OutboxRecord.MessageId), possibleIds))
-                            .UniqueResult<OutboxRecord>();
+                        result = session.CreateCriteria<TEntity>()
+                            .Add(Restrictions.In(nameof(IOutboxRecord.MessageId), possibleIds))
+                            .UniqueResult<TEntity>();
 
                         tx.Commit();
                     }
@@ -74,12 +75,13 @@
                 Options = t.Options,
             });
             var nhibernateTransaction = (NHibernateOutboxTransaction)transaction;
-            nhibernateTransaction.Session.Save(new OutboxRecord
+            var record = new TEntity
             {
                 MessageId = EndpointQualifiedMessageId(outboxMessage.MessageId),
                 Dispatched = false,
                 TransportOperations = ConvertObjectToString(operations)
-            });
+            };
+            nhibernateTransaction.Session.Save(record);
             return Task.FromResult(0);
         }
 
@@ -91,7 +93,7 @@
                 {
                     using (var tx = session.BeginTransaction(IsolationLevel.ReadCommitted))
                     {
-                        var queryString = $"update {typeof(OutboxRecord).Name} set Dispatched = true, DispatchedAt = :date, TransportOperations = NULL where MessageId IN ( :messageid, :qualifiedMessageId ) And Dispatched = false";
+                        var queryString = $"update {typeof(TEntity).Name} set Dispatched = true, DispatchedAt = :date, TransportOperations = NULL where MessageId IN ( :messageid, :qualifiedMessageId ) And Dispatched = false";
                         session.CreateQuery(queryString)
                             .SetString("messageid", messageId)
                             .SetString("qualifiedMessageId", EndpointQualifiedMessageId(messageId))
@@ -123,7 +125,7 @@
                 {
                     using (var tx = session.BeginTransaction(IsolationLevel.ReadCommitted))
                     {
-                        var queryString = $"delete from {typeof(OutboxRecord).Name} where Dispatched = true And DispatchedAt < :date";
+                        var queryString = $"delete from {typeof(TEntity).Name} where Dispatched = true And DispatchedAt < :date";
 
                         session.CreateQuery(queryString)
                             .SetDateTime("date", dateTime)

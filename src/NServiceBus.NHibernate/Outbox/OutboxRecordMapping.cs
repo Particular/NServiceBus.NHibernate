@@ -4,9 +4,9 @@ namespace NServiceBus.Outbox.NHibernate
     using global::NHibernate.Mapping.ByCode;
     using global::NHibernate.Mapping.ByCode.Conformist;
 
-    class OutboxEntityMap : ClassMapping<OutboxRecord>
+    class OutboxRecordMapping : ClassMapping<OutboxRecord>
     {
-        public OutboxEntityMap()
+        public OutboxRecordMapping()
         {
             Id(x => x.Id, m => m.Generator(Generators.Native));
             Property(p => p.MessageId, pm => pm.Column(c =>
