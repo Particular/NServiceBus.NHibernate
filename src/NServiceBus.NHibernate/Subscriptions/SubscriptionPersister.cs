@@ -32,8 +32,7 @@ namespace NServiceBus.Unicast.Subscriptions.NHibernate
             {
                 try
                 {
-                    StoreSubscription(subscriber, messageType);
-                    return Task.FromResult(0);
+                    return StoreSubscription(subscriber, messageType);
                 }
                 catch (GenericADOException)
                 {
@@ -55,8 +54,10 @@ namespace NServiceBus.Unicast.Subscriptions.NHibernate
             throw new Exception($"Internal error occured when storing subscription of endpoint '{subscriber.Endpoint}' to message '{messageType}'.");
         }
 
-        void StoreSubscription(Subscriber subscriber, MessageType messageType)
+        async Task StoreSubscription(Subscriber subscriber, MessageType messageType)
         {
+            await Task.Yield();
+
             using (new TransactionScope(TransactionScopeOption.Suppress))
             using (var session = sessionFactory.OpenSession())
             using (var tx = session.BeginTransaction(IsolationLevel.ReadCommitted))
@@ -79,8 +80,7 @@ namespace NServiceBus.Unicast.Subscriptions.NHibernate
             {
                 try
                 {
-                    DeleteSubscription(address, messageType);
-                    return Task.FromResult(0);
+                    return DeleteSubscription(address, messageType);
                 }
                 catch (GenericADOException)
                 {
@@ -102,8 +102,10 @@ namespace NServiceBus.Unicast.Subscriptions.NHibernate
             throw new Exception($"Internal error occured when deleting subscription of endpoint '{address.Endpoint}' to message '{messageType}'.");
         }
 
-        void DeleteSubscription(Subscriber address, MessageType messageType)
+        async Task DeleteSubscription(Subscriber address, MessageType messageType)
         {
+            await Task.Yield();
+
             var messageTypes = new List<MessageType> { messageType };
             using (new TransactionScope(TransactionScopeOption.Suppress))
             using (var session = sessionFactory.OpenSession())
