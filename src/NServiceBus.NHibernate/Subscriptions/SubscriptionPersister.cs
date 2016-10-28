@@ -7,12 +7,10 @@ namespace NServiceBus.Unicast.Subscriptions.NHibernate
     using System.Transactions;
     using global::NHibernate;
     using global::NHibernate.Criterion;
-    using global::NHibernate.Exceptions;
     using Logging;
     using MessageDrivenSubscriptions;
     using NServiceBus.Extensibility;
     using IsolationLevel = System.Data.IsolationLevel;
-    using TransactionException = global::NHibernate.TransactionException;
 
     class SubscriptionPersister : ISubscriptionStorage
     {
@@ -36,7 +34,7 @@ namespace NServiceBus.Unicast.Subscriptions.NHibernate
                     StoreSubscription(subscriber, messageType);
                     return Task.FromResult(0);
                 }
-                catch (Exception e) when(e is TransactionException || e is GenericADOException)
+                catch (Exception)
                 {
                     // A unique constraint violation exception is possible at this point in a scale-out scenario.
 
@@ -83,7 +81,7 @@ namespace NServiceBus.Unicast.Subscriptions.NHibernate
                     DeleteSubscription(address, messageType);
                     return Task.FromResult(0);
                 }
-                catch (Exception e) when (e is TransactionException || e is GenericADOException)
+                catch (Exception)
                 {
                     // An aborted transaction is possible at this point in a scale-out scenario.
 
