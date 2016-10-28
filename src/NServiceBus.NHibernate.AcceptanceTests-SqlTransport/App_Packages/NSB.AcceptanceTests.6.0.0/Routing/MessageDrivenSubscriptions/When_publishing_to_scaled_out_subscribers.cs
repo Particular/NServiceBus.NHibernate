@@ -63,7 +63,11 @@
         {
             public Publisher()
             {
-                EndpointSetup<DefaultServer>(c => { c.OnEndpointSubscribed<Context>((s, context) => { context.IncrementSubscribersCounter(); }); });
+                EndpointSetup<DefaultServer>(c =>
+                {
+                    c.LimitMessageProcessingConcurrencyTo(1);
+                    c.OnEndpointSubscribed<Context>((s, context) => { context.IncrementSubscribersCounter(); });
+                });
             }
         }
 
@@ -94,7 +98,7 @@
             public SubscriberB()
             {
                 EndpointSetup<DefaultServer>(c =>
-                {                    
+                {
                     c.MessageDrivenPubSubRouting().RegisterPublisher(typeof(MyEvent), PublisherEndpoint);
                 });
             }
