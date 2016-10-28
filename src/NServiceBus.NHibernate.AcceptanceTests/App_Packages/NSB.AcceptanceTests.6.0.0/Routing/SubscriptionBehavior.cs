@@ -27,7 +27,6 @@
                 scenarioContext.AddTrace($"Error in SubscriptionBehavior: {e}");
                 throw;
             }
-
             var subscriptionMessageType = GetSubscriptionMessageTypeFrom(context.Message);
             if (subscriptionMessageType != null)
             {

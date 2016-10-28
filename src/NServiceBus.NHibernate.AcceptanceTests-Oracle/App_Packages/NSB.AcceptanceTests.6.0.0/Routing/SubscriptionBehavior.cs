@@ -18,7 +18,15 @@
 
         public async Task Invoke(IIncomingPhysicalMessageContext context, Func<IIncomingPhysicalMessageContext, Task> next)
         {
-            await next(context).ConfigureAwait(false);
+            try
+            {
+                await next(context).ConfigureAwait(false);
+            }
+            catch (Exception e)
+            {
+                scenarioContext.AddTrace($"Error in SubscriptionBehavior: {e}");
+                throw;
+            }
             var subscriptionMessageType = GetSubscriptionMessageTypeFrom(context.Message);
             if (subscriptionMessageType != null)
             {
