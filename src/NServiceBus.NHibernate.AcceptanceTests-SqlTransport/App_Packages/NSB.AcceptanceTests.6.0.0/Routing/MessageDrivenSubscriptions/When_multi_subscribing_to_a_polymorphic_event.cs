@@ -53,6 +53,8 @@
             {
                 EndpointSetup<DefaultPublisher>(b =>
                 {
+                    //Immediate Retries on since subscription storages can throw on concurrency violation and need to retry
+                    b.Recoverability().Immediate(immediate => immediate.NumberOfRetries(5));
                     b.OnEndpointSubscribed<Context>((args, context) =>
                     {
                         context.AddTrace("Publisher1 OnEndpointSubscribed " + args.MessageType);
@@ -71,9 +73,13 @@
             {
                 EndpointSetup<DefaultPublisher>(b =>
                 {
+                    // Immediate Retries on since subscription storages can throw on concurrency violation and need to retry
+                    b.Recoverability().Immediate(immediate => immediate.NumberOfRetries(5));
+
                     b.OnEndpointSubscribed<Context>((args, context) =>
                     {
                         context.AddTrace("Publisher2 OnEndpointSubscribed " + args.MessageType);
+
                         if (args.MessageType.Contains(typeof(MyEvent2).Name))
                         {
                             context.Publisher2HasDetectedASubscriberForEvent2 = true;
