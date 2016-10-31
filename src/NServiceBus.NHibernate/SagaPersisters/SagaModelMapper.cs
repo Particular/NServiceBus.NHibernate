@@ -264,6 +264,10 @@ namespace NServiceBus.SagaPersisters.NHibernate.AutoPersistence
                 return; //We skip user abstract classes
             }
 
+            if (rootEntity == typeof(object))
+            {
+                return;//skip object as that will result in mapping all its derivatives
+            }
             entityTypes.Add(rootEntity, sagaMetadata);
 
             var propertyInfos = rootEntity.GetProperties();
