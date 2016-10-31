@@ -3,7 +3,6 @@ namespace NServiceBus.Unicast.Subscriptions.NHibernate
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using System.Threading;
     using System.Threading.Tasks;
     using System.Transactions;
     using global::NHibernate;
@@ -43,7 +42,6 @@ namespace NServiceBus.Unicast.Subscriptions.NHibernate
                     {
                         // An exception will be swallowed here to allow for a retry.
                         Logger.DebugFormat("Error occured when storing subscription of endpoint '{0}' to message '{1}'. The operation will be retried.", subscriber.Endpoint, messageType);
-                        Thread.Sleep(1000);
                     }
                     else
                     {
@@ -91,7 +89,6 @@ namespace NServiceBus.Unicast.Subscriptions.NHibernate
                     {
                         // An exception will be swallowed here to allow for a retry.
                         Logger.DebugFormat("Error occured when deleting subscription of endpoint '{0}' to message '{1}'. The operation will be retried.", address.Endpoint, messageType);
-                        Thread.Sleep(1000);
                     }
                     else
                     {
