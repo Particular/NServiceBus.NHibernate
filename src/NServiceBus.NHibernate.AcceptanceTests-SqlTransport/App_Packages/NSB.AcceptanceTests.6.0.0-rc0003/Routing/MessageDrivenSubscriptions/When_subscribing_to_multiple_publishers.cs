@@ -14,7 +14,7 @@
         {
             await Scenario.Define<Context>()
                 .WithEndpoint<Subscriber>(e => e
-                    .When(c => c.EndpointsStarted, s => s.Subscribe<SomeEvent>()))
+                    .When(s => s.Subscribe<SomeEvent>()))
                 .WithEndpoint<Publisher>(e => e
                     .CustomConfig(cfg =>
                     {

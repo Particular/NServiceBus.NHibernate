@@ -7,10 +7,10 @@
     using NUnit.Framework;
     using ScenarioDescriptors;
 
-    public class When_subscribing_to_a_base_event_with_a_route_for_a_derived_event : NServiceBusAcceptanceTest
+    public class When_subscribing_to_a_base_event_with_routes_to_base_and_specific_events : NServiceBusAcceptanceTest
     {
         [Test]
-        public Task Event_should_be_delivered()
+        public Task Event_from_both_publishers_should_be_delivered()
         {
             return Scenario.Define<Context>()
                 .WithEndpoint<PublisherOne>(b => b.When(c => c.SubscriberSubscribedToOne, async session =>
@@ -21,7 +21,7 @@
                 {
                     await session.Publish(new EventTwo());
                 }))
-                .WithEndpoint<Subscriber>(b => b.When(c => c.EndpointsStarted, async (session, c) => await session.Subscribe<IBaseEvent>()))
+                .WithEndpoint<Subscriber>(b => b.When(async (session, c) => await session.Subscribe<IBaseEvent>()))
                 .Done(c => c.SubscriberGotEventOne)
                 .Repeat(r => r.For<AllTransportsWithMessageDrivenPubSub>())
                 .Should(c => Assert.IsTrue(c.SubscriberGotEventOne))
@@ -31,8 +31,6 @@
         public class Context : ScenarioContext
         {
             public bool SubscriberGotEventOne { get; set; }
-            public bool SubscriberGotEventTwo { get; set; }
-
             public bool SubscriberSubscribedToOne { get; set; }
             public bool SubscriberSubscribedToTwo { get; set; }
         }
@@ -67,8 +65,8 @@
                 {
                     c.DisableFeature<AutoSubscribe>();
                 })
-                    .AddMapping<EventOne>(typeof(PublisherOne))
-                    .AddMapping<EventTwo>(typeof(PublisherTwo));
+                    .AddMapping<EventTwo>(typeof(PublisherTwo))
+                    .AddMapping<IBaseEvent>(typeof(PublisherOne));
             }
 
             public class MyEventHandler : IHandleMessages<IBaseEvent>
@@ -80,10 +78,6 @@
                     if (messageThatIsEnlisted is EventOne)
                     {
                         Context.SubscriberGotEventOne = true;
-                    }
-                    if (messageThatIsEnlisted is EventTwo)
-                    {
-                        Context.SubscriberGotEventTwo = true;
                     }
                     return Task.FromResult(0);
                 }
