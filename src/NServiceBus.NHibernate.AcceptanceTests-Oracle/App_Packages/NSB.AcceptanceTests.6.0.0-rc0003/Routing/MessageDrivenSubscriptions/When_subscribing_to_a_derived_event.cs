@@ -7,33 +7,31 @@
     using NUnit.Framework;
     using ScenarioDescriptors;
 
-    public class When_subscribing_to_a_base_event : NServiceBusAcceptanceTest
+    public class When_subscribing_to_a_derived_event : NServiceBusAcceptanceTest
     {
         [Test]
-        public Task Both_base_and_specific_events_should_be_delivered()
+        public Task Base_event_should_not_be_delivered()
         {
             return Scenario.Define<Context>()
                 .WithEndpoint<Publisher>(b => b.When(c => c.SubscriberSubscribed, async session =>
                 {
-                    await session.Publish(new SpecificEvent());
                     await session.Publish<IBaseEvent>();
+                    await session.Send(new Done());
                 }))
-                .WithEndpoint<GeneralSubscriber>(b => b.When(c => c.EndpointsStarted, async (session, c) => await session.Subscribe<IBaseEvent>()))
-                .Done(c => c.SubscriberGotBaseEvent && c.SubscriberGotSpecificEvent)
+                .WithEndpoint<Subscriber>(b => b.When(async (session, c) => await session.Subscribe<SpecificEvent>()))
+                .Done(c => c.Done)
                 .Repeat(r => r.For<AllTransportsWithMessageDrivenPubSub>())
-                .Should(c =>
-                {
-                    Assert.True(c.SubscriberGotBaseEvent);
-                    Assert.True(c.SubscriberGotSpecificEvent);
-                })
+                .Should(c => Assert.IsFalse(c.SubscriberGotEvent))
                 .Run();
         }
 
         public class Context : ScenarioContext
         {
-            public bool SubscriberGotBaseEvent { get; set; }
-            public bool SubscriberGotSpecificEvent { get; set; }
+            public bool SubscriberGotEvent { get; set; }
+
             public bool SubscriberSubscribed { get; set; }
+
+            public bool Done { get; set; }
         }
 
         public class Publisher : EndpointConfigurationBuilder
@@ -43,35 +41,41 @@
                 EndpointSetup<DefaultPublisher>(b => b.OnEndpointSubscribed<Context>((args, context) =>
                 {
                     context.SubscriberSubscribed = true;
-                }));
+                }))
+                    .AddMapping<Done>(typeof(Subscriber));
             }
         }
 
-        public class GeneralSubscriber : EndpointConfigurationBuilder
+        public class Subscriber : EndpointConfigurationBuilder
         {
-            public GeneralSubscriber()
+            public Subscriber()
             {
                 EndpointSetup<DefaultServer>(c =>
                 {
                     c.DisableFeature<AutoSubscribe>();
+                    c.LimitMessageProcessingConcurrencyTo(1); //To ensure Done is processed after the event.
                 })
-                    .AddMapping<IBaseEvent>(typeof(Publisher));
+                    .AddMapping<SpecificEvent>(typeof(Publisher));
             }
 
-            public class MyEventHandler : IHandleMessages<IBaseEvent>
+            public class MyEventHandler : IHandleMessages<SpecificEvent>
             {
                 public Context Context { get; set; }
 
-                public Task Handle(IBaseEvent messageThatIsEnlisted, IMessageHandlerContext context)
+                public Task Handle(SpecificEvent messageThatIsEnlisted, IMessageHandlerContext context)
                 {
-                    if (messageThatIsEnlisted is SpecificEvent)
-                    {
-                        Context.SubscriberGotSpecificEvent = true;
-                    }
-                    else
-                    {
-                        Context.SubscriberGotBaseEvent = true;
-                    }
+                    Context.SubscriberGotEvent = true;
+                    return Task.FromResult(0);
+                }
+            }
+
+            public class DoneHandler : IHandleMessages<Done>
+            {
+                public Context Context { get; set; }
+
+                public Task Handle(Done message, IMessageHandlerContext context)
+                {
+                    Context.Done = true;
                     return Task.FromResult(0);
                 }
             }
@@ -82,6 +86,10 @@
         }
 
         public interface IBaseEvent : IEvent
+        {
+        }
+
+        public class Done : ICommand
         {
         }
     }
