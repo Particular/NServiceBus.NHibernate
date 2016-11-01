@@ -33,7 +33,8 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
                 typeof(DerivedFromTestSagaWithTableNameAttributeActualSaga), typeof(DerivedFromTestSagaWithTableNameAttribute),
                 typeof(TestSagaWithTableNameAttributeActualSaga), typeof(TestSagaWithTableNameAttribute),
                 typeof(SagaWithVersionedPropertyAttributeActualSaga), typeof(SagaWithVersionedPropertyAttribute),
-                typeof(SagaWithoutVersionedPropertyAttributeActualSaga), typeof(SagaWithoutVersionedPropertyAttribute)
+                typeof(SagaWithoutVersionedPropertyAttributeActualSaga), typeof(SagaWithoutVersionedPropertyAttribute),
+                typeof(object)
             };
             metaModel.Initialize(types);
             settings.Set<SagaMetadataCollection>(metaModel);
