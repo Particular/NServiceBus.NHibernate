@@ -1,10 +1,14 @@
 ﻿namespace NServiceBus.AcceptanceTests.Routing
 {
     using System;
+    using System.Collections.Generic;
     using System.Threading.Tasks;
     using AcceptanceTesting;
+    using AcceptanceTesting.Customization;
     using EndpointTemplates;
     using Features;
+    using NServiceBus.Configuration.AdvanceExtensibility;
+    using NServiceBus.Routing.MessageDrivenSubscriptions;
     using NUnit.Framework;
 
     public class When_base_event_from_2_publishers : NServiceBusAcceptanceTest
@@ -80,9 +84,16 @@
         {
             public Subscriber1()
             {
-                EndpointSetup<DefaultServer>(c => c.DisableFeature<AutoSubscribe>())
-                    .AddMapping<DerivedEvent1>(typeof(Publisher1))
-                    .AddMapping<DerivedEvent2>(typeof(Publisher2));
+                EndpointSetup<DefaultServer>((c, r) =>
+                {
+                    c.DisableFeature<AutoSubscribe>();
+                    var publishers = c.UseTransport(r.GetTransportType()).Routing().GetSettings().GetOrCreate<Publishers>();
+                    publishers.AddOrReplacePublishers("AcceptanceTest", new List<PublisherTableEntry>
+                    {
+                        new PublisherTableEntry(typeof(DerivedEvent1), PublisherAddress.CreateFromEndpointName(Conventions.EndpointNamingConvention(typeof(Publisher1)))),
+                        new PublisherTableEntry(typeof(DerivedEvent2), PublisherAddress.CreateFromEndpointName(Conventions.EndpointNamingConvention(typeof(Publisher2)))),
+                    });
+                });
             }
 
             public class BaseEventHandler : IHandleMessages<BaseEvent>
