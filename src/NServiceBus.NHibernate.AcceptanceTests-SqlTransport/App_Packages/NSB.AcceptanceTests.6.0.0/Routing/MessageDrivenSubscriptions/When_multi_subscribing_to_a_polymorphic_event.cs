@@ -104,7 +104,7 @@
                     publishers.AddOrReplacePublishers("AcceptanceTests", new List<PublisherTableEntry>
                     {
                         new PublisherTableEntry(typeof(IMyEvent), PublisherAddress.CreateFromEndpointName(Conventions.EndpointNamingConvention(typeof(Publisher1)))),
-                        new PublisherTableEntry(typeof(IMyEvent), PublisherAddress.CreateFromEndpointName(Conventions.EndpointNamingConvention(typeof(Publisher2))))
+                        new PublisherTableEntry(typeof(MyEvent2), PublisherAddress.CreateFromEndpointName(Conventions.EndpointNamingConvention(typeof(Publisher2))))
                     });
                 });
             }
