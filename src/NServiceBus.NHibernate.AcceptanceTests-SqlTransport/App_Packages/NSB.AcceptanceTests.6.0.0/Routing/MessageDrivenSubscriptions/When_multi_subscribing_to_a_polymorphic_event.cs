@@ -100,7 +100,7 @@
                 EndpointSetup<DefaultServer>((c, r) =>
                 {
                     c.DisableFeature<AutoSubscribe>();
-                    var publishers = c.UseTransport(r.GetTransportType()).Routing().GetSettings().Get<Publishers>();
+                    var publishers = c.UseTransport(r.GetTransportType()).Routing().GetSettings().GetOrCreate<Publishers>();
                     publishers.AddOrReplacePublishers("AcceptanceTests", new List<PublisherTableEntry>
                     {
                         new PublisherTableEntry(typeof(IMyEvent), PublisherAddress.CreateFromEndpointName(Conventions.EndpointNamingConvention(typeof(Publisher1)))),
