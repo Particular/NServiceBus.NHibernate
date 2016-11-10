@@ -12,7 +12,7 @@
     {
         static string PublisherEndpoint => Conventions.EndpointNamingConvention(typeof(Publisher));
 
-        [Test]
+        [Test, Ignore("Ignore unstable tests for now")]
         public async Task Each_event_should_be_delivered_to_single_instance_of_each_subscriber()
         {
             await Scenario.Define<Context>()
@@ -94,7 +94,7 @@
             public SubscriberB()
             {
                 EndpointSetup<DefaultServer>(c =>
-                {                    
+                {
                     c.MessageDrivenPubSubRouting().RegisterPublisher(typeof(MyEvent), PublisherEndpoint);
                 });
             }
