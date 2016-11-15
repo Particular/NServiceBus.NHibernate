@@ -89,6 +89,7 @@
     <Compile Include="Outbox\IOutboxRecord.cs" />
     <Compile Include="Outbox\OutboxConfig.cs" />
     <Compile Include="Outbox\OutboxRecord.cs" />
+    <Compile Include="RepeatedFailuresOverTimeCircuitBreaker.cs" />
     <Compile Include="SynchronizedStorage\INHibernateSynchronizedStorageSession.cs" />
     <Compile Include="SynchronizedStorage\NHibernateAmbientTransactionSynchronizedStorageSession.cs" />
     <Compile Include="Obsoletes\NHibernateStorageContext.cs" />
