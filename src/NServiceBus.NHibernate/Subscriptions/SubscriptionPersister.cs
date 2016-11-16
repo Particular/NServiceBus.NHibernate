@@ -126,6 +126,37 @@ namespace NServiceBus.Unicast.Subscriptions.NHibernate
 
         public virtual Task<IEnumerable<Subscriber>> GetSubscriberAddressesForMessage(IEnumerable<MessageType> messageTypes, ContextBag context)
         {
+            var listOfMessageTypes = string.Join(",", messageTypes.Select(t => t.TypeName));
+
+            for (var attempt = 1; attempt <= MaxRetries; ++attempt)
+            {
+                try
+                {
+                    var subscriberAddresses = QuerySubscriberAddressesForMessage(messageTypes);
+                    return Task.FromResult(subscriberAddresses);
+                }
+                catch (Exception)
+                {
+                    // An connection error is possible at this point.
+
+                    if (attempt < MaxRetries)
+                    {
+                        // An exception will be swallowed here to allow for a retry.
+                        Logger.DebugFormat("Error occured when querying for subscriber addresses for messages '[{0}]'. The operation will be retried.", listOfMessageTypes);
+                    }
+                    else
+                    {
+                        // This was the last attempt, give up.
+                        throw;
+                    }
+                }
+            }
+
+            throw new Exception($"Internal error occured when querying for subscriber addresses for messages '[{listOfMessageTypes}]'");
+        }
+
+        IEnumerable<Subscriber> QuerySubscriberAddressesForMessage(IEnumerable<MessageType> messageTypes)
+        {
             using (new TransactionScope(TransactionScopeOption.Suppress))
             using (var session = sessionFactory.OpenStatelessSession())
             using (var tx = session.BeginTransaction(IsolationLevel.ReadCommitted))
@@ -142,7 +173,7 @@ namespace NServiceBus.Unicast.Subscriptions.NHibernate
 
                 tx.Commit();
 
-                return Task.FromResult(results.AsEnumerable());
+                return results;
             }
         }
 
