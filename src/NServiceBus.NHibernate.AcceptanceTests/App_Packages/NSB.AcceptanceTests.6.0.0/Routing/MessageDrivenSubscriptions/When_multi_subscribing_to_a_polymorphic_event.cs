@@ -10,6 +10,7 @@
     public class When_multi_subscribing_to_a_polymorphic_event : NServiceBusAcceptanceTest
     {
         [Test]
+        [Category("pubsub")]
         public async Task Both_events_should_be_delivered()
         {
             await Scenario.Define<Context>()
