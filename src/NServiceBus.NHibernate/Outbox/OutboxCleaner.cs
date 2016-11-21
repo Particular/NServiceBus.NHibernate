@@ -4,15 +4,12 @@ namespace NServiceBus.Features
     using System.Configuration;
     using System.Threading;
     using System.Threading.Tasks;
-    using NServiceBus.Persistence.NHibernate;
 
     class OutboxCleaner : FeatureStartupTask
     {
-        public OutboxPersister OutboxPersister { get; }
-
-        public OutboxCleaner(OutboxPersister outboxPersister)
+        public OutboxCleaner(INHibernateOutboxStorage outboxPersister)
         {
-            OutboxPersister = outboxPersister;
+            this.outboxPersister = outboxPersister;
         }
 
         protected override Task OnStart(IMessageSession busSession)
@@ -58,13 +55,14 @@ namespace NServiceBus.Features
 
         void PerformCleanup(object state)
         {
-            OutboxPersister.RemoveEntriesOlderThan(DateTime.UtcNow - timeToKeepDeduplicationData);
+            outboxPersister.RemoveEntriesOlderThan(DateTime.UtcNow - timeToKeepDeduplicationData);
         }
 
         // ReSharper disable NotAccessedField.Local
         Timer cleanupTimer;
         // ReSharper restore NotAccessedField.Local
-        TimeSpan timeToKeepDeduplicationData;
         TimeSpan frequencyToRunDeduplicationDataCleanup;
+        INHibernateOutboxStorage outboxPersister;
+        TimeSpan timeToKeepDeduplicationData;
     }
 }
