@@ -5,13 +5,13 @@ VisualStudioVersion = 14.0.24720.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NServiceBus.NHibernate", "NServiceBus.NHibernate\NServiceBus.NHibernate.csproj", "{281646E3-32E0-4F4D-BCF6-1DC5EFC6C268}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NServiceBus.NHibernate.Tests", "NServiceBus.NHibernate.Tests\NServiceBus.NHibernate.Tests.csproj", "{7F6284D7-8DBE-44D3-875C-C59FC7489287}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NServiceBus.NHibernate.Tests", "Tests\NServiceBus.NHibernate.Tests.csproj", "{7F6284D7-8DBE-44D3-875C-C59FC7489287}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NServiceBus.NHibernate.PerformanceTests", "NServiceBus.NHibernate.PerformanceTests\NServiceBus.NHibernate.PerformanceTests.csproj", "{96467E41-F299-474C-AB0D-00B7CCD73E26}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NServiceBus.NHibernate.PerformanceTests", "PerformanceTests\NServiceBus.NHibernate.PerformanceTests.csproj", "{96467E41-F299-474C-AB0D-00B7CCD73E26}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NServiceBus.NHibernate.AcceptanceTests", "NServiceBus.NHibernate.AcceptanceTests\NServiceBus.NHibernate.AcceptanceTests.csproj", "{8BF5E2C0-8F97-4746-9A8B-10CB38CF8B97}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NServiceBus.NHibernate.AcceptanceTests", "AcceptanceTests\NServiceBus.NHibernate.AcceptanceTests.csproj", "{8BF5E2C0-8F97-4746-9A8B-10CB38CF8B97}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NServiceBus.NHibernate.AcceptanceTests-Oracle", "NServiceBus.NHibernate.AcceptanceTests-Oracle\NServiceBus.NHibernate.AcceptanceTests-Oracle.csproj", "{0412098A-6622-44AF-8932-C4C77E525B1F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NServiceBus.NHibernate.AcceptanceTests-Oracle", "AcceptanceTests-Oracle\NServiceBus.NHibernate.AcceptanceTests-Oracle.csproj", "{0412098A-6622-44AF-8932-C4C77E525B1F}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{8A0A9664-98CF-4DD4-9330-9FA28183BC23}"
 	ProjectSection(SolutionItems) = preProject
@@ -23,7 +23,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{99DC84
 		.nuget\packages.config = .nuget\packages.config
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NServiceBus.NHibernate.AcceptanceTests-SqlTransport", "NServiceBus.NHibernate.AcceptanceTests-SqlTransport\NServiceBus.NHibernate.AcceptanceTests-SqlTransport.csproj", "{40F6304C-CFA4-426F-949B-AB7E0E370C27}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NServiceBus.NHibernate.AcceptanceTests-SqlTransport", "AcceptanceTests-SqlTransport\NServiceBus.NHibernate.AcceptanceTests-SqlTransport.csproj", "{40F6304C-CFA4-426F-949B-AB7E0E370C27}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{40F6304C-CFA4-426F-949B-AB7E0E370C27}</ProjectGuid>
+    <ProjectGuid>{0412098A-6622-44AF-8932-C4C77E525B1F}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>NServiceBus.NHibernate.AcceptanceTests</RootNamespace>
-    <AssemblyName>NServiceBus.NHibernate.AcceptanceTests-SqlTransport</AssemblyName>
+    <AssemblyName>NServiceBus.NHibernate.AcceptanceTests-Oracle</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
@@ -56,13 +56,12 @@
       <HintPath>..\packages\NServiceBus.6.1.0-alpha0079\lib\net452\NServiceBus.Core.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="NServiceBus.Transport.SQLServer, Version=3.0.0.0, Culture=neutral, PublicKeyToken=9fc386479f8a226c, processorArchitecture=MSIL">
-      <HintPath>..\packages\NServiceBus.SqlServer.3.0.0\lib\net452\NServiceBus.Transport.SQLServer.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="nunit.framework, Version=3.2.1.0, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">
       <HintPath>..\packages\NUnit.3.2.1\lib\net45\nunit.framework.dll</HintPath>
       <Private>True</Private>
+    </Reference>
+    <Reference Include="Oracle.ManagedDataAccess">
+      <HintPath>..\packages\Oracle.ManagedDataAccess.12.1.2400\lib\net40\Oracle.ManagedDataAccess.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.configuration" />
@@ -75,22 +74,16 @@
     <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\NServiceBus.NHibernate.AcceptanceTests\EndpointConfigurer.cs">
+    <Compile Include="..\AcceptanceTests\EndpointConfigurer.cs">
       <Link>EndpointConfigurer.cs</Link>
     </Compile>
-    <Compile Include="..\NServiceBus.NHibernate.AcceptanceTests\When_saga_contains_nested_collection.cs">
+    <Compile Include="..\AcceptanceTests\When_saga_contains_nested_collection.cs">
       <Link>When_saga_contains_nested_collection.cs</Link>
     </Compile>
-    <Compile Include="..\NServiceBus.NHibernate.AcceptanceTests\When_saga_contains_nested_collection_without_parent_relation.cs">
-      <Link>When_saga_contains_nested_collection_without_parent_relation.cs</Link>
-    </Compile>
-    <Compile Include="..\NServiceBus.NHibernate.AcceptanceTests\When_saga_contains_nested_collection_with_row_version.cs">
+    <Compile Include="..\AcceptanceTests\When_saga_contains_nested_collection_with_row_version.cs">
       <Link>When_saga_contains_nested_collection_with_row_version.cs</Link>
     </Compile>
-    <Compile Include="..\NServiceBus.NHibernate.AcceptanceTests\When_user_supplies_NH_Configuration.cs">
-      <Link>When_user_supplies_NH_Configuration.cs</Link>
-    </Compile>
-    <Compile Include="..\NServiceBus.NHibernate.AcceptanceTests\When_using_hbms.cs">
+    <Compile Include="..\AcceptanceTests\When_using_hbms.cs">
       <Link>When_using_hbms.cs</Link>
     </Compile>
     <Compile Include="App_Packages\NSB.AcceptanceTests.6.1.0-alpha0079\ApiExtension\When_extending_sendoptions.cs" />
@@ -336,7 +329,6 @@
     <Compile Include="App_Packages\NSB.AcceptanceTests.6.1.0-alpha0079\UnicastRoutingExtensions.cs" />
     <Compile Include="App_Packages\NSB.AcceptanceTests.6.1.0-alpha0079\Versioning\When_multiple_versions_of_a_message_is_published.cs" />
     <Compile Include="ConfigureEndpointNHibernatePersistence.cs" />
-    <Compile Include="ConfigureEndpointSqlServerTransport.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config">
