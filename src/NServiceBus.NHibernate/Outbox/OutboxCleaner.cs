@@ -7,7 +7,6 @@ namespace NServiceBus.Features
 
     class OutboxCleaner : FeatureStartupTask
     {
-
         public OutboxCleaner(INHibernateOutboxStorage outboxPersister, CriticalError criticalError)
         {
             this.outboxPersister = outboxPersister;
@@ -54,8 +53,8 @@ namespace NServiceBus.Features
             circuitBreaker = new RepeatedFailuresOverTimeCircuitBreaker(
                 "OutboxCleanupTaskConnectivity",
                 timeToWaitBeforeTriggeringCriticalError,
-                ex => criticalError.Raise("Repeated failures when purging expired outbox records from storage, endpoint will be terminated.", ex)
-                );
+                ex => criticalError.Raise("Failed to clean the Oubox.", ex)
+            );
 
             cleanupTimer = new Timer(PerformCleanup, null, TimeSpan.FromMinutes(1), frequencyToRunDeduplicationDataCleanup);
 
@@ -87,14 +86,15 @@ namespace NServiceBus.Features
             }
         }
 
+        RepeatedFailuresOverTimeCircuitBreaker circuitBreaker;
+
         // ReSharper disable NotAccessedField.Local
         Timer cleanupTimer;
         // ReSharper restore NotAccessedField.Local
+        CriticalError criticalError;
         TimeSpan frequencyToRunDeduplicationDataCleanup;
         INHibernateOutboxStorage outboxPersister;
         TimeSpan timeToKeepDeduplicationData;
-        RepeatedFailuresOverTimeCircuitBreaker circuitBreaker;
         TimeSpan timeToWaitBeforeTriggeringCriticalError;
-        CriticalError criticalError;
     }
 }
