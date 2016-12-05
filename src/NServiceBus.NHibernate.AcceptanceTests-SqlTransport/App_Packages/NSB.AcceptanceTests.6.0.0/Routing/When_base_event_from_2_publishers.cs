@@ -49,14 +49,18 @@
         {
             public Publisher1()
             {
-                EndpointSetup<DefaultPublisher>(b => b.OnEndpointSubscribed<Context>((s, context) =>
+                EndpointSetup<DefaultPublisher>(b =>
                 {
-                    context.AddTrace("Publisher1 SubscriberReturnAddress=" + s.SubscriberReturnAddress);
-                    if (s.SubscriberReturnAddress.Contains("Subscriber1"))
+                    b.LimitMessageProcessingConcurrencyTo(1);
+                    b.OnEndpointSubscribed<Context>((s, context) =>
                     {
-                        context.SubscribedToPublisher1 = true;
-                    }
-                }));
+                        context.AddTrace("Publisher1 SubscriberReturnAddress=" + s.SubscriberReturnAddress);
+                        if (s.SubscriberReturnAddress.Contains("Subscriber1"))
+                        {
+                            context.SubscribedToPublisher1 = true;
+                        }
+                    });
+                });
             }
         }
 
@@ -64,15 +68,19 @@
         {
             public Publisher2()
             {
-                EndpointSetup<DefaultPublisher>(b => b.OnEndpointSubscribed<Context>((s, context) =>
+                EndpointSetup<DefaultPublisher>(b =>
                 {
-                    context.AddTrace("Publisher2 SubscriberReturnAddress=" + s.SubscriberReturnAddress);
-
-                    if (s.SubscriberReturnAddress.Contains("Subscriber1"))
+                    b.LimitMessageProcessingConcurrencyTo(1);
+                    b.OnEndpointSubscribed<Context>((s, context) =>
                     {
-                        context.SubscribedToPublisher2 = true;
-                    }
-                }));
+                        context.AddTrace("Publisher2 SubscriberReturnAddress=" + s.SubscriberReturnAddress);
+
+                        if (s.SubscriberReturnAddress.Contains("Subscriber1"))
+                        {
+                            context.SubscribedToPublisher2 = true;
+                        }
+                    });
+                });
             }
         }
 

@@ -56,6 +56,7 @@
                 {
                     //Immediate Retries on since subscription storages can throw on concurrency violation and need to retry
                     b.Recoverability().Immediate(immediate => immediate.NumberOfRetries(5));
+                    b.LimitMessageProcessingConcurrencyTo(1);
                     b.OnEndpointSubscribed<Context>((args, context) =>
                     {
                         context.AddTrace("Publisher1 OnEndpointSubscribed " + args.MessageType);
@@ -76,7 +77,7 @@
                 {
                     // Immediate Retries on since subscription storages can throw on concurrency violation and need to retry
                     b.Recoverability().Immediate(immediate => immediate.NumberOfRetries(5));
-
+                    b.LimitMessageProcessingConcurrencyTo(1);
                     b.OnEndpointSubscribed<Context>((args, context) =>
                     {
                         context.AddTrace("Publisher2 OnEndpointSubscribed " + args.MessageType);

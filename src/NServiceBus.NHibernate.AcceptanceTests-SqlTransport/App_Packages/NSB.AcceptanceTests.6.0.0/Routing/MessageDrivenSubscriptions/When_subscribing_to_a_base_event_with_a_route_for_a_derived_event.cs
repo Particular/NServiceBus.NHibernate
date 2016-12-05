@@ -42,10 +42,14 @@
         {
             public PublisherOne()
             {
-                EndpointSetup<DefaultPublisher>(b => b.OnEndpointSubscribed<Context>((args, context) =>
+                EndpointSetup<DefaultPublisher>(b =>
                 {
-                    context.SubscriberSubscribedToOne = true;
-                }));
+                    b.LimitMessageProcessingConcurrencyTo(1);
+                    b.OnEndpointSubscribed<Context>((args, context) =>
+                    {
+                        context.SubscriberSubscribedToOne = true;
+                    });
+                });
             }
         }
 
@@ -53,10 +57,14 @@
         {
             public PublisherTwo()
             {
-                EndpointSetup<DefaultPublisher>(b => b.OnEndpointSubscribed<Context>((args, context) =>
+                EndpointSetup<DefaultPublisher>(b =>
                 {
-                    context.SubscriberSubscribedToTwo = true;
-                }));
+                    b.LimitMessageProcessingConcurrencyTo(1);
+                    b.OnEndpointSubscribed<Context>((args, context) =>
+                    {
+                        context.SubscriberSubscribedToTwo = true;
+                    });
+                });
             }
         }
 
