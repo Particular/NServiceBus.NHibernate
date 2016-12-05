@@ -1,9 +1,13 @@
 ﻿namespace NServiceBus.AcceptanceTests.Routing.MessageDrivenSubscriptions
 {
+    using System.Collections.Generic;
     using System.Threading.Tasks;
     using AcceptanceTesting;
+    using AcceptanceTesting.Customization;
     using EndpointTemplates;
     using Features;
+    using NServiceBus.Configuration.AdvanceExtensibility;
+    using NServiceBus.Routing.MessageDrivenSubscriptions;
     using NUnit.Framework;
     using ScenarioDescriptors;
 
@@ -94,9 +98,16 @@
         {
             public Subscriber1()
             {
-                EndpointSetup<DefaultServer>(c => c.DisableFeature<AutoSubscribe>())
-                    .AddMapping<IMyEvent>(typeof(Publisher1))
-                    .AddMapping<MyEvent2>(typeof(Publisher2));
+                EndpointSetup<DefaultServer>((c, r) =>
+                {
+                    c.DisableFeature<AutoSubscribe>();
+                    var publishers = c.UseTransport(r.GetTransportType()).Routing().GetSettings().GetOrCreate<Publishers>();
+                    publishers.AddOrReplacePublishers("AcceptanceTests", new List<PublisherTableEntry>
+                    {
+                        new PublisherTableEntry(typeof(IMyEvent), PublisherAddress.CreateFromEndpointName(Conventions.EndpointNamingConvention(typeof(Publisher1)))),
+                        new PublisherTableEntry(typeof(MyEvent2), PublisherAddress.CreateFromEndpointName(Conventions.EndpointNamingConvention(typeof(Publisher2))))
+                    });
+                });
             }
 
             public class MyEventHandler : IHandleMessages<IMyEvent>

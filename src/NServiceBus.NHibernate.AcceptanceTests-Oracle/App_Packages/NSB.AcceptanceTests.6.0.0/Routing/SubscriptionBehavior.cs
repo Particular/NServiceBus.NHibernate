@@ -18,16 +18,23 @@
 
         public async Task Invoke(IIncomingPhysicalMessageContext context, Func<IIncomingPhysicalMessageContext, Task> next)
         {
-            await next(context).ConfigureAwait(false);
+            string returnAddress;
+            if (!context.Message.Headers.TryGetValue(Headers.SubscriberTransportAddress, out returnAddress))
+            {
+                context.Message.Headers.TryGetValue(Headers.ReplyToAddress, out returnAddress);
+            }
             var subscriptionMessageType = GetSubscriptionMessageTypeFrom(context.Message);
+            try
+            {
+                await next(context).ConfigureAwait(false);
+            }
+            catch (Exception e)
+            {
+                scenarioContext.AddTrace($"Error in SubscriptionBehavior: {e}");
+                throw;
+            }
             if (subscriptionMessageType != null)
             {
-                string returnAddress;
-                if (!context.Message.Headers.TryGetValue(Headers.SubscriberTransportAddress, out returnAddress))
-                {
-                    context.Message.Headers.TryGetValue(Headers.ReplyToAddress, out returnAddress);
-                }
-
                 var intent = (MessageIntentEnum)Enum.Parse(typeof(MessageIntentEnum), context.Message.Headers[Headers.MessageIntent], true);
                 if (intent != intentToHandle)
                 {
