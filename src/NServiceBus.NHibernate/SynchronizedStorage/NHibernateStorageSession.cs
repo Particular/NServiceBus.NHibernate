@@ -22,7 +22,7 @@ namespace NServiceBus.Features
 
             Defaults(s => s.SetDefault<SharedMappings>(new SharedMappings()));
 
-            // since the installers are registered even if the feature isn't enabled we need to make 
+            // since the installers are registered even if the feature isn't enabled we need to make
             // this a no-op of there is no "schema updater" available
             Defaults(c => c.Set<Installer.SchemaUpdater>(new Installer.SchemaUpdater()));
         }
@@ -54,7 +54,7 @@ namespace NServiceBus.Features
             if (outboxEnabled)
             {
                 context.Container.ConfigureComponent(b => new OutboxPersister(sessionFactory, context.Settings.EndpointName().ToString()), DependencyLifecycle.SingleInstance);
-                context.RegisterStartupTask(b => new OutboxCleaner(b.Build<OutboxPersister>()));
+                context.RegisterStartupTask(b => new OutboxCleaner(b.Build<OutboxPersister>(), b.Build<CriticalError>()));
             }
 
             var runInstaller = context.Settings.Get<bool>("NHibernate.Common.AutoUpdateSchema");
