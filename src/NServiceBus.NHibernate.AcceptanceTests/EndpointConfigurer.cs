@@ -21,7 +21,7 @@ public abstract class EndpointConfigurer : IConfigureEndpointTestExecution
         }
     }
 
-    public abstract Task Configure(string endpointName, EndpointConfiguration configuration, RunSettings settings);
+    public abstract Task Configure(string endpointName, EndpointConfiguration configuration, RunSettings settings, PublisherMetadata metadata);
 
     public Task Cleanup()
     {

@@ -15,7 +15,7 @@ public class ConfigureScenariosForSqlServerTransport : IConfigureSupportedScenar
 }
 public class ConfigureEndpointSqlServerTransport : EndpointConfigurer
 {
-    public override Task Configure(string endpointName, EndpointConfiguration configuration, RunSettings settings)
+    public override Task Configure(string endpointName, EndpointConfiguration configuration, RunSettings settings, PublisherMetadata metadata)
     {
         configuration.UseTransport<SqlServerTransport>()
             .ConnectionString(ConnectionString);
