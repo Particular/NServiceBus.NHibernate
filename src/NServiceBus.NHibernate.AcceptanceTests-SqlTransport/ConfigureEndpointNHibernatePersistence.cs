@@ -12,11 +12,11 @@ public class ConfigureScenariosForNHibernatePersistence : IConfigureSupportedSce
 
 public class ConfigureEndpointNHibernatePersistence : EndpointConfigurer
 {
-    public override Task Configure(string endpointName, EndpointConfiguration configuration, RunSettings settings)
+    public override Task Configure(string endpointName, EndpointConfiguration configuration, RunSettings settings, PublisherMetadata metadata)
     {
         configuration.UsePersistence<NHibernatePersistence>()
             .ConnectionString(ConnectionString);
 
         return Task.FromResult(0);
-    }    
+    }
 }

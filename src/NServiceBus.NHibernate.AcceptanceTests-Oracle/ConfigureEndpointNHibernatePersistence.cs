@@ -16,7 +16,7 @@ public class ConfigureScenariosForNHibernatePersistence : IConfigureSupportedSce
 
 public class ConfigureEndpointNHibernatePersistence : IConfigureEndpointTestExecution
 {
-    public Task Configure(string endpointName, EndpointConfiguration config, RunSettings settings)
+    public Task Configure(string endpointName, EndpointConfiguration config, RunSettings settings, PublisherMetadata metadata)
     {
         NHibernateSettingRetriever.AppSettings = () => new NameValueCollection
         {
