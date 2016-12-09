@@ -84,6 +84,7 @@
   <ItemGroup>
     <Compile Include="Internal\NHibernateConfiguration.cs" />
     <Compile Include="Internal\ObjectSerializer.cs" />
+    <Compile Include="RepeatedFailuresOverTimeCircuitBreaker.cs" />
     <Compile Include="SynchronizedStorage\INHibernateSynchronizedStorageSession.cs" />
     <Compile Include="SynchronizedStorage\NHibernateAmbientTransactionSynchronizedStorageSession.cs" />
     <Compile Include="Obsoletes\NHibernateStorageContext.cs" />

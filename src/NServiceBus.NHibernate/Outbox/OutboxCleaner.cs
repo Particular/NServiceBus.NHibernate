@@ -8,11 +8,10 @@ namespace NServiceBus.Features
 
     class OutboxCleaner : FeatureStartupTask
     {
-        public OutboxPersister OutboxPersister { get; }
-
-        public OutboxCleaner(OutboxPersister outboxPersister)
+        public OutboxCleaner(OutboxPersister outboxPersister, CriticalError criticalError)
         {
-            OutboxPersister = outboxPersister;
+            this.outboxPersister = outboxPersister;
+            this.criticalError = criticalError;
         }
 
         protected override Task OnStart(IMessageSession busSession)
@@ -32,14 +31,31 @@ namespace NServiceBus.Features
 
             if (configValue == null)
             {
-                frequencyToRunDeduplicationDataCleanup = TimeSpan.FromMinutes(1);
+                frequencyToRunDeduplicationDataCleanup = DefaultFrequencyToRunDeduplicationDataCleanup;
             }
             else if (!TimeSpan.TryParse(configValue, out frequencyToRunDeduplicationDataCleanup))
             {
                 throw new Exception("Invalid value in \"NServiceBus/Outbox/NHibernate/FrequencyToRunDeduplicationDataCleanup\" AppSetting. Please ensure it is a TimeSpan.");
             }
 
-            cleanupTimer = new Timer(PerformCleanup, null, TimeSpan.FromMinutes(1), frequencyToRunDeduplicationDataCleanup);
+            configValue = ConfigurationManager.AppSettings.Get("NServiceBus/Outbox/NHibernate/TimeToWaitBeforeTriggeringCriticalErrorWhenCleanupTaskFails");
+
+            if (configValue == null)
+            {
+                timeToWaitBeforeTriggeringCriticalError = DefaultTimeToWaitBeforeTriggeringCriticalError;
+            }
+            else if (!TimeSpan.TryParse(configValue, out timeToWaitBeforeTriggeringCriticalError))
+            {
+                throw new Exception("Invalid value in \"NServiceBus/Outbox/NHibernate/TimeToWaitBeforeTriggeringCriticalErrorWhenCleanupTaskFails\" AppSetting. Please ensure it is a TimeSpan.");
+            }
+
+            circuitBreaker = new RepeatedFailuresOverTimeCircuitBreaker(
+                "OutboxCleanupTaskConnectivity",
+                timeToWaitBeforeTriggeringCriticalError,
+                ex => criticalError.Raise("Failed to clean the Oubox.", ex)
+            );
+
+            cleanupTimer = new Timer(PerformCleanup, null, OutboxCleanupStartupDelay, frequencyToRunDeduplicationDataCleanup);
 
             return Task.FromResult(true);
         }
@@ -58,13 +74,29 @@ namespace NServiceBus.Features
 
         void PerformCleanup(object state)
         {
-            OutboxPersister.RemoveEntriesOlderThan(DateTime.UtcNow - timeToKeepDeduplicationData);
+            try
+            {
+                outboxPersister.RemoveEntriesOlderThan(DateTime.UtcNow - timeToKeepDeduplicationData);
+                circuitBreaker.Success();
+            }
+            catch (Exception ex)
+            {
+                circuitBreaker.Failure(ex);
+            }
         }
 
+        RepeatedFailuresOverTimeCircuitBreaker circuitBreaker;
+        OutboxPersister outboxPersister;
         // ReSharper disable NotAccessedField.Local
         Timer cleanupTimer;
         // ReSharper restore NotAccessedField.Local
         TimeSpan timeToKeepDeduplicationData;
+        CriticalError criticalError;
         TimeSpan frequencyToRunDeduplicationDataCleanup;
+        TimeSpan timeToWaitBeforeTriggeringCriticalError;
+
+        static readonly TimeSpan DefaultFrequencyToRunDeduplicationDataCleanup = TimeSpan.FromMinutes(1);
+        static readonly TimeSpan DefaultTimeToWaitBeforeTriggeringCriticalError = TimeSpan.FromMinutes(2);
+        static readonly TimeSpan OutboxCleanupStartupDelay = TimeSpan.FromMinutes(1);
     }
 }
