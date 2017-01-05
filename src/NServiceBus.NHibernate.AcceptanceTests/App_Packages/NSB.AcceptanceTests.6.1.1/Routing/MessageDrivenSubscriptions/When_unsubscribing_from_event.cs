@@ -11,6 +11,7 @@
     public class When_unsubscribing_from_event : NServiceBusAcceptanceTest
     {
         [Test]
+        [Category("pubsub")]
         public Task ShouldNoLongerReceiveEvent()
         {
             return Scenario.Define<Context>()
