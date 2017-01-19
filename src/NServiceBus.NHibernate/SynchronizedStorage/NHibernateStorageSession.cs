@@ -7,6 +7,7 @@ namespace NServiceBus.Features
     using global::NHibernate.Cfg;
     using global::NHibernate.Mapping.ByCode;
     using global::NHibernate.Tool.hbm2ddl;
+    using NServiceBus.NHibernate.Outbox;
     using NServiceBus.Outbox.NHibernate;
     using Persistence.NHibernate;
     using Persistence.NHibernate.Installer;
@@ -16,11 +17,18 @@ namespace NServiceBus.Features
     /// </summary>
     public class NHibernateStorageSession : Feature
     {
+        internal const string OutboxMappingSettingsKey = "NServiceBus.NHibernate.OutboxMapping";
+
         internal NHibernateStorageSession()
         {
             DependsOnOptionally<Outbox>();
 
-            Defaults(s => s.SetDefault<SharedMappings>(new SharedMappings()));
+            Defaults(s =>
+            {
+                s.SetDefault<SharedMappings>(new SharedMappings());
+                s.SetDefault<IOutboxPersisterFactory>(new OutboxPersisterFactory<OutboxRecord>());
+                s.SetDefault(OutboxMappingSettingsKey, typeof(OutboxRecordMapping));
+            });
 
             // since the installers are registered even if the feature isn't enabled we need to make
             // this a no-op of there is no "schema updater" available
@@ -39,7 +47,7 @@ namespace NServiceBus.Features
             var outboxEnabled = context.Settings.IsFeatureActive(typeof(Outbox));
             if (outboxEnabled)
             {
-                sharedMappings.AddMapping(ApplyMappings);
+                sharedMappings.AddMapping(configuration => ApplyMappings(configuration, context));
             }
 
             sharedMappings.ApplyTo(config.Configuration);
@@ -53,8 +61,10 @@ namespace NServiceBus.Features
 
             if (outboxEnabled)
             {
-                context.Container.ConfigureComponent(b => new OutboxPersister(sessionFactory, context.Settings.EndpointName().ToString()), DependencyLifecycle.SingleInstance);
-                context.RegisterStartupTask(b => new OutboxCleaner(b.Build<OutboxPersister>(), b.Build<CriticalError>()));
+                var factory = context.Settings.Get<IOutboxPersisterFactory>();
+                var persister = factory.Create(sessionFactory, context.Settings.EndpointName());
+                context.Container.ConfigureComponent(b => persister, DependencyLifecycle.SingleInstance);
+                context.RegisterStartupTask(b => new OutboxCleaner(persister, b.Build<CriticalError>()));
             }
 
             var runInstaller = context.Settings.Get<bool>("NHibernate.Common.AutoUpdateSchema");
@@ -87,11 +97,10 @@ TSql Script:
             }
         }
 
-        void ApplyMappings(Configuration config)
+        void ApplyMappings(Configuration config, FeatureConfigurationContext context)
         {
             var mapper = new ModelMapper();
-            mapper.AddMapping<OutboxEntityMap>();
-
+            mapper.AddMapping(context.Settings.Get<Type>(OutboxMappingSettingsKey));
             config.AddMapping(mapper.CompileMappingForAllExplicitlyAddedEntities());
         }
     }

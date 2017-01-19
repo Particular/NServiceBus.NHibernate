@@ -84,6 +84,11 @@
   <ItemGroup>
     <Compile Include="Internal\NHibernateConfiguration.cs" />
     <Compile Include="Internal\ObjectSerializer.cs" />
+    <Compile Include="Outbox\INHibernateOutboxStorage.cs" />
+    <Compile Include="Outbox\IOutboxPersisterFactory.cs" />
+    <Compile Include="Outbox\IOutboxRecord.cs" />
+    <Compile Include="Outbox\OutboxConfig.cs" />
+    <Compile Include="Outbox\OutboxRecord.cs" />
     <Compile Include="RepeatedFailuresOverTimeCircuitBreaker.cs" />
     <Compile Include="SynchronizedStorage\INHibernateSynchronizedStorageSession.cs" />
     <Compile Include="SynchronizedStorage\NHibernateAmbientTransactionSynchronizedStorageSession.cs" />
@@ -111,8 +116,8 @@
     <Compile Include="SagaPersisters\NHibernateSagaStorage.cs" />
     <Compile Include="SynchronizedStorage\NHibernateStorageSession.cs" />
     <Compile Include="Outbox\IDbConnectionProvider.cs" />
-    <Compile Include="Outbox\Entities.cs" />
-    <Compile Include="Outbox\EntityMappings.cs" />
+    <Compile Include="Outbox\OutboxOperation.cs" />
+    <Compile Include="Outbox\OutboxRecordMapping.cs" />
     <Compile Include="Outbox\OutboxPersister.cs" />
     <Compile Include="Internal\NHibernateConfigurationBuilder.cs" />
     <Compile Include="Internal\NHibernateSettingRetriever.cs" />

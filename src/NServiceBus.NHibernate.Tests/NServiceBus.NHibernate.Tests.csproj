@@ -58,7 +58,7 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="NServiceBus.Core, Version=6.0.0.0, Culture=neutral, PublicKeyToken=9fc386479f8a226c, processorArchitecture=MSIL">
-      <HintPath>..\packages\NServiceBus.6.0.0\lib\net452\NServiceBus.Core.dll</HintPath>
+      <HintPath>..\packages\NServiceBus.6.1.1\lib\net452\NServiceBus.Core.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="nunit.framework, Version=3.2.1.0, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">
@@ -82,9 +82,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Outbox\FakeDbConnectionProvider.cs" />
-    <Compile Include="Outbox\InMemoryDBFixture.cs" />
-    <Compile Include="Outbox\When_deserializing_outbox_messages.cs" />
+    <Compile Include="Outbox\MessageIdOutboxRecord.cs" />
+    <Compile Include="Outbox\GuidOutboxRecord.cs" />
     <Compile Include="Outbox\When_adding_outbox_messages.cs" />
+    <Compile Include="Outbox\When_deserializing_outbox_messages.cs" />
     <Compile Include="Persistence\NHibernateConfigurationBuilderTests.cs" />
     <Compile Include="SagaPersister\FakeConfigurationSource.cs" />
     <Compile Include="SagaPersister\InMemoryFixture.cs" />
@@ -108,7 +109,6 @@
     <Compile Include="TimeoutPersister\InMemoryDBFixture.cs" />
     <Compile Include="TimeoutPersister\When_fetching_timeouts_from_storage.cs" />
     <Compile Include="TimeoutPersister\When_removing_timeouts_from_the_storage.cs" />
-    <Compile Include="Outbox\When_getting_outbox_messages.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="hibernate.cfg.xml">

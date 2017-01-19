@@ -4,11 +4,10 @@ namespace NServiceBus.Features
     using System.Configuration;
     using System.Threading;
     using System.Threading.Tasks;
-    using NServiceBus.Persistence.NHibernate;
 
     class OutboxCleaner : FeatureStartupTask
     {
-        public OutboxCleaner(OutboxPersister outboxPersister, CriticalError criticalError)
+        public OutboxCleaner(INHibernateOutboxStorage outboxPersister, CriticalError criticalError)
         {
             this.outboxPersister = outboxPersister;
             this.criticalError = criticalError;
@@ -86,13 +85,14 @@ namespace NServiceBus.Features
         }
 
         RepeatedFailuresOverTimeCircuitBreaker circuitBreaker;
-        OutboxPersister outboxPersister;
+
         // ReSharper disable NotAccessedField.Local
         Timer cleanupTimer;
         // ReSharper restore NotAccessedField.Local
         TimeSpan timeToKeepDeduplicationData;
         CriticalError criticalError;
         TimeSpan frequencyToRunDeduplicationDataCleanup;
+        INHibernateOutboxStorage outboxPersister;
         TimeSpan timeToWaitBeforeTriggeringCriticalError;
 
         static readonly TimeSpan DefaultFrequencyToRunDeduplicationDataCleanup = TimeSpan.FromMinutes(1);
