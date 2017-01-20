@@ -1,5 +1,6 @@
 namespace NServiceBus.TimeoutPersisters.NHibernate.Tests
 {
+    using System;
     using System.Collections.Generic;
     using System.IO;
     using Config;
@@ -40,7 +41,7 @@ namespace NServiceBus.TimeoutPersisters.NHibernate.Tests
 
             sessionFactory = configuration.BuildSessionFactory();
 
-            persister = new TimeoutPersister("MyTestEndpoint", sessionFactory, new NHibernateSynchronizedStorageAdapter(sessionFactory), new NHibernateSynchronizedStorage(sessionFactory));
+            persister = new TimeoutPersister("MyTestEndpoint", sessionFactory, new NHibernateSynchronizedStorageAdapter(sessionFactory), new NHibernateSynchronizedStorage(sessionFactory), TimeSpan.FromMinutes(2));
         }
     }
 }
