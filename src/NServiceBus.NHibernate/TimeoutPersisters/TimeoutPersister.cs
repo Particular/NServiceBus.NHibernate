@@ -2,6 +2,7 @@ namespace NServiceBus.TimeoutPersisters.NHibernate
 {
     using System;
     using System.Collections.Generic;
+    using System.Data.SqlTypes;
     using System.Linq;
     using System.Threading.Tasks;
     using System.Transactions;
@@ -18,24 +19,39 @@ namespace NServiceBus.TimeoutPersisters.NHibernate
         ISessionFactory SessionFactory;
         ISynchronizedStorageAdapter transportTransactionAdapter;
         ISynchronizedStorage synchronizedStorage;
+        TimeSpan timeoutsCleanupExecutionInterval;
         string EndpointName;
+
+		DateTime lastTimeoutsCleanupExecution = DateTime.MinValue;
 
         public TimeoutPersister(string endpointName,
             ISessionFactory sessionFactory,
             ISynchronizedStorageAdapter transportTransactionAdapter,
-            ISynchronizedStorage synchronizedStorage)
+            ISynchronizedStorage synchronizedStorage, 
+            TimeSpan timeoutsCleanupExecutionInterval)
         {
             EndpointName = endpointName;
             SessionFactory = sessionFactory;
             this.transportTransactionAdapter = transportTransactionAdapter;
             this.synchronizedStorage = synchronizedStorage;
+            this.timeoutsCleanupExecutionInterval = timeoutsCleanupExecutionInterval;
         }
 
         public Task<TimeoutsChunk> GetNextChunk(DateTime startSlice)
         {
-            using (new TransactionScope(TransactionScopeOption.Suppress))
+            var now = DateTime.UtcNow;
+
+            //Every timeoutsCleanupExecutionInterval we extend the query window back in time to make
+            //sure we will pick-up any missed timeouts which might exists due to TimeoutManager timeoute storeage race-condition
+            if (lastTimeoutsCleanupExecution.Add(timeoutsCleanupExecutionInterval) < now)
             {
-                var now = DateTime.UtcNow;
+                lastTimeoutsCleanupExecution = now;
+                //We cannot use DateTime.MinValue as sql supports dates only back to 1 January 1753
+                startSlice = SqlDateTime.MinValue.Value;
+            }
+
+			using (new TransactionScope(TransactionScopeOption.Suppress))
+            {
                 using (var session = SessionFactory.OpenStatelessSession())
                 using (var tx = session.BeginTransaction(IsolationLevel.ReadCommitted))
                 {
