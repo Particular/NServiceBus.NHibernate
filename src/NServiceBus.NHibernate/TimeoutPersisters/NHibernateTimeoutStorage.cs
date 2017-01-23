@@ -1,5 +1,6 @@
 namespace NServiceBus.Features
 {
+    using System;
     using System.Threading.Tasks;
     using Persistence.NHibernate;
     using TimeoutPersisters.NHibernate;
@@ -41,13 +42,16 @@ namespace NServiceBus.Features
                 };
             }
 
+            var timeoutsCleanupExecutionInterval = context.Settings.GetOrDefault<TimeSpan?>("NHibernate.Timeouts.CleanupExecutionInterval") ?? TimeSpan.FromMinutes(2);
+
             context.Container.ConfigureComponent(b =>
             {
                 var sessionFactory = config.Configuration.BuildSessionFactory();
                 return new TimeoutPersister(
                     context.Settings.EndpointName().ToString(),
                     sessionFactory,
-                    new NHibernateSynchronizedStorageAdapter(sessionFactory), new NHibernateSynchronizedStorage(sessionFactory));
+                    new NHibernateSynchronizedStorageAdapter(sessionFactory), new NHibernateSynchronizedStorage(sessionFactory),
+                    timeoutsCleanupExecutionInterval);
             }, DependencyLifecycle.SingleInstance);
         }
 
