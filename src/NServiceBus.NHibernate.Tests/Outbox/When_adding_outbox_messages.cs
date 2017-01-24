@@ -14,6 +14,7 @@ namespace NServiceBus.NHibernate.Tests.Outbox
     using NServiceBus.Outbox;
     using NServiceBus.Outbox.NHibernate;
     using NServiceBus.Persistence.NHibernate;
+    using NServiceBus.TimeoutPersisters.NHibernate.Installer;
     using NUnit.Framework;
     using Environment = global::NHibernate.Cfg.Environment;
 
@@ -51,7 +52,7 @@ namespace NServiceBus.NHibernate.Tests.Outbox
 
             configuration.AddMapping(mapper.CompileMappingForAllExplicitlyAddedEntities());
 
-            new SchemaUpdate(configuration).Execute(false, true);
+            new OptimizedSchemaUpdate(configuration).Execute(false, true);
 
             sessionFactory = configuration.BuildSessionFactory();
 

@@ -1,4 +1,4 @@
-namespace NServiceBus.TimeoutPersisters.NHibernate.Installer
+namespace NServiceBus
 {
     using System;
     using System.Collections.Generic;
@@ -13,11 +13,12 @@ namespace NServiceBus.TimeoutPersisters.NHibernate.Installer
 
     class OptimizedSchemaUpdate
     {
-        public OptimizedSchemaUpdate(Configuration cfg) : this(cfg, cfg.Properties)
+        public OptimizedSchemaUpdate(global::NHibernate.Cfg.Configuration cfg) 
+            : this(cfg, cfg.Properties)
         {
         }
 
-        public OptimizedSchemaUpdate(Configuration cfg, IDictionary<string, string> configProperties)
+        public OptimizedSchemaUpdate(global::NHibernate.Cfg.Configuration cfg, IDictionary<string, string> configProperties)
         {
             configuration = cfg;
             dialect = Dialect.GetDialect(configProperties);
@@ -101,7 +102,10 @@ namespace NServiceBus.TimeoutPersisters.NHibernate.Installer
 
                     if (dialectScopes.Contains(dialect.GetType().FullName))
                     {
-                        sql = sql.Replace("primary key (Id)", "primary key nonclustered (Id)");
+                        if (sql.StartsWith("create table TimeoutEntity"))
+                        {
+                            sql = sql.Replace("primary key (Id)", "primary key nonclustered (Id)");
+                        }
                         sql = sql.Replace("create index TimeoutEntity_EndpointIdx on TimeoutEntity (Time, Endpoint)", "create clustered index TimeoutEntity_EndpointIdx on TimeoutEntity (Endpoint, Time)");
                     }
 
@@ -147,7 +151,7 @@ namespace NServiceBus.TimeoutPersisters.NHibernate.Installer
         }
 
         static IInternalLogger log = LoggerProvider.LoggerFor(typeof(OptimizedSchemaUpdate));
-        Configuration configuration;
+        global::NHibernate.Cfg.Configuration configuration;
         IConnectionHelper connectionHelper;
         Dialect dialect;
         List<Exception> exceptions;

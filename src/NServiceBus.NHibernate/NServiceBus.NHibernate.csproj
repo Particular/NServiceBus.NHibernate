@@ -133,7 +133,7 @@
     <Compile Include="SynchronizedStorageSessionExtensions.cs" />
     <Compile Include="TimeoutPersisters\TimeoutEntityMap.cs" />
     <Compile Include="TimeoutPersisters\Installer\Installer.cs" />
-    <Compile Include="TimeoutPersisters\OptimizedSchemaUpdate.cs" />
+    <Compile Include="OptimizedSchemaUpdate.cs" />
     <Compile Include="TimeoutPersisters\NHibernateTimeoutStorage.cs" />
     <Compile Include="TimeoutPersisters\TimeoutConfig.cs" />
     <Compile Include="TimeoutPersisters\TimeoutEntity.cs" />

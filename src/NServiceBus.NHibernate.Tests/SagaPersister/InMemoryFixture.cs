@@ -6,6 +6,7 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
     using global::NHibernate;
     using global::NHibernate.Tool.hbm2ddl;
     using NServiceBus.Sagas;
+    using NServiceBus.TimeoutPersisters.NHibernate.Installer;
     using NUnit.Framework;
 
     class InMemoryFixture<T> where T : Saga
@@ -36,7 +37,7 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
 
             SessionFactory = configuration.BuildSessionFactory();
 
-            new SchemaUpdate(configuration).Execute(false, true);
+            new OptimizedSchemaUpdate(configuration).Execute(false, true);
 
             SagaPersister = new SagaPersister();
         }

@@ -9,8 +9,9 @@ namespace NServiceBus.Features
     using global::NHibernate.Tool.hbm2ddl;
     using NServiceBus.NHibernate.Outbox;
     using NServiceBus.Outbox.NHibernate;
+    using NServiceBus.TimeoutPersisters.NHibernate.Installer;
     using Persistence.NHibernate;
-    using Persistence.NHibernate.Installer;
+    using Installer = NServiceBus.Persistence.NHibernate.Installer.Installer;
 
     /// <summary>
     /// NHibernate Storage Session.
@@ -73,7 +74,7 @@ namespace NServiceBus.Features
             {
                 context.Settings.Get<Installer.SchemaUpdater>().Execute = identity =>
                 {
-                    var schemaUpdate = new SchemaUpdate(config.Configuration);
+                    var schemaUpdate = new OptimizedSchemaUpdate(config.Configuration);
                     var sb = new StringBuilder();
                     schemaUpdate.Execute(s => sb.AppendLine(s), true);
 
