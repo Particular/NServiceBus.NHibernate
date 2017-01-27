@@ -3,8 +3,6 @@ namespace NServiceBus.Features
     using System.Threading.Tasks;
     using Deduplication.NHibernate.Config;
     using Deduplication.NHibernate;
-    using global::NHibernate.Tool.hbm2ddl;
-    using NServiceBus.TimeoutPersisters.NHibernate.Installer;
     using Persistence.NHibernate;
     using Installer = NServiceBus.Deduplication.NHibernate.Installer.Installer;
 

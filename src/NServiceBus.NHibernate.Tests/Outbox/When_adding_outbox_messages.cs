@@ -9,12 +9,10 @@ namespace NServiceBus.NHibernate.Tests.Outbox
     using global::NHibernate.Cfg;
     using global::NHibernate.Mapping.ByCode;
     using global::NHibernate.Mapping.ByCode.Conformist;
-    using global::NHibernate.Tool.hbm2ddl;
     using NServiceBus.Extensibility;
     using NServiceBus.Outbox;
     using NServiceBus.Outbox.NHibernate;
     using NServiceBus.Persistence.NHibernate;
-    using NServiceBus.TimeoutPersisters.NHibernate.Installer;
     using NUnit.Framework;
     using Environment = global::NHibernate.Cfg.Environment;
 

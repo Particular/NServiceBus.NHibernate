@@ -18,7 +18,7 @@ namespace NServiceBus
         {
         }
 
-        public OptimizedSchemaUpdate(global::NHibernate.Cfg.Configuration cfg, IDictionary<string, string> configProperties)
+        OptimizedSchemaUpdate(global::NHibernate.Cfg.Configuration cfg, IDictionary<string, string> configProperties)
         {
             configuration = cfg;
             dialect = Dialect.GetDialect(configProperties);

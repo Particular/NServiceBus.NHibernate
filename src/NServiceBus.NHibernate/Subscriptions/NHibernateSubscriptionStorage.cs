@@ -2,8 +2,6 @@ namespace NServiceBus.Features
 {
     using System;
     using System.Threading.Tasks;
-    using global::NHibernate.Tool.hbm2ddl;
-    using NServiceBus.TimeoutPersisters.NHibernate.Installer;
     using Persistence.NHibernate;
     using Unicast.Subscriptions.NHibernate;
     using Unicast.Subscriptions.NHibernate.Config;

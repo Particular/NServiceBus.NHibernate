@@ -6,10 +6,8 @@ namespace NServiceBus.Features
     using System.Threading.Tasks;
     using global::NHibernate.Cfg;
     using global::NHibernate.Mapping.ByCode;
-    using global::NHibernate.Tool.hbm2ddl;
     using NServiceBus.NHibernate.Outbox;
     using NServiceBus.Outbox.NHibernate;
-    using NServiceBus.TimeoutPersisters.NHibernate.Installer;
     using Persistence.NHibernate;
     using Installer = NServiceBus.Persistence.NHibernate.Installer.Installer;
 
