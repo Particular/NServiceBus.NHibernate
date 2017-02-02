@@ -9,7 +9,7 @@
 
     public class When_subscribing_to_a_derived_event : NServiceBusAcceptanceTest
     {
-        [Test]
+        [Test, Category("pubsub")]
         public Task Base_event_should_not_be_delivered()
         {
             return Scenario.Define<Context>()

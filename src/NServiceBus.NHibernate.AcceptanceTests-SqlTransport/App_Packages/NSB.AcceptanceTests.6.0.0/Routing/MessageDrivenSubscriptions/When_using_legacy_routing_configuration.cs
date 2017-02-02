@@ -9,7 +9,7 @@
 
     public class When_using_legacy_routing_configuration : NServiceBusAcceptanceTest
     {
-        [Test]
+        [Test, Category("pubsub")]
         public async Task Events_routes_and_command_routes_should_be_kept_separate()
         {
             await Scenario.Define<Context>()

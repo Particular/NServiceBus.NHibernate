@@ -9,7 +9,7 @@
 
     public class When_subscribing_to_multiple_publishers : NServiceBusAcceptanceTest
     {
-        [Test]
+        [Test, Category("pubsub")]
         public async Task Should_subscribe_to_all_registered_publishers_of_same_type()
         {
             await Scenario.Define<Context>()

@@ -15,7 +15,7 @@
     {
         static string PublisherEndpoint => Conventions.EndpointNamingConvention(typeof(Publisher));
 
-        [Test]
+        [Test, Category("pubsub")]
         public async Task Should_route_events_correctly()
         {
             await Scenario.Define<Context>()

@@ -13,7 +13,7 @@
     {
         static string OtherEndpointName => Conventions.EndpointNamingConvention(typeof(OtherEndpoint));
 
-        [Test]
+        [Test, Category("pubsub")]
         public async Task The_mapping_should_not_cause_publishing_to_non_subscribers()
         {
             await Scenario.Define<Context>()
