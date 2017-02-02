@@ -12,7 +12,7 @@
 
     public class When_subscribing_to_scaled_out_publisher : NServiceBusAcceptanceTest
     {
-        [Test]
+        [Test, Category("pubsub")]
         public Task Should_send_subscription_message_to_each_instance()
         {
             return Scenario.Define<Context>()

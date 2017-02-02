@@ -8,7 +8,7 @@
 
     public class When_using_autosubscribe_with_missing_routing_information : NServiceBusAcceptanceTest
     {
-        [Test]
+        [Test, Category("pubsub")]
         public Task Should_skip_events_with_missing_routes()
         {
             return Scenario.Define<ScenarioContext>()
