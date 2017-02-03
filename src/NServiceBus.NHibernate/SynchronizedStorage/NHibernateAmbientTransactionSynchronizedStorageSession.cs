@@ -23,14 +23,20 @@
 
         public void Dispose()
         {
-            if (session.IsValueCreated)
+            try
             {
-                session.Value.Flush();
-                session.Value.Dispose();
+                if (session.IsValueCreated)
+                {
+                    session.Value.Flush();
+                    session.Value.Dispose();
+                }
             }
-            if (connection.IsValueCreated)
+            finally
             {
-                connection.Value.Dispose();
+                if (connection.IsValueCreated)
+                {
+                    connection.Value.Dispose();
+                }
             }
         }
 
