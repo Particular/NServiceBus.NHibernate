@@ -7,12 +7,15 @@ namespace NServiceBus.TimeoutPersisters.NHibernate.Installer
     using global::NHibernate.AdoNet.Util;
     using global::NHibernate.Cfg;
     using global::NHibernate.Dialect;
+    using global::NHibernate.Mapping;
     using global::NHibernate.Tool.hbm2ddl;
     using global::NHibernate.Util;
     using Environment = global::NHibernate.Cfg.Environment;
 
     class OptimizedSchemaUpdate
     {
+        static readonly IInternalLogger log = LoggerProvider.LoggerFor(typeof(OptimizedSchemaUpdate));
+
         public OptimizedSchemaUpdate(Configuration cfg) : this(cfg, cfg.Properties)
         {
         }
@@ -29,6 +32,7 @@ namespace NServiceBus.TimeoutPersisters.NHibernate.Installer
             connectionHelper = new ManagedProviderConnectionHelper(props);
             exceptions = new List<Exception>();
             formatter = (PropertiesHelper.GetBoolean(Environment.FormatSql, configProperties, true) ? FormatStyle.Ddl : FormatStyle.None).Formatter;
+            timeoutEntityMapping = configuration.GetClassMapping(typeof(TimeoutEntity));
         }
 
         /// <summary>
@@ -101,17 +105,29 @@ namespace NServiceBus.TimeoutPersisters.NHibernate.Installer
                 {
                     typeof(MsSql2005Dialect).FullName,
                     typeof(MsSql2008Dialect).FullName,
-                    typeof(MsSql2012Dialect).FullName,
+                    typeof(MsSql2012Dialect).FullName
                 };
+
+                var shouldOptimizeTimeoutEntityIndexes = timeoutEntityMapping != null;
 
                 for (var j = 0; j < updateSQL.Length; j++)
                 {
                     var sql = updateSQL[j];
 
-                    if (dialectScopes.Contains(dialect.GetType().FullName))
+                    if (dialectScopes.Contains(dialect.GetType().FullName) && shouldOptimizeTimeoutEntityIndexes)
                     {
-                        sql = sql.Replace("primary key (Id)", "primary key nonclustered (Id)");
-                        sql = sql.Replace("create index TimeoutEntity_EndpointIdx on TimeoutEntity (Time, Endpoint)", "create clustered index TimeoutEntity_EndpointIdx on TimeoutEntity (Endpoint, Time)");
+                        var qualifiedTimeoutEntityTableName = timeoutEntityMapping.Table.GetQualifiedName(dialect);
+
+                        if (sql.StartsWith($"create table {qualifiedTimeoutEntityTableName}"))
+                        {
+                            sql = sql.Replace("primary key (Id)", "primary key nonclustered (Id)");
+                        }
+                        else if (sql.StartsWith("create index TimeoutEntity_EndpointIdx"))
+                        {
+                            sql = sql.Replace(
+                                $"create index TimeoutEntity_EndpointIdx on {qualifiedTimeoutEntityTableName} (Time, Endpoint)",
+                                $"create clustered index TimeoutEntity_EndpointIdx on {qualifiedTimeoutEntityTableName} (Endpoint, Time)");
+                        }
                     }
 
                     var formatted = formatter.Format(sql);
@@ -161,11 +177,11 @@ namespace NServiceBus.TimeoutPersisters.NHibernate.Installer
             }
         }
 
-        static readonly IInternalLogger log = LoggerProvider.LoggerFor(typeof(OptimizedSchemaUpdate));
         readonly Configuration configuration;
         readonly IConnectionHelper connectionHelper;
         readonly Dialect dialect;
         readonly List<Exception> exceptions;
+        readonly PersistentClass timeoutEntityMapping;
         IFormatter formatter;
     }
 }
