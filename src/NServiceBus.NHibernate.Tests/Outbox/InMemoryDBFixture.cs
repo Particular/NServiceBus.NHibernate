@@ -2,17 +2,16 @@
 
 namespace NServiceBus.NHibernate.Tests.Outbox
 {
-    using System;
     using System.Collections.Generic;
-    using global::NHibernate;
-    using global::NHibernate.Mapping.ByCode;
-    using global::NHibernate.Tool.hbm2ddl;
-    using NServiceBus.Outbox.NHibernate;
-    using SagaPersisters.NHibernate.Tests;
     using System.IO;
+    using global::NHibernate;
+    using global::NHibernate.Cfg;
+    using global::NHibernate.Mapping.ByCode;
     using NServiceBus.Outbox;
+    using NServiceBus.Outbox.NHibernate;
+    using NServiceBus.SagaPersisters.NHibernate.Tests;
+    using NServiceBus.TimeoutPersisters.NHibernate.Installer;
     using NUnit.Framework;
-
 
     abstract class InMemoryDBFixture
     {
@@ -22,7 +21,7 @@ namespace NServiceBus.NHibernate.Tests.Outbox
         private readonly string connectionString = @"Data Source=.\SQLEXPRESS;Initial Catalog=nservicebus;Integrated Security=True;";
         private const string dialect = "NHibernate.Dialect.MsSql2012Dialect";
 #else
-        private readonly string connectionString = String.Format(@"Data Source={0};Version=3;New=True;", Path.GetTempFileName());
+        private readonly string connectionString = $@"Data Source={Path.GetTempFileName()};Version=3;New=True;";
         private const string dialect = "NHibernate.Dialect.SQLiteDialect";
 #endif
 
@@ -32,16 +31,16 @@ namespace NServiceBus.NHibernate.Tests.Outbox
             var mapper = new ModelMapper();
             mapper.AddMapping<OutboxEntityMap>();
 
-            var configuration = new global::NHibernate.Cfg.Configuration()
+            var configuration = new Configuration()
                 .AddProperties(new Dictionary<string, string>
                 {
-                    { "dialect", dialect },
-                    { global::NHibernate.Cfg.Environment.ConnectionString,connectionString }
+                    {"dialect", dialect},
+                    {Environment.ConnectionString, connectionString}
                 });
 
             configuration.AddMapping(mapper.CompileMappingForAllExplicitlyAddedEntities());
 
-            new SchemaUpdate(configuration).Execute(false, true);
+            new OptimizedSchemaUpdate(configuration).Execute(false, true);
 
             SessionFactory = configuration.BuildSessionFactory();
 
@@ -52,7 +51,6 @@ namespace NServiceBus.NHibernate.Tests.Outbox
                 StorageSessionProvider = new FakeSessionProvider(SessionFactory, Session),
                 EndpointName = "TestEndpoint"
             };
-
         }
 
         [TearDown]

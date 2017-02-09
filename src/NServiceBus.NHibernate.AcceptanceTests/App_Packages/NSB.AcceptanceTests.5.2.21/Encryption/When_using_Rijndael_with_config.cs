@@ -4,9 +4,11 @@
     using System.Collections.Generic;
     using EndpointTemplates;
     using AcceptanceTesting;
+    using NServiceBus.Config;
+    using NServiceBus.Config.ConfigurationSource;
     using NUnit.Framework;
 
-    public class When_using_Rijndael_with_custom : NServiceBusAcceptanceTest
+    public class When_using_Rijndael_with_config : NServiceBusAcceptanceTest
     {
         [Test]
         public void Should_receive_decrypted_message()
@@ -30,7 +32,7 @@
                                         }
                                 }
                         })))
-                    .Done(c => c.GetTheMessage)
+                    .Done(c => c.GotTheMessage)
                     .Run();
 
             Assert.AreEqual("betcha can't guess my secret", context.Secret);
@@ -40,7 +42,7 @@
 
         public class Context : ScenarioContext
         {
-            public bool GetTheMessage { get; set; }
+            public bool GotTheMessage { get; set; }
 
             public string Secret { get; set; }
 
@@ -53,7 +55,7 @@
         {
             public Endpoint()
             {
-                EndpointSetup<DefaultServer>(builder => builder.RijndaelEncryptionService("gdDbqRpqdRbTs3mhdZh9qCaDaxJXl+e6"));
+                EndpointSetup<DefaultServer>(builder => builder.RijndaelEncryptionService());
             }
 
             public class Handler : IHandleMessages<MessageWithSecretData>
@@ -72,7 +74,7 @@
                         message.CreditCards[1].Number.Value
                     };
 
-                    Context.GetTheMessage = true;
+                    Context.GotTheMessage = true;
                 }
             }
         }
@@ -98,5 +100,16 @@
             public WireEncryptedString Secret { get; set; }
         }
 
+        public class ConfigureEncryption: IProvideConfiguration<RijndaelEncryptionServiceConfig>
+        {
+            public RijndaelEncryptionServiceConfig GetConfiguration()
+            {
+                return new RijndaelEncryptionServiceConfig
+                {
+                    KeyIdentifier = "1st",
+                    Key = "gdDbqRpqdRbTs3mhdZh9qCaDaxJXl+e6"
+                };
+            }
+        }
     }
 }

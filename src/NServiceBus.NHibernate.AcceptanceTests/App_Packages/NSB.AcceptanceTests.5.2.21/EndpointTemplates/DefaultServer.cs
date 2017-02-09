@@ -58,7 +58,7 @@
             {
                 builder.UseSerialization(Type.GetType(serializer));
             }
-            builder.DefinePersistence(settings, endpointConfiguration.BuilderType);
+            builder.DefinePersistence(settings);
 
             builder.GetSettings().SetDefault("ScaleOut.UseSingleBrokerQueue", true);
             configurationBuilderCustomization(builder);

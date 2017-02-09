@@ -73,6 +73,7 @@
                     public virtual Guid SomeId { get; set; }
                 }
             }
+
         }
 
 

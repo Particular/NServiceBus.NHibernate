@@ -4,8 +4,8 @@ namespace NServiceBus.Persistence.NHibernate
     using System.Linq;
     using System.Text;
     using global::NHibernate.Cfg;
-    using global::NHibernate.Tool.hbm2ddl;
-    using Installation;
+    using NServiceBus.Installation;
+    using NServiceBus.TimeoutPersisters.NHibernate.Installer;
 
     class Installer : INeedToInstallSomething
     {
@@ -16,7 +16,7 @@ namespace NServiceBus.Persistence.NHibernate
         {
             if (RunInstaller)
             {
-                var schemaUpdate = new SchemaUpdate(Configuration);
+                var schemaUpdate = new OptimizedSchemaUpdate(Configuration);
                 var sb = new StringBuilder();
                 schemaUpdate.Execute(s => sb.AppendLine(s), true);
 
