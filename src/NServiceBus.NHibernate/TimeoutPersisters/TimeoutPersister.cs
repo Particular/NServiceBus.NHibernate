@@ -86,23 +86,23 @@ namespace NServiceBus.TimeoutPersisters.NHibernate
 
         public async Task Add(TimeoutData timeout, ContextBag context)
         {
-            var timeoutId = Guid.NewGuid();
             using (var session = await OpenSession(context).ConfigureAwait(false))
             {
-                session.Session().Save(new TimeoutEntity
+                var timeoutEntity = new TimeoutEntity
                 {
-                    Id = timeoutId,
                     Destination = timeout.Destination,
                     SagaId = timeout.SagaId,
                     State = timeout.State,
                     Time = timeout.Time,
                     Headers = ConvertDictionaryToString(timeout.Headers),
                     Endpoint = timeout.OwningTimeoutManager
-                });
-                await session.CompleteAsync().ConfigureAwait(false);
-            }
+                };
 
-            timeout.Id = timeoutId.ToString();
+                session.Session().Save(timeoutEntity);
+                await session.CompleteAsync().ConfigureAwait(false);
+
+                timeout.Id = timeoutEntity.Id.ToString();
+            }
         }
 
         public async Task<bool> TryRemove(string timeoutId, ContextBag context)
