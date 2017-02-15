@@ -98,10 +98,10 @@ namespace NServiceBus.TimeoutPersisters.NHibernate
                     Endpoint = timeout.OwningTimeoutManager
                 };
 
-                session.Session().Save(timeoutEntity);
+                var timeoutId = (Guid) session.Session().Save(timeoutEntity);
                 await session.CompleteAsync().ConfigureAwait(false);
 
-                timeout.Id = timeoutEntity.Id.ToString();
+                timeout.Id = timeoutId.ToString();
             }
         }
 
