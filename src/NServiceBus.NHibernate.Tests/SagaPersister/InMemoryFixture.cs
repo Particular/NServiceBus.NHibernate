@@ -4,7 +4,6 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
     using System.IO;
     using AutoPersistence;
     using global::NHibernate;
-    using global::NHibernate.Tool.hbm2ddl;
     using NServiceBus.Sagas;
     using NUnit.Framework;
 
@@ -36,7 +35,7 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
 
             SessionFactory = configuration.BuildSessionFactory();
 
-            new SchemaUpdate(configuration).Execute(false, true);
+            new OptimizedSchemaUpdate(configuration).Execute(false, true);
 
             SagaPersister = new SagaPersister();
         }

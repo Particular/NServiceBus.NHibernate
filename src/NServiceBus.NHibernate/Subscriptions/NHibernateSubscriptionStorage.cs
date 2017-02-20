@@ -2,11 +2,10 @@ namespace NServiceBus.Features
 {
     using System;
     using System.Threading.Tasks;
-    using global::NHibernate.Tool.hbm2ddl;
     using Persistence.NHibernate;
     using Unicast.Subscriptions.NHibernate;
     using Unicast.Subscriptions.NHibernate.Config;
-    using Unicast.Subscriptions.NHibernate.Installer;
+    using Installer = NServiceBus.Unicast.Subscriptions.NHibernate.Installer.Installer;
 
     /// <summary>
     /// NHibernate Subscription Storage
@@ -41,8 +40,7 @@ namespace NServiceBus.Features
             {
                 context.Settings.Get<Installer.SchemaUpdater>().Execute = identity =>
                 {
-                    new SchemaUpdate(config.Configuration).Execute(false, true);
-
+                    new OptimizedSchemaUpdate(config.Configuration).Execute(false, true);
                     return Task.FromResult(0);
                 };
             }
