@@ -1,6 +1,7 @@
 ﻿namespace NServiceBus
 {
     using System;
+    using System.Threading.Tasks;
     using global::NHibernate;
     using NServiceBus.Persistence;
 
@@ -20,6 +21,22 @@
                 return ambientTransactionSession.Session;
             }
             throw new InvalidOperationException("Shared session has not been configured for NHibernate.");
+        }
+
+        /// <summary>
+        /// Registers a callback to be called before completing the session.
+        /// </summary>
+        public static void RegisterCommitHook(this SynchronizedStorageSession session, Func<Task> callback)
+        {
+            var nhibernateSession = session as INHibernateSynchronizedStorageSession;
+            if (nhibernateSession != null)
+            {
+                nhibernateSession.RegisterCommitHook(callback);
+            }
+            else
+            {
+                throw new InvalidOperationException("Shared session has not been configured for NHibernate.");
+            }
         }
     }
 }

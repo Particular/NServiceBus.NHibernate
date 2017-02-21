@@ -12,6 +12,7 @@
     {
         Lazy<ISession> session;
         Lazy<IDbConnection> connection;
+        CallbackList callbacks = new CallbackList();
 
         public NHibernateLazyAmbientTransactionSynchronizedStorageSession(Func<IDbConnection> connectionFactory, Func<IDbConnection, ISession> sessionFactory)
         {
@@ -20,29 +21,27 @@
         }
 
         public ISession Session => session.Value;
+        public void RegisterCommitHook(Func<Task> callback)
+        {
+            callbacks.Add(callback);
+        }
 
         public void Dispose()
         {
-            try
+            if (connection.IsValueCreated)
             {
-                if (session.IsValueCreated)
-                {
-                    session.Value.Flush();
-                    session.Value.Dispose();
-                }
-            }
-            finally
-            {
-                if (connection.IsValueCreated)
-                {
-                    connection.Value.Dispose();
-                }
+                connection.Value.Dispose();
             }
         }
 
-        public Task CompleteAsync()
+        public async Task CompleteAsync()
         {
-            return Task.FromResult(0);
+            await callbacks.InvokeAll().ConfigureAwait(false);
+            if (session.IsValueCreated)
+            {
+                session.Value.Flush();
+                session.Value.Dispose();
+            }
         }
     }
 }

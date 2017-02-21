@@ -84,6 +84,7 @@
   <ItemGroup>
     <Compile Include="Internal\NHibernateConfiguration.cs" />
     <Compile Include="Internal\ObjectSerializer.cs" />
+    <Compile Include="CallbackList.cs" />
     <Compile Include="Outbox\INHibernateOutboxStorage.cs" />
     <Compile Include="Outbox\IOutboxPersisterFactory.cs" />
     <Compile Include="Outbox\IOutboxRecord.cs" />
@@ -99,7 +100,7 @@
     <Compile Include="SagaPersisters\LockModes.cs" />
     <Compile Include="SynchronizedStorage\NHibernateLazyNativeTransactionSynchronizedStorageSession.cs" />
     <Compile Include="SynchronizedStorage\TestingNHibernateSynchronizedStorageSession.cs" />
-    <Compile Include="SynchronizedStorage\NHibernateNativeTransactionSynchronizedStorageSession.cs" />
+    <Compile Include="SynchronizedStorage\NHibernateOutboxTransactionSynchronizedStorageSession.cs" />
     <Compile Include="Outbox\NHibernateOutboxTransaction.cs" />
     <Compile Include="SynchronizedStorage\NHibernateSynchronizedStorage.cs" />
     <Compile Include="SynchronizedStorage\NHibernateSynchronizedStorageAdapter.cs" />

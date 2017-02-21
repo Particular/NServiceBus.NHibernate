@@ -9,10 +9,11 @@
     class NHibernateLazyNativeTransactionSynchronizedStorageSession : CompletableSynchronizedStorageSession, INHibernateSynchronizedStorageSession
     {
         Lazy<ISession> session;
+        CallbackList callbacks = new CallbackList();
 
         public NHibernateLazyNativeTransactionSynchronizedStorageSession(Func<ISession> sessionFactory)
         {
-            session =new Lazy<ISession>(() =>
+            session = new Lazy<ISession>(() =>
             {
                 var s = sessionFactory();
                 s.BeginTransaction();
@@ -22,23 +23,28 @@
 
         public ISession Session => session.Value;
 
+        public void RegisterCommitHook(Func<Task> callback)
+        {
+            callbacks.Add(callback);
+        }
+
         public ITransaction Transaction => Session.Transaction;
 
-        public Task CompleteAsync()
+        public async Task CompleteAsync()
         {
+            await callbacks.InvokeAll().ConfigureAwait(false);
             if (session.IsValueCreated)
             {
                 Transaction.Commit();
                 Transaction.Dispose();
             }
-            return Task.FromResult(0);
         }
 
         public void Dispose()
         {
             if (session.IsValueCreated)
             {
-              session.Value.Dispose();  
+                session.Value.Dispose();
             }
         }
     }

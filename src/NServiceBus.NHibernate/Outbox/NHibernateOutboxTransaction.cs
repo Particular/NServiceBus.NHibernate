@@ -1,5 +1,6 @@
 ﻿namespace NServiceBus.Outbox.NHibernate
 {
+    using System;
     using System.Threading.Tasks;
     using global::NHibernate;
     using Janitor;
@@ -22,12 +23,19 @@
             Session.Dispose();
         }
 
-        public Task Commit()
+        public void RegisterCommitHook(Func<Task> callback)
         {
+            callbacks.Add(callback);
+        }
+
+        public async Task Commit()
+        {
+            await callbacks.InvokeAll().ConfigureAwait(false);
+
             Transaction.Commit();
             Transaction.Dispose();
-
-            return Task.FromResult(0);
         }
+
+        CallbackList callbacks = new CallbackList();
     }
 }
