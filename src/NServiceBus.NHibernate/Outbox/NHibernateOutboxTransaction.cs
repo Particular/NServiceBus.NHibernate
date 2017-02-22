@@ -23,7 +23,7 @@
             Session.Dispose();
         }
 
-        public void RegisterCommitHook(Func<Task> callback)
+        public void OnSaveChanges(Func<Task> callback)
         {
             callbacks.Add(callback);
         }

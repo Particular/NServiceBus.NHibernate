@@ -23,7 +23,7 @@
 
         public ISession Session => session.Value;
 
-        public void RegisterCommitHook(Func<Task> callback)
+        public void OnSaveChanges(Func<Task> callback)
         {
             callbacks.Add(callback);
         }

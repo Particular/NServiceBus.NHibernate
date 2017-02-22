@@ -8,6 +8,6 @@
     {
         ISession Session { get; }
 
-        void RegisterCommitHook(Func<Task> callback);
+        void OnSaveChanges(Func<Task> callback);
     }
 }

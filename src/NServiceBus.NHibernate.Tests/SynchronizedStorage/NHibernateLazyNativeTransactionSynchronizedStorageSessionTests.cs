@@ -18,7 +18,7 @@
             using (var storageSession = await storage.OpenSession(new ContextBag()))
             {
                 storageSession.Session(); //Make sure session is initialized
-                storageSession.RegisterCommitHook(() =>
+                storageSession.OnSaveChanges(() =>
                 {
                     callbackInvoked = true;
                     return Task.FromResult(0);

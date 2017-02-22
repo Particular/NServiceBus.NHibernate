@@ -18,9 +18,9 @@
         }
 
         public ISession Session => outboxTransaction.Session;
-        public void RegisterCommitHook(Func<Task> callback)
+        public void OnSaveChanges(Func<Task> callback)
         {
-            outboxTransaction.RegisterCommitHook(callback);
+            outboxTransaction.OnSaveChanges(callback);
         }
 
         public ITransaction Transaction => outboxTransaction.Transaction;

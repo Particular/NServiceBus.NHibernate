@@ -26,7 +26,7 @@
         /// </summary>
         public ISession Session { get; }
 
-        void INHibernateSynchronizedStorageSession.RegisterCommitHook(Func<Task> callback)
+        void INHibernateSynchronizedStorageSession.OnSaveChanges(Func<Task> callback)
         {
             callbacks.Add(callback);
         }
