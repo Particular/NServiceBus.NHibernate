@@ -2,10 +2,11 @@ namespace NServiceBus.Features
 {
     using System;
     using System.Threading.Tasks;
-    using Persistence.NHibernate;
-    using TimeoutPersisters.NHibernate;
-    using TimeoutPersisters.NHibernate.Config;
-    using TimeoutPersisters.NHibernate.Installer;
+    using global::NHibernate.Cfg;
+    using NServiceBus.Persistence.NHibernate;
+    using NServiceBus.TimeoutPersisters.NHibernate;
+    using NServiceBus.TimeoutPersisters.NHibernate.Config;
+    using NServiceBus.TimeoutPersisters.NHibernate.Installer;
 
     /// <summary>
     /// NHibernate Timeout Storage.
@@ -13,7 +14,7 @@ namespace NServiceBus.Features
     public class NHibernateTimeoutStorage : Feature
     {
         /// <summary>
-        /// Creates an instance of <see cref="NHibernateTimeoutStorage"/>.
+        /// Creates an instance of <see cref="NHibernateTimeoutStorage" />.
         /// </summary>
         public NHibernateTimeoutStorage()
         {
@@ -42,8 +43,6 @@ namespace NServiceBus.Features
                 };
             }
 
-            new IncorrectIndexDetector(config.Configuration).LogWarningIfTimeoutEntityIndexIsIncorrect();
-
             var timeoutsCleanupExecutionInterval = context.Settings.GetOrDefault<TimeSpan?>("NHibernate.Timeouts.CleanupExecutionInterval") ?? TimeSpan.FromMinutes(2);
 
             context.Container.ConfigureComponent(b =>
@@ -55,6 +54,8 @@ namespace NServiceBus.Features
                     new NHibernateSynchronizedStorageAdapter(sessionFactory), new NHibernateSynchronizedStorage(sessionFactory),
                     timeoutsCleanupExecutionInterval);
             }, DependencyLifecycle.SingleInstance);
+
+            context.RegisterStartupTask(new DetectIncorrectIndexesStartupTask(config.Configuration));
         }
 
         static bool RunInstaller(FeatureConfigurationContext context)
@@ -62,6 +63,27 @@ namespace NServiceBus.Features
             return context.Settings.Get<bool>(context.Settings.HasSetting("NHibernate.Timeouts.AutoUpdateSchema")
                 ? "NHibernate.Timeouts.AutoUpdateSchema"
                 : "NHibernate.Common.AutoUpdateSchema");
+        }
+
+        class DetectIncorrectIndexesStartupTask : FeatureStartupTask
+        {
+            public DetectIncorrectIndexesStartupTask(Configuration configuration)
+            {
+                this.configuration = configuration;
+            }
+
+            protected override Task OnStart(IMessageSession session)
+            {
+                new IncorrectIndexDetector(configuration).LogWarningIfTimeoutEntityIndexIsIncorrect();
+                return Task.FromResult(0);
+            }
+
+            protected override Task OnStop(IMessageSession session)
+            {
+                return Task.FromResult(0);
+            }
+
+            Configuration configuration;
         }
     }
 }
