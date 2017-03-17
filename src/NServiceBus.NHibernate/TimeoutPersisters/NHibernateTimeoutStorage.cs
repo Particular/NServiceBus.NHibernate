@@ -33,7 +33,7 @@ namespace NServiceBus.Features
             builder.AddMappings<TimeoutEntityMap>();
             var config = builder.Build();
 
-             if (RunInstaller(context))
+            if (RunInstaller(context))
             {
                 context.Settings.Get<Installer.SchemaUpdater>().Execute = identity =>
                 {
@@ -41,6 +41,8 @@ namespace NServiceBus.Features
                     return Task.FromResult(0);
                 };
             }
+
+            new IncorrectIndexDetector(config.Configuration).LogWarningIfTimeoutEntityIndexIsIncorrect();
 
             var timeoutsCleanupExecutionInterval = context.Settings.GetOrDefault<TimeSpan?>("NHibernate.Timeouts.CleanupExecutionInterval") ?? TimeSpan.FromMinutes(2);
 
