@@ -13,7 +13,6 @@ namespace NServiceBus.TimeoutPersisters.NHibernate.Installer
             if (RunInstaller)
             {
                 new OptimizedSchemaUpdate(Configuration).Execute(false, true);
-                new IncorrectIndexDetector(Configuration).LogWarningIfTimeoutEntityIndexIsIncorrect();
             }
         }
     }
