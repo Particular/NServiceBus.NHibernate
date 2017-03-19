@@ -56,7 +56,7 @@ namespace NServiceBus.Unicast.Subscriptions.NHibernate
             return cacheItem.Item2;
         }
 
-        static ConcurrentDictionary<string, Tuple<DateTimeOffset, IEnumerable<Subscriber>>> cache = new ConcurrentDictionary<string, Tuple<DateTimeOffset, IEnumerable<Subscriber>>>();
+        ConcurrentDictionary<string, Tuple<DateTimeOffset, IEnumerable<Subscriber>>> cache = new ConcurrentDictionary<string, Tuple<DateTimeOffset, IEnumerable<Subscriber>>>();
         TimeSpan expiration;
     }
 }
