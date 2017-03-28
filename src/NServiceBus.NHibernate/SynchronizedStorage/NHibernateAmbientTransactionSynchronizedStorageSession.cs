@@ -12,7 +12,7 @@
     {
         Lazy<ISession> session;
         Lazy<IDbConnection> connection;
-        CallbackList callbacks = new CallbackList();
+        Func<SynchronizedStorageSession, Task> onSaveChangesCallback;
 
         public NHibernateLazyAmbientTransactionSynchronizedStorageSession(Func<IDbConnection> connectionFactory, Func<IDbConnection, ISession> sessionFactory)
         {
@@ -21,9 +21,13 @@
         }
 
         public ISession Session => session.Value;
-        public void OnSaveChanges(Func<Task> callback)
+        public void OnSaveChanges(Func<SynchronizedStorageSession, Task> callback)
         {
-            callbacks.Add(callback);
+            if (onSaveChangesCallback != null)
+            {
+                throw new Exception("Save changes callback for this session has already been registered.");
+            }
+            onSaveChangesCallback = callback;
         }
 
         public void Dispose()
@@ -36,7 +40,10 @@
 
         public async Task CompleteAsync()
         {
-            await callbacks.InvokeAll().ConfigureAwait(false);
+            if (onSaveChangesCallback != null)
+            {
+                await onSaveChangesCallback(this).ConfigureAwait(false);
+            }
             if (session.IsValueCreated)
             {
                 session.Value.Flush();

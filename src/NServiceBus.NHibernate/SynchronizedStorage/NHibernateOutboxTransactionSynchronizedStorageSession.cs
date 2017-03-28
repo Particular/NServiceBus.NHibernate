@@ -18,9 +18,9 @@
         }
 
         public ISession Session => outboxTransaction.Session;
-        public void OnSaveChanges(Func<Task> callback)
+        public void OnSaveChanges(Func<SynchronizedStorageSession, Task> callback)
         {
-            outboxTransaction.OnSaveChanges(callback);
+            outboxTransaction.OnSaveChanges(() => callback(this));
         }
 
         public ITransaction Transaction => outboxTransaction.Transaction;

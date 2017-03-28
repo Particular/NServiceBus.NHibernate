@@ -1,5 +1,6 @@
 ﻿namespace NServiceBus.NHibernate.Tests.SynchronizedStorage
 {
+    using System;
     using System.Threading.Tasks;
     using NServiceBus.Extensibility;
     using NServiceBus.Outbox.NHibernate;
@@ -23,7 +24,7 @@
                 using (var storageSession = await adapter.TryAdapt(outboxTransaction, new ContextBag()))
                 {
                     storageSession.Session(); //Make sure session is initialized
-                    storageSession.OnSaveChanges(() =>
+                    storageSession.OnSaveChanges(s =>
                     {
                         callbackInvoked = true;
                         return Task.FromResult(0);
@@ -50,7 +51,7 @@
                 using (var storageSession = await adapter.TryAdapt(outboxTransaction, new ContextBag()))
                 {
                     storageSession.Session(); //Make sure session is initialized
-                    storageSession.OnSaveChanges(() =>
+                    storageSession.OnSaveChanges(s =>
                     {
                         callbackInvoked = true;
                         return Task.FromResult(0);
@@ -63,6 +64,51 @@
             }
 
             Assert.IsTrue(callbackInvoked);
+        }
+
+        [Test]
+        public async Task It_does_not_commit_outbox_transaction_if_callback_throws()
+        {
+            var entityId = Guid.NewGuid().ToString();
+            var exceptionThrown = false;
+            using (var session = SessionFactory.OpenSession())
+            {
+                var transaction = session.BeginTransaction();
+
+                using (var outboxTransaction = new NHibernateOutboxTransaction(session, transaction))
+                {
+                    var adapter = new NHibernateSynchronizedStorageAdapter(SessionFactory);
+
+                    using (var storageSession = await adapter.TryAdapt(outboxTransaction, new ContextBag()))
+                    {
+                        storageSession.Session().Save(new TestEntity()
+                        {
+                            Id = entityId
+                        });
+                        storageSession.OnSaveChanges(s =>
+                        {
+                            throw new Exception("Simulated");
+                        });
+
+                        try
+                        {
+                            await storageSession.CompleteAsync();
+                            await outboxTransaction.Commit();
+                        }
+                        catch (Exception)
+                        {
+                            exceptionThrown = true;
+                        }
+                    }
+                }
+                Assert.IsTrue(exceptionThrown);
+            }
+
+            using (var session = SessionFactory.OpenSession())
+            {
+                var savedEntity = session.Get<TestEntity>(entityId);
+                Assert.IsNull(savedEntity);
+            }
         }
     }
 }

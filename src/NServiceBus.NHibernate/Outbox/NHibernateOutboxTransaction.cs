@@ -25,17 +25,23 @@
 
         public void OnSaveChanges(Func<Task> callback)
         {
-            callbacks.Add(callback);
+            if (onSaveChangesCallback != null)
+            {
+                throw new Exception("Save changes callback for this session has already been registered.");
+            }
+            onSaveChangesCallback = callback;
         }
 
         public async Task Commit()
         {
-            await callbacks.InvokeAll().ConfigureAwait(false);
-
+            if (onSaveChangesCallback != null)
+            {
+                await onSaveChangesCallback().ConfigureAwait(false);
+            }
             Transaction.Commit();
             Transaction.Dispose();
         }
 
-        CallbackList callbacks = new CallbackList();
+        Func<Task> onSaveChangesCallback;
     }
 }

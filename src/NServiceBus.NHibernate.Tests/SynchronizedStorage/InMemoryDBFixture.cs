@@ -23,6 +23,7 @@ namespace NServiceBus.NHibernate.Tests.SynchronizedStorage
                 });
 
             var mapper = new ModelMapper();
+            mapper.AddMapping<TestEntity.Mapping>();
             cfg.AddMapping(mapper.CompileMappingForAllExplicitlyAddedEntities());
 
             new SchemaExport(cfg).Create(false, true);

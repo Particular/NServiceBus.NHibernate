@@ -26,7 +26,7 @@
         /// <summary>
         /// Registers a callback to be called before completing the session.
         /// </summary>
-        public static void OnSaveChanges(this SynchronizedStorageSession session, Func<Task> callback)
+        public static void OnSaveChanges(this SynchronizedStorageSession session, Func<SynchronizedStorageSession, Task> callback)
         {
             var nhibernateSession = session as INHibernateSynchronizedStorageSession;
             if (nhibernateSession != null)

@@ -26,11 +26,9 @@
         /// </summary>
         public ISession Session { get; }
 
-        void INHibernateSynchronizedStorageSession.OnSaveChanges(Func<Task> callback)
+        void INHibernateSynchronizedStorageSession.OnSaveChanges(Func<SynchronizedStorageSession, Task> callback)
         {
-            callbacks.Add(callback);
+            //NOOP
         }
-
-        CallbackList callbacks = new CallbackList();
     }
 }

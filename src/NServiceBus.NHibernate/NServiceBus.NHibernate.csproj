@@ -84,7 +84,6 @@
   <ItemGroup>
     <Compile Include="Internal\NHibernateConfiguration.cs" />
     <Compile Include="Internal\ObjectSerializer.cs" />
-    <Compile Include="CallbackList.cs" />
     <Compile Include="Outbox\INHibernateOutboxStorage.cs" />
     <Compile Include="Outbox\IOutboxPersisterFactory.cs" />
     <Compile Include="Outbox\IOutboxRecord.cs" />

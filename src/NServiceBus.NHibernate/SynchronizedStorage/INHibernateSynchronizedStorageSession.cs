@@ -3,11 +3,12 @@
     using System;
     using System.Threading.Tasks;
     using global::NHibernate;
+    using NServiceBus.Persistence;
 
     interface INHibernateSynchronizedStorageSession
     {
         ISession Session { get; }
 
-        void OnSaveChanges(Func<Task> callback);
+        void OnSaveChanges(Func<SynchronizedStorageSession, Task> callback);
     }
 }

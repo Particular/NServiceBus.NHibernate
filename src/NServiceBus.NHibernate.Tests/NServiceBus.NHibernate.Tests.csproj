@@ -81,7 +81,6 @@
     <Reference Include="System.Transactions" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CallbacksTests.cs" />
     <Compile Include="Outbox\FakeDbConnectionProvider.cs" />
     <Compile Include="Outbox\MessageIdOutboxRecord.cs" />
     <Compile Include="Outbox\GuidOutboxRecord.cs" />
@@ -111,6 +110,7 @@
     <Compile Include="SynchronizedStorage\NHibernateLazyNativeTransactionSynchronizedStorageSessionTests.cs" />
     <Compile Include="SynchronizedStorage\NHibernateAmbientTransactionSynchronizedStorageSessionTests.cs" />
     <Compile Include="SynchronizedStorage\NHibernateOutboxTransactionSynchronizedStorageSessionTests.cs" />
+    <Compile Include="SynchronizedStorage\TestEntity.cs" />
     <Compile Include="TimeoutPersister\InMemoryDBFixture.cs" />
     <Compile Include="TimeoutPersister\When_fetching_timeouts_from_storage.cs" />
     <Compile Include="TimeoutPersister\When_removing_timeouts_from_the_storage.cs" />
