@@ -7,8 +7,10 @@ namespace NServiceBus.TimeoutPersisters.NHibernate.Installer
     using global::NHibernate.AdoNet.Util;
     using global::NHibernate.Cfg;
     using global::NHibernate.Dialect;
+    using global::NHibernate.Mapping;
     using global::NHibernate.Tool.hbm2ddl;
     using global::NHibernate.Util;
+    using NServiceBus.TimeoutPersisters.NHibernate.Config;
     using Environment = global::NHibernate.Cfg.Environment;
 
     class OptimizedSchemaUpdate
@@ -28,6 +30,7 @@ namespace NServiceBus.TimeoutPersisters.NHibernate.Installer
             }
             connectionHelper = new ManagedProviderConnectionHelper(props);
             exceptions = new List<Exception>();
+            timeoutEntityMapping = configuration.GetClassMapping(typeof(TimeoutEntity));
             formatter = (PropertiesHelper.GetBoolean(Environment.FormatSql, configProperties, true) ? FormatStyle.Ddl : FormatStyle.None).Formatter;
         }
 
@@ -47,7 +50,7 @@ namespace NServiceBus.TimeoutPersisters.NHibernate.Installer
         }
 
         /// <summary>
-        ///     Execute the schema updates
+        /// Execute the schema updates
         /// </summary>
         /// <param name="scriptAction">The action to write the each schema line.</param>
         /// <param name="doUpdate">Commit the script to DB</param>
@@ -92,35 +95,45 @@ namespace NServiceBus.TimeoutPersisters.NHibernate.Installer
                 {
                     typeof(MsSql2005Dialect).FullName,
                     typeof(MsSql2008Dialect).FullName,
-                    typeof(MsSql2012Dialect).FullName,
+                    typeof(MsSql2012Dialect).FullName
                 };
+
+                var shouldOptimizeTimeoutEntity = timeoutEntityMapping != null;
 
                 foreach (var item in updateSQL)
                 {
-                    var sql = item;
+                    var updateSqlStatement = item;
 
-                    if (dialectScopes.Contains(dialect.GetType().FullName))
+                    if (dialectScopes.Contains(dialect.GetType().FullName) && shouldOptimizeTimeoutEntity)
                     {
-                        sql = sql.Replace("primary key (Id)", "primary key nonclustered (Id)");
-                        sql = sql.Replace("create index TimeoutEntity_EndpointIdx on TimeoutEntity (Time, Endpoint)", "create clustered index TimeoutEntity_EndpointIdx on TimeoutEntity (Endpoint, Time)");
+                        var qualifiedTimeoutEntityTableName = timeoutEntityMapping.Table.GetQualifiedName(dialect);
+
+                        if (updateSqlStatement.StartsWith($"create table {qualifiedTimeoutEntityTableName}"))
+                        {
+                            updateSqlStatement = updateSqlStatement.Replace("primary key (Id)", "primary key nonclustered (Id)");
+                        }
+                        else if (updateSqlStatement.StartsWith($"create index {TimeoutEntityMap.EndpointIndexName}"))
+                        {
+                            updateSqlStatement = updateSqlStatement.Replace($"create index {TimeoutEntityMap.EndpointIndexName}", $"create clustered index {TimeoutEntityMap.EndpointIndexName}");
+                        }
                     }
 
-                    var formatted = formatter.Format(sql);
+                    var formatted = formatter.Format(updateSqlStatement);
 
                     try
                     {
                         scriptAction?.Invoke(formatted);
                         if (doUpdate)
                         {
-                            log.Debug(sql);
-                            stmt.CommandText = sql;
+                            log.Debug(updateSqlStatement);
+                            stmt.CommandText = updateSqlStatement;
                             stmt.ExecuteNonQuery();
                         }
                     }
                     catch (Exception e)
                     {
                         exceptions.Add(e);
-                        log.Error("Unsuccessful: " + sql, e);
+                        log.Error("Unsuccessful: " + updateSqlStatement, e);
                     }
                 }
 
@@ -146,11 +159,13 @@ namespace NServiceBus.TimeoutPersisters.NHibernate.Installer
             }
         }
 
-        static IInternalLogger log = LoggerProvider.LoggerFor(typeof(OptimizedSchemaUpdate));
         Configuration configuration;
         IConnectionHelper connectionHelper;
         Dialect dialect;
         List<Exception> exceptions;
         IFormatter formatter;
+        PersistentClass timeoutEntityMapping;
+
+        static IInternalLogger log = LoggerProvider.LoggerFor(typeof(OptimizedSchemaUpdate));
     }
 }

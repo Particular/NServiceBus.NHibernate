@@ -131,6 +131,7 @@
     <Compile Include="Subscriptions\NHibernateSubscriptionStorage.cs" />
     <Compile Include="Subscriptions\SubscriptionConfig.cs" />
     <Compile Include="SynchronizedStorageSessionExtensions.cs" />
+    <Compile Include="TimeoutPersisters\IncorrectIndexDetector.cs" />
     <Compile Include="TimeoutPersisters\TimeoutEntityMap.cs" />
     <Compile Include="TimeoutPersisters\Installer\Installer.cs" />
     <Compile Include="TimeoutPersisters\OptimizedSchemaUpdate.cs" />
