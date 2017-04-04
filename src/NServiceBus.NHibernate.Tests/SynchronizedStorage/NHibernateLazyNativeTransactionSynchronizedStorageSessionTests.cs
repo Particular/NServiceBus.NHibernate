@@ -2,10 +2,8 @@
 {
     using System;
     using System.Threading.Tasks;
-    using System.Transactions;
     using NServiceBus.Extensibility;
     using NServiceBus.Persistence.NHibernate;
-    using NServiceBus.Transport;
     using NUnit.Framework;
 
     [TestFixture]
