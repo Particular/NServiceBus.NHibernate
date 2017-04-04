@@ -2,13 +2,12 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Text;
     using EndpointTemplates;
     using AcceptanceTesting;
-    using NServiceBus.Config;
-    using NServiceBus.Config.ConfigurationSource;
     using NUnit.Framework;
 
-    public class When_using_Rijndael_with_config : NServiceBusAcceptanceTest
+    public class When_using_Rijndael_with_custom : NServiceBusAcceptanceTest
     {
         [Test]
         public void Should_receive_decrypted_message()
@@ -17,7 +16,7 @@
                     .WithEndpoint<Endpoint>(b => b.Given(bus => bus.SendLocal(new MessageWithSecretData
                         {
                             Secret = "betcha can't guess my secret",
-                            SubProperty = new MySecretSubProperty {Secret = "My sub secret"},
+                            SubProperty = new MySecretSubProperty { Secret = "My sub secret" },
                             CreditCards = new List<CreditCardDetails>
                                 {
                                     new CreditCardDetails
@@ -32,7 +31,7 @@
                                         }
                                 }
                         })))
-                    .Done(c => c.GotTheMessage)
+                    .Done(c => c.GetTheMessage)
                     .Run();
 
             Assert.AreEqual("betcha can't guess my secret", context.Secret);
@@ -42,7 +41,7 @@
 
         public class Context : ScenarioContext
         {
-            public bool GotTheMessage { get; set; }
+            public bool GetTheMessage { get; set; }
 
             public string Secret { get; set; }
 
@@ -55,7 +54,12 @@
         {
             public Endpoint()
             {
-                EndpointSetup<DefaultServer>(builder => builder.RijndaelEncryptionService());
+                var keys = new Dictionary<string, byte[]>
+                {
+                   {"1st", Encoding.ASCII.GetBytes("gdDbqRpqdRbTs3mhdZh9qCaDaxJXl+e6")}
+                };
+
+                EndpointSetup<DefaultServer>(builder => builder.RijndaelEncryptionService("1st", keys));
             }
 
             public class Handler : IHandleMessages<MessageWithSecretData>
@@ -74,7 +78,7 @@
                         message.CreditCards[1].Number.Value
                     };
 
-                    Context.GotTheMessage = true;
+                    Context.GetTheMessage = true;
                 }
             }
         }
@@ -100,15 +104,5 @@
             public WireEncryptedString Secret { get; set; }
         }
 
-        public class ConfigureEncryption: IProvideConfiguration<RijndaelEncryptionServiceConfig>
-        {
-            public RijndaelEncryptionServiceConfig GetConfiguration()
-            {
-                return new RijndaelEncryptionServiceConfig
-                {
-                    Key = "gdDbqRpqdRbTs3mhdZh9qCaDaxJXl+e6"
-                };
-            }
-        }
     }
 }

@@ -29,18 +29,26 @@ namespace NServiceBus.TimeoutPersisters.NHibernate
         public virtual byte[] State { get; set; }
 
         /// <summary>
+        /// Timeout endpoint name.
+        /// </summary>
+        /// <remarks>
+        /// It is important that this property is declared before the <see cref="Time"/> property
+        /// for NHibernate to ensure TimeoutEntity_EndpointIdx has proper column order: (Endpoint, Time).
+        /// </remarks>
+        public virtual string Endpoint { get; set; }
+
+        /// <summary>
         /// The time at which the saga ID expired.
         /// </summary>
+        /// <remarks>
+        /// It is important that this property is declared after the <see cref="Endpoint"/> property
+        /// for NHibernate to ensure TimeoutEntity_EndpointIdx has proper column order: (Endpoint, Time).
+        /// </remarks>
         public virtual DateTime Time { get; set; }
 
         /// <summary>
         /// Store the headers to preserve them across timeouts.
         /// </summary>
         public virtual string Headers { get; set; }
-
-        /// <summary>
-        /// Timeout endpoint name.
-        /// </summary>
-        public virtual string Endpoint { get; set; }
     }
 }

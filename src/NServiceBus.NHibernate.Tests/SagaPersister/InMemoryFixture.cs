@@ -4,39 +4,43 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
     using System.Collections.Generic;
     using System.IO;
     using System.Security.Principal;
-    using AutoPersistence;
     using global::NHibernate;
-    using global::NHibernate.Tool.hbm2ddl;
+    using global::NHibernate.Cfg;
+    using NServiceBus.Persistence.NHibernate;
+    using NServiceBus.Saga;
+    using NServiceBus.SagaPersisters.NHibernate.AutoPersistence;
+    using NServiceBus.TimeoutPersisters.NHibernate.Installer;
     using NUnit.Framework;
-    using Persistence.NHibernate;
-    using Saga;
+    using Environment = global::NHibernate.Cfg.Environment;
+    using Installer = NServiceBus.Persistence.NHibernate.Installer;
 
     class InMemoryFixture<T> where T : IContainSagaData
     {
-        protected SagaPersister SagaPersister;
-        protected ISessionFactory SessionFactory;
+        const string dialect = "NHibernate.Dialect.SQLiteDialect";
 
 
         [SetUp]
         public void SetUp()
         {
-            connectionString = String.Format(@"Data Source={0};New=True;", Path.GetTempFileName());
+            connectionString = $@"Data Source={Path.GetTempFileName()};New=True;";
 
-
-            var configuration = new global::NHibernate.Cfg.Configuration()
+            var configuration = new Configuration()
                 .AddProperties(new Dictionary<string, string>
                 {
-                    { "dialect", dialect },
-                    { global::NHibernate.Cfg.Environment.ConnectionString,connectionString }
+                    {"dialect", dialect},
+                    {Environment.ConnectionString, connectionString}
                 });
 
-            var modelMapper = new SagaModelMapper(new[] { typeof(T) });
+            var modelMapper = new SagaModelMapper(new[]
+            {
+                typeof(T)
+            });
 
             configuration.AddMapping(modelMapper.Compile());
 
             SessionFactory = configuration.BuildSessionFactory();
 
-            new SchemaUpdate(configuration).Execute(false, true);
+            new OptimizedSchemaUpdate(configuration).Execute(false, true);
 
             session = SessionFactory.OpenSession();
 
@@ -64,16 +68,15 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
             SessionFactory.Close();
         }
 
-        const string dialect = "NHibernate.Dialect.SQLiteDialect";
         string connectionString;
+        protected SagaPersister SagaPersister;
         ISession session;
+        protected ISessionFactory SessionFactory;
         bool sessionFlushed;
     }
 
     class FakeSessionProvider : IStorageSessionProvider
     {
-        readonly ISessionFactory sessionFactory;
-
         public FakeSessionProvider(ISessionFactory sessionFactory, ISession session)
         {
             this.sessionFactory = sessionFactory;
@@ -81,6 +84,12 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
         }
 
         public ISession Session { get; private set; }
+
+        public void ExecuteInTransaction(Action<ISession> operation)
+        {
+            operation(Session);
+        }
+
         public IStatelessSession OpenStatelessSession()
         {
             return sessionFactory.OpenStatelessSession();
@@ -91,9 +100,6 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
             return sessionFactory.OpenSession();
         }
 
-        public void ExecuteInTransaction(Action<ISession> operation)
-        {
-            operation(Session);
-        }
+        readonly ISessionFactory sessionFactory;
     }
 }

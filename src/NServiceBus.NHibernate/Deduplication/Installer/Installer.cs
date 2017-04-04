@@ -1,8 +1,8 @@
 ﻿namespace NServiceBus.Deduplication.NHibernate.Installer
 {
     using global::NHibernate.Cfg;
-    using global::NHibernate.Tool.hbm2ddl;
-    using Installation;
+    using NServiceBus.Installation;
+    using NServiceBus.TimeoutPersisters.NHibernate.Installer;
 
     class Installer : INeedToInstallSomething
     {
@@ -13,7 +13,7 @@
         {
             if (RunInstaller)
             {
-                new SchemaUpdate(Configuration).Execute(false, true);
+                new OptimizedSchemaUpdate(Configuration).Execute(false, true);
             }
         }
     }

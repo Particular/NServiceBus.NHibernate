@@ -11,6 +11,8 @@ namespace NServiceBus.TimeoutPersisters.NHibernate.Config
     /// </summary>
     class TimeoutEntityMap : ClassMapping<TimeoutEntity>
     {
+        public const string EndpointIndexName = "TimeoutEntity_EndpointIdx";
+
         /// <summary>
         /// Default constructor
         /// </summary>
@@ -28,13 +30,13 @@ namespace NServiceBus.TimeoutPersisters.NHibernate.Config
                 pm.Length(1024);
             });
             Property(p => p.SagaId, pm => pm.Index("TimeoutEntity_SagaIdIdx"));
-            Property(p => p.Time, pm => pm.Index("TimeoutEntity_EndpointIdx"));
-            Property(p => p.Headers, pm => pm.Type(NHibernateUtil.StringClob));
             Property(p => p.Endpoint, pm =>
             {
-                pm.Index("TimeoutEntity_EndpointIdx");
+                pm.Index(EndpointIndexName);
                 pm.Length(440);
             });
+            Property(p => p.Time, pm => pm.Index(EndpointIndexName));
+            Property(p => p.Headers, pm => pm.Type(NHibernateUtil.StringClob));
         }
     }
 }

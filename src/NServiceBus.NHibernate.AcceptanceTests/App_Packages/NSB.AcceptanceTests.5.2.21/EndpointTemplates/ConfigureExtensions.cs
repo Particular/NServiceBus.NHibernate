@@ -56,7 +56,7 @@
             }
         }
 
-        public static void DefinePersistence(this BusConfiguration config, IDictionary<string, string> settings, Type endpointBuilderType)
+        public static void DefinePersistence(this BusConfiguration config, IDictionary<string, string> settings)
         {
             if (!settings.ContainsKey("Persistence"))
             {
@@ -68,7 +68,7 @@
 
             var typeName = "Configure" + persistenceType.Name;
 
-            var configurerType = endpointBuilderType.GetNestedType("ConfigurePersistence") ?? Type.GetType(typeName, false);
+            var configurerType = Type.GetType(typeName, false);
 
             if (configurerType != null)
             {

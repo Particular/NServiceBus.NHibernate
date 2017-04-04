@@ -2,6 +2,7 @@ namespace NServiceBus.Features
 {
     using System;
     using NHibernate.Cfg;
+    using NServiceBus.TimeoutPersisters.NHibernate.Installer;
     using Persistence.NHibernate;
     using TimeoutPersisters.NHibernate;
     using TimeoutPersisters.NHibernate.Config;
@@ -19,6 +20,7 @@ namespace NServiceBus.Features
         {
             DependsOn<TimeoutManager>();
             DependsOn<NHibernateDBConnectionProvider>();
+            RegisterStartupTask<DetectIncorrectIndexesStartupTask>();
         }
 
         /// <summary>
@@ -40,7 +42,6 @@ namespace NServiceBus.Features
             context.Container.ConfigureComponent<TimeoutPersisters.NHibernate.Installer.Installer>(DependencyLifecycle.SingleInstance)
                 .ConfigureProperty(x => x.Configuration, configuration)
                 .ConfigureProperty(x => x.RunInstaller, RunInstaller(context));
-                
 
             string connString;
 
@@ -64,6 +65,9 @@ namespace NServiceBus.Features
                 .ConfigureProperty(p => p.SessionFactory, configuration.BuildSessionFactory())
                 .ConfigureProperty(p => p.EndpointName, context.Settings.EndpointName())
                 .ConfigureProperty(p => p.TimeoutsCleanupExecutionInterval, timeoutsCleanupExecutionInterval);
+
+            context.Container.ConfigureComponent<DetectIncorrectIndexesStartupTask>(DependencyLifecycle.SingleInstance)
+                .ConfigureProperty(t => t.Configuration, configuration);
         }
 
         static bool RunInstaller(FeatureConfigurationContext context)
@@ -71,6 +75,16 @@ namespace NServiceBus.Features
             return context.Settings.Get<bool>(context.Settings.HasSetting("NHibernate.Timeouts.AutoUpdateSchema") 
                 ? "NHibernate.Timeouts.AutoUpdateSchema" 
                 : "NHibernate.Common.AutoUpdateSchema");
+        }
+
+        class DetectIncorrectIndexesStartupTask : FeatureStartupTask
+        {
+            public Configuration Configuration { get; set; }
+
+            protected override void OnStart()
+            {
+                new IncorrectIndexDetector(Configuration).LogWarningIfTimeoutEntityIndexIsIncorrect();
+            }
         }
     }
 }

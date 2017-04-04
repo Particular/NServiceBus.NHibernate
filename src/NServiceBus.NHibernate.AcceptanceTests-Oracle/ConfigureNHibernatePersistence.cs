@@ -13,11 +13,11 @@ public class ConfigureNHibernatePersistence
     {
         NHibernateSettingRetriever.AppSettings = () => new NameValueCollection
         {
-            {"NServiceBus/Persistence/NHibernate/connection.driver_class", "NHibernate.Driver.OracleDataClientDriver"},
+            {"NServiceBus/Persistence/NHibernate/connection.driver_class", "NHibernate.Driver.OracleManagedDataClientDriver"},
             {"NServiceBus/Persistence/NHibernate/dialect", "NHibernate.Dialect.Oracle10gDialect"}
         };
         config.UsePersistence<NHibernatePersistence>()
-            .ConnectionString(@"Data Source=XE;User Id=particular;Password=Welcome1")
+            .ConnectionString("Data Source=(DESCRIPTION=(ADDRESS_LIST = (ADDRESS = (PROTOCOL = TCP)(HOST = 127.0.0.1)(PORT = 1521)))(CONNECT_DATA = (SERVER = DEDICATED)(SERVICE_NAME = XE)));User Id=particular;Password=Welcome1")
             .SagaTableNamingConvention(type =>
             {
                 var tablename = DefaultTableNameConvention(type);
