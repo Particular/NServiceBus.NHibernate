@@ -2,6 +2,7 @@
 {
     using System;
     using System.Threading.Tasks;
+    using System.Transactions;
     using global::NHibernate;
     using Janitor;
 
@@ -10,13 +11,14 @@
     {
         Lazy<ISession> session;
         Func<SynchronizedStorageSession, Task> onSaveChangesCallback;
+        ITransaction transaction;
 
         public NHibernateLazyNativeTransactionSynchronizedStorageSession(Func<ISession> sessionFactory)
         {
             session = new Lazy<ISession>(() =>
             {
                 var s = sessionFactory();
-                s.BeginTransaction();
+                transaction = s.BeginTransaction();
                 return s;
             });
         }
@@ -32,23 +34,28 @@
             onSaveChangesCallback = callback;
         }
 
-        public ITransaction Transaction => Session.Transaction;
-
         public async Task CompleteAsync()
         {
             if (onSaveChangesCallback != null)
             {
                 await onSaveChangesCallback(this).ConfigureAwait(false);
             }
-            if (session.IsValueCreated)
+            if (transaction != null)
             {
-                Transaction.Commit();
-                Transaction.Dispose();
+                transaction.Commit();
+                transaction.Dispose();
+                transaction = null;
             }
         }
 
         public void Dispose()
         {
+            //If save changes callback failed, we need to dispose the transaction here.
+            if (transaction != null)
+            {
+                transaction.Dispose();
+                transaction = null;
+            }
             if (session.IsValueCreated)
             {
                 session.Value.Dispose();

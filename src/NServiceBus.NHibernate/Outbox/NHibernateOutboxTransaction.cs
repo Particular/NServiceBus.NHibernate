@@ -12,16 +12,12 @@
         public NHibernateOutboxTransaction(ISession session, ITransaction transaction)
         {
             Session = session;
-            Transaction = transaction;
+            this.transaction = transaction;
         }
 
         public ISession Session { get; }
-        public ITransaction Transaction { get; }
 
-        public void Dispose()
-        {
-            Session.Dispose();
-        }
+        public ITransaction Transaction => transaction;
 
         public void OnSaveChanges(Func<Task> callback)
         {
@@ -38,10 +34,23 @@
             {
                 await onSaveChangesCallback().ConfigureAwait(false);
             }
-            Transaction.Commit();
-            Transaction.Dispose();
+            transaction.Commit();
+            transaction.Dispose();
+            transaction = null;
+        }
+
+        public void Dispose()
+        {
+            //If save changes callback failed, we need to dispose the transaction here.
+            if (transaction != null)
+            {
+                transaction.Dispose();
+                transaction = null;
+            }
+            Session.Dispose();
         }
 
         Func<Task> onSaveChangesCallback;
+        ITransaction transaction;
     }
 }
