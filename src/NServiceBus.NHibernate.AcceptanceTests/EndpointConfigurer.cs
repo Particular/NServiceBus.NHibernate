@@ -5,7 +5,7 @@ using NServiceBus.AcceptanceTesting.Support;
 
 public abstract class EndpointConfigurer : IConfigureEndpointTestExecution
 {
-    const string defaultConnStr = @"Server=localhost\SqlExpress;Database=nservicebus;Trusted_Connection=True;";
+    const string defaultConnStr = @"Server=localhost\SqlExpress;Database=nservicebus;Trusted_Connection=True;Connection Timeout=30;";
 
     public static string ConnectionString
     {
