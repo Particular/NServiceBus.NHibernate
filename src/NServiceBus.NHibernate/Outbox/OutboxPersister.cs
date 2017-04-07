@@ -8,7 +8,6 @@
     using global::NHibernate;
     using global::NHibernate.Criterion;
     using NServiceBus.Extensibility;
-    using NServiceBus.Logging;
     using NServiceBus.Outbox;
     using NServiceBus.Outbox.NHibernate;
     using IsolationLevel = System.Data.IsolationLevel;
@@ -16,7 +15,6 @@
     class OutboxPersister<TEntity> : INHibernateOutboxStorage
         where TEntity : class, IOutboxRecord, new()
     {
-        static ILog Log = LogManager.GetLogger<OutboxPersister<TEntity>>();
         ISessionFactory sessionFactory;
         string endpointName;
 
@@ -35,7 +33,7 @@
 
             if (Transaction.Current != null)
             {
-                Log.Warn("The endpoint is configured to use Outbox but a TransactionScope has been detected. Outbox mode is not compatible with "
+                throw new Exception("The endpoint is configured to use Outbox but a TransactionScope has been detected. Outbox mode is not compatible with "
                     + $"TransactionScope. Do not configure the transport to use '{nameof(TransportTransactionMode.TransactionScope)}' transaction mode with Outbox.");
             }
 
