@@ -8,9 +8,11 @@ namespace NServiceBus.Features
     using global::NHibernate.Mapping.ByCode;
     using global::NHibernate.Tool.hbm2ddl;
     using NServiceBus.NHibernate.Outbox;
+    using global::NHibernate.Transaction;
     using NServiceBus.Outbox.NHibernate;
     using Persistence.NHibernate;
     using Persistence.NHibernate.Installer;
+    using Environment = global::NHibernate.Cfg.Environment;
 
     /// <summary>
     /// NHibernate Storage Session.
@@ -48,6 +50,7 @@ namespace NServiceBus.Features
             if (outboxEnabled)
             {
                 sharedMappings.AddMapping(configuration => ApplyMappings(configuration, context));
+                config.Configuration.Properties[Environment.TransactionStrategy] = typeof(AdoNetTransactionFactory).FullName;
             }
 
             sharedMappings.ApplyTo(config.Configuration);
