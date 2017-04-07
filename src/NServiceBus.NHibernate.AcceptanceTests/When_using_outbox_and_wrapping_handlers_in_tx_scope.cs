@@ -9,17 +9,17 @@
     using NServiceBus.Logging;
     using NUnit.Framework;
 
-    public class When_using_transaction_scope_and_outbox : NServiceBusAcceptanceTest
+    public class When_using_outbox_and_wrapping_handlers_in_tx_scope : NServiceBusAcceptanceTest
     {
         [Test]
-        public async Task Persist_saga_and_log_warning()
+        public async Task Should_persist_saga_and_log_warning()
         {
             /*
              * DoNotFailOnErrorMessages is used here because the original problem discovered with the code was causing data loss due to incorrect transaction
              * handling in the outbox feature while FLR was enabled.
              */
             var ctx = await Scenario.Define<Context>()
-                .WithEndpoint<NonDtcReceivingEndpoint>(b => b.When(async session =>
+                .WithEndpoint<OutboxTransactionScopeSagaEndpoint>(b => b.When(async session =>
                 {
                     var sagaId = Guid.NewGuid();
                     await session.SendLocal(new StartSagaMessage
@@ -45,9 +45,9 @@
             public bool Done { get; set; }
         }
 
-        public class NonDtcReceivingEndpoint : EndpointConfigurationBuilder
+        public class OutboxTransactionScopeSagaEndpoint : EndpointConfigurationBuilder
         {
-            public NonDtcReceivingEndpoint()
+            public OutboxTransactionScopeSagaEndpoint()
             {
                 EndpointSetup<DefaultServer>(b =>
                 {
@@ -84,7 +84,7 @@
                 }
             }
 
-            class OutboxTransactionScopeSagaData : ContainSagaData
+            public class OutboxTransactionScopeSagaData : ContainSagaData
             {
                 public virtual bool Started { get; set; }
                 public virtual Guid UniqueId { get; set; }
