@@ -7,10 +7,12 @@ namespace NServiceBus.Features
     using global::NHibernate.Cfg;
     using global::NHibernate.Mapping.ByCode;
     using global::NHibernate.Tool.hbm2ddl;
+    using global::NHibernate.Transaction;
     using NServiceBus.NHibernate.Outbox;
     using NServiceBus.Outbox.NHibernate;
     using Persistence.NHibernate;
     using Persistence.NHibernate.Installer;
+    using Environment = global::NHibernate.Cfg.Environment;
 
     /// <summary>
     /// NHibernate Storage Session.
@@ -47,6 +49,8 @@ namespace NServiceBus.Features
             var outboxEnabled = context.Settings.IsFeatureActive(typeof(Outbox));
             if (outboxEnabled)
             {
+                //Prevent TransactionScope opended in the pipeline from interfering with OutboxTransaction
+                config.Configuration.Properties[Environment.TransactionStrategy] = typeof(AdoNetTransactionFactory).FullName;
                 sharedMappings.AddMapping(configuration => ApplyMappings(configuration, context));
             }
 
