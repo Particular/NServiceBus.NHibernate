@@ -84,7 +84,7 @@
                 }
             }
 
-            class OutboxTransactionScopeSagaData : ContainSagaData
+            public class OutboxTransactionScopeSagaData : ContainSagaData
             {
                 public virtual bool Started { get; set; }
                 public virtual Guid UniqueId { get; set; }
