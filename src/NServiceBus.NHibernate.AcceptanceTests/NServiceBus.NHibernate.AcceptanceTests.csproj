@@ -316,6 +316,8 @@
     <Compile Include="App_Packages\NSB.AcceptanceTests.6.1.1\Versioning\When_multiple_versions_of_a_message_is_published.cs" />
     <Compile Include="ConfigureEndpointNHibernatePersistence.cs" />
     <Compile Include="EndpointConfigurer.cs" />
+    <Compile Include="When_using_outbox_with_transport_in_transaction_scope_mode.cs" />
+    <Compile Include="When_using_outbox_and_wrapping_handlers_in_tx_scope.cs" />
     <Compile Include="When_receiving_a_message_with_customized_outbox_record_mapping.cs" />
     <Compile Include="When_user_supplies_NH_Configuration.cs" />
     <Compile Include="When_using_hbms.cs" />
