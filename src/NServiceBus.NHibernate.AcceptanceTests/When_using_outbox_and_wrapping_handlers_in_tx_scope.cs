@@ -19,7 +19,7 @@
              * handling in the outbox feature while FLR was enabled.
              */
             var ctx = await Scenario.Define<Context>()
-                .WithEndpoint<Endpoint>(b => b.When(async session =>
+                .WithEndpoint<OutboxTransactionScopeSagaEndpoint>(b => b.When(async session =>
                 {
                     var sagaId = Guid.NewGuid();
                     await session.SendLocal(new StartSagaMessage
@@ -45,9 +45,9 @@
             public bool Done { get; set; }
         }
 
-        public class Endpoint : EndpointConfigurationBuilder
+        public class OutboxTransactionScopeSagaEndpoint : EndpointConfigurationBuilder
         {
-            public Endpoint()
+            public OutboxTransactionScopeSagaEndpoint()
             {
                 EndpointSetup<DefaultServer>(b =>
                 {
