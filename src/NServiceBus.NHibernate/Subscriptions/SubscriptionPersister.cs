@@ -1,5 +1,6 @@
 namespace NServiceBus.Unicast.Subscriptions.NHibernate
 {
+    using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
@@ -25,6 +26,11 @@ namespace NServiceBus.Unicast.Subscriptions.NHibernate
 
         public virtual Task Subscribe(Subscriber subscriber, MessageType messageType, ContextBag context)
         {
+            return Retry(() => SubscribeInternal(subscriber, messageType));
+        }
+
+        void SubscribeInternal(Subscriber subscriber, MessageType messageType)
+        {
             using (new TransactionScope(TransactionScopeOption.Suppress))
             using (var session = sessionFactory.OpenSession())
             using (var tx = session.BeginTransaction(IsolationLevel.ReadCommitted))
@@ -39,12 +45,19 @@ namespace NServiceBus.Unicast.Subscriptions.NHibernate
                 });
                 tx.Commit();
             }
-            return Task.FromResult(0);
         }
 
         public virtual Task Unsubscribe(Subscriber address, MessageType messageType, ContextBag context)
         {
-            var messageTypes = new List<MessageType> { messageType };
+            return Retry(() => UnsubscribeInternal(address, messageType));
+        }
+
+        void UnsubscribeInternal(Subscriber address, MessageType messageType)
+        {
+            var messageTypes = new List<MessageType>
+            {
+                messageType
+            };
             using (new TransactionScope(TransactionScopeOption.Suppress))
             using (var session = sessionFactory.OpenSession())
             using (var tx = session.BeginTransaction(IsolationLevel.ReadCommitted))
@@ -63,7 +76,28 @@ namespace NServiceBus.Unicast.Subscriptions.NHibernate
 
                 tx.Commit();
             }
-            return Task.FromResult(0);
+        }
+
+        static async Task Retry(Action function, int maximumAttempts = 5)
+        {
+            var attempt = 0;
+            while (true)
+            {
+                try
+                {
+                    function();
+                    return;
+                }
+                catch (Exception)
+                {
+                    attempt++;
+                    if (attempt >= maximumAttempts)
+                    {
+                        throw;
+                    }
+                    await Task.Delay(500).ConfigureAwait(false);
+                }
+            }
         }
 
         public virtual Task<IEnumerable<Subscriber>> GetSubscriberAddressesForMessage(IEnumerable<MessageType> messageTypes, ContextBag context)
