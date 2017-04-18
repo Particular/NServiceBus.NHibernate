@@ -1,5 +1,7 @@
 ﻿namespace NServiceBus.Testing
 {
+    using System;
+    using System.Threading.Tasks;
     using global::NHibernate;
     using Janitor;
     using NServiceBus.Persistence;
@@ -23,5 +25,10 @@
         /// Gets the underlying NHibernate session.
         /// </summary>
         public ISession Session { get; }
+
+        void INHibernateSynchronizedStorageSession.OnSaveChanges(Func<SynchronizedStorageSession, Task> callback)
+        {
+            //NOOP
+        }
     }
 }

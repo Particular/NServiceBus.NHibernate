@@ -36,7 +36,7 @@
                         + "TransactionScope. Do not use config.UnitOfWork().WrapHandlersInATransactionScope() when Outbox is enabled.");
                 }
 
-                CompletableSynchronizedStorageSession session = new NHibernateNativeTransactionSynchronizedStorageSession(nhibernateTransaction.Session, nhibernateTransaction.Transaction);
+                CompletableSynchronizedStorageSession session = new NHibernateOutboxTransactionSynchronizedStorageSession(nhibernateTransaction);
                 return Task.FromResult(session);
             }
             return EmptyResult;

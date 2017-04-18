@@ -9,36 +9,55 @@
     class NHibernateLazyNativeTransactionSynchronizedStorageSession : CompletableSynchronizedStorageSession, INHibernateSynchronizedStorageSession
     {
         Lazy<ISession> session;
+        Func<SynchronizedStorageSession, Task> onSaveChangesCallback;
+        ITransaction transaction;
 
         public NHibernateLazyNativeTransactionSynchronizedStorageSession(Func<ISession> sessionFactory)
         {
-            session =new Lazy<ISession>(() =>
+            session = new Lazy<ISession>(() =>
             {
                 var s = sessionFactory();
-                s.BeginTransaction();
+                transaction = s.BeginTransaction();
                 return s;
             });
         }
 
         public ISession Session => session.Value;
 
-        public ITransaction Transaction => Session.Transaction;
-
-        public Task CompleteAsync()
+        public void OnSaveChanges(Func<SynchronizedStorageSession, Task> callback)
         {
-            if (session.IsValueCreated)
+            if (onSaveChangesCallback != null)
             {
-                Transaction.Commit();
-                Transaction.Dispose();
+                throw new Exception("Save changes callback for this session has already been registered.");
             }
-            return Task.FromResult(0);
+            onSaveChangesCallback = callback;
+        }
+
+        public async Task CompleteAsync()
+        {
+            if (onSaveChangesCallback != null)
+            {
+                await onSaveChangesCallback(this).ConfigureAwait(false);
+            }
+            if (transaction != null)
+            {
+                transaction.Commit();
+                transaction.Dispose();
+                transaction = null;
+            }
         }
 
         public void Dispose()
         {
+            //If save changes callback failed, we need to dispose the transaction here.
+            if (transaction != null)
+            {
+                transaction.Dispose();
+                transaction = null;
+            }
             if (session.IsValueCreated)
             {
-              session.Value.Dispose();  
+                session.Value.Dispose();
             }
         }
     }
