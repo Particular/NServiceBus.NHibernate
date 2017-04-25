@@ -81,6 +81,7 @@
     <Reference Include="System.Transactions" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="SagaPersister\InMemoryFixture.cs" />
     <Compile Include="Outbox\FakeDbConnectionProvider.cs" />
     <Compile Include="Outbox\MessageIdOutboxRecord.cs" />
     <Compile Include="Outbox\GuidOutboxRecord.cs" />
@@ -88,7 +89,6 @@
     <Compile Include="Outbox\When_deserializing_outbox_messages.cs" />
     <Compile Include="Persistence\NHibernateConfigurationBuilderTests.cs" />
     <Compile Include="SagaPersister\FakeConfigurationSource.cs" />
-    <Compile Include="SagaPersister\InMemoryFixture.cs" />
     <Compile Include="SagaPersister\MySaga.cs" />
     <Compile Include="SagaPersister\SessionFactoryHelper.cs" />
     <Compile Include="SagaPersister\SQLiteConfiguration.cs" />
@@ -114,6 +114,7 @@
     <Compile Include="TimeoutPersister\InMemoryDBFixture.cs" />
     <Compile Include="TimeoutPersister\When_fetching_timeouts_from_storage.cs" />
     <Compile Include="TimeoutPersister\When_removing_timeouts_from_the_storage.cs" />
+    <Compile Include="SagaPersister\When_automapping_sagas_with_different_correlation_properties.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="hibernate.cfg.xml">
