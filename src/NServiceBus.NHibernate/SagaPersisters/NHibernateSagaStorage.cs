@@ -1,8 +1,11 @@
 namespace NServiceBus.Features
 {
     using System;
+    using System.Collections.Generic;
     using System.Linq;
     using global::NHibernate.Cfg;
+    using global::NHibernate.Dialect;
+    using global::NHibernate.Mapping;
     using NServiceBus.Sagas;
     using SagaPersisters.NHibernate;
     using SagaPersisters.NHibernate.AutoPersistence;
@@ -45,8 +48,7 @@ namespace NServiceBus.Features
 
             var allSagaMetadata = settings.Get<SagaMetadataCollection>();
             var types = settings.GetAvailableTypes().Except(configuration.ClassMappings.Select(x => x.MappedClass));
-            var modelMapper = new SagaModelMapper(allSagaMetadata, types, tableNamingConvention);
-            configuration.AddMapping(modelMapper.Compile());
+            SagaModelMapper.AddMappings(configuration, allSagaMetadata, types, tableNamingConvention);
         }
     }
 }
