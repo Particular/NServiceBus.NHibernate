@@ -3,13 +3,16 @@
     using System;
     using System.Threading.Tasks;
     using NServiceBus.Extensibility;
+    using NServiceBus.NHibernate.Tests;
     using NServiceBus.Sagas;
     using NServiceBus.Testing;
     using NUnit.Framework;
 
     [TestFixture]
-    class When_persisting_a_saga_with_a_unique_property : InMemoryFixture<SomeSaga>
+    class When_persisting_a_saga_with_a_unique_property : InMemoryFixture
     {
+        protected override Type[] SagaTypes => new[] {typeof(SomeSaga)};
+
         [Test]
         public async Task The_database_should_enforce_the_uniqueness()
         {

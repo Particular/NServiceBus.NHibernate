@@ -3,9 +3,9 @@ namespace NServiceBus.Features
     using System.Threading.Tasks;
     using Deduplication.NHibernate.Config;
     using Deduplication.NHibernate;
-    using Deduplication.NHibernate.Installer;
-    using global::NHibernate.Tool.hbm2ddl;
+    using TimeoutPersisters.NHibernate.Installer;
     using Persistence.NHibernate;
+    using Installer = Deduplication.NHibernate.Installer.Installer;
 
     /// <summary>
     /// NHibernate Gateway Deduplication.
@@ -37,7 +37,7 @@ namespace NServiceBus.Features
             {
                 context.Settings.Get<Installer.SchemaUpdater>().Execute = identity =>
                 {
-                    new SchemaUpdate(config.Configuration).Execute(false, true);
+                    new OptimizedSchemaUpdate(config.Configuration).Execute(false, true);
 
                     return Task.FromResult(0);
                 };
