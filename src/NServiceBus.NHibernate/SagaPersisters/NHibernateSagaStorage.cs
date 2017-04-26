@@ -45,16 +45,7 @@ namespace NServiceBus.Features
 
             var allSagaMetadata = settings.Get<SagaMetadataCollection>();
             var types = settings.GetAvailableTypes().Except(configuration.ClassMappings.Select(x => x.MappedClass));
-            SagaModelMapper modelMapper;
-            if (tableNamingConvention == null)
-            {
-                modelMapper = new SagaModelMapper(allSagaMetadata, types);
-            }
-            else
-            {
-                modelMapper = new SagaModelMapper(allSagaMetadata, types, tableNamingConvention);
-            }
-
+            var modelMapper = new SagaModelMapper(allSagaMetadata, types, tableNamingConvention);
             configuration.AddMapping(modelMapper.Compile());
         }
     }

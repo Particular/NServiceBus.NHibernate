@@ -1,0 +1,62 @@
+﻿using NHibernate.Dialect;
+
+namespace NServiceBus.NHibernate.Tests
+{
+    using System.Threading.Tasks;
+    using ApprovalTests;
+    using ApprovalTests.Reporters;
+    using NServiceBus;
+    using NHibernate;
+    using NUnit.Framework;
+
+    [TestFixture]
+    public class DDL
+    {
+        [Test]
+        [UseReporter(typeof(DiffReporter))]
+        public void Outbox()
+        {
+            var script = ScriptGenerator<MsSql2012Dialect>.GenerateOutboxScript();
+            Approvals.Verify(script);
+        }
+
+        [Test]
+        [UseReporter(typeof(DiffReporter))]
+        public void Subscriptions()
+        {
+            var script = ScriptGenerator<MsSql2012Dialect>.GenerateSubscriptionStoreScript();
+            Approvals.Verify(script);
+        }
+
+        [Test]
+        [UseReporter(typeof(DiffReporter))]
+        public void MySaga()
+        {
+            var script = ScriptGenerator<MsSql2012Dialect>.GenerateSagaScript<MySaga>();
+            Approvals.Verify(script);
+        }
+    }
+
+    class MySaga : Saga<MySaga.SagaData>, IAmStartedByMessages<MyMessage>
+    {
+        protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaData> mapper)
+        {
+            mapper.ConfigureMapping<MyMessage>(m => m.UniqueId).ToSaga(s => s.UniqueId);
+        }
+
+        public class SagaData : ContainSagaData
+        {
+            public virtual string UniqueId { get; set; }
+        }
+
+        public Task Handle(MyMessage message, IMessageHandlerContext context)
+        {
+            throw new System.NotImplementedException();
+        }
+    }
+
+    class MyMessage : IMessage
+    {
+        public string UniqueId { get; set; }
+    }
+}

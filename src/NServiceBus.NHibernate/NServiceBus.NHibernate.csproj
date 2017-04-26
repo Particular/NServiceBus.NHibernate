@@ -90,6 +90,7 @@
     <Compile Include="Outbox\OutboxConfig.cs" />
     <Compile Include="Outbox\OutboxRecord.cs" />
     <Compile Include="RepeatedFailuresOverTimeCircuitBreaker.cs" />
+    <Compile Include="ScriptGenerator.cs" />
     <Compile Include="SynchronizedStorage\INHibernateSynchronizedStorageSession.cs" />
     <Compile Include="SynchronizedStorage\NHibernateAmbientTransactionSynchronizedStorageSession.cs" />
     <Compile Include="Obsoletes\NHibernateStorageContext.cs" />
@@ -132,6 +133,7 @@
     <Compile Include="Subscriptions\SubscriptionConfig.cs" />
     <Compile Include="SynchronizedStorageSessionExtensions.cs" />
     <Compile Include="TimeoutPersisters\IncorrectIndexDetector.cs" />
+    <Compile Include="TimeoutPersisters\SchemaFixUpHelper.cs" />
     <Compile Include="TimeoutPersisters\TimeoutEntityMap.cs" />
     <Compile Include="TimeoutPersisters\Installer\Installer.cs" />
     <Compile Include="TimeoutPersisters\OptimizedSchemaUpdate.cs" />

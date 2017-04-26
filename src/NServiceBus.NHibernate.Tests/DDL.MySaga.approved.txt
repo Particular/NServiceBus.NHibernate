@@ -1,0 +1,11 @@
+﻿
+    
+    if exists (select * from dbo.sysobjects where id = object_id(N'MySaga') and OBJECTPROPERTY(id, N'IsUserTable') = 1) drop table MySaga
+    
+    create table MySaga (
+        Id UNIQUEIDENTIFIER not null,
+       Originator NVARCHAR(255) null,
+       OriginalMessageId NVARCHAR(255) null,
+       UniqueId NVARCHAR(255) null unique,
+       primary key (Id)
+    )
