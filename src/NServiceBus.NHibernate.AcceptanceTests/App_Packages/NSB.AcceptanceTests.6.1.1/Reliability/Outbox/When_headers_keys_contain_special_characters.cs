@@ -29,12 +29,12 @@
         {
             var context =
                 await Scenario.Define<Context>()
-                .WithEndpoint<OutboxEndpoint>(b => b.When(session => session.SendLocal(new Pläceörder())))
+                .WithEndpoint<OutboxEndpoint>(b => b.When(session => session.SendLocal(new PlaceOrder())))
                 .Done(c => c.MessageReceived)
                 .Run(TimeSpan.FromSeconds(20));
 
             Assert.IsNotEmpty(context.UnicodeHeaders);
-            CollectionAssert.IsSubsetOf(sentHeaders, context.UnicodeHeaders);
+            CollectionAssert.IsSupersetOf(context.UnicodeHeaders, sentHeaders);
         }
 
         class Context : ScenarioContext
@@ -54,9 +54,9 @@
                 });
             }
 
-            class PlaceOrderHandler : IHandleMessages<Pläceörder>
+            class PlaceOrderHandler : IHandleMessages<PlaceOrder>
             {
-                public Task Handle(Pläceörder message, IMessageHandlerContext context)
+                public Task Handle(PlaceOrder message, IMessageHandlerContext context)
                 {
                     var sendOrderAcknowledgement = new SendOrderAcknowledgement();
                     var sendOptions = new SendOptions();
@@ -82,7 +82,7 @@
             }
         }
 
-        public class Pläceörder : ICommand
+        public class PlaceOrder : ICommand
         {
         }
 
