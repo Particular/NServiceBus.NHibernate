@@ -6,10 +6,13 @@
     using AcceptanceTesting;
     using EndpointTemplates;
     using NServiceBus.Configuration.AdvanceExtensibility;
+    using NServiceBus.Pipeline;
     using NUnit.Framework;
 
     public class When_headers_contain_special_characters : NServiceBusAcceptanceTest
     {
+        static Guid messageId = Guid.NewGuid();
+        static bool SavedOutBoxRecord = false;
         static Dictionary<string, string> sentHeaders = new Dictionary<string, string>
                           {
                             { "a-B1", "a-B" },
@@ -41,6 +44,8 @@
         {
             public Dictionary<string,string> UnicodeHeaders { get; set; }
             public bool MessageReceived { get; set; }
+
+            public bool Counter { get; set; }
         }
 
         public class OutboxEndpoint : EndpointConfigurationBuilder
@@ -50,8 +55,25 @@
                 EndpointSetup<DefaultServer>(b =>
                 {
                     b.GetSettings().Set("DisableOutboxTransportCheck", true);
+                    b.Pipeline.Register("BlowUpBeforeDispatchBehavior", new BlowUpBeforeDispatchBehavior(), "For testing");
+                    b.Recoverability().Immediate(a => a.NumberOfRetries(1));
                     b.EnableOutbox();
                 });
+            }
+
+            class BlowUpBeforeDispatchBehavior : IBehavior<IBatchDispatchContext, IBatchDispatchContext>
+            {
+                public async Task Invoke(IBatchDispatchContext context, Func<IBatchDispatchContext, Task> next)
+                {
+                    if (!SavedOutBoxRecord)
+                    {
+                        SavedOutBoxRecord = true;
+                        throw new Exception();
+                    }
+                    
+
+                    await next(context).ConfigureAwait(false);
+                }
             }
 
             class PlaceOrderHandler : IHandleMessages<PlaceOrder>
@@ -65,6 +87,7 @@
                     {
                         sendOptions.SetHeader(header.Key, header.Value);
                     }
+                    sendOptions.SetMessageId(messageId.ToString());
                     return context.Send(sendOrderAcknowledgement, sendOptions);
                 }
             }
