@@ -139,6 +139,7 @@
     <Compile Include="App_Packages\NSB.AcceptanceTests.6.1.1\DataBus\When_using_custom_IDataBus.cs" />
     <Compile Include="App_Packages\NSB.AcceptanceTests.6.1.1\DelayedDelivery\When_Deferring_a_message.cs" />
     <Compile Include="App_Packages\NSB.AcceptanceTests.6.1.1\DelayedDelivery\When_deferring_a_message_to_the_past.cs" />
+    <Compile Include="App_Packages\NSB.AcceptanceTests.6.1.1\DelayedDelivery\When_using_special_characters_in_headers.cs" />
     <Compile Include="App_Packages\NSB.AcceptanceTests.6.1.1\DeterministicGuid.cs" />
     <Compile Include="App_Packages\NSB.AcceptanceTests.6.1.1\Encryption\When_using_encryption_with_custom_service.cs" />
     <Compile Include="App_Packages\NSB.AcceptanceTests.6.1.1\Encryption\When_using_Rijndael_without_incoming_key_identifier.cs" />
@@ -205,6 +206,7 @@
     <Compile Include="App_Packages\NSB.AcceptanceTests.6.1.1\Recoverability\When_message_is_moved_to_error_queue_using_dtc.cs" />
     <Compile Include="App_Packages\NSB.AcceptanceTests.6.1.1\Recoverability\When_message_is_moved_to_error_queue_with_header_customizations.cs" />
     <Compile Include="App_Packages\NSB.AcceptanceTests.6.1.1\Recoverability\When_message_with_TimeToBeReceived_fails.cs" />
+    <Compile Include="App_Packages\NSB.AcceptanceTests.6.1.1\Recoverability\When_using_special_characters_in_headers.cs" />
     <Compile Include="App_Packages\NSB.AcceptanceTests.6.1.1\Reliability\Outbox\When_a_duplicate_message_arrives.cs" />
     <Compile Include="App_Packages\NSB.AcceptanceTests.6.1.1\Reliability\Outbox\When_a_message_is_audited.cs" />
     <Compile Include="App_Packages\NSB.AcceptanceTests.6.1.1\Reliability\Outbox\When_blowing_up_just_after_dispatch.cs" />
