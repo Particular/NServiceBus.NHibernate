@@ -37,7 +37,7 @@ namespace NServiceBus.TimeoutPersisters.NHibernate
             {
                 var results = session.QueryOver<TimeoutEntity>()
                     .Where(x => x.Endpoint == Configure.EndpointName)
-                    .And(x => x.Time >= startSlice && x.Time <= now)
+                    .And(x => x.Time > startSlice && x.Time <= now)
                     .OrderBy(x => x.Time).Asc
                     .Select(x => x.Id, x => x.Time)
                     .List<object[]>()
