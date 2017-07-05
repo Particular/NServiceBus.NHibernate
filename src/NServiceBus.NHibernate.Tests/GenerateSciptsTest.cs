@@ -2,6 +2,7 @@
 
 namespace NServiceBus.NHibernate.Tests
 {
+    using System.Runtime.CompilerServices;
     using System.Threading.Tasks;
     using ApprovalTests;
     using ApprovalTests.Reporters;
@@ -13,6 +14,7 @@ namespace NServiceBus.NHibernate.Tests
     public class DDL
     {
         [Test]
+        [MethodImpl(MethodImplOptions.NoInlining)]
         [UseReporter(typeof(DiffReporter))]
         public void Outbox()
         {
@@ -21,6 +23,7 @@ namespace NServiceBus.NHibernate.Tests
         }
 
         [Test]
+        [MethodImpl(MethodImplOptions.NoInlining)]
         [UseReporter(typeof(DiffReporter))]
         public void Subscriptions()
         {
@@ -29,6 +32,7 @@ namespace NServiceBus.NHibernate.Tests
         }
 
         [Test]
+        [MethodImpl(MethodImplOptions.NoInlining)]
         [UseReporter(typeof(DiffReporter))]
         public void MySaga()
         {
