@@ -34,6 +34,24 @@ namespace NServiceBus.NHibernate.Tests
         [Test]
         [MethodImpl(MethodImplOptions.NoInlining)]
         [UseReporter(typeof(DiffReporter))]
+        public void Timeouts()
+        {
+            var script = ScriptGenerator<MsSql2012Dialect>.GenerateTimeoutStoreScript();
+            Approvals.Verify(script);
+        }
+
+        [Test]
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        [UseReporter(typeof(DiffReporter))]
+        public void GatewayDeduplication()
+        {
+            var script = ScriptGenerator<MsSql2012Dialect>.GenerateGatewayDeduplicationStoreScript();
+            Approvals.Verify(script);
+        }
+
+        [Test]
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        [UseReporter(typeof(DiffReporter))]
         public void MySaga()
         {
             var script = ScriptGenerator<MsSql2012Dialect>.GenerateSagaScript<MySaga>();

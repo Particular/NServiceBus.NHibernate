@@ -8,9 +8,11 @@
     using global::NHibernate.Dialect;
     using global::NHibernate.Mapping.ByCode;
     using global::NHibernate.Tool.hbm2ddl;
+    using NServiceBus.Deduplication.NHibernate.Config;
     using NServiceBus.Outbox.NHibernate;
     using NServiceBus.SagaPersisters.NHibernate.AutoPersistence;
     using NServiceBus.Sagas;
+    using NServiceBus.TimeoutPersisters.NHibernate.Config;
     using NServiceBus.TimeoutPersisters.NHibernate.Installer;
     using Unicast.Subscriptions.NHibernate.Config;
 
@@ -37,6 +39,24 @@
         public static string GenerateSubscriptionStoreScript()
         {
             return GenerateScript(typeof(SubscriptionMap));
+        }
+
+        /// <summary>
+        /// Generates the table creation script for the timeout store.
+        /// </summary>
+        /// <returns></returns>
+        public static string GenerateTimeoutStoreScript()
+        {
+            return GenerateScript(typeof(TimeoutEntityMap));
+        }
+
+        /// <summary>
+        /// Generates the table creation script for the Gateway deduplication store.
+        /// </summary>
+        /// <returns></returns>
+        public static string GenerateGatewayDeduplicationStoreScript()
+        {
+            return GenerateScript(typeof(DeduplicationMessageMap));
         }
 
         /// <summary>
