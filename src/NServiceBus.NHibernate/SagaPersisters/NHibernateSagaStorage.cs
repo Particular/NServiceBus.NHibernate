@@ -1,11 +1,8 @@
 namespace NServiceBus.Features
 {
     using System;
-    using System.Collections.Generic;
     using System.Linq;
     using global::NHibernate.Cfg;
-    using global::NHibernate.Dialect;
-    using global::NHibernate.Mapping;
     using NServiceBus.Sagas;
     using SagaPersisters.NHibernate;
     using SagaPersisters.NHibernate.AutoPersistence;
