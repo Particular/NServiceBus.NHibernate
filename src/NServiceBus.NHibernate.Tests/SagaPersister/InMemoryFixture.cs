@@ -43,9 +43,6 @@
 
             sagaDataTypes.Add(typeof(ContainSagaData));
 
-            var modelMapper = new SagaModelMapper(metaModel, sagaDataTypes);
-
-
             SagaModelMapper.AddMappings(configuration, metaModel, sagaDataTypes);
             SessionFactory = configuration.BuildSessionFactory();
 

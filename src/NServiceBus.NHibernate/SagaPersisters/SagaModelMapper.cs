@@ -53,24 +53,24 @@ namespace NServiceBus.SagaPersisters.NHibernate.AutoPersistence
         {
             var modelMapper = new SagaModelMapper(allSagaMetadata, types, tableNamingConvention);
             configuration.AddMapping(modelMapper.Compile());
-            //configuration.BuildMappings();
-            //var mappings = configuration.CreateMappings(Dialect.GetDialect(configuration.Properties));
-            //foreach (var type in modelMapper.childTables)
-            //{
-            //    var table = mappings.GetClass(type.FullName)?.Table;
-            //    if (table == null)
-            //    {
-            //        continue;
-            //    }
-            //    foreach (var foreignKey in table.ForeignKeyIterator)
-            //    {
-            //        var idx = new Index();
-            //        idx.AddColumns(foreignKey.ColumnIterator);
-            //        idx.Name = "IDX" + foreignKey.Name.Substring(2);
-            //        idx.Table = table;
-            //        table.AddIndex(idx);
-            //    }
-            //}
+            configuration.BuildMappings();
+            var mappings = configuration.CreateMappings(Dialect.GetDialect(configuration.Properties));
+            foreach (var type in modelMapper.childTables)
+            {
+                var table = mappings.GetClass(type.FullName)?.Table;
+                if (table == null)
+                {
+                    continue;
+                }
+                foreach (var foreignKey in table.ForeignKeyIterator)
+                {
+                    var idx = new Index();
+                    idx.AddColumns(foreignKey.ColumnIterator);
+                    idx.Name = "IDX" + foreignKey.Name.Substring(2);
+                    idx.Table = table;
+                    table.AddIndex(idx);
+                }
+            }
         }
 
         void ApplyClassConvention(IModelInspector mi, Type type, IClassAttributesMapper map)
