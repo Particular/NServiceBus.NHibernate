@@ -1,0 +1,18 @@
+﻿
+    
+    if exists (select * from dbo.sysobjects where id = object_id(N'TimeoutEntity') and OBJECTPROPERTY(id, N'IsUserTable') = 1) drop table TimeoutEntity
+    
+    create table TimeoutEntity (
+        Id UNIQUEIDENTIFIER not null,
+       Destination NVARCHAR(1024) null,
+       SagaId UNIQUEIDENTIFIER null,
+       State VARBINARY(MAX) null,
+       Endpoint NVARCHAR(440) null,
+       Time DATETIME null,
+       Headers NVARCHAR(MAX) null,
+       primary key (Id)
+    )
+    
+    create index TimeoutEntity_SagaIdIdx on TimeoutEntity (SagaId)
+    
+    create index TimeoutEntity_EndpointIdx on TimeoutEntity (Endpoint, Time)

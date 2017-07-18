@@ -7,10 +7,8 @@ namespace NServiceBus.TimeoutPersisters.NHibernate.Installer
     using global::NHibernate.AdoNet.Util;
     using global::NHibernate.Cfg;
     using global::NHibernate.Dialect;
-    using global::NHibernate.Mapping;
     using global::NHibernate.Tool.hbm2ddl;
     using global::NHibernate.Util;
-    using NServiceBus.TimeoutPersisters.NHibernate.Config;
     using Environment = global::NHibernate.Cfg.Environment;
 
     class OptimizedSchemaUpdate
@@ -30,7 +28,7 @@ namespace NServiceBus.TimeoutPersisters.NHibernate.Installer
             }
             connectionHelper = new ManagedProviderConnectionHelper(props);
             exceptions = new List<Exception>();
-            timeoutEntityMapping = configuration.GetClassMapping(typeof(TimeoutEntity));
+            fixUpHelper = new SchemaFixUpHelper(configuration, dialect);
             formatter = (PropertiesHelper.GetBoolean(Environment.FormatSql, configProperties, true) ? FormatStyle.Ddl : FormatStyle.None).Formatter;
         }
 
@@ -91,33 +89,9 @@ namespace NServiceBus.TimeoutPersisters.NHibernate.Installer
 
                 var updateSQL = configuration.GenerateSchemaUpdateScript(dialect, meta);
 
-                var dialectScopes = new List<string>
-                {
-                    typeof(MsSql2005Dialect).FullName,
-                    typeof(MsSql2008Dialect).FullName,
-                    typeof(MsSql2012Dialect).FullName
-                };
-
-                var shouldOptimizeTimeoutEntity = timeoutEntityMapping != null;
-
                 foreach (var item in updateSQL)
                 {
-                    var updateSqlStatement = item;
-
-                    if (dialectScopes.Contains(dialect.GetType().FullName) && shouldOptimizeTimeoutEntity)
-                    {
-                        var qualifiedTimeoutEntityTableName = timeoutEntityMapping.Table.GetQualifiedName(dialect);
-
-                        if (updateSqlStatement.StartsWith($"create table {qualifiedTimeoutEntityTableName}"))
-                        {
-                            updateSqlStatement = updateSqlStatement.Replace("primary key (Id)", "primary key nonclustered (Id)");
-                        }
-                        else if (updateSqlStatement.StartsWith($"create index {TimeoutEntityMap.EndpointIndexName}"))
-                        {
-                            updateSqlStatement = updateSqlStatement.Replace($"create index {TimeoutEntityMap.EndpointIndexName}", $"create clustered index {TimeoutEntityMap.EndpointIndexName}");
-                        }
-                    }
-
+                    var updateSqlStatement = fixUpHelper.FixUp(item);
                     var formatted = formatter.Format(updateSqlStatement);
 
                     try
@@ -164,8 +138,7 @@ namespace NServiceBus.TimeoutPersisters.NHibernate.Installer
         Dialect dialect;
         List<Exception> exceptions;
         IFormatter formatter;
-        PersistentClass timeoutEntityMapping;
-
+        SchemaFixUpHelper fixUpHelper;
         static IInternalLogger log = LoggerProvider.LoggerFor(typeof(OptimizedSchemaUpdate));
     }
 }

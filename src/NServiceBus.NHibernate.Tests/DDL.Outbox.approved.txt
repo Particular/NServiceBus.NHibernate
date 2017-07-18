@@ -1,0 +1,16 @@
+﻿
+    
+    if exists (select * from dbo.sysobjects where id = object_id(N'OutboxRecord') and OBJECTPROPERTY(id, N'IsUserTable') = 1) drop table OutboxRecord
+    
+    create table OutboxRecord (
+        Id BIGINT IDENTITY NOT NULL,
+       MessageId NVARCHAR(255) not null unique,
+       Dispatched BIT not null,
+       DispatchedAt DATETIME null,
+       TransportOperations NVARCHAR(MAX) null,
+       primary key (Id)
+    )
+    
+    create index OutboxRecord_Dispatched_Idx on OutboxRecord (Dispatched)
+    
+    create index OutboxRecord_DispatchedAt_Idx on OutboxRecord (DispatchedAt)

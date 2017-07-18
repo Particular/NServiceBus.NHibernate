@@ -15,15 +15,9 @@ namespace NServiceBus.SagaPersisters.NHibernate.AutoPersistence
     {
         readonly Func<Type, string> tableNamingConvention;
 
-        public SagaModelMapper(SagaMetadataCollection allMetadata, IEnumerable<Type> typesToScan)
-            : this(allMetadata, typesToScan, DefaultTableNameConvention)
+        public SagaModelMapper(SagaMetadataCollection allMetadata, IEnumerable<Type> typesToScan, Func<Type, string> tableNamingConvention = null)
         {
-            
-        }
-
-        public SagaModelMapper(SagaMetadataCollection allMetadata, IEnumerable<Type> typesToScan, Func<Type, string> tableNamingConvention)
-        {
-            this.tableNamingConvention = tableNamingConvention;
+            this.tableNamingConvention = tableNamingConvention ?? DefaultTableNameConvention;
             Mapper = new ConventionModelMapper();
 
             this.typesToScan = typesToScan.ToList();
