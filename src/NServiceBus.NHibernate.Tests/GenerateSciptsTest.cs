@@ -2,6 +2,8 @@
 
 namespace NServiceBus.NHibernate.Tests
 {
+    using System;
+    using System.Collections.Generic;
     using System.Runtime.CompilerServices;
     using System.Threading.Tasks;
     using ApprovalTests;
@@ -69,11 +71,18 @@ namespace NServiceBus.NHibernate.Tests
         public class SagaData : ContainSagaData
         {
             public virtual string UniqueId { get; set; }
+            public virtual IList<CollectionEntry> Entries { get; set; }
+        }
+
+        public class CollectionEntry
+        {
+            public virtual Guid Id { get; set; }
+            public virtual decimal Value { get; set; }
         }
 
         public Task Handle(MyMessage message, IMessageHandlerContext context)
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
     }
 

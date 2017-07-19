@@ -86,11 +86,9 @@
                 sagaDataBase = sagaDataBase.BaseType;
             }
 
-            var sagaMapper = new SagaModelMapper(metadata, typesToScan, tableNamingConvention);
-
             var config = new Configuration();
             config.DataBaseIntegration(db => { db.Dialect<T>(); });
-            config.AddMapping(sagaMapper.Compile());
+            SagaModelMapper.AddMappings(config, metadata, typesToScan, tableNamingConvention);
             return GenerateScript(config);
         }
 

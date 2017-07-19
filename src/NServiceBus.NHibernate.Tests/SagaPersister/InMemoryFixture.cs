@@ -43,13 +43,10 @@
 
             sagaDataTypes.Add(typeof(ContainSagaData));
 
-            var modelMapper = new SagaModelMapper(metaModel, sagaDataTypes);
-
-            configuration.AddMapping(modelMapper.Compile());
-
+            SagaModelMapper.AddMappings(configuration, metaModel, sagaDataTypes);
             SessionFactory = configuration.BuildSessionFactory();
 
-            new SchemaUpdate(configuration).Execute(false, true);
+            new SchemaUpdate(configuration).Execute(true, true);
 
             SagaPersister = new SagaPersister();
         }
