@@ -1,7 +1,7 @@
 ﻿namespace NServiceBus.NHibernate.Outbox
 {
     using global::NHibernate.Mapping.ByCode.Conformist;
-    using Configuration.AdvanceExtensibility;
+    using NServiceBus.Configuration.AdvancedExtensibility;
     using NServiceBus.Outbox.NHibernate;
 
     /// <summary>

@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.26730.3
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NServiceBus.NHibernate", "NServiceBus.NHibernate\NServiceBus.NHibernate.csproj", "{281646E3-32E0-4F4D-BCF6-1DC5EFC6C268}"
 EndProject
@@ -15,12 +15,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NServiceBus.NHibernate.Acce
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{8A0A9664-98CF-4DD4-9330-9FA28183BC23}"
 	ProjectSection(SolutionItems) = preProject
-		..\packaging\nuget\nservicebus.nhibernate.nuspec = ..\packaging\nuget\nservicebus.nhibernate.nuspec
-	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{99DC8440-7E53-470F-9CDB-A529606E45C1}"
-	ProjectSection(SolutionItems) = preProject
-		.nuget\packages.config = .nuget\packages.config
+		Directory.Build.targets = Directory.Build.targets
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NServiceBus.NHibernate.AcceptanceTests-SqlTransport", "NServiceBus.NHibernate.AcceptanceTests-SqlTransport\NServiceBus.NHibernate.AcceptanceTests-SqlTransport.csproj", "{40F6304C-CFA4-426F-949B-AB7E0E370C27}"
@@ -58,5 +53,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {6933DF0C-83E6-46B0-922B-9077CDA15C00}
 	EndGlobalSection
 EndGlobal

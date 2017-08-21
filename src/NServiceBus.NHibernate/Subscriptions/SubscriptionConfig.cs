@@ -1,8 +1,8 @@
 namespace NServiceBus.Persistence.NHibernate
 {
     using System;
-    using Configuration.AdvanceExtensibility;
     using global::NHibernate.Cfg;
+    using NServiceBus.Configuration.AdvancedExtensibility;
     using NServiceBus.Features;
 
     /// <summary>

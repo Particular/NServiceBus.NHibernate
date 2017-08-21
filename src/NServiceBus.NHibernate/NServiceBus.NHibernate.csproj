@@ -1,165 +1,33 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="..\packages\Particular.CodeRules.0.2.0\build\Particular.CodeRules.props" Condition="Exists('..\packages\Particular.CodeRules.0.2.0\build\Particular.CodeRules.props')" />
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{281646E3-32E0-4F4D-BCF6-1DC5EFC6C268}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <TargetFrameworks>net452</TargetFrameworks>
     <RootNamespace>NServiceBus.NHibernate</RootNamespace>
     <AssemblyName>NServiceBus.NHibernate</AssemblyName>
-    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <AssemblyOriginatorKeyFile>..\NServiceBus.snk</AssemblyOriginatorKeyFile>
     <SignAssembly>true</SignAssembly>
-    <TargetFrameworkProfile />
-    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
-    <NuGetPackageImportStamp>
-    </NuGetPackageImportStamp>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
+    <AssemblyOriginatorKeyFile>..\NServiceBus.snk</AssemblyOriginatorKeyFile>
     <OutputPath>..\..\binaries\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <DocumentationFile>..\..\binaries\NServiceBus.NHibernate.xml</DocumentationFile>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <Prefer32Bit>false</Prefer32Bit>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <UpdateAssemblyInfo>true</UpdateAssemblyInfo>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>..\..\binaries\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <DocumentationFile>..\..\binaries\NServiceBus.NHibernate.xml</DocumentationFile>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <Prefer32Bit>false</Prefer32Bit>
+
+  <PropertyGroup>
+    <Description>NHibernate integration for NServiceBus</Description>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
+
   <ItemGroup>
-    <None Include="FodyWeavers.xml">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="packages.config">
-      <SubType>Designer</SubType>
-    </None>
-    <Reference Include="Iesi.Collections, Version=4.0.0.0, Culture=neutral, PublicKeyToken=aa95f207798dfdb4, processorArchitecture=MSIL">
-      <HintPath>..\packages\Iesi.Collections.4.0.1.4000\lib\net40\Iesi.Collections.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Janitor, Version=1.1.6.0, Culture=neutral, PublicKeyToken=d34c7d3bba3746e6, processorArchitecture=MSIL">
-      <HintPath>..\packages\Janitor.Fody.1.1.6.0\lib\dotnet\Janitor.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="NHibernate, Version=4.0.0.4000, Culture=neutral, PublicKeyToken=aa95f207798dfdb4, processorArchitecture=MSIL">
-      <HintPath>..\packages\NHibernate.4.0.4.4000\lib\net40\NHibernate.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="NServiceBus.Core, Version=6.0.0.0, Culture=neutral, PublicKeyToken=9fc386479f8a226c, processorArchitecture=MSIL">
-      <HintPath>..\packages\NServiceBus.6.0.0\lib\net452\NServiceBus.Core.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Obsolete, Version=4.1.0.0, Culture=neutral, PublicKeyToken=1ca091877d12ca03, processorArchitecture=MSIL">
-      <HintPath>..\packages\Obsolete.Fody.4.1.0\lib\dotnet\Obsolete.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="System" />
-    <Reference Include="System.configuration" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Data" />
     <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="System.Runtime.Serialization" />
-    <Reference Include="System.Transactions" />
-    <Reference Include="System.Web.Services" />
-    <Reference Include="System.Xml" />
-    <Reference Include="System.Xml.Linq" />
+    
+    <PackageReference Include="Fody" Version="2.1.2" PrivateAssets="All" />
+    <PackageReference Include="Janitor.Fody" Version="1.5.1" PrivateAssets="All" />
+    <PackageReference Include="Obsolete.Fody" Version="4.2.4" PrivateAssets="All" />
+    <PackageReference Include="Particular.CodeRules" Version="0.2.0" PrivateAssets="All" />
+    <PackageReference Include="NServiceBus" Version="7.0.0-*" />
+    <PackageReference Include="GitVersionTask" Version="4.0.0-beta0011" />
+    <PackageReference Include="NHibernate" version="4.0.4.4000" />
+    <PackageReference Include="Iesi.Collections" version="4.0.2" />
   </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Internal\NHibernateConfiguration.cs" />
-    <Compile Include="Internal\ObjectSerializer.cs" />
-    <Compile Include="Outbox\INHibernateOutboxStorage.cs" />
-    <Compile Include="Outbox\IOutboxPersisterFactory.cs" />
-    <Compile Include="Outbox\IOutboxRecord.cs" />
-    <Compile Include="Outbox\OutboxConfig.cs" />
-    <Compile Include="Outbox\OutboxRecord.cs" />
-    <Compile Include="RepeatedFailuresOverTimeCircuitBreaker.cs" />
-    <Compile Include="ScriptGenerator.cs" />
-    <Compile Include="SynchronizedStorage\INHibernateSynchronizedStorageSession.cs" />
-    <Compile Include="SynchronizedStorage\NHibernateAmbientTransactionSynchronizedStorageSession.cs" />
-    <Compile Include="Obsoletes\NHibernateStorageContext.cs" />
-    <Compile Include="Deduplication\DeduplicationConfig.cs" />
-    <Compile Include="Deduplication\NHibernateGatewayDeduplication.cs" />
-    <Compile Include="NHibernatePersistence.cs" />
-    <Compile Include="SagaPersisters\LockModes.cs" />
-    <Compile Include="SynchronizedStorage\NHibernateLazyNativeTransactionSynchronizedStorageSession.cs" />
-    <Compile Include="SynchronizedStorage\TestingNHibernateSynchronizedStorageSession.cs" />
-    <Compile Include="SynchronizedStorage\NHibernateOutboxTransactionSynchronizedStorageSession.cs" />
-    <Compile Include="Outbox\NHibernateOutboxTransaction.cs" />
-    <Compile Include="SynchronizedStorage\NHibernateSynchronizedStorage.cs" />
-    <Compile Include="SynchronizedStorage\NHibernateSynchronizedStorageAdapter.cs" />
-    <Compile Include="SagaPersisters\RowVersionAttribute.cs" />
-    <Compile Include="SagaPersisters\SagaConfig.cs" />
-    <Compile Include="SagaPersisters\SagaModelMapper.cs" />
-    <Compile Include="SharedConfig.cs" />
-    <Compile Include="Deduplication\Config\DeduplicationMessage.cs" />
-    <Compile Include="Deduplication\Config\DeduplicationMessageMap.cs" />
-    <Compile Include="Deduplication\GatewayDeduplication.cs" />
-    <Compile Include="Deduplication\Installer\Installer.cs" />
-    <Compile Include="InternalsVisibleTo.cs" />
-    <Compile Include="Outbox\OutboxCleaner.cs" />
-    <Compile Include="SagaPersisters\NHibernateSagaStorage.cs" />
-    <Compile Include="SynchronizedStorage\NHibernateStorageSession.cs" />
-    <Compile Include="Outbox\IDbConnectionProvider.cs" />
-    <Compile Include="Outbox\OutboxOperation.cs" />
-    <Compile Include="Outbox\OutboxRecordMapping.cs" />
-    <Compile Include="Outbox\OutboxPersister.cs" />
-    <Compile Include="Internal\NHibernateConfigurationBuilder.cs" />
-    <Compile Include="Internal\NHibernateSettingRetriever.cs" />
-    <Compile Include="AssemblyInfo.cs" />
-    <Compile Include="SagaPersisters\LockModeAttribute.cs" />
-    <Compile Include="SagaPersisters\TableNameAttribute.cs" />
-    <Compile Include="SynchronizedStorage\Installer\Installer.cs" />
-    <Compile Include="SagaPersisters\SagaPersister.cs" />
-    <Compile Include="SynchronizedStorage\SharedMappings.cs" />
-    <Compile Include="Subscriptions\CachedSubscriptionPersister.cs" />
-    <Compile Include="Subscriptions\NHibernateSubscriptionStorage.cs" />
-    <Compile Include="Subscriptions\SubscriptionConfig.cs" />
-    <Compile Include="SynchronizedStorageSessionExtensions.cs" />
-    <Compile Include="TimeoutPersisters\IncorrectIndexDetector.cs" />
-    <Compile Include="TimeoutPersisters\SchemaFixUpHelper.cs" />
-    <Compile Include="TimeoutPersisters\TimeoutEntityMap.cs" />
-    <Compile Include="TimeoutPersisters\Installer\Installer.cs" />
-    <Compile Include="TimeoutPersisters\OptimizedSchemaUpdate.cs" />
-    <Compile Include="TimeoutPersisters\NHibernateTimeoutStorage.cs" />
-    <Compile Include="TimeoutPersisters\TimeoutConfig.cs" />
-    <Compile Include="TimeoutPersisters\TimeoutEntity.cs" />
-    <Compile Include="TimeoutPersisters\TimeoutPersister.cs" />
-    <Compile Include="Subscriptions\Config\SubscriptionMap.cs" />
-    <Compile Include="Subscriptions\Installer\Installer.cs" />
-    <Compile Include="Subscriptions\Subscription.cs" />
-    <Compile Include="Subscriptions\SubscriptionPersister.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <Analyzer Include="..\packages\Particular.CodeRules.0.2.0\tools\..\analyzers\dotnet\cs\Particular.CodeRules.dll" />
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
-    <PropertyGroup>
-      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
-    </PropertyGroup>
-    <Error Condition="!Exists('..\packages\Fody.1.29.4\build\dotnet\Fody.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Fody.1.29.4\build\dotnet\Fody.targets'))" />
-    <Error Condition="!Exists('..\packages\NuGetPackager.0.6.0\build\NuGetPackager.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\NuGetPackager.0.6.0\build\NuGetPackager.targets'))" />
-    <Error Condition="!Exists('..\packages\GitVersionTask.3.6.3\build\dotnet\GitVersionTask.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\GitVersionTask.3.6.3\build\dotnet\GitVersionTask.targets'))" />
-    <Error Condition="!Exists('..\packages\Particular.CodeRules.0.2.0\build\Particular.CodeRules.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Particular.CodeRules.0.2.0\build\Particular.CodeRules.props'))" />
-  </Target>
-  <Import Project="..\packages\Fody.1.29.4\build\dotnet\Fody.targets" Condition="Exists('..\packages\Fody.1.29.4\build\dotnet\Fody.targets')" />
-  <Import Project="..\packages\NuGetPackager.0.6.0\build\NuGetPackager.targets" Condition="Exists('..\packages\NuGetPackager.0.6.0\build\NuGetPackager.targets')" />
-  <Import Project="..\packages\GitVersionTask.3.6.3\build\dotnet\GitVersionTask.targets" Condition="Exists('..\packages\GitVersionTask.3.6.3\build\dotnet\GitVersionTask.targets')" />
 </Project>
