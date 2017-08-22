@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Security.Cryptography;
 using System.Text;
@@ -8,11 +7,6 @@ using NServiceBus;
 using NServiceBus.AcceptanceTesting.Support;
 using NServiceBus.Persistence;
 using NServiceBus.Persistence.NHibernate;
-
-public class ConfigureScenariosForNHibernatePersistence : IConfigureSupportedScenariosForTestExecution
-{
-    public IEnumerable<Type> UnsupportedScenarioDescriptorTypes { get; } = new List<Type>();
-}
 
 public class ConfigureEndpointNHibernatePersistence : IConfigureEndpointTestExecution
 {
