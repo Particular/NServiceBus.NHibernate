@@ -1,7 +1,7 @@
 namespace NServiceBus.Persistence.NHibernate
 {
     using System;
-    using NServiceBus.Configuration.AdvancedExtensibility;
+    using Configuration.AdvancedExtensibility;
 
     /// <summary>
     /// Saga configuration extensions.

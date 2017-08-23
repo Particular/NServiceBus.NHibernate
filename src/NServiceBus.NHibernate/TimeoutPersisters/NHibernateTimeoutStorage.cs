@@ -3,10 +3,10 @@ namespace NServiceBus.Features
     using System;
     using System.Threading.Tasks;
     using global::NHibernate.Cfg;
-    using NServiceBus.Persistence.NHibernate;
-    using NServiceBus.TimeoutPersisters.NHibernate;
-    using NServiceBus.TimeoutPersisters.NHibernate.Config;
-    using NServiceBus.TimeoutPersisters.NHibernate.Installer;
+    using Persistence.NHibernate;
+    using TimeoutPersisters.NHibernate;
+    using TimeoutPersisters.NHibernate.Config;
+    using TimeoutPersisters.NHibernate.Installer;
 
     /// <summary>
     /// NHibernate Timeout Storage.

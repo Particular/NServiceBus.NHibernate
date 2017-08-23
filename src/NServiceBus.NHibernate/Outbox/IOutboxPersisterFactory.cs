@@ -2,7 +2,7 @@
 {
     using global::NHibernate;
     using NServiceBus.Outbox.NHibernate;
-    using NServiceBus.Persistence.NHibernate;
+    using Persistence.NHibernate;
 
     interface IOutboxPersisterFactory
     {

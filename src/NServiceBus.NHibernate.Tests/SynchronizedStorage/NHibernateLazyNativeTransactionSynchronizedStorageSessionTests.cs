@@ -2,8 +2,8 @@
 {
     using System;
     using System.Threading.Tasks;
-    using NServiceBus.Extensibility;
-    using NServiceBus.Persistence.NHibernate;
+    using Extensibility;
+    using Persistence.NHibernate;
     using NUnit.Framework;
 
     [TestFixture]
@@ -40,7 +40,7 @@
 
             using (var storageSession = await storage.OpenSession(new ContextBag()))
             {
-                storageSession.Session().Save(new TestEntity() { Id = entityId });
+                storageSession.Session().Save(new TestEntity { Id = entityId });
                 storageSession.OnSaveChanges(s =>
                 {
                     throw new Exception("Simulated");

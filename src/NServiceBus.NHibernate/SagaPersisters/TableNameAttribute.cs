@@ -11,7 +11,7 @@ namespace NServiceBus.SagaPersisters.NHibernate
         /// <summary>
         /// Gets the table name.
         /// </summary>
-        public string TableName { get; private set; }
+        public string TableName { get; }
 
         /// <summary>
         /// Gets or sets the database schema to use for the table.

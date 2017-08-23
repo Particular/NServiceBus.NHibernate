@@ -2,9 +2,9 @@
 {
     using System;
     using System.Threading.Tasks;
-    using NServiceBus.Extensibility;
+    using Extensibility;
     using NServiceBus.Outbox.NHibernate;
-    using NServiceBus.Persistence.NHibernate;
+    using Persistence.NHibernate;
     using NUnit.Framework;
 
     [TestFixture]
@@ -81,7 +81,7 @@
 
                     using (var storageSession = await adapter.TryAdapt(outboxTransaction, new ContextBag()))
                     {
-                        storageSession.Session().Save(new TestEntity()
+                        storageSession.Session().Save(new TestEntity
                         {
                             Id = entityId
                         });

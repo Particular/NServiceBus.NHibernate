@@ -8,8 +8,8 @@ namespace NServiceBus.TimeoutPersisters.NHibernate.Tests
     using System.Threading.Tasks;
     using System.Transactions;
     using global::NHibernate.Impl;
-    using NServiceBus.Extensibility;
-    using NServiceBus.Transport;
+    using Extensibility;
+    using Transport;
     using NUnit.Framework;
     using Timeout.Core;
 
@@ -142,7 +142,7 @@ namespace NServiceBus.TimeoutPersisters.NHibernate.Tests
         [Test]
         public async Task TryRemove_should_return_false_when_timeout_already_deleted()
         {
-            var timeout = new TimeoutData()
+            var timeout = new TimeoutData
             {
                 Time = DateTime.Now
             };
@@ -156,7 +156,7 @@ namespace NServiceBus.TimeoutPersisters.NHibernate.Tests
         [Test]
         public async Task Peek_should_return_no_timeout_when_timeout_already_deleted()
         {
-            var timeout = new TimeoutData()
+            var timeout = new TimeoutData
             {
                 Time = DateTime.Now
             };

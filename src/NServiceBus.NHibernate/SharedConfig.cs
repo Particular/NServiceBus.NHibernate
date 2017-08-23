@@ -1,7 +1,7 @@
 ﻿namespace NServiceBus.Persistence
 {
     using global::NHibernate.Cfg;
-    using NServiceBus.Configuration.AdvancedExtensibility;
+    using Configuration.AdvancedExtensibility;
 
     /// <summary>
     /// Shared configuration extensions.
