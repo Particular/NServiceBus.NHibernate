@@ -4,7 +4,7 @@
     using System.Threading.Tasks;
     using global::NHibernate;
     using Janitor;
-    using NServiceBus.Outbox;
+    using Outbox;
 
     [SkipWeaving]
     class NHibernateOutboxTransaction : OutboxTransaction

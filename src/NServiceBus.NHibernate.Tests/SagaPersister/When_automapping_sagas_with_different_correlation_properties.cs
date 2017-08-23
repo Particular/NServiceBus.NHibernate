@@ -2,9 +2,9 @@
 {
     using System;
     using System.Threading.Tasks;
-    using NServiceBus.Extensibility;
-    using NServiceBus.Sagas;
-    using NServiceBus.Testing;
+    using Extensibility;
+    using Sagas;
+    using Testing;
     using NUnit.Framework;
 
     [TestFixture]

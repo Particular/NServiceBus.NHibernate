@@ -103,7 +103,7 @@ namespace NServiceBus.Persistence.NHibernate
                 return;
             }
 
-            const string errorMsg = @"When providing a custom Configuration object you need to at least specify the connection string either via " +
+            const string errorMsg = "When providing a custom Configuration object you need to at least specify the connection string either via " +
                                     Environment.ConnectionString + " or " + Environment.ConnectionStringName + ".";
 
             throw new InvalidOperationException(errorMsg);

@@ -1,7 +1,7 @@
 namespace NServiceBus.Persistence.NHibernate
 {
     using global::NHibernate.Cfg;
-    using NServiceBus.Configuration.AdvancedExtensibility;
+    using Configuration.AdvancedExtensibility;
 
     /// <summary>
     /// Deduplication configuration extensions.

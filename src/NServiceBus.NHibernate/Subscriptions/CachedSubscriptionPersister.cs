@@ -6,7 +6,7 @@ namespace NServiceBus.Unicast.Subscriptions.NHibernate
     using System.Linq;
     using System.Threading.Tasks;
     using global::NHibernate;
-    using NServiceBus.Extensibility;
+    using Extensibility;
     using MessageDrivenSubscriptions;
 
     class CachedSubscriptionPersister : SubscriptionPersister

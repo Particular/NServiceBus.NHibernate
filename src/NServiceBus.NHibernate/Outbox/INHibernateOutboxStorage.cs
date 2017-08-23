@@ -1,7 +1,7 @@
 ﻿namespace NServiceBus
 {
     using System;
-    using NServiceBus.Outbox;
+    using Outbox;
 
     interface INHibernateOutboxStorage : IOutboxStorage
     {

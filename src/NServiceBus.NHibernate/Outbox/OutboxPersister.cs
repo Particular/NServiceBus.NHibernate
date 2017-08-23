@@ -7,9 +7,9 @@
     using System.Transactions;
     using global::NHibernate;
     using global::NHibernate.Criterion;
-    using NServiceBus.Extensibility;
-    using NServiceBus.Outbox;
-    using NServiceBus.Outbox.NHibernate;
+    using Extensibility;
+    using Outbox;
+    using Outbox.NHibernate;
     using IsolationLevel = System.Data.IsolationLevel;
 
     class OutboxPersister<TEntity> : INHibernateOutboxStorage

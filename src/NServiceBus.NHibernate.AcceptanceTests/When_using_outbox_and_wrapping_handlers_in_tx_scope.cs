@@ -6,7 +6,7 @@
     using AcceptanceTesting;
     using Configuration.AdvancedExtensibility;
     using EndpointTemplates;
-    using NServiceBus.Logging;
+    using Logging;
     using NUnit.Framework;
 
     public class When_using_outbox_and_wrapping_handlers_in_tx_scope : NServiceBusAcceptanceTest

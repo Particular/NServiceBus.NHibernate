@@ -3,7 +3,7 @@ namespace NServiceBus.TimeoutPersisters.NHibernate.Installer
     using System;
     using System.Threading.Tasks;
     using Installation;
-    using NServiceBus.Settings;
+    using Settings;
 
     class Installer : INeedToInstallSomething
     {

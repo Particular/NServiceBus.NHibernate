@@ -4,8 +4,8 @@
     using System.Threading.Tasks;
     using global::NHibernate;
     using Janitor;
-    using NServiceBus.Outbox.NHibernate;
-    using NServiceBus.Persistence;
+    using Outbox.NHibernate;
+    using Persistence;
 
     [SkipWeaving]
     class NHibernateOutboxTransactionSynchronizedStorageSession : CompletableSynchronizedStorageSession, INHibernateSynchronizedStorageSession

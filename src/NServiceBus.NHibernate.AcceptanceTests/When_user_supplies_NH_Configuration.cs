@@ -7,7 +7,7 @@
     using global::NHibernate.Cfg;
     using global::NHibernate.Dialect;
     using global::NHibernate.Driver;
-    using NServiceBus.Persistence;
+    using Persistence;
     using NUnit.Framework;
     using Environment = global::NHibernate.Cfg.Environment;
 

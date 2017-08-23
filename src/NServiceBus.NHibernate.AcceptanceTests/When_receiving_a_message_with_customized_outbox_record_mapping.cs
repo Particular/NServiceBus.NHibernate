@@ -8,9 +8,9 @@
     using global::NHibernate;
     using global::NHibernate.Mapping.ByCode;
     using global::NHibernate.Mapping.ByCode.Conformist;
-    using NServiceBus.NHibernate.Outbox;
+    using NHibernate.Outbox;
     using NServiceBus.Outbox.NHibernate;
-    using NServiceBus.Settings;
+    using Settings;
     using NUnit.Framework;
 
     public class When_receiving_a_message_with_customized_outbox_record_mapping : NServiceBusAcceptanceTest
