@@ -26,7 +26,7 @@
     <PackageReference Include="Obsolete.Fody" Version="4.*" PrivateAssets="All" />
     <PackageReference Include="Particular.CodeRules" Version="0.2.0" PrivateAssets="All" />
     <PackageReference Include="NServiceBus" Version="7.0.0-*" />
-    <PackageReference Include="GitVersionTask" Version="4.0.0-beta0011" />
+    <PackageReference Include="GitVersionTask" Version="4.0.0-beta0011" PrivateAssets="All" />
     <PackageReference Include="NHibernate" version="4.0.4.4000" />
     <PackageReference Include="Iesi.Collections" version="4.0.2" />
   </ItemGroup>
