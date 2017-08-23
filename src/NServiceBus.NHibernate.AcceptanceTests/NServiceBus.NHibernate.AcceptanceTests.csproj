@@ -2,6 +2,12 @@
   <PropertyGroup>
     <TargetFrameworks>net452</TargetFrameworks>
   </PropertyGroup>
+  <ItemGroup>
+    <None Remove="TestSagaData.hbm.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="TestSagaData.hbm.xml" />
+  </ItemGroup>
 
   <ItemGroup>
     <Reference Include="System.Data.DataSetExtensions" />
