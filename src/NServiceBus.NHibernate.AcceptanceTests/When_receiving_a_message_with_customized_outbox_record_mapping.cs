@@ -3,7 +3,6 @@
     using System;
     using System.Threading.Tasks;
     using AcceptanceTesting;
-    using Configuration.AdvancedExtensibility;
     using EndpointTemplates;
     using global::NHibernate;
     using global::NHibernate.Mapping.ByCode;
