@@ -39,7 +39,6 @@
             {
                 EndpointSetup<DefaultServer>(b =>
                 {
-                    b.GetSettings().Set("DisableOutboxTransportCheck", true);
                     b.EnableOutbox();
                     b.UsePersistence<NHibernatePersistence>().UseOutboxRecord<MessageIdOutboxRecord, MessageIdOutboxRecordMapping>();
                 });

@@ -4,7 +4,6 @@
     using System.Linq;
     using System.Threading.Tasks;
     using AcceptanceTesting;
-    using Configuration.AdvancedExtensibility;
     using EndpointTemplates;
     using Logging;
     using NUnit.Framework;
@@ -51,7 +50,6 @@
             {
                 EndpointSetup<DefaultServer>(b =>
                 {
-                    b.GetSettings().Set("DisableOutboxTransportCheck", true);
                     b.EnableOutbox();
                     b.UnitOfWork().WrapHandlersInATransactionScope();
                     b.LimitMessageProcessingConcurrencyTo(1); //To ensure saga is properly created before we check it.
