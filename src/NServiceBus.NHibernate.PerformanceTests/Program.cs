@@ -8,7 +8,7 @@
     using System.Threading.Tasks;
     using System.Transactions;
     using NServiceBus;
-    using NServiceBus.Configuration.AdvanceExtensibility;
+    using NServiceBus.Configuration.AdvancedExtensibility;
     using NServiceBus.Features;
     using NServiceBus.Persistence.NHibernate;
     using Saga;
@@ -57,7 +57,7 @@
                     break;
 
                 case "json":
-                    config.UseSerialization<JsonSerializer>();
+                    config.UseSerialization<NewtonsoftSerializer>();
                     break;
 
                 default:

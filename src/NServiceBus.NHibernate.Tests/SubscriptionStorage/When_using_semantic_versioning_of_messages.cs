@@ -3,7 +3,7 @@ namespace NServiceBus.Unicast.Subscriptions.NHibernate.Tests
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
-    using NServiceBus.Extensibility;
+    using Extensibility;
     using NUnit.Framework;
 
     [TestFixture]

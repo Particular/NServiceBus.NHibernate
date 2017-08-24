@@ -4,7 +4,7 @@
     using System.Threading.Tasks;
     using global::NHibernate;
     using Janitor;
-    using NServiceBus.Persistence;
+    using Persistence;
 
     /// <summary>
     /// Allows writing automated tests against handlers which use NServiceBus-managed NHibernate session.

@@ -3,7 +3,7 @@
     using System;
     using System.Threading.Tasks;
     using global::NHibernate;
-    using NServiceBus.Persistence;
+    using Persistence;
 
     interface INHibernateSynchronizedStorageSession
     {

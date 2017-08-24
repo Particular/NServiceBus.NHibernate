@@ -4,8 +4,8 @@
     using global::NHibernate.Dialect;
     using global::NHibernate.Mapping;
     using global::NHibernate.Tool.hbm2ddl;
-    using NHibernate.Config;
-    using NServiceBus.Logging;
+    using Config;
+    using Logging;
     using System;
     using System.Collections.Generic;
     using System.Data;
@@ -18,9 +18,9 @@
 
         public IncorrectIndexDetector(Configuration configuration)
         {
-            this.dialect = Dialect.GetDialect(configuration.Properties);
-            this.connectionHelper = new ManagedProviderConnectionHelper(MergeProperties(configuration.Properties));
-            this.timeoutEntityMapping = configuration.GetClassMapping(typeof(TimeoutEntity));
+            dialect = Dialect.GetDialect(configuration.Properties);
+            connectionHelper = new ManagedProviderConnectionHelper(MergeProperties(configuration.Properties));
+            timeoutEntityMapping = configuration.GetClassMapping(typeof(TimeoutEntity));
         }
 
         Dictionary<string, string> MergeProperties(IDictionary<string, string> properties)

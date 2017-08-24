@@ -1,7 +1,7 @@
 namespace NServiceBus.Persistence.NHibernate
 {
-    using Configuration.AdvanceExtensibility;
     using global::NHibernate.Cfg;
+    using Configuration.AdvancedExtensibility;
 
     /// <summary>
     /// Timeout configuration extensions.

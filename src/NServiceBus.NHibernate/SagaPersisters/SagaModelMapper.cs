@@ -118,7 +118,7 @@ namespace NServiceBus.SagaPersisters.NHibernate.AutoPersistence
             if (tableAttribute != null)
             {
                 map.Table(tableAttribute.TableName);
-                if (!String.IsNullOrEmpty(tableAttribute.Schema))
+                if (!string.IsNullOrEmpty(tableAttribute.Schema))
                 {
                     map.Schema(tableAttribute.Schema);
                 }
@@ -152,7 +152,7 @@ namespace NServiceBus.SagaPersisters.NHibernate.AutoPersistence
             if (tableAttribute != null)
             {
                 map.Table(tableAttribute.TableName);
-                if (!String.IsNullOrEmpty(tableAttribute.Schema))
+                if (!string.IsNullOrEmpty(tableAttribute.Schema))
                 {
                     map.Schema(tableAttribute.Schema);
                 }
@@ -193,7 +193,7 @@ namespace NServiceBus.SagaPersisters.NHibernate.AutoPersistence
             {
                 if (propertyInfo.PropertyType == typeof(byte[]))
                 {
-                    map.Length(Int32.MaxValue);
+                    map.Length(int.MaxValue);
                 }
 
                 return;
@@ -202,7 +202,7 @@ namespace NServiceBus.SagaPersisters.NHibernate.AutoPersistence
             var fieldInfo = type.LocalMember as FieldInfo;
             if (fieldInfo != null && fieldInfo.FieldType == typeof(byte[]))
             {
-                map.Length(Int32.MaxValue);
+                map.Length(int.MaxValue);
             }
         }
 
@@ -313,7 +313,7 @@ namespace NServiceBus.SagaPersisters.NHibernate.AutoPersistence
 
                 if (rootEntity.BaseType != typeof(object) && HasAttribute<RowVersionAttribute>(propertyInfo))
                 {
-                    throw new MappingException(String.Format("RowVersionAttribute is not supported on derived classes, please remove RowVersionAttribute from '{0}' or derive directly from IContainSagaData", rootEntity));
+                    throw new MappingException($"RowVersionAttribute is not supported on derived classes, please remove RowVersionAttribute from '{rootEntity}' or derive directly from IContainSagaData");
                 }
             }
 

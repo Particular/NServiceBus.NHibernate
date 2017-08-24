@@ -3,9 +3,9 @@
     using System;
     using System.Threading.Tasks;
     using System.Transactions;
-    using NServiceBus.Extensibility;
-    using NServiceBus.Persistence.NHibernate;
-    using NServiceBus.Transport;
+    using Extensibility;
+    using Persistence.NHibernate;
+    using Transport;
     using NUnit.Framework;
 
     [TestFixture]
@@ -54,7 +54,7 @@
 
                 using (var storageSession = await adapter.TryAdapt(transportTransaction, new ContextBag()))
                 {
-                    storageSession.Session().Save(new TestEntity() {Id = entityId});
+                    storageSession.Session().Save(new TestEntity {Id = entityId});
                     storageSession.OnSaveChanges(s =>
                     {
                         throw new Exception("Simulated");

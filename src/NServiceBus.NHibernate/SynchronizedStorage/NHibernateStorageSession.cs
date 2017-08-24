@@ -59,8 +59,6 @@ namespace NServiceBus.Features
 
             context.Container.ConfigureComponent(b => new NHibernateSynchronizedStorage(sessionFactory), DependencyLifecycle.SingleInstance);
             context.Container.ConfigureComponent(b => new NHibernateSynchronizedStorageAdapter(sessionFactory), DependencyLifecycle.SingleInstance);
-            //Legacy
-            context.Container.ConfigureComponent(b => new NHibernateStorageContext(), DependencyLifecycle.InstancePerUnitOfWork);
 
             if (outboxEnabled)
             {

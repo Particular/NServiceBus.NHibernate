@@ -6,32 +6,32 @@
     using EndpointTemplates;
     using AcceptanceTesting;
     using NUnit.Framework;
-    using ScenarioDescriptors;
 
     public class When_saga_contains_nested_collection : NServiceBusAcceptanceTest
     {
         [Test]
         public async Task Should_persist_correctly()
         {
-            await Scenario.Define<Context>(c => c.Id = Guid.NewGuid())
-                      .WithEndpoint<NHNestedCollectionEndpoint>(b => b.When(async (bus, context) =>
-                      {
-                          await bus.SendLocal(new Message1
-                          {
-                              SomeId = context.Id
-                          }).ConfigureAwait(false);
-                          await bus.SendLocal(new Message2
-                          {
-                              SomeId = context.Id
-                          }).ConfigureAwait(false);
-                          await bus.SendLocal(new Message3
-                          {
-                              SomeId = context.Id
-                          }).ConfigureAwait(false);
-                      }))
-                    .Done(c => c.SagaCompleted)
-                    .Repeat(r => r.For(Transports.Default))
-                    .Run();
+            var result = await Scenario.Define<Context>(c => c.Id = Guid.NewGuid())
+                .WithEndpoint<NHNestedCollectionEndpoint>(b => b.When(async (bus, context) =>
+                {
+                    await bus.SendLocal(new Message1
+                    {
+                        SomeId = context.Id
+                    }).ConfigureAwait(false);
+                    await bus.SendLocal(new Message2
+                    {
+                        SomeId = context.Id
+                    }).ConfigureAwait(false);
+                    await bus.SendLocal(new Message3
+                    {
+                        SomeId = context.Id
+                    }).ConfigureAwait(false);
+                }))
+                .Done(c => c.SagaCompleted)
+                .Run();
+
+            Assert.IsTrue(result.SagaCompleted);
         }
 
         public class Context : ScenarioContext
@@ -59,7 +59,7 @@
                 Task PerformSagaCompletionCheck(IMessageHandlerContext context)
                 {
                     if (Data.RelatedData == null)
-                    Data.RelatedData = new List<ChildData>
+                        Data.RelatedData = new List<ChildData>
                                        {
                                            new ChildData{NhNestedCollectionSagaData = Data},
                                            new ChildData{NhNestedCollectionSagaData = Data},
@@ -96,7 +96,7 @@
             }
 
         }
-        public class CompletionHandler:IHandleMessages<SagaCompleted>
+        public class CompletionHandler : IHandleMessages<SagaCompleted>
         {
             public Context Context { get; set; }
 
@@ -149,5 +149,5 @@
         }
     }
 
-     
+
 }

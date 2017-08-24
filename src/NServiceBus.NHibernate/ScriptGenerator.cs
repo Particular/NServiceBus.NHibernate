@@ -8,12 +8,12 @@
     using global::NHibernate.Dialect;
     using global::NHibernate.Mapping.ByCode;
     using global::NHibernate.Tool.hbm2ddl;
-    using NServiceBus.Deduplication.NHibernate.Config;
+    using Deduplication.NHibernate.Config;
     using NServiceBus.Outbox.NHibernate;
-    using NServiceBus.SagaPersisters.NHibernate.AutoPersistence;
-    using NServiceBus.Sagas;
-    using NServiceBus.TimeoutPersisters.NHibernate.Config;
-    using NServiceBus.TimeoutPersisters.NHibernate.Installer;
+    using SagaPersisters.NHibernate.AutoPersistence;
+    using Sagas;
+    using TimeoutPersisters.NHibernate.Config;
+    using TimeoutPersisters.NHibernate.Installer;
     using Unicast.Subscriptions.NHibernate.Config;
 
     /// <summary>

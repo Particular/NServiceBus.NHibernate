@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Security.Cryptography;
 using System.Text;
@@ -8,11 +7,6 @@ using NServiceBus;
 using NServiceBus.AcceptanceTesting.Support;
 using NServiceBus.Persistence;
 using NServiceBus.Persistence.NHibernate;
-
-public class ConfigureScenariosForNHibernatePersistence : IConfigureSupportedScenariosForTestExecution
-{
-    public IEnumerable<Type> UnsupportedScenarioDescriptorTypes { get; } = new List<Type>();
-}
 
 public class ConfigureEndpointNHibernatePersistence : IConfigureEndpointTestExecution
 {
@@ -26,7 +20,7 @@ public class ConfigureEndpointNHibernatePersistence : IConfigureEndpointTestExec
         };
 
         config.UsePersistence<NHibernatePersistence>()
-            .ConnectionString(@"Data Source=(DESCRIPTION=(ADDRESS_LIST = (ADDRESS = (PROTOCOL = TCP)(HOST = 127.0.0.1)(PORT = 1521)))(CONNECT_DATA = (SERVER = DEDICATED)(SERVICE_NAME = XE)));User Id=particular; Password=Welcome1; Enlist=dynamic")
+            .ConnectionString("Data Source=(DESCRIPTION=(ADDRESS_LIST = (ADDRESS = (PROTOCOL = TCP)(HOST = 127.0.0.1)(PORT = 1521)))(CONNECT_DATA = (SERVER = DEDICATED)(SERVICE_NAME = XE)));User Id=particular; Password=Welcome1; Enlist=dynamic")
             .SagaTableNamingConvention(type =>
             {
                 var tablename = DefaultTableNameConvention(type);

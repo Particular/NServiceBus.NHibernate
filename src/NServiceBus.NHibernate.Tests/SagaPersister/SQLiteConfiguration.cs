@@ -28,7 +28,7 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
         {
             var cfg = Base();
 
-            cfg.Add(Environment.ConnectionString, string.Format(@"Data Source={0};New=True;", filename));
+            cfg.Add(Environment.ConnectionString, $"Data Source={filename};New=True;");
 
             return cfg;
         }
