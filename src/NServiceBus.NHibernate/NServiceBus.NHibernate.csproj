@@ -25,9 +25,9 @@
     <PackageReference Include="Janitor.Fody" Version="1.*" PrivateAssets="All" />
     <PackageReference Include="Obsolete.Fody" Version="4.*" PrivateAssets="All" />
     <PackageReference Include="Particular.CodeRules" Version="0.2.0" PrivateAssets="All" />
-    <PackageReference Include="NServiceBus" Version="7.0.0-*" />
+    <PackageReference Include="NServiceBus" Version="[7.0.0-*, 8.0.0)" />
     <PackageReference Include="GitVersionTask" Version="4.0.0-beta0011" PrivateAssets="All" />
-    <PackageReference Include="NHibernate" version="4.0.4.4000" />
-    <PackageReference Include="Iesi.Collections" version="4.0.2" />
+    <PackageReference Include="NHibernate" version="[4.0.4.4000, 5.0.0)" />
+    <PackageReference Include="Iesi.Collections" version="[4.0.2, 5.0.0)" />
   </ItemGroup>
 </Project>
