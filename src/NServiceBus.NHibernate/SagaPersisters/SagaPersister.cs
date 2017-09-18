@@ -24,7 +24,8 @@ namespace NServiceBus.SagaPersisters.NHibernate
             return Task.FromResult(0);
         }
 
-        public Task<T> Get<T>(Guid sagaId, SynchronizedStorageSession session, ContextBag context) where T : IContainSagaData
+        public Task<T> Get<T>(Guid sagaId, SynchronizedStorageSession session, ContextBag context)
+            where T : class, IContainSagaData
         {
             var result = session.Session().Get<T>(sagaId, GetLockModeForSaga<T>());
             return Task.FromResult(result);
