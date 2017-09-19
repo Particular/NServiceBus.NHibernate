@@ -2,6 +2,7 @@
   <PropertyGroup>
     <TargetFrameworks>net452</TargetFrameworks>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+    <RootNamespace>NServiceBus.NHibernate.AcceptanceTests.SqlTransport</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
