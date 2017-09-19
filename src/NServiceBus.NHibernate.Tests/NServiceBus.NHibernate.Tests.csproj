@@ -6,6 +6,7 @@
     <DebugType>full</DebugType>
     <DebugSymbols>True</DebugSymbols>
     <Optimize>False</Optimize>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
   </PropertyGroup>
   <ItemGroup>
     <None Remove="SagaPersister\TestSagaWithHbmlXmlOverride.hbm.xml" />

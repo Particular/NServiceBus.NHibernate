@@ -2,6 +2,7 @@
   <PropertyGroup>
     <TargetFrameworks>net452</TargetFrameworks>
     <OutputType>Exe</OutputType>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
   </PropertyGroup>
   
   <ItemGroup>
