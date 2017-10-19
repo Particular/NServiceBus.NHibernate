@@ -18,17 +18,19 @@
             this.sessionFactory = sessionFactory;
         }
 
-        public Task<bool> DeduplicateMessage(string clientId, DateTime timeReceived, ContextBag context)
+        public async Task<bool> DeduplicateMessage(string clientId, DateTime timeReceived, ContextBag context)
         {
             using (var session = sessionFactory.OpenSession())
             using (var tx = session.BeginTransaction(IsolationLevel.ReadCommitted))
             {
-                var gatewayMessage = session.Get<DeduplicationMessage>(clientId);
+                var gatewayMessage = await session.GetAsync<DeduplicationMessage>(clientId)
+                    .ConfigureAwait(false);
 
                 if (gatewayMessage != null)
                 {
-                    tx.Commit();
-                    return Task.FromResult(false);
+                    await tx.CommitAsync()
+                        .ConfigureAwait(false);
+                    return false;
                 }
 
                 gatewayMessage = new DeduplicationMessage
@@ -39,17 +41,20 @@
 
                 try
                 {
-                    session.Save(gatewayMessage);
-                    tx.Commit();
+                    await session.SaveAsync(gatewayMessage)
+                        .ConfigureAwait(false);
+                    await tx.CommitAsync()
+                        .ConfigureAwait(false);
                 }
                 catch (GenericADOException)
                 {
-                    tx.Rollback();
-                    return Task.FromResult(false);
+                    await tx.RollbackAsync()
+                        .ConfigureAwait(false);
+                    return false;
                 }
             }
 
-            return Task.FromResult(true);
+            return true;
         }
     }
 }
