@@ -65,7 +65,7 @@
                     .Select(t => new TransportOperation(t.MessageId, t.Options, t.Message, t.Headers))
                     .ToArray();
 
-                return new OutboxMessage(result.MessageId, transportOperations);;
+                return new OutboxMessage(result.MessageId, transportOperations);
             }
         }
 
