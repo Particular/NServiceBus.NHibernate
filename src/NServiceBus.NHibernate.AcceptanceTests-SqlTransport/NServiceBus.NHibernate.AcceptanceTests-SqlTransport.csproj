@@ -4,6 +4,9 @@
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <RootNamespace>NServiceBus.NHibernate.AcceptanceTests.SqlTransport</RootNamespace>
   </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="..\NServiceBus.NHibernate.AcceptanceTests\NServiceBusAcceptanceTest.cs" Link="NServiceBusAcceptanceTest.cs" />
+  </ItemGroup>
 
   <ItemGroup>
     <Reference Include="System.Data.DataSetExtensions" />
