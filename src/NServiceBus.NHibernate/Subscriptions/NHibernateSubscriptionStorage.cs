@@ -74,8 +74,7 @@ namespace NServiceBus.Features
 
             protected override Task OnStart(IMessageSession session)
             {
-                persister.Init();
-                return Task.FromResult(0);
+                return persister.Init();
             }
 
             protected override Task OnStop(IMessageSession session)
