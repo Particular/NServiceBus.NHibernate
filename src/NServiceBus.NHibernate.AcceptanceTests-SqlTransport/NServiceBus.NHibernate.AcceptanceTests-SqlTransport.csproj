@@ -1,15 +1,18 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>net452</TargetFrameworks>
+    <TargetFrameworks>net461</TargetFrameworks>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <RootNamespace>NServiceBus.NHibernate.AcceptanceTests.SqlTransport</RootNamespace>
   </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="..\NServiceBus.NHibernate.AcceptanceTests\NServiceBusAcceptanceTest.cs" Link="NServiceBusAcceptanceTest.cs" />
+  </ItemGroup>
 
   <ItemGroup>
     <Reference Include="System.Data.DataSetExtensions" />
 
     <PackageReference Include="NServiceBus" Version="7.0.0-*" />
-    <PackageReference Include="NServiceBus.SqlServer" Version="4.0.0-alpha0027" />
+    <PackageReference Include="NServiceBus.SqlServer" Version="4.0.0-beta0004" />
     <PackageReference Include="NServiceBus.AcceptanceTesting" Version="7.0.0-*" />
     <PackageReference Include="NServiceBus.AcceptanceTests.Sources" Version="7.0.0-*" />
     <PackageReference Include="NUnit" Version="3.*" />

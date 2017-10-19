@@ -8,7 +8,7 @@
        SagaId UNIQUEIDENTIFIER null,
        State VARBINARY(MAX) null,
        Endpoint NVARCHAR(440) null,
-       Time DATETIME null,
+       Time DATETIME2 null,
        Headers NVARCHAR(MAX) null,
        primary key (Id)
     )

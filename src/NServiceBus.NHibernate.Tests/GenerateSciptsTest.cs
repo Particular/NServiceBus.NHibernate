@@ -13,11 +13,11 @@ namespace NServiceBus.NHibernate.Tests
     using NUnit.Framework;
 
     [TestFixture]
+    [UseReporter(typeof(DiffReporter),typeof(AllFailingTestsClipboardReporter))]
     public class DDL
     {
         [Test]
         [MethodImpl(MethodImplOptions.NoInlining)]
-        [UseReporter(typeof(DiffReporter))]
         public void Outbox()
         {
             var script = ScriptGenerator<MsSql2012Dialect>.GenerateOutboxScript();
@@ -26,7 +26,6 @@ namespace NServiceBus.NHibernate.Tests
 
         [Test]
         [MethodImpl(MethodImplOptions.NoInlining)]
-        [UseReporter(typeof(DiffReporter))]
         public void Subscriptions()
         {
             var script = ScriptGenerator<MsSql2012Dialect>.GenerateSubscriptionStoreScript();
@@ -35,7 +34,6 @@ namespace NServiceBus.NHibernate.Tests
 
         [Test]
         [MethodImpl(MethodImplOptions.NoInlining)]
-        [UseReporter(typeof(DiffReporter))]
         public void Timeouts()
         {
             var script = ScriptGenerator<MsSql2012Dialect>.GenerateTimeoutStoreScript();
@@ -44,7 +42,6 @@ namespace NServiceBus.NHibernate.Tests
 
         [Test]
         [MethodImpl(MethodImplOptions.NoInlining)]
-        [UseReporter(typeof(DiffReporter))]
         public void GatewayDeduplication()
         {
             var script = ScriptGenerator<MsSql2012Dialect>.GenerateGatewayDeduplicationStoreScript();
@@ -53,7 +50,6 @@ namespace NServiceBus.NHibernate.Tests
 
         [Test]
         [MethodImpl(MethodImplOptions.NoInlining)]
-        [UseReporter(typeof(DiffReporter))]
         public void MySaga()
         {
             var script = ScriptGenerator<MsSql2012Dialect>.GenerateSagaScript<MySaga>();

@@ -60,7 +60,7 @@ namespace NServiceBus.TimeoutPersisters.NHibernate.Installer
             autoKeyWordsImport = autoKeyWordsImport.ToLowerInvariant();
             if (autoKeyWordsImport == Hbm2DDLKeyWords.AutoQuote)
             {
-                SchemaMetadataUpdater.QuoteTableAndColumns(configuration);
+                SchemaMetadataUpdater.QuoteTableAndColumns(configuration, dialect);
             }
 
             IDbCommand stmt = null;
