@@ -27,7 +27,7 @@ namespace NServiceBus.TimeoutPersisters.NHibernate
         public TimeoutPersister(string endpointName,
             ISessionFactory sessionFactory,
             ISynchronizedStorageAdapter transportTransactionAdapter,
-            ISynchronizedStorage synchronizedStorage, 
+            ISynchronizedStorage synchronizedStorage,
             TimeSpan timeoutsCleanupExecutionInterval)
         {
             EndpointName = endpointName;
@@ -37,12 +37,12 @@ namespace NServiceBus.TimeoutPersisters.NHibernate
             this.timeoutsCleanupExecutionInterval = timeoutsCleanupExecutionInterval;
         }
 
-        public Task<TimeoutsChunk> GetNextChunk(DateTime startSlice)
+        public async Task<TimeoutsChunk> GetNextChunk(DateTime startSlice)
         {
             var now = DateTime.UtcNow;
 
             //Every timeoutsCleanupExecutionInterval we extend the query window back in time to make
-            //sure we will pick-up any missed timeouts which might exists due to TimeoutManager timeoute storeage race-condition
+            //sure we will pick-up any missed timeouts which might exists due to TimeoutManager timeout storage race-condition
             if (lastTimeoutsCleanupExecution.Add(timeoutsCleanupExecutionInterval) < now)
             {
                 lastTimeoutsCleanupExecution = now;
@@ -50,38 +50,37 @@ namespace NServiceBus.TimeoutPersisters.NHibernate
                 startSlice = SqlDateTime.MinValue.Value;
             }
 
-			using (new TransactionScope(TransactionScopeOption.Suppress))
+            using (new TransactionScope(TransactionScopeOption.Suppress, TransactionScopeAsyncFlowOption.Enabled))
+            using (var session = SessionFactory.OpenStatelessSession())
+            using (var tx = session.BeginTransaction(IsolationLevel.ReadCommitted))
             {
-                using (var session = SessionFactory.OpenStatelessSession())
-                using (var tx = session.BeginTransaction(IsolationLevel.ReadCommitted))
-                {
-                    var results = session.QueryOver<TimeoutEntity>()
-                        .Where(x => x.Endpoint == EndpointName)
-                        .And(x => x.Time > startSlice && x.Time <= now)
-                        .OrderBy(x => x.Time).Asc
-                        .Select(x => x.Id, x => x.Time)
-                        .List<object[]>()
-                        .Select(p =>
-                        {
-                            var id = (Guid)p[0];
-                            var dueTime = (DateTime)p[1];
-                            return new TimeoutsChunk.Timeout(id.ToString(), dueTime);
-                        })
-                        .ToArray();
+                var results = session.QueryOver<TimeoutEntity>()
+                    .Where(x => x.Endpoint == EndpointName)
+                    .And(x => x.Time > startSlice && x.Time <= now)
+                    .OrderBy(x => x.Time).Asc
+                    .Select(x => x.Id, x => x.Time)
+                    .List<object[]>()
+                    .Select(p =>
+                    {
+                        var id = (Guid)p[0];
+                        var dueTime = (DateTime)p[1];
+                        return new TimeoutsChunk.Timeout(id.ToString(), dueTime);
+                    })
+                    .ToArray();
 
-                    //Retrieve next time we need to run query
-                    var startOfNextChunk = session.QueryOver<TimeoutEntity>()
-                        .Where(x => x.Endpoint == EndpointName && x.Time > now)
-                        .OrderBy(x => x.Time).Asc
+                //Retrieve next time we need to run query
+                var startOfNextChunk = session.QueryOver<TimeoutEntity>()
+                    .Where(x => x.Endpoint == EndpointName && x.Time > now)
+                    .OrderBy(x => x.Time).Asc
                         .Select(x => x.Time)
-                        .Take(1)
+                    .Take(1)
                         .SingleOrDefault<DateTime?>();
 
                     var nextTimeToRunQuery = startOfNextChunk ?? DateTime.UtcNow.AddMinutes(10);
 
-                    tx.Commit();
-                    return Task.FromResult(new TimeoutsChunk(results, nextTimeToRunQuery));
-                }
+                await tx.CommitAsync()
+                    .ConfigureAwait(false);
+                return new TimeoutsChunk(results, nextTimeToRunQuery);
             }
         }
 
@@ -99,8 +98,10 @@ namespace NServiceBus.TimeoutPersisters.NHibernate
                     Endpoint = timeout.OwningTimeoutManager
                 };
 
-                var timeoutId = (Guid) session.Session().Save(timeoutEntity);
-                await session.CompleteAsync().ConfigureAwait(false);
+                var timeoutId = (Guid) await session.Session().SaveAsync(timeoutEntity)
+                    .ConfigureAwait(false);
+                await session.CompleteAsync()
+                    .ConfigureAwait(false);
 
                 timeout.Id = timeoutId.ToString();
             }
@@ -109,15 +110,13 @@ namespace NServiceBus.TimeoutPersisters.NHibernate
         public async Task<bool> TryRemove(string timeoutId, ContextBag context)
         {
             var id = Guid.Parse(timeoutId);
-            bool found;
             using (var session = await OpenSession(context).ConfigureAwait(false))
             {
                 var queryString = $"delete {typeof(TimeoutEntity)} where Id = :id";
-                found = session.Session().CreateQuery(queryString).SetParameter("id", id).ExecuteUpdate() > 0;
+                var found = session.Session().CreateQuery(queryString).SetParameter("id", id).ExecuteUpdate() > 0;
                 await session.CompleteAsync().ConfigureAwait(false);
+                return found;
             }
-
-            return found;
         }
 
         async Task<CompletableSynchronizedStorageSession> OpenSession(ContextBag context)
@@ -128,25 +127,19 @@ namespace NServiceBus.TimeoutPersisters.NHibernate
             return session;
         }
 
-        public Task RemoveTimeoutBy(Guid sagaId, ContextBag context)
+        public async Task RemoveTimeoutBy(Guid sagaId, ContextBag context)
         {
-            using (new TransactionScope(TransactionScopeOption.Suppress))
+            using (new TransactionScope(TransactionScopeOption.Suppress, TransactionScopeAsyncFlowOption.Enabled))
+            using (var session = SessionFactory.OpenStatelessSession())
+            using (var tx = session.BeginTransaction(IsolationLevel.ReadCommitted))
             {
-                using (var session = SessionFactory.OpenStatelessSession())
-                {
-                    using (var tx = session.BeginTransaction(IsolationLevel.ReadCommitted))
-                    {
-                        var queryString = $"delete {typeof(TimeoutEntity)} where SagaId = :sagaid";
-                        session.CreateQuery(queryString)
-                            .SetParameter("sagaid", sagaId)
-                            .ExecuteUpdate();
+                var queryString = $"delete {typeof(TimeoutEntity)} where SagaId = :sagaid";
+                session.CreateQuery(queryString)
+                    .SetParameter("sagaid", sagaId)
+                    .ExecuteUpdate();
 
-                        tx.Commit();
-
-                        return Task.FromResult(0);
-                    }
-                }
-
+                await tx.CommitAsync()
+                    .ConfigureAwait(false);
             }
         }
 
@@ -157,8 +150,7 @@ namespace NServiceBus.TimeoutPersisters.NHibernate
                 var id = Guid.Parse(timeoutId);
                 var te = session.Session().Get<TimeoutEntity>(id, LockMode.Upgrade);
 
-                var timeout = MapToTimeoutData(te);
-                return timeout;
+                return MapToTimeoutData(te);
             }
         }
 
@@ -200,6 +192,5 @@ namespace NServiceBus.TimeoutPersisters.NHibernate
 
             return ObjectSerializer.Serialize(data);
         }
-
     }
 }

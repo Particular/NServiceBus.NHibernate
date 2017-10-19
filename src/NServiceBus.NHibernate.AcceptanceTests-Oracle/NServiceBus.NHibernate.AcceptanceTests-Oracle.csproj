@@ -2,8 +2,13 @@
 
   <PropertyGroup>
     <TargetFramework>net452</TargetFramework>
+    <TargetFrameworks>net461</TargetFrameworks>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <RootNamespace>NServiceBus.NHibernate.AcceptanceTests.Oracle</RootNamespace>
   </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="..\NServiceBus.NHibernate.AcceptanceTests\NServiceBusAcceptanceTest.cs" Link="NServiceBusAcceptanceTest.cs" />
+  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\NServiceBus.NHibernate\NServiceBus.NHibernate.csproj" />

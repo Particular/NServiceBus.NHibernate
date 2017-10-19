@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>net452</TargetFramework>
+    <TargetFrameworks>net461</TargetFrameworks>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\NServiceBus.snk</AssemblyOriginatorKeyFile>
     <Optimize>False</Optimize>

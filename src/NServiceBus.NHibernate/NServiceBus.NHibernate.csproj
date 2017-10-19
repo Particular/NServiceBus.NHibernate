@@ -2,6 +2,9 @@
 
   <PropertyGroup>
     <TargetFramework>net452</TargetFramework>
+    <TargetFrameworks>net461</TargetFrameworks>
+    <RootNamespace>NServiceBus.NHibernate</RootNamespace>
+    <AssemblyName>NServiceBus.NHibernate</AssemblyName>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\NServiceBus.snk</AssemblyOriginatorKeyFile>
     <OutputPath>..\..\binaries\</OutputPath>
@@ -21,6 +24,14 @@
     <PackageReference Include="NServiceBus" Version="[7.0.0, 8.0.0)" />
     <PackageReference Include="NHibernate" version="[4.0.4.4000, 5.0.0)" />
     <PackageReference Include="Iesi.Collections" version="[4.0.2, 5.0.0)" />
+
+    <PackageReference Include="Fody" Version="2.*" PrivateAssets="All" />
+    <PackageReference Include="Janitor.Fody" Version="1.*" PrivateAssets="All" />
+    <PackageReference Include="Obsolete.Fody" Version="4.*" PrivateAssets="All" />
+    <PackageReference Include="Particular.CodeRules" Version="0.2.0" PrivateAssets="All" />
+    <PackageReference Include="NServiceBus" Version="[7.0.0-*, 8.0.0)" />
+    <PackageReference Include="NHibernate" version="[5.0.3, 6.0.0)" />
+    <PackageReference Include="Iesi.Collections" version="[4.0.3, 5.0.0)" /> 
   </ItemGroup>
 
   <ItemGroup>

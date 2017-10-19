@@ -96,7 +96,7 @@ namespace NServiceBus.SagaPersisters.NHibernate.AutoPersistence
 
                     if (rowVersionProperty.PropertyType == typeof(DateTime))
                     {
-                        mapper.Type(new TimestampType());
+                        mapper.Type(new DateTimeType());
                     }
 
                     if (rowVersionProperty.PropertyType == typeof(byte[]))
@@ -107,7 +107,7 @@ namespace NServiceBus.SagaPersisters.NHibernate.AutoPersistence
                         mapper.Column(cm =>
                         {
                             cm.NotNullable(false);
-                            cm.SqlType(NHibernateUtil.Timestamp.Name);
+                            cm.SqlType(NHibernateUtil.DateTime.Name);
                         });
                     }
                 });

@@ -21,7 +21,7 @@ namespace NServiceBus.Unicast.Subscriptions.NHibernate.Tests
                 command.ExecuteNonQuery();
             }
 
-            storage.Init();
+            await storage.Init();
 
             var messageTypes = new List<MessageType> { MessageTypes.MessageB };
             var subscribers = (await storage.GetSubscriberAddressesForMessage(messageTypes, new ContextBag()).ConfigureAwait(false)).ToArray();

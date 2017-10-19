@@ -11,6 +11,7 @@ namespace NServiceBus.NHibernate.Tests
     using NUnit.Framework;
 
     [TestFixture]
+    [UseReporter(typeof(DiffReporter),typeof(AllFailingTestsClipboardReporter))]
     public class DDL
     {
         [Test]

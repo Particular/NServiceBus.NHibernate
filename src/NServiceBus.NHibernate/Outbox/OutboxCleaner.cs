@@ -52,7 +52,7 @@ namespace NServiceBus.Features
             circuitBreaker = new RepeatedFailuresOverTimeCircuitBreaker(
                 "OutboxCleanupTaskConnectivity",
                 timeToWaitBeforeTriggeringCriticalError,
-                ex => criticalError.Raise("Failed to clean the Oubox.", ex)
+                ex => criticalError.Raise("Failed to clean the Outbox.", ex)
             );
 
             if (Timeout.InfiniteTimeSpan == frequencyToRunDeduplicationDataCleanup)

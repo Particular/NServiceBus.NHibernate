@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>net452</TargetFramework>
+    <TargetFrameworks>net461</TargetFrameworks>
     <OutputType>Exe</OutputType>
   </PropertyGroup>
 
