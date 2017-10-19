@@ -54,13 +54,20 @@
             {
                 throw new NotSupportedException("Overriding default implementation of ISessionFactory is not supported.");
             }
-            CompletableSynchronizedStorageSession session = new NHibernateLazyAmbientTransactionSynchronizedStorageSession(() => OpenConnection(sessionFactoryImpl, ambientTransaction), conn => sessionFactory.OpenSession(conn));
+            CompletableSynchronizedStorageSession session = new NHibernateLazyAmbientTransactionSynchronizedStorageSession(
+                connectionFactory: () => OpenConnection(sessionFactoryImpl, ambientTransaction),
+                sessionFactory: conn =>
+                {
+                    var sessionBuilder = sessionFactory.WithOptions();
+                    sessionBuilder.Connection(conn);
+                    return sessionBuilder.OpenSession();
+                });
             return Task.FromResult(session);
         }
 
-        static IDbConnection OpenConnection(SessionFactoryImpl sessionFactoryImpl, Transaction ambientTransaction)
+        static DbConnection OpenConnection(SessionFactoryImpl sessionFactoryImpl, Transaction ambientTransaction)
         {
-            var connection = (DbConnection) sessionFactoryImpl.ConnectionProvider.GetConnection();
+            var connection = sessionFactoryImpl.ConnectionProvider.GetConnection();
             connection.EnlistTransaction(ambientTransaction);
             return connection;
         }

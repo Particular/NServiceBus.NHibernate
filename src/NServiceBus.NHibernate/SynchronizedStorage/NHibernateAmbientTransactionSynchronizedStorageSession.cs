@@ -2,6 +2,7 @@
 {
     using System;
     using System.Data;
+    using System.Data.Common;
     using System.Threading.Tasks;
     using global::NHibernate;
     using Janitor;
@@ -11,12 +12,12 @@
     class NHibernateLazyAmbientTransactionSynchronizedStorageSession : CompletableSynchronizedStorageSession, INHibernateSynchronizedStorageSession
     {
         Lazy<ISession> session;
-        Lazy<IDbConnection> connection;
+        Lazy<DbConnection> connection;
         Func<SynchronizedStorageSession, Task> onSaveChangesCallback;
 
-        public NHibernateLazyAmbientTransactionSynchronizedStorageSession(Func<IDbConnection> connectionFactory, Func<IDbConnection, ISession> sessionFactory)
+        public NHibernateLazyAmbientTransactionSynchronizedStorageSession(Func<DbConnection> connectionFactory, Func<DbConnection, ISession> sessionFactory)
         {
-            connection = new Lazy<IDbConnection>(connectionFactory);
+            connection = new Lazy<DbConnection>(connectionFactory);
             session = new Lazy<ISession>(() => sessionFactory(connection.Value));
         }
 
