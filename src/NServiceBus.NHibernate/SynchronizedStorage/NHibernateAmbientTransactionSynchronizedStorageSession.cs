@@ -1,7 +1,6 @@
 ﻿namespace NServiceBus.Persistence.NHibernate
 {
     using System;
-    using System.Data;
     using System.Data.Common;
     using System.Threading.Tasks;
     using global::NHibernate;
