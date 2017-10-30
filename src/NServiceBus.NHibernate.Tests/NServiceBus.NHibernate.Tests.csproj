@@ -1,42 +1,36 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
-    <TargetFrameworks>net452</TargetFrameworks>
+    <TargetFramework>net452</TargetFramework>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\NServiceBus.snk</AssemblyOriginatorKeyFile>
     <Optimize>False</Optimize>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
   </PropertyGroup>
-  <ItemGroup>
-    <None Remove="SagaPersister\TestSagaWithHbmlXmlOverride.hbm.xml" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="SagaPersister\TestSagaWithHbmlXmlOverride.hbm.xml" />
-  </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="System.Data.DataSetExtensions" />
-    <PackageReference Include="NServiceBus" Version="7.0.0-*" />
-    <PackageReference Include="NUnit" Version="3.*" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.3.0" />
-    <PackageReference Include="NUnit3TestAdapter" Version="3.8.0-alpha1" />
-    <PackageReference Include="Mono.Cecil" Version="0.10.0-beta6" /> <!--avoids loader exceptions related to Mono.Cecil when running the tests-->
-    <PackageReference Include="PublicApiGenerator" Version="6.1.0-beta2" />
-    <PackageReference Include="ApprovalTests" Version="3.*" />
-    <PackageReference Include="ApprovalUtilities" Version="3.*" />
-    <PackageReference Include="System.Data.SQLite" Version="1.0.99.0" />
-    <PackageReference Include="System.Data.SQLite.Core" Version="1.0.99.0" />
-    <PackageReference Include="System.Data.SQLite.Linq" Version="1.0.99.0" />
-    <PackageReference Include="Newtonsoft.Json" Version="5.0.6" />
     <ProjectReference Include="..\NServiceBus.NHibernate\NServiceBus.NHibernate.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="hibernate.cfg.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Testing.config">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    <PackageReference Include="ApprovalTests" Version="3.*" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.3.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="5.0.6" />
+    <PackageReference Include="NServiceBus" Version="7.0.0-*" />
+    <PackageReference Include="NUnit" Version="3.*" />
+    <PackageReference Include="NUnit3TestAdapter" Version="3.8.0-alpha1" />
+    <PackageReference Include="PublicApiGenerator" Version="6.4.0" />
+    <PackageReference Include="System.Data.SQLite" Version="1.0.105.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="SagaPersister\TestSagaWithHbmlXmlOverride.hbm.xml" />
+    <EmbeddedResource Include="SagaPersister\TestSagaWithHbmlXmlOverride.hbm.xml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="hibernate.cfg.xml" CopyToOutputDirectory="PreserveNewest" />
+    <None Update="Testing.config" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
 </Project>
