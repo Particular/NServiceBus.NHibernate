@@ -1,9 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net452</TargetFrameworks>
-    <RootNamespace>NServiceBus.NHibernate</RootNamespace>
-    <AssemblyName>NServiceBus.NHibernate</AssemblyName>
+    <TargetFramework>net452</TargetFramework>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\NServiceBus.snk</AssemblyOriginatorKeyFile>
     <OutputPath>..\..\binaries\</OutputPath>
@@ -12,7 +10,9 @@
 
   <ItemGroup>
     <Reference Include="System.Data.DataSetExtensions" />
+  </ItemGroup>
 
+  <ItemGroup>
     <PackageReference Include="Fody" Version="2.*" PrivateAssets="All" />
     <PackageReference Include="Janitor.Fody" Version="1.*" PrivateAssets="All" />
     <PackageReference Include="Obsolete.Fody" Version="4.*" PrivateAssets="All" />
@@ -22,4 +22,5 @@
     <PackageReference Include="NHibernate" version="[4.0.4.4000, 5.0.0)" />
     <PackageReference Include="Iesi.Collections" version="[4.0.2, 5.0.0)" />
   </ItemGroup>
+
 </Project>
