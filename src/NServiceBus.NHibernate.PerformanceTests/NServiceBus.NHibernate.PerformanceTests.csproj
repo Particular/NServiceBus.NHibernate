@@ -1,15 +1,18 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
-    <TargetFrameworks>net452</TargetFrameworks>
+    <TargetFramework>net452</TargetFramework>
     <OutputType>Exe</OutputType>
-    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
   </PropertyGroup>
-  
+
+  <ItemGroup>
+    <ProjectReference Include="..\NServiceBus.NHibernate\NServiceBus.NHibernate.csproj" />
+  </ItemGroup>
+
   <ItemGroup>
     <PackageReference Include="NServiceBus" Version="7.0.0-*" />
-    <PackageReference Include="NServiceBus.Transport.Msmq" Version="1.0.0-*" />
     <PackageReference Include="NServiceBus.Newtonsoft.Json" Version="2.0.0-*" />
-    <ProjectReference Include="..\NServiceBus.NHibernate\NServiceBus.NHibernate.csproj" />
+    <PackageReference Include="NServiceBus.Transport.Msmq" Version="1.0.0-*" />
   </ItemGroup>
 
 </Project>
