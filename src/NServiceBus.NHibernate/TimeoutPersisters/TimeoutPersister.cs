@@ -154,10 +154,7 @@ namespace NServiceBus.TimeoutPersisters.NHibernate
             using (var session = await OpenSession(context).ConfigureAwait(false))
             {
                 var id = Guid.Parse(timeoutId);
-                var te = session.Session().QueryOver<TimeoutEntity>()
-                    .Where(x => x.Id == id)
-                    .List()
-                    .SingleOrDefault();
+                var te = session.Session().Get<TimeoutEntity>(id, LockMode.Upgrade);
 
                 var timeout = MapToTimeoutData(te);
                 return timeout;
