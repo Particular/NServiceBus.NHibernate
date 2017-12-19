@@ -15,9 +15,9 @@
     <PackageReference Include="NUnit" Version="3.*" />
     <PackageReference Include="NUnit3TestAdapter" Version="3.8.0-alpha1" />
   </ItemGroup>
-
   <ItemGroup>
-    <CSFile Include="*.cs" Exclude="**\NSB.AcceptanceTests\ConventionEnforcementTests.cs" />
+    <!-- Until we have a core beta 14 or higher that excludes this -->
+    <Compile Remove="$(NuGetPackageRoot)**\NSB.AcceptanceTests\ConventionEnforcementTests.cs" />
     <None Remove="TestSagaData.hbm.xml" />
     <EmbeddedResource Include="TestSagaData.hbm.xml" />
   </ItemGroup>
