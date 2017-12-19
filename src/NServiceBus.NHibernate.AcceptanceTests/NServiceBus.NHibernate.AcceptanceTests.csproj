@@ -17,6 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <CSFile Include="*.cs" Exclude="**\NSB.AcceptanceTests\ConventionEnforcementTests.cs" />
     <None Remove="TestSagaData.hbm.xml" />
     <EmbeddedResource Include="TestSagaData.hbm.xml" />
   </ItemGroup>
