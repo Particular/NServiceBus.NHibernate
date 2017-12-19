@@ -9,7 +9,7 @@
         public bool SupportsNativePubSub => true;
         public bool SupportsNativeDeferral => true;
         public bool SupportsOutbox => true;
-        public IConfigureEndpointTestExecution CreateTransportConfiguration() => new ConfigureEndpointLearningTransport();
+        public IConfigureEndpointTestExecution CreateTransportConfiguration() => new ConfigureEndpointAcceptanceTestingTransport(SupportsNativePubSub, SupportsNativeDeferral);
         public IConfigureEndpointTestExecution CreatePersistenceConfiguration() => new ConfigureEndpointNHibernatePersistence();
     }
 }
