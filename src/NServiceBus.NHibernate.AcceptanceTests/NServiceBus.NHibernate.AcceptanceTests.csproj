@@ -11,11 +11,13 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.3.0" />
     <PackageReference Include="NServiceBus.AcceptanceTests.Sources" Version="7.0.0-beta0012" />
+    <PackageReference Include="NServiceBus.Gateway.AcceptanceTests.Sources" Version="3.0.0-beta0005" />
     <PackageReference Include="NUnit" Version="3.*" />
     <PackageReference Include="NUnit3TestAdapter" Version="3.8.0-alpha1" />
   </ItemGroup>
-
   <ItemGroup>
+    <!-- Until we have a core beta 14 or higher that excludes this -->
+    <Compile Remove="$(NuGetPackageRoot)**\NSB.AcceptanceTests\ConventionEnforcementTests.cs" />
     <None Remove="TestSagaData.hbm.xml" />
     <EmbeddedResource Include="TestSagaData.hbm.xml" />
   </ItemGroup>
