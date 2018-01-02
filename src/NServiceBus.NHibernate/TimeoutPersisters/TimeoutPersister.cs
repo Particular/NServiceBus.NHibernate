@@ -73,10 +73,11 @@ namespace NServiceBus.TimeoutPersisters.NHibernate
                     var startOfNextChunk = session.QueryOver<TimeoutEntity>()
                         .Where(x => x.Endpoint == EndpointName && x.Time > now)
                         .OrderBy(x => x.Time).Asc
+                        .Select(x => x.Time)
                         .Take(1)
-                        .SingleOrDefault();
+                        .SingleOrDefault<DateTime?>();
 
-                    var nextTimeToRunQuery = startOfNextChunk?.Time ?? DateTime.UtcNow.AddMinutes(10);
+                    var nextTimeToRunQuery = startOfNextChunk ?? DateTime.UtcNow.AddMinutes(10);
 
                     tx.Commit();
                     return Task.FromResult(new TimeoutsChunk(results, nextTimeToRunQuery));
