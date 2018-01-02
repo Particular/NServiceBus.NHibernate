@@ -73,6 +73,7 @@ namespace NServiceBus.TimeoutPersisters.NHibernate
                     var startOfNextChunk = session.QueryOver<TimeoutEntity>()
                         .Where(x => x.Endpoint == EndpointName && x.Time > now)
                         .OrderBy(x => x.Time).Asc
+                        .Select(x => x.Time)
                         .Take(1)
                         .SingleOrDefault<DateTime?>();
 
