@@ -1,0 +1,155 @@
+﻿[assembly: System.Runtime.CompilerServices.InternalsVisibleToAttribute(@"NServiceBus.NHibernate.Tests, PublicKey=0024000004800000940000000602000000240000525341310004000001000100dde965e6172e019ac82c2639ffe494dd2e7dd16347c34762a05732b492e110f2e4e2e1b5ef2d85c848ccfb671ee20a47c8d1376276708dc30a90ff1121b647ba3b7259a6bc383b2034938ef0e275b58b920375ac605076178123693c6c4f1331661a62eba28c249386855637780e3ff5f23a6d854700eaa6803ef48907513b92")]
+[assembly: System.Runtime.InteropServices.ComVisibleAttribute(false)]
+[assembly: System.Runtime.Versioning.TargetFrameworkAttribute(".NETFramework,Version=v4.5.2", FrameworkDisplayName=".NET Framework 4.5.2")]
+
+namespace NServiceBus.Features
+{
+    
+    public class NHibernateGatewayDeduplication : NServiceBus.Features.Feature
+    {
+        public NHibernateGatewayDeduplication() { }
+        protected override void Setup(NServiceBus.Features.FeatureConfigurationContext context) { }
+    }
+    public class NHibernateSagaStorage : NServiceBus.Features.Feature
+    {
+        public NHibernateSagaStorage() { }
+        protected override void Setup(NServiceBus.Features.FeatureConfigurationContext context) { }
+    }
+    public class NHibernateStorageSession : NServiceBus.Features.Feature
+    {
+        protected override void Setup(NServiceBus.Features.FeatureConfigurationContext context) { }
+    }
+    public class NHibernateTimeoutStorage : NServiceBus.Features.Feature
+    {
+        public NHibernateTimeoutStorage() { }
+        protected override void Setup(NServiceBus.Features.FeatureConfigurationContext context) { }
+    }
+}
+namespace NServiceBus.NHibernate.Outbox
+{
+    
+    public class static OutboxConfig
+    {
+        public static NServiceBus.PersistenceExtensions<NServiceBus.NHibernatePersistence> UseOutboxRecord<TEntity, TMapping>(this NServiceBus.PersistenceExtensions<NServiceBus.NHibernatePersistence> persistenceConfiguration)
+            where TEntity :  class, NServiceBus.Outbox.NHibernate.IOutboxRecord, new ()
+            where TMapping : NHibernate.Mapping.ByCode.Conformist.ClassMapping<> { }
+    }
+}
+namespace NServiceBus.NHibernate
+{
+    
+    public class ScriptGenerator<T>
+        where T : NHibernate.Dialect.Dialect, new ()
+    {
+        public ScriptGenerator() { }
+        public static string GenerateGatewayDeduplicationStoreScript() { }
+        public static string GenerateOutboxScript(System.Type outboxRecordMappingType = null) { }
+        public static string GenerateSagaScript<TSaga>(System.Func<System.Type, string> tableNamingConvention = null)
+            where TSaga : NServiceBus.Saga { }
+        public static string GenerateSubscriptionStoreScript() { }
+        public static string GenerateTimeoutStoreScript() { }
+    }
+}
+namespace NServiceBus
+{
+    
+    public class NHibernatePersistence : NServiceBus.Persistence.PersistenceDefinition
+    {
+        public NHibernatePersistence() { }
+    }
+    public class static SynchronizedStorageSessionExtensions
+    {
+        public static void OnSaveChanges(this NServiceBus.Persistence.SynchronizedStorageSession session, System.Func<NServiceBus.Persistence.SynchronizedStorageSession, System.Threading.Tasks.Task> callback) { }
+        public static NHibernate.ISession Session(this NServiceBus.Persistence.SynchronizedStorageSession session) { }
+    }
+}
+namespace NServiceBus.Outbox.NHibernate
+{
+    
+    public interface IOutboxRecord
+    {
+        bool Dispatched { get; set; }
+        System.Nullable<System.DateTime> DispatchedAt { get; set; }
+        string MessageId { get; set; }
+        string TransportOperations { get; set; }
+    }
+}
+namespace NServiceBus.Persistence.NHibernate
+{
+    
+    public class static DeduplicationConfig
+    {
+        public static NServiceBus.PersistenceExtensions<NServiceBus.NHibernatePersistence> DisableGatewayDeduplicationSchemaUpdate(this NServiceBus.PersistenceExtensions<NServiceBus.NHibernatePersistence> persistenceConfiguration) { }
+        public static NServiceBus.PersistenceExtensions<NServiceBus.NHibernatePersistence> UseGatewayDeduplicationConfiguration(this NServiceBus.PersistenceExtensions<NServiceBus.NHibernatePersistence> persistenceConfiguration, NHibernate.Cfg.Configuration configuration) { }
+    }
+    public class static NHibernateSettingRetriever
+    {
+        public static System.Func<System.Collections.Specialized.NameValueCollection> AppSettings { get; set; }
+        public static System.Func<System.Configuration.ConnectionStringSettingsCollection> ConnectionStrings { get; set; }
+    }
+    public class static SagaConfig
+    {
+        public static NServiceBus.PersistenceExtensions<NServiceBus.NHibernatePersistence> SagaTableNamingConvention(this NServiceBus.PersistenceExtensions<NServiceBus.NHibernatePersistence> persistenceConfiguration, System.Func<System.Type, string> tableNamingConvention) { }
+    }
+    public class static SubscriptionConfig
+    {
+        public static NServiceBus.PersistenceExtensions<NServiceBus.NHibernatePersistence> DisableSubscriptionStorageSchemaUpdate(this NServiceBus.PersistenceExtensions<NServiceBus.NHibernatePersistence> persistenceConfiguration) { }
+        public static NServiceBus.PersistenceExtensions<NServiceBus.NHibernatePersistence> EnableCachingForSubscriptionStorage(this NServiceBus.PersistenceExtensions<NServiceBus.NHibernatePersistence> persistenceConfiguration, System.TimeSpan expiration) { }
+        public static NServiceBus.PersistenceExtensions<NServiceBus.NHibernatePersistence> UseSubscriptionStorageConfiguration(this NServiceBus.PersistenceExtensions<NServiceBus.NHibernatePersistence> persistenceConfiguration, NHibernate.Cfg.Configuration configuration) { }
+    }
+    public class static TimeoutConfig
+    {
+        public static NServiceBus.PersistenceExtensions<NServiceBus.NHibernatePersistence> DisableTimeoutStorageSchemaUpdate(this NServiceBus.PersistenceExtensions<NServiceBus.NHibernatePersistence> persistenceConfiguration) { }
+        public static NServiceBus.PersistenceExtensions<NServiceBus.NHibernatePersistence> UseTimeoutStorageConfiguration(this NServiceBus.PersistenceExtensions<NServiceBus.NHibernatePersistence> persistenceConfiguration, NHibernate.Cfg.Configuration configuration) { }
+    }
+}
+namespace NServiceBus.Persistence
+{
+    
+    public class static SharedConfig
+    {
+        public static NServiceBus.PersistenceExtensions<NServiceBus.NHibernatePersistence> ConnectionString(this NServiceBus.PersistenceExtensions<NServiceBus.NHibernatePersistence> persistenceConfiguration, string connectionString) { }
+        public static NServiceBus.PersistenceExtensions<NServiceBus.NHibernatePersistence> DisableSchemaUpdate(this NServiceBus.PersistenceExtensions<NServiceBus.NHibernatePersistence> persistenceConfiguration) { }
+        public static NServiceBus.PersistenceExtensions<NServiceBus.NHibernatePersistence> UseConfiguration(this NServiceBus.PersistenceExtensions<NServiceBus.NHibernatePersistence> persistenceConfiguration, NHibernate.Cfg.Configuration configuration) { }
+    }
+}
+namespace NServiceBus.SagaPersisters.NHibernate
+{
+    
+    [System.AttributeUsageAttribute(System.AttributeTargets.Class | System.AttributeTargets.All)]
+    public sealed class LockModeAttribute : System.Attribute
+    {
+        public LockModeAttribute(NServiceBus.SagaPersisters.NHibernate.LockModes lockModeToUse) { }
+        public NServiceBus.SagaPersisters.NHibernate.LockModes RequestedLockMode { get; }
+    }
+    public enum LockModes
+    {
+        None = 1,
+        Read = 2,
+        Upgrade = 3,
+        UpgradeNoWait = 4,
+        Write = 5,
+        Force = 6,
+    }
+    [System.AttributeUsageAttribute(System.AttributeTargets.Property | System.AttributeTargets.All)]
+    public class RowVersionAttribute : System.Attribute
+    {
+        public RowVersionAttribute() { }
+    }
+    [System.AttributeUsageAttribute(System.AttributeTargets.Class | System.AttributeTargets.All)]
+    public class TableNameAttribute : System.Attribute
+    {
+        public TableNameAttribute(string tableName) { }
+        public string Schema { get; set; }
+        public string TableName { get; }
+    }
+}
+namespace NServiceBus.Testing
+{
+    
+    public class TestingNHibernateSynchronizedStorageSession : NServiceBus.Persistence.SynchronizedStorageSession
+    {
+        public TestingNHibernateSynchronizedStorageSession(NHibernate.ISession session) { }
+        public NHibernate.ISession Session { get; }
+    }
+}

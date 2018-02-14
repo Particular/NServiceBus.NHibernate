@@ -6,8 +6,6 @@ namespace NServiceBus.NHibernate.Tests
     using System.Collections.Generic;
     using System.Runtime.CompilerServices;
     using System.Threading.Tasks;
-    using ApprovalTests;
-    using ApprovalTests.Reporters;
     using NServiceBus;
     using NHibernate;
     using NUnit.Framework;
@@ -17,47 +15,42 @@ namespace NServiceBus.NHibernate.Tests
     {
         [Test]
         [MethodImpl(MethodImplOptions.NoInlining)]
-        [UseReporter(typeof(DiffReporter))]
         public void Outbox()
         {
             var script = ScriptGenerator<MsSql2012Dialect>.GenerateOutboxScript();
-            Approvals.Verify(script);
+            TestApprover.Verify(script);
         }
 
         [Test]
         [MethodImpl(MethodImplOptions.NoInlining)]
-        [UseReporter(typeof(DiffReporter))]
         public void Subscriptions()
         {
             var script = ScriptGenerator<MsSql2012Dialect>.GenerateSubscriptionStoreScript();
-            Approvals.Verify(script);
+            TestApprover.Verify(script);
         }
 
         [Test]
         [MethodImpl(MethodImplOptions.NoInlining)]
-        [UseReporter(typeof(DiffReporter))]
         public void Timeouts()
         {
             var script = ScriptGenerator<MsSql2012Dialect>.GenerateTimeoutStoreScript();
-            Approvals.Verify(script);
+            TestApprover.Verify(script);
         }
 
         [Test]
         [MethodImpl(MethodImplOptions.NoInlining)]
-        [UseReporter(typeof(DiffReporter))]
         public void GatewayDeduplication()
         {
             var script = ScriptGenerator<MsSql2012Dialect>.GenerateGatewayDeduplicationStoreScript();
-            Approvals.Verify(script);
+            TestApprover.Verify(script);
         }
 
         [Test]
         [MethodImpl(MethodImplOptions.NoInlining)]
-        [UseReporter(typeof(DiffReporter))]
         public void MySaga()
         {
             var script = ScriptGenerator<MsSql2012Dialect>.GenerateSagaScript<MySaga>();
-            Approvals.Verify(script);
+            TestApprover.Verify(script);
         }
     }
 
