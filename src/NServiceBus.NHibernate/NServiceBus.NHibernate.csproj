@@ -26,7 +26,7 @@
     <PackageReference Include="Obsolete.Fody" Version="4.*" PrivateAssets="All" />
     <PackageReference Include="Particular.CodeRules" Version="0.2.0" PrivateAssets="All" />
     <PackageReference Include="NServiceBus" Version="[7.0.0-*, 8.0.0)" />
-    <PackageReference Include="NHibernate" version="[5.0.0, 6.0.0)" />
-    <PackageReference Include="Iesi.Collections" version="[4.0.2, 5.0.0)" />
+    <PackageReference Include="NHibernate" version="[5.0.3, 6.0.0)" />
+    <PackageReference Include="Iesi.Collections" version="[4.0.3, 5.0.0)" /> 
   </ItemGroup>
 </Project>
