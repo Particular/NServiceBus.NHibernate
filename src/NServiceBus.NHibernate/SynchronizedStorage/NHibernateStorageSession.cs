@@ -20,6 +20,10 @@ namespace NServiceBus.Features
     public class NHibernateStorageSession : Feature
     {
         internal const string OutboxMappingSettingsKey = "NServiceBus.NHibernate.OutboxMapping";
+        internal const string OutboxTableNameSettingsKey = "NServiceBus.NHibernate.OutboxTableName";
+        internal const string OutboxSchemaNameSettingsKey = "NServiceBus.NHibernate.OutboxSchemaName";
+        internal const string OutboxTimeToKeepDeduplicationDataSettingsKey = "NServiceBus.NHibernate.TimeToKeepDeduplicationData";
+        internal const string OutboxCleanupIntervalSettingsKey = "NServiceBus.NHibernate.FrequencyToRunDeduplicationDataCleanup";
 
         internal NHibernateStorageSession()
         {
@@ -47,10 +51,23 @@ namespace NServiceBus.Features
             var sharedMappings = context.Settings.Get<SharedMappings>();
 
             var outboxEnabled = context.Settings.IsFeatureActive(typeof(Outbox));
+
             if (outboxEnabled)
             {
                 sharedMappings.AddMapping(configuration => ApplyMappings(configuration, context));
                 config.Configuration.Properties[Environment.TransactionStrategy] = typeof(AdoNetTransactionFactory).FullName;
+
+                string tableName;
+                if (context.Settings.TryGet(OutboxTableNameSettingsKey, out tableName))
+                {
+                    outboxTableName = tableName;
+                }
+
+                string schemaName;
+                if (context.Settings.TryGet(OutboxSchemaNameSettingsKey, out schemaName))
+                {
+                    outboxSchemaName = schemaName;
+                }
             }
 
             sharedMappings.ApplyTo(config.Configuration);
@@ -93,8 +110,6 @@ TSql Script:
                         throw new Exception(string.Format(errorMessage, aggregate.Flatten(), sb));
                     }
 
-
-
                     return Task.FromResult(0);
                 };
             }
@@ -103,8 +118,19 @@ TSql Script:
         void ApplyMappings(Configuration config, FeatureConfigurationContext context)
         {
             var mapper = new ModelMapper();
+            mapper.BeforeMapClass += OutboxTableAndSchemaOverride;
             mapper.AddMapping(context.Settings.Get<Type>(OutboxMappingSettingsKey));
             config.AddMapping(mapper.CompileMappingForAllExplicitlyAddedEntities());
         }
+
+        void OutboxTableAndSchemaOverride(IModelInspector modelInspector, Type type, IClassAttributesMapper map)
+        {
+            if (type != typeof(OutboxRecordMapping)) return;
+            if (outboxTableName != null) map.Table(outboxTableName);
+            if (outboxSchemaName != null) map.Schema(outboxSchemaName);
+        }
+
+        string outboxTableName;
+        string outboxSchemaName;
     }
 }
