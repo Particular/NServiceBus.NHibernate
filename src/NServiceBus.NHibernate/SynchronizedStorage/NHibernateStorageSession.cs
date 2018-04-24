@@ -22,8 +22,7 @@ namespace NServiceBus.Features
         internal const string OutboxMappingSettingsKey = "NServiceBus.NHibernate.OutboxMapping";
         internal const string OutboxTableNameSettingsKey = "NServiceBus.NHibernate.OutboxTableName";
         internal const string OutboxSchemaNameSettingsKey = "NServiceBus.NHibernate.OutboxSchemaName";
-        internal const string OutboxTimeToKeepDeduplicationDataSettingsKey = "NServiceBus.NHibernate.TimeToKeepDeduplicationData";
-        internal const string OutboxCleanupIntervalSettingsKey = "NServiceBus.NHibernate.FrequencyToRunDeduplicationDataCleanup";
+
 
         internal NHibernateStorageSession()
         {
