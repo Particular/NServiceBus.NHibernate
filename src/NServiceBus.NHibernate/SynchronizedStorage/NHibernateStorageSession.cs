@@ -124,9 +124,17 @@ TSql Script:
 
         void OutboxTableAndSchemaOverride(IModelInspector modelInspector, Type type, IClassAttributesMapper map)
         {
-            if (type != typeof(OutboxRecordMapping)) return;
-            if (outboxTableName != null) map.Table(outboxTableName);
-            if (outboxSchemaName != null) map.Schema(outboxSchemaName);
+            if (type == typeof(OutboxRecordMapping))
+            {
+                if (outboxTableName != null)
+                {
+                    map.Table(outboxTableName);
+                }
+                if (outboxSchemaName != null)
+                {
+                    map.Schema(outboxSchemaName);
+                }
+            }
         }
 
         string outboxTableName;
