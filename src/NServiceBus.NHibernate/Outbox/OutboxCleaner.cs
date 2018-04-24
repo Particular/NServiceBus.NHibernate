@@ -54,16 +54,18 @@ namespace NServiceBus.Features
                 ex => criticalError.Raise("Failed to clean the Oubox.", ex)
             );
 
-
-            cleanupTimer = new AsyncTimer();
-            cleanupTimer.Start(PerformCleanup, frequencyToRunDeduplicationDataCleanup, ex => circuitBreaker.Failure(ex));
+            if (frequencyToRunDeduplicationDataCleanup != Timeout.InfiniteTimeSpan)
+            {
+                cleanupTimer = new AsyncTimer();
+                cleanupTimer.Start(PerformCleanup, frequencyToRunDeduplicationDataCleanup, ex => circuitBreaker.Failure(ex));
+            }
 
             return Task.FromResult(true);
         }
 
         protected override Task OnStop(IMessageSession busSession)
         {
-            return cleanupTimer.Stop();
+            return cleanupTimer?.Stop();
         }
 
         async Task PerformCleanup()
