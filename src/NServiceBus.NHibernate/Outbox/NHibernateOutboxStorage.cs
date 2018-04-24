@@ -4,6 +4,7 @@ namespace NServiceBus.Features
     using System.Configuration;
     using System.Threading;
     using NHibernate.Mapping.ByCode;
+    using NServiceBus.Logging;
     using NServiceBus.Outbox;
     using NServiceBus.Outbox.NHibernate;
     using Configuration = NHibernate.Cfg.Configuration;
@@ -79,8 +80,11 @@ namespace NServiceBus.Features
                         throw new Exception("Invalid value in \"NServiceBus/Outbox/NHibernate/FrequencyToRunDeduplicationDataCleanup\" AppSetting. Please ensure it is a TimeSpan.");
                     }
                 }
-
-                cleanupTimer = new Timer(PerformCleanup, null, TimeSpan.FromMinutes(1), frequencyToRunDeduplicationDataCleanup);
+                if (Timeout.InfiniteTimeSpan == frequencyToRunDeduplicationDataCleanup)
+                {
+                    Logger.InfoFormat("Outbox cleanup task is disabled.");
+                }
+                cleanupTimer = new Timer(PerformCleanup, null, frequencyToRunDeduplicationDataCleanup, frequencyToRunDeduplicationDataCleanup);
             }
 
             protected override void OnStop()
@@ -97,8 +101,27 @@ namespace NServiceBus.Features
             {
                 try
                 {
-                    outboxPersister.RemoveEntriesOlderThan(DateTime.UtcNow - timeToKeepDeduplicationData);
-                    cleanupFailures = 0;
+                    if (cleanupRunning)
+                    {
+                        return;
+                    }
+                    lock (cleanupLock)
+                    {
+                        if (cleanupRunning)
+                        {
+                           return;
+                        }
+                        cleanupRunning = true;
+                    }
+                    try
+                    {
+                        outboxPersister.RemoveEntriesOlderThan(DateTime.UtcNow - timeToKeepDeduplicationData);
+                        cleanupFailures = 0;
+                    }
+                    finally
+                    {
+                        cleanupRunning = false;
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -111,6 +134,7 @@ namespace NServiceBus.Features
                 }
             }
  
+            static readonly ILog Logger = LogManager.GetLogger(typeof(NHibernateOutboxStorage));
 // ReSharper disable NotAccessedField.Local
             Timer cleanupTimer;
 // ReSharper restore NotAccessedField.Local
@@ -119,6 +143,8 @@ namespace NServiceBus.Features
             int cleanupFailures;
             TimeSpan timeToKeepDeduplicationData;
             TimeSpan frequencyToRunDeduplicationDataCleanup;
+            object cleanupLock = new object();
+            volatile bool cleanupRunning;
         }
     }
 }
