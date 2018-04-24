@@ -20,7 +20,8 @@ namespace NServiceBus.Features
     public class NHibernateStorageSession : Feature
     {
         internal const string OutboxMappingSettingsKey = "NServiceBus.NHibernate.OutboxMapping";
-
+        internal const string OutboxTableNameSettingsKey = "NServiceBus.NHibernate.OutboxTableName";
+        internal const string OutboxSchemaNameSettingsKey = "NServiceBus.NHibernate.OutboxSchemaName";
         internal NHibernateStorageSession()
         {
             DependsOnOptionally<Outbox>();
@@ -51,6 +52,16 @@ namespace NServiceBus.Features
             {
                 sharedMappings.AddMapping(configuration => ApplyMappings(configuration, context));
                 config.Configuration.Properties[Environment.TransactionStrategy] = typeof(AdoNetTransactionFactory).FullName;
+
+                if (context.Settings.TryGet(OutboxTableNameSettingsKey, out string tableName))
+                {
+                    outboxTableName = tableName;
+                }
+
+                if (context.Settings.TryGet(OutboxSchemaNameSettingsKey, out string schemaName))
+                {
+                    outboxSchemaName = schemaName;
+                }
             }
 
             sharedMappings.ApplyTo(config.Configuration);
@@ -101,8 +112,28 @@ TSql Script:
         void ApplyMappings(Configuration config, FeatureConfigurationContext context)
         {
             var mapper = new ModelMapper();
+            mapper.BeforeMapClass += OutboxTableAndSchemaOverride;
             mapper.AddMapping(context.Settings.Get<Type>(OutboxMappingSettingsKey));
             config.AddMapping(mapper.CompileMappingForAllExplicitlyAddedEntities());
         }
+
+        void OutboxTableAndSchemaOverride(IModelInspector modelInspector, Type type, IClassAttributesMapper map)
+        {
+            if (type == typeof(OutboxRecordMapping))
+            {
+                if (outboxTableName != null)
+                {
+                    map.Table(outboxTableName);
+                }
+
+                if (outboxSchemaName != null)
+                {
+                    map.Schema(outboxSchemaName);
+                }
+            }
+        }
+
+        string outboxTableName;
+        string outboxSchemaName;
     }
 }
