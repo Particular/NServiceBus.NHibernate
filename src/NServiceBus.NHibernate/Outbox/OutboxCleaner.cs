@@ -54,40 +54,30 @@ namespace NServiceBus.Features
                 ex => criticalError.Raise("Failed to clean the Oubox.", ex)
             );
 
-            cleanupTimer = new Timer(PerformCleanup, null, OutboxCleanupStartupDelay, frequencyToRunDeduplicationDataCleanup);
+            if (frequencyToRunDeduplicationDataCleanup != Timeout.InfiniteTimeSpan)
+            {
+                cleanupTimer = new AsyncTimer();
+                cleanupTimer.Start(PerformCleanup, frequencyToRunDeduplicationDataCleanup, ex => circuitBreaker.Failure(ex));
+            }
 
             return Task.FromResult(true);
         }
 
         protected override Task OnStop(IMessageSession busSession)
         {
-            using (var waitHandle = new ManualResetEvent(false))
-            {
-                cleanupTimer.Dispose(waitHandle);
-
-                waitHandle.WaitOne();
-            }
-
-            return Task.FromResult(true);
+            return cleanupTimer?.Stop();
         }
 
-        void PerformCleanup(object state)
+        async Task PerformCleanup()
         {
-            try
-            {
-                outboxPersister.RemoveEntriesOlderThan(DateTime.UtcNow - timeToKeepDeduplicationData);
-                circuitBreaker.Success();
-            }
-            catch (Exception ex)
-            {
-                circuitBreaker.Failure(ex);
-            }
+            await Task.Run(() => outboxPersister.RemoveEntriesOlderThan(DateTime.UtcNow - timeToKeepDeduplicationData)).ConfigureAwait(false);
+            circuitBreaker.Success();
         }
 
         RepeatedFailuresOverTimeCircuitBreaker circuitBreaker;
 
         // ReSharper disable NotAccessedField.Local
-        Timer cleanupTimer;
+        AsyncTimer cleanupTimer;
         // ReSharper restore NotAccessedField.Local
         TimeSpan timeToKeepDeduplicationData;
         CriticalError criticalError;
