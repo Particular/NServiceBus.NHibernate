@@ -86,7 +86,7 @@ namespace NServiceBus.Features
                     Logger.InfoFormat("Outbox cleanup task is disabled.");
                 }
 
-                cleanupTimer = new Timer(PerformCleanup, null, frequencyToRunDeduplicationDataCleanup, frequencyToRunDeduplicationDataCleanup);
+                cleanupTimer = new Timer(PerformCleanup, null, frequencyToRunDeduplicationDataCleanup, Timeout.InfiniteTimeSpan);
             }
 
             protected override void OnStop()
@@ -114,6 +114,10 @@ namespace NServiceBus.Features
                         criticalError.Raise("Failed to clean expired Outbox records after 10 consecutive unsuccessful attempts. The most likely cause of this is connectivity issues with your database.", ex);
                         cleanupFailures = 0;
                     }
+                }
+                finally
+                {
+                    cleanupTimer.Change(frequencyToRunDeduplicationDataCleanup, Timeout.InfiniteTimeSpan);
                 }
             }
 
