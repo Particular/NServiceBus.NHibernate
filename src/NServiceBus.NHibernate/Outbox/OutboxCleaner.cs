@@ -60,7 +60,7 @@ namespace NServiceBus.Features
                 Logger.InfoFormat("Outbox cleanup task is disabled.");
             }
 
-            cleanupTimer = new Timer(PerformCleanup, null, frequencyToRunDeduplicationDataCleanup, frequencyToRunDeduplicationDataCleanup);
+            cleanupTimer = new Timer(PerformCleanup, null, frequencyToRunDeduplicationDataCleanup, Timeout.InfiniteTimeSpan);
 
             return Task.FromResult(true);
         }
@@ -87,6 +87,10 @@ namespace NServiceBus.Features
             catch (Exception ex)
             {
                 circuitBreaker.Failure(ex);
+            }
+            finally
+            {
+                cleanupTimer.Change(frequencyToRunDeduplicationDataCleanup, Timeout.InfiniteTimeSpan);
             }
         }
 
