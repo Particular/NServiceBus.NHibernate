@@ -90,7 +90,14 @@ namespace NServiceBus.Features
             }
             finally
             {
-                cleanupTimer.Change(frequencyToRunDeduplicationDataCleanup, Timeout.InfiniteTimeSpan);
+                try
+                {
+                    cleanupTimer.Change(frequencyToRunDeduplicationDataCleanup, Timeout.InfiniteTimeSpan);
+                }
+                catch (ObjectDisposedException)
+                {
+                    // Ignore, can happen during graceful shutdown.
+                }
             }
         }
 
