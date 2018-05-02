@@ -4,6 +4,7 @@ namespace NServiceBus.Features
     using System.Configuration;
     using System.Threading;
     using NHibernate.Mapping.ByCode;
+    using NServiceBus.Logging;
     using NServiceBus.Outbox;
     using NServiceBus.Outbox.NHibernate;
     using Configuration = NHibernate.Cfg.Configuration;
@@ -80,7 +81,12 @@ namespace NServiceBus.Features
                     }
                 }
 
-                cleanupTimer = new Timer(PerformCleanup, null, TimeSpan.FromMinutes(1), frequencyToRunDeduplicationDataCleanup);
+                if (Timeout.InfiniteTimeSpan == frequencyToRunDeduplicationDataCleanup)
+                {
+                    Logger.InfoFormat("Outbox cleanup task is disabled.");
+                }
+
+                cleanupTimer = new Timer(PerformCleanup, null, frequencyToRunDeduplicationDataCleanup, Timeout.InfiniteTimeSpan);
             }
 
             protected override void OnStop()
@@ -109,8 +115,20 @@ namespace NServiceBus.Features
                         cleanupFailures = 0;
                     }
                 }
+                finally
+                {
+                    try
+                    {
+                        cleanupTimer.Change(frequencyToRunDeduplicationDataCleanup, Timeout.InfiniteTimeSpan);
+                    }
+                    catch (ObjectDisposedException)
+                    {
+                        // Ignore, can happen during graceful shutdown.
+                    }
+                }
             }
- 
+
+            static readonly ILog Logger = LogManager.GetLogger(typeof(OutboxCleaner));
 // ReSharper disable NotAccessedField.Local
             Timer cleanupTimer;
 // ReSharper restore NotAccessedField.Local
