@@ -4,6 +4,7 @@ namespace NServiceBus.Features
     using System.Configuration;
     using System.Threading;
     using System.Threading.Tasks;
+    using NServiceBus.Logging;
 
     class OutboxCleaner : FeatureStartupTask
     {
@@ -54,7 +55,12 @@ namespace NServiceBus.Features
                 ex => criticalError.Raise("Failed to clean the Oubox.", ex)
             );
 
-            cleanupTimer = new Timer(PerformCleanup, null, OutboxCleanupStartupDelay, frequencyToRunDeduplicationDataCleanup);
+            if (Timeout.InfiniteTimeSpan == frequencyToRunDeduplicationDataCleanup)
+            {
+                Logger.InfoFormat("Outbox cleanup task is disabled.");
+            }
+
+            cleanupTimer = new Timer(PerformCleanup, null, frequencyToRunDeduplicationDataCleanup, Timeout.InfiniteTimeSpan);
 
             return Task.FromResult(true);
         }
@@ -82,8 +88,20 @@ namespace NServiceBus.Features
             {
                 circuitBreaker.Failure(ex);
             }
+            finally
+            {
+                try
+                {
+                    cleanupTimer.Change(frequencyToRunDeduplicationDataCleanup, Timeout.InfiniteTimeSpan);
+                }
+                catch (ObjectDisposedException)
+                {
+                    // Ignore, can happen during graceful shutdown.
+                }
+            }
         }
 
+        static readonly ILog Logger = LogManager.GetLogger(typeof(OutboxCleaner));
         RepeatedFailuresOverTimeCircuitBreaker circuitBreaker;
 
         // ReSharper disable NotAccessedField.Local
@@ -97,6 +115,5 @@ namespace NServiceBus.Features
 
         static readonly TimeSpan DefaultFrequencyToRunDeduplicationDataCleanup = TimeSpan.FromMinutes(1);
         static readonly TimeSpan DefaultTimeToWaitBeforeTriggeringCriticalError = TimeSpan.FromMinutes(2);
-        static readonly TimeSpan OutboxCleanupStartupDelay = TimeSpan.FromMinutes(1);
     }
 }
