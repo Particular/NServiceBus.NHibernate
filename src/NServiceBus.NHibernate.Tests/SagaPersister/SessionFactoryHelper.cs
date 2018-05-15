@@ -4,7 +4,7 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
     using Features;
     using global::NHibernate.Cfg;
     using global::NHibernate.Impl;
-    using NServiceBus.Sagas;
+    using Sagas;
     using Settings;
 
     public static class SessionFactoryHelper

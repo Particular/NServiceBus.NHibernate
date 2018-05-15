@@ -1,0 +1,31 @@
+﻿
+    
+    if exists (select 1 from sys.objects where object_id = OBJECT_ID(N'[FK236CFC11C9055018]') AND parent_object_id = OBJECT_ID('MySaga_CollectionEntry'))
+alter table MySaga_CollectionEntry  drop constraint FK236CFC11C9055018
+
+    
+    if exists (select * from dbo.sysobjects where id = object_id(N'MySaga_CollectionEntry') and OBJECTPROPERTY(id, N'IsUserTable') = 1) drop table MySaga_CollectionEntry
+    
+    if exists (select * from dbo.sysobjects where id = object_id(N'MySaga') and OBJECTPROPERTY(id, N'IsUserTable') = 1) drop table MySaga
+    
+    create table MySaga_CollectionEntry (
+        Id UNIQUEIDENTIFIER not null,
+       Value DECIMAL(19,5) null,
+       SagaData_id UNIQUEIDENTIFIER null,
+       primary key (Id)
+    )
+    
+    create table MySaga (
+        Id UNIQUEIDENTIFIER not null,
+       Originator NVARCHAR(255) null,
+       OriginalMessageId NVARCHAR(255) null,
+       UniqueId NVARCHAR(255) null unique,
+       primary key (Id)
+    )
+    
+    create index IDX236CFC11C9055018 on MySaga_CollectionEntry (SagaData_id)
+    
+    alter table MySaga_CollectionEntry 
+        add constraint FK236CFC11C9055018 
+        foreign key (SagaData_id) 
+        references MySaga

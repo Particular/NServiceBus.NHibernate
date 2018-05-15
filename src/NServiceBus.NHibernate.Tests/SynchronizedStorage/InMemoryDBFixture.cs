@@ -19,7 +19,7 @@ namespace NServiceBus.NHibernate.Tests.SynchronizedStorage
                 .DataBaseIntegration(x =>
                 {
                     x.Dialect<SQLiteDialect>();
-                    x.ConnectionString = $@"Data Source={Path.GetTempFileName()};Version=3;New=True;";
+                    x.ConnectionString = $"Data Source={Path.GetTempFileName()};Version=3;New=True;";
                 });
 
             var mapper = new ModelMapper();

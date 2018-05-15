@@ -18,7 +18,7 @@ namespace NServiceBus.SagaPersisters.NHibernate
         /// <summary>
         /// Gets the <see cref="LockModes"/> to be used by the framework while retrieving <see cref="Saga"/> data.
         /// </summary>
-        public LockModes RequestedLockMode { get; private set; }
+        public LockModes RequestedLockMode { get; }
 
         /// <summary>
         /// Create a new instance of <see cref="LockModeAttribute"/>.

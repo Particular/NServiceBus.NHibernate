@@ -19,7 +19,7 @@
 {
 
   
-    ..\.\bin\debug\NServiceBus.NHibernate.PerformanceTests.exe $numThreads $numMessages $serializationFormat $transport $mode $messagemode $persistence $concurrency
+    ..\.\bin\debug\net452\NServiceBus.NHibernate.PerformanceTests.exe $numThreads $numMessages $serializationFormat $transport $mode $messagemode $persistence $concurrency
 
 }
 

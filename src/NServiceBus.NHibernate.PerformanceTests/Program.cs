@@ -8,7 +8,7 @@
     using System.Threading.Tasks;
     using System.Transactions;
     using NServiceBus;
-    using NServiceBus.Configuration.AdvanceExtensibility;
+    using NServiceBus.Configuration.AdvancedExtensibility;
     using NServiceBus.Features;
     using NServiceBus.Persistence.NHibernate;
     using Saga;
@@ -49,6 +49,7 @@
             config.UseTransport<MsmqTransport>().Transactions(suppressDTC ? TransportTransactionMode.SendsAtomicWithReceive : TransportTransactionMode.TransactionScope);
             config.LimitMessageProcessingConcurrencyTo(numberOfThreads);
             config.EnableInstallers();
+            config.SendFailedMessagesTo("error");
 
             switch (args[2].ToLower())
             {
@@ -57,7 +58,7 @@
                     break;
 
                 case "json":
-                    config.UseSerialization<JsonSerializer>();
+                    config.UseSerialization<NewtonsoftSerializer>();
                     break;
 
                 default:
@@ -176,7 +177,7 @@
                 {
                     await bus.Send(inputQueue, new StartSagaMessage
                     {
-                        Id = i
+                        Id = i + 1
                     }).ConfigureAwait(false);
                 }
             }
@@ -193,7 +194,7 @@
                {
                    var message = CreateMessage();
                    message.TwoPhaseCommit = twoPhaseCommit;
-                   message.Id = j;
+                   message.Id = j + 1;
 
                    if (createTransaction)
                    {

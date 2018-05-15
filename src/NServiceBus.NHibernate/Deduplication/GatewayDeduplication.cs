@@ -7,7 +7,7 @@
     using Gateway.Deduplication;
     using global::NHibernate;
     using global::NHibernate.Exceptions;
-    using NServiceBus.Extensibility;
+    using Extensibility;
 
     class GatewayDeduplication : IDeduplicateMessages
     {

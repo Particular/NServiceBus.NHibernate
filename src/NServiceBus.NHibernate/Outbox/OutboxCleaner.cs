@@ -4,7 +4,7 @@ namespace NServiceBus.Features
     using System.Configuration;
     using System.Threading;
     using System.Threading.Tasks;
-    using NServiceBus.Logging;
+    using Logging;
 
     class OutboxCleaner : FeatureStartupTask
     {

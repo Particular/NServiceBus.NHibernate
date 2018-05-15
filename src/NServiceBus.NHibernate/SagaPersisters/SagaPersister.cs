@@ -5,9 +5,9 @@ namespace NServiceBus.SagaPersisters.NHibernate
     using System.Threading.Tasks;
     using global::NHibernate;
     using global::NHibernate.Criterion;
-    using NServiceBus.Extensibility;
-    using NServiceBus.Persistence;
-    using NServiceBus.Sagas;
+    using Extensibility;
+    using Persistence;
+    using Sagas;
 
     class SagaPersister : ISagaPersister
     {
@@ -24,7 +24,8 @@ namespace NServiceBus.SagaPersisters.NHibernate
             return Task.FromResult(0);
         }
 
-        public Task<T> Get<T>(Guid sagaId, SynchronizedStorageSession session, ContextBag context) where T : IContainSagaData
+        public Task<T> Get<T>(Guid sagaId, SynchronizedStorageSession session, ContextBag context)
+            where T : class, IContainSagaData
         {
             var result = session.Session().Get<T>(sagaId, GetLockModeForSaga<T>());
             return Task.FromResult(result);

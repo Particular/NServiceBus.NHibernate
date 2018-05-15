@@ -3,27 +3,28 @@
     using System;
     using System.Threading.Tasks;
     using AcceptanceTesting;
-    using Configuration.AdvanceExtensibility;
     using EndpointTemplates;
     using global::NHibernate;
     using global::NHibernate.Mapping.ByCode;
     using global::NHibernate.Mapping.ByCode.Conformist;
-    using NServiceBus.NHibernate.Outbox;
+    using NHibernate.Outbox;
     using NServiceBus.Outbox.NHibernate;
-    using NServiceBus.Settings;
+    using Settings;
     using NUnit.Framework;
-    using ScenarioDescriptors;
 
     public class When_receiving_a_message_with_customized_outbox_record_mapping : NServiceBusAcceptanceTest
     {
         [Test]
-        public Task Should_handle_it()
+        public async Task Should_handle_it()
         {
-            return Scenario.Define<Context>()
+            Requires.OutboxPersistence();
+
+            var result = await Scenario.Define<Context>()
                 .WithEndpoint<NonDtcReceivingEndpoint>(b => b.When(session => session.SendLocal(new PlaceOrder())))
                 .Done(c => c.OrderAckReceived == 1)
-                .Repeat(r => r.For<AllOutboxCapableStorages>())
-                .Run(TimeSpan.FromSeconds(20));
+                .Run();
+
+            Assert.AreEqual(1, result.OrderAckReceived);
         }
 
         class Context : ScenarioContext
@@ -37,7 +38,6 @@
             {
                 EndpointSetup<DefaultServer>(b =>
                 {
-                    b.GetSettings().Set("DisableOutboxTransportCheck", true);
                     b.EnableOutbox();
                     b.UsePersistence<NHibernatePersistence>().UseOutboxRecord<MessageIdOutboxRecord, MessageIdOutboxRecordMapping>();
                 });

@@ -6,7 +6,6 @@
     using AcceptanceTesting;
     using EndpointTemplates;
     using NUnit.Framework;
-    using ScenarioDescriptors;
 
     // When_saga_contains_nested_collection_without_parent_relation - name getting too long for MSMQ
     public class When_saga_w_nested_coll_no_parent_rel : NServiceBusAcceptanceTest
@@ -14,12 +13,12 @@
         [Test]
         public async Task Should_complete()
         {
-            await Scenario.Define<Context>(c => c.Id = Guid.NewGuid())
+            var result = await Scenario.Define<Context>(c => c.Id = Guid.NewGuid())
                 .WithEndpoint<NHNestedCollNoParentRelationEP>(b => b.When((bus, context) => bus.SendLocal(new Message1 { SomeId = context.Id })))
                 .Done(c => c.SagaCompleted)
-                .Repeat(r => r.For(Transports.Default))
-                .Run()
-                .ConfigureAwait(false);
+                .Run();
+
+            Assert.IsTrue(result.SagaCompleted);
         }
 
         public class Context : ScenarioContext

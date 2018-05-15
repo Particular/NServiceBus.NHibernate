@@ -6,9 +6,9 @@
     using global::NHibernate;
     using global::NHibernate.Cfg;
     using global::NHibernate.Tool.hbm2ddl;
-    using NServiceBus.SagaPersisters.NHibernate;
-    using NServiceBus.SagaPersisters.NHibernate.AutoPersistence;
-    using NServiceBus.Sagas;
+    using SagaPersisters.NHibernate;
+    using SagaPersisters.NHibernate.AutoPersistence;
+    using Sagas;
     using NUnit.Framework;
     using Environment = global::NHibernate.Cfg.Environment;
 
@@ -19,7 +19,7 @@
         [SetUp]
         public void SetUp()
         {
-            ConnectionString = $@"Data Source={Path.GetTempFileName()};New=True;";
+            ConnectionString = $"Data Source={Path.GetTempFileName()};New=True;";
 
             var configuration = new Configuration()
                 .AddProperties(new Dictionary<string, string>
@@ -43,13 +43,10 @@
 
             sagaDataTypes.Add(typeof(ContainSagaData));
 
-            var modelMapper = new SagaModelMapper(metaModel, sagaDataTypes);
-
-            configuration.AddMapping(modelMapper.Compile());
-
+            SagaModelMapper.AddMappings(configuration, metaModel, sagaDataTypes);
             SessionFactory = configuration.BuildSessionFactory();
 
-            new SchemaUpdate(configuration).Execute(false, true);
+            new SchemaUpdate(configuration).Execute(true, true);
 
             SagaPersister = new SagaPersister();
         }

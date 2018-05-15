@@ -7,12 +7,12 @@
     using System.Transactions;
     using global::NHibernate;
     using global::NHibernate.Impl;
-    using NServiceBus.Extensibility;
-    using NServiceBus.Logging;
-    using NServiceBus.Outbox;
-    using NServiceBus.Outbox.NHibernate;
-    using NServiceBus.Persistence;
-    using NServiceBus.Transport;
+    using Extensibility;
+    using Logging;
+    using Outbox;
+    using Outbox.NHibernate;
+    using Persistence;
+    using Transport;
 
     class NHibernateSynchronizedStorageAdapter : ISynchronizedStorageAdapter
     {

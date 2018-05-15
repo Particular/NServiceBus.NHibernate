@@ -2,7 +2,7 @@ namespace NServiceBus.Unicast.Subscriptions.NHibernate.Tests
 {
     using System;
     using System.Collections.Generic;
-    using NServiceBus.Unicast.Subscriptions.MessageDrivenSubscriptions;
+    using MessageDrivenSubscriptions;
 
     public interface ISomeInterface
     {

@@ -6,25 +6,20 @@ namespace NServiceBus.SagaPersisters.NHibernate.AutoPersistence
     using System.Linq;
     using System.Reflection;
     using global::NHibernate;
+    using global::NHibernate.Cfg;
     using global::NHibernate.Cfg.MappingSchema;
+    using global::NHibernate.Dialect;
+    using global::NHibernate.Mapping;
     using global::NHibernate.Mapping.ByCode;
     using global::NHibernate.Type;
-    using NServiceBus.Sagas;
+    using Sagas;
 
     class SagaModelMapper
     {
-        readonly Func<Type, string> tableNamingConvention;
-
-        public SagaModelMapper(SagaMetadataCollection allMetadata, IEnumerable<Type> typesToScan)
-            : this(allMetadata, typesToScan, DefaultTableNameConvention)
+        SagaModelMapper(SagaMetadataCollection allMetadata, IEnumerable<Type> typesToScan, Func<Type, string> tableNamingConvention = null)
         {
-
-        }
-
-        public SagaModelMapper(SagaMetadataCollection allMetadata, IEnumerable<Type> typesToScan, Func<Type, string> tableNamingConvention)
-        {
-            this.tableNamingConvention = tableNamingConvention;
-            Mapper = new ConventionModelMapper();
+            this.tableNamingConvention = tableNamingConvention ?? DefaultTableNameConvention;
+            mapper = new ConventionModelMapper();
 
             this.typesToScan = typesToScan.ToList();
 
@@ -35,26 +30,48 @@ namespace NServiceBus.SagaPersisters.NHibernate.AutoPersistence
 
             PopulateTypesThatShouldBeAutoMapped();
 
-            Mapper.IsTablePerClass((type, b) => false);
-            Mapper.IsTablePerConcreteClass((type, b) => sagaEntities.Contains(type));
-            Mapper.IsTablePerClassHierarchy((type, b) => false);
-            Mapper.IsEntity((type, mapped) => entityTypes.Contains(type));
-            Mapper.IsArray((info, b) => false);
-            Mapper.IsBag((info, b) =>
+            mapper.IsTablePerClass((type, b) => false);
+            mapper.IsTablePerConcreteClass((type, b) => sagaEntities.Contains(type));
+            mapper.IsTablePerClassHierarchy((type, b) => false);
+            mapper.IsEntity((type, mapped) => entityTypes.Contains(type));
+            mapper.IsArray((info, b) => false);
+            mapper.IsBag((info, b) =>
             {
                 var memberType = info.GetPropertyOrFieldType();
                 return typeof(IEnumerable).IsAssignableFrom(memberType) &&
                        !(memberType == typeof(string) || memberType == typeof(byte[]) || memberType.IsArray);
             });
-            Mapper.IsPersistentProperty((info, b) => !HasAttribute<RowVersionAttribute>(info));
-            Mapper.BeforeMapClass += ApplyClassConvention;
-            Mapper.BeforeMapUnionSubclass += ApplySubClassConvention;
-            Mapper.BeforeMapProperty += ApplyPropertyConvention;
-            Mapper.BeforeMapBag += ApplyBagConvention;
-            Mapper.BeforeMapManyToOne += ApplyManyToOneConvention;
+            mapper.IsPersistentProperty((info, b) => !HasAttribute<RowVersionAttribute>(info));
+            mapper.BeforeMapClass += ApplyClassConvention;
+            mapper.BeforeMapUnionSubclass += ApplySubClassConvention;
+            mapper.BeforeMapProperty += ApplyPropertyConvention;
+            mapper.BeforeMapBag += ApplyBagConvention;
+            mapper.BeforeMapManyToOne += ApplyManyToOneConvention;
         }
 
-        public ConventionModelMapper Mapper { get; }
+        public static void AddMappings(Configuration configuration, SagaMetadataCollection allSagaMetadata, IEnumerable<Type> types, Func<Type, string> tableNamingConvention = null)
+        {
+            var modelMapper = new SagaModelMapper(allSagaMetadata, types, tableNamingConvention);
+            configuration.AddMapping(modelMapper.Compile());
+            configuration.BuildMappings();
+            var mappings = configuration.CreateMappings(Dialect.GetDialect(configuration.Properties));
+            foreach (var type in modelMapper.childTables)
+            {
+                var table = mappings.GetClass(type.FullName)?.Table;
+                if (table == null)
+                {
+                    continue;
+                }
+                foreach (var foreignKey in table.ForeignKeyIterator)
+                {
+                    var idx = new Index();
+                    idx.AddColumns(foreignKey.ColumnIterator);
+                    idx.Name = "IDX" + foreignKey.Name.Substring(2);
+                    idx.Table = table;
+                    table.AddIndex(idx);
+                }
+            }
+        }
 
         void ApplyClassConvention(IModelInspector mi, Type type, IClassAttributesMapper map)
         {
@@ -196,6 +213,7 @@ namespace NServiceBus.SagaPersisters.NHibernate.AutoPersistence
 
             var bagType = type.LocalMember.GetPropertyOrFieldType().DetermineCollectionElementType();
             var parentType = type.LocalMember.DeclaringType;
+            childTables.Add(bagType);
 
             if (bagType.HasPublicPropertyOf(parentType))
             {
@@ -203,14 +221,14 @@ namespace NServiceBus.SagaPersisters.NHibernate.AutoPersistence
             }
         }
 
-        void ApplyManyToOneConvention(IModelInspector mi, PropertyPath type, IManyToOneMapper map)
+        static void ApplyManyToOneConvention(IModelInspector mi, PropertyPath type, IManyToOneMapper map)
         {
             map.Column(type.LocalMember.Name + "_id");
         }
 
-        public HbmMapping Compile()
+        HbmMapping Compile()
         {
-            var hbmMapping = Mapper.CompileMappingFor(entityTypes);
+            var hbmMapping = mapper.CompileMappingFor(entityTypes);
 
             ApplyOptimisticLockingOnMapping(hbmMapping);
 
@@ -270,7 +288,7 @@ namespace NServiceBus.SagaPersisters.NHibernate.AutoPersistence
 
             if (rootEntity == typeof(object))
             {
-                return;//skip object as that will result in mapping all its derivatives
+                return; //skip object as that will result in mapping all its derivatives
             }
             entityTypes.Add(rootEntity);
 
@@ -295,7 +313,7 @@ namespace NServiceBus.SagaPersisters.NHibernate.AutoPersistence
 
                 if (rootEntity.BaseType != typeof(object) && HasAttribute<RowVersionAttribute>(propertyInfo))
                 {
-                    throw new MappingException(string.Format("RowVersionAttribute is not supported on derived classes, please remove RowVersionAttribute from '{0}' or derive directly from IContainSagaData", rootEntity));
+                    throw new MappingException($"RowVersionAttribute is not supported on derived classes, please remove RowVersionAttribute from '{rootEntity}' or derive directly from IContainSagaData");
                 }
             }
 
@@ -326,9 +344,12 @@ namespace NServiceBus.SagaPersisters.NHibernate.AutoPersistence
             return attributes.Any();
         }
 
-        List<Type> entityTypes = new List<Type>();
-        readonly List<Type> sagaEntities;
-        readonly List<Type> typesToScan;
-        readonly SagaMetadataCollection sagaMetaModel;
+        List<Type> sagaEntities;
+        SagaMetadataCollection sagaMetaModel;
+        Func<Type, string> tableNamingConvention;
+        List<Type> typesToScan;
+        List<Type> childTables = new List<Type>();
+		List<Type> entityTypes = new List<Type>();
+        ConventionModelMapper mapper;
     }
 }

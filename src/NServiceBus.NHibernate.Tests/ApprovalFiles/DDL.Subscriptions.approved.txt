@@ -1,0 +1,14 @@
+﻿
+    
+    if exists (select * from dbo.sysobjects where id = object_id(N'Subscription') and OBJECTPROPERTY(id, N'IsUserTable') = 1) drop table Subscription
+    
+    create table Subscription (
+        SubscriberEndpoint VARCHAR(450) not null,
+       MessageType VARCHAR(450) not null,
+       LogicalEndpoint VARCHAR(450) null,
+       Version VARCHAR(450) null,
+       TypeName VARCHAR(450) null,
+       primary key (SubscriberEndpoint, MessageType)
+    )
+    
+    create index Subscription_TypeNameIdx on Subscription (TypeName)

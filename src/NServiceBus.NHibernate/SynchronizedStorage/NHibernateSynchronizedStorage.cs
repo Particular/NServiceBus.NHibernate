@@ -2,8 +2,8 @@
 {
     using System.Threading.Tasks;
     using global::NHibernate;
-    using NServiceBus.Extensibility;
-    using NServiceBus.Persistence;
+    using Extensibility;
+    using Persistence;
 
     class NHibernateSynchronizedStorage : ISynchronizedStorage
     {

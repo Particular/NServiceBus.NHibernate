@@ -6,8 +6,8 @@ namespace NServiceBus.Unicast.Subscriptions.NHibernate
     using System.Linq;
     using System.Threading.Tasks;
     using global::NHibernate;
-    using NServiceBus.Extensibility;
-    using NServiceBus.Unicast.Subscriptions.MessageDrivenSubscriptions;
+    using Extensibility;
+    using MessageDrivenSubscriptions;
 
     class CachedSubscriptionPersister : SubscriptionPersister
     {
@@ -19,16 +19,14 @@ namespace NServiceBus.Unicast.Subscriptions.NHibernate
 
         public override Task Subscribe(Subscriber subscriber, MessageType messageType, ContextBag context)
         {
-            base.Subscribe(subscriber, messageType, context);
             cache.Clear();
-            return Task.FromResult(0);
+            return base.Subscribe(subscriber, messageType, context);
         }
 
         public override Task Unsubscribe(Subscriber address, MessageType messageType, ContextBag context)
         {
-            base.Unsubscribe(address, messageType, context);
             cache.Clear();
-            return Task.FromResult(0);
+            return base.Unsubscribe(address, messageType, context);
         }
 
         public override async Task<IEnumerable<Subscriber>> GetSubscriberAddressesForMessage(IEnumerable<MessageType> messageTypes, ContextBag context)
