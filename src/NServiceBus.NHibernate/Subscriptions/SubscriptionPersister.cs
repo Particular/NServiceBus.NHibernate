@@ -130,8 +130,7 @@ namespace NServiceBus.Unicast.Subscriptions.NHibernate
             {
                 var v2XSubscriptions = await session.QueryOver<Subscription>()
                     .Where(s => s.TypeName == null)
-                    .ListAsync()
-                    .ConfigureAwait(false);
+                    .ListAsync().ConfigureAwait(false);
 
                 if (v2XSubscriptions.Count == 0)
                 {
