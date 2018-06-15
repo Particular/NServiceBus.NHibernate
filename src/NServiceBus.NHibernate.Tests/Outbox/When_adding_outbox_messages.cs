@@ -187,7 +187,7 @@ namespace NServiceBus.NHibernate.Tests.Outbox
 
             using (var session = sessionFactory.OpenSession())
             {
-                var result = session.QueryOver<IOutboxRecord>().List();
+                var result = await session.QueryOver<IOutboxRecord>().ListAsync();
 
                 Assert.AreEqual(1, result.Count);
                 Assert.AreEqual("TestEndpoint/NotDispatched", result[0].MessageId);

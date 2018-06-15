@@ -45,9 +45,10 @@
                 {
                     //Explicitly using ICriteria instead of QueryOver for performance reasons.
                     //It seems QueryOver uses quite a bit reflection and that takes longer.
-                    result = session.CreateCriteria<TEntity>()
+                    result = await session.CreateCriteria<TEntity>()
                         .Add(Restrictions.In(nameof(IOutboxRecord.MessageId), possibleIds))
-                        .UniqueResult<TEntity>();
+                        .UniqueResultAsync<TEntity>()
+                        .ConfigureAwait(false);
 
                     await tx.CommitAsync()
                         .ConfigureAwait(false);

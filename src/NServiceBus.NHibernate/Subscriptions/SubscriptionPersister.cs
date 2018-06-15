@@ -64,11 +64,11 @@ namespace NServiceBus.Unicast.Subscriptions.NHibernate
             using (var tx = session.BeginTransaction(IsolationLevel.ReadCommitted))
             {
                 var transportAddress = address.TransportAddress;
-                var subscriptions = session.QueryOver<Subscription>()
+                var subscriptions = await session.QueryOver<Subscription>()
                     .Where(
                         s => s.TypeName.IsIn(messageTypes.Select(mt => mt.TypeName).ToList()) &&
                              s.SubscriberEndpoint == transportAddress)
-                    .List();
+                    .ListAsync().ConfigureAwait(false);
 
                 foreach (var subscription in subscriptions.Where(s => messageTypes.Contains(new MessageType(s.TypeName, s.Version))))
                 {
@@ -107,9 +107,10 @@ namespace NServiceBus.Unicast.Subscriptions.NHibernate
             using (var session = sessionFactory.OpenStatelessSession())
             using (var tx = session.BeginTransaction(IsolationLevel.ReadCommitted))
             {
-                var tmp = session.QueryOver<Subscription>()
+                var tmp = await session.QueryOver<Subscription>()
                     .Where(s => s.TypeName.IsIn(messageTypes.Select(mt => mt.TypeName).ToList()))
-                    .List();
+                    .ListAsync()
+                    .ConfigureAwait(false);
 
                 await tx.CommitAsync()
                     .ConfigureAwait(false);
@@ -127,9 +128,11 @@ namespace NServiceBus.Unicast.Subscriptions.NHibernate
             using (var session = sessionFactory.OpenStatelessSession())
             using (var tx = session.BeginTransaction(IsolationLevel.ReadCommitted))
             {
-                var v2XSubscriptions = session.QueryOver<Subscription>()
+                var v2XSubscriptions = await session.QueryOver<Subscription>()
                     .Where(s => s.TypeName == null)
-                    .List();
+                    .ListAsync()
+                    .ConfigureAwait(false);
+
                 if (v2XSubscriptions.Count == 0)
                 {
                     return;
@@ -165,6 +168,5 @@ namespace NServiceBus.Unicast.Subscriptions.NHibernate
                 return obj.SubscriberEndpoint.GetHashCode();
             }
         }
-
     }
 }

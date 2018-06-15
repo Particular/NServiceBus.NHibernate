@@ -22,7 +22,7 @@ namespace NServiceBus.TimeoutPersisters.NHibernate
         TimeSpan timeoutsCleanupExecutionInterval;
         string EndpointName;
 
-		DateTime lastTimeoutsCleanupExecution = DateTime.MinValue;
+        DateTime lastTimeoutsCleanupExecution = DateTime.MinValue;
 
         public TimeoutPersister(string endpointName,
             ISessionFactory sessionFactory,
@@ -54,12 +54,14 @@ namespace NServiceBus.TimeoutPersisters.NHibernate
             using (var session = SessionFactory.OpenStatelessSession())
             using (var tx = session.BeginTransaction(IsolationLevel.ReadCommitted))
             {
-                var results = session.QueryOver<TimeoutEntity>()
+                var list = await session.QueryOver<TimeoutEntity>()
                     .Where(x => x.Endpoint == EndpointName)
                     .And(x => x.Time > startSlice && x.Time <= now)
                     .OrderBy(x => x.Time).Asc
                     .Select(x => x.Id, x => x.Time)
-                    .List<object[]>()
+                    .ListAsync<object[]>().ConfigureAwait(false);
+
+                var results = list
                     .Select(p =>
                     {
                         var id = (Guid)p[0];
@@ -69,14 +71,14 @@ namespace NServiceBus.TimeoutPersisters.NHibernate
                     .ToArray();
 
                 //Retrieve next time we need to run query
-                var startOfNextChunk = session.QueryOver<TimeoutEntity>()
+                var startOfNextChunk = await session.QueryOver<TimeoutEntity>()
                     .Where(x => x.Endpoint == EndpointName && x.Time > now)
                     .OrderBy(x => x.Time).Asc
-                        .Select(x => x.Time)
+                    .Select(x => x.Time)
                     .Take(1)
-                        .SingleOrDefault<DateTime?>();
+                    .SingleOrDefaultAsync<DateTime?>().ConfigureAwait(false);
 
-                    var nextTimeToRunQuery = startOfNextChunk ?? DateTime.UtcNow.AddMinutes(10);
+                var nextTimeToRunQuery = startOfNextChunk ?? DateTime.UtcNow.AddMinutes(10);
 
                 await tx.CommitAsync()
                     .ConfigureAwait(false);
@@ -98,7 +100,7 @@ namespace NServiceBus.TimeoutPersisters.NHibernate
                     Endpoint = timeout.OwningTimeoutManager
                 };
 
-                var timeoutId = (Guid) await session.Session().SaveAsync(timeoutEntity)
+                var timeoutId = (Guid)await session.Session().SaveAsync(timeoutEntity)
                     .ConfigureAwait(false);
                 await session.CompleteAsync()
                     .ConfigureAwait(false);
@@ -134,9 +136,10 @@ namespace NServiceBus.TimeoutPersisters.NHibernate
             using (var tx = session.BeginTransaction(IsolationLevel.ReadCommitted))
             {
                 var queryString = $"delete {typeof(TimeoutEntity)} where SagaId = :sagaid";
-                session.CreateQuery(queryString)
+                await session.CreateQuery(queryString)
                     .SetParameter("sagaid", sagaId)
-                    .ExecuteUpdate();
+                    .ExecuteUpdateAsync()
+                    .ConfigureAwait(false);
 
                 await tx.CommitAsync()
                     .ConfigureAwait(false);
@@ -148,7 +151,7 @@ namespace NServiceBus.TimeoutPersisters.NHibernate
             using (var session = await OpenSession(context).ConfigureAwait(false))
             {
                 var id = Guid.Parse(timeoutId);
-                var te = session.Session().Get<TimeoutEntity>(id, LockMode.Upgrade);
+                var te = await session.Session().GetAsync<TimeoutEntity>(id, LockMode.Upgrade).ConfigureAwait(false);
 
                 return MapToTimeoutData(te);
             }
