@@ -81,7 +81,7 @@ namespace NServiceBus.TimeoutPersisters.NHibernate.Installer
                 catch (Exception sqlException)
                 {
                     exceptions.Add(sqlException);
-                    log.Error("could not get database metadata", sqlException);
+                    log.Error(sqlException, "could not get database metadata");
                     throw;
                 }
 
@@ -107,7 +107,7 @@ namespace NServiceBus.TimeoutPersisters.NHibernate.Installer
                     catch (Exception e)
                     {
                         exceptions.Add(e);
-                        log.Error("Unsuccessful: " + updateSqlStatement, e);
+                        log.Error(e, "Unsuccessful: " + updateSqlStatement);
                     }
                 }
 
@@ -116,7 +116,7 @@ namespace NServiceBus.TimeoutPersisters.NHibernate.Installer
             catch (Exception e)
             {
                 exceptions.Add(e);
-                log.Error("could not complete schema update", e);
+                log.Error(e, "could not complete schema update");
             }
             finally
             {
@@ -128,7 +128,7 @@ namespace NServiceBus.TimeoutPersisters.NHibernate.Installer
                 catch (Exception e)
                 {
                     exceptions.Add(e);
-                    log.Error("Error closing connection", e);
+                    log.Error(e, "Error closing connection");
                 }
             }
         }
@@ -139,6 +139,6 @@ namespace NServiceBus.TimeoutPersisters.NHibernate.Installer
         List<Exception> exceptions;
         IFormatter formatter;
         SchemaFixUpHelper fixUpHelper;
-        static IInternalLogger log = LoggerProvider.LoggerFor(typeof(OptimizedSchemaUpdate));
+        static INHibernateLogger log = NHibernateLogger.For(typeof(OptimizedSchemaUpdate));
     }
 }
