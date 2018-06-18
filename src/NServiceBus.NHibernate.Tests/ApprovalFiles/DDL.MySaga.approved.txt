@@ -1,6 +1,6 @@
 ﻿
     
-    if exists (select 1 from sys.objects where object_id = OBJECT_ID(N'[FK236CFC11C9055018]') AND parent_object_id = OBJECT_ID('MySaga_CollectionEntry'))
+    if exists (select 1 from sys.objects where object_id = OBJECT_ID(N'[FK236CFC11C9055018]') and parent_object_id = OBJECT_ID(N'MySaga_CollectionEntry'))
 alter table MySaga_CollectionEntry  drop constraint FK236CFC11C9055018
 
     
