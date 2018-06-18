@@ -126,9 +126,9 @@
 
             public string ColumnNameAt(int position)
             {
-                var columnName = from row in indexColumns.AsEnumerable()
-                                 where position == (int)row["ordinal_position"]
-                                 select row["column_name"].ToString();
+                var columnName = indexColumns.AsEnumerable()
+                    .Where(row => position == (int)row["ordinal_position"])
+                    .Select(row => row["column_name"].ToString());
 
                 return columnName.FirstOrDefault();
             }
