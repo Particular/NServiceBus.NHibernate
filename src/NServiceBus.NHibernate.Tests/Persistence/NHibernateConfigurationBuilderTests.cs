@@ -4,10 +4,13 @@ namespace NServiceBus.Persistence.NHibernate.Tests
     using System.Collections.Generic;
     using System.Collections.Specialized;
     using System.Configuration;
-    using System.Reflection;
     using NUnit.Framework;
     using Settings;
 
+#if NET461
+    using System.Reflection;
+#endif
+    
     [TestFixture]
     public class NHibernateConfigurationBuilderTests
     {
@@ -128,6 +131,9 @@ namespace NServiceBus.Persistence.NHibernate.Tests
             CollectionAssert.IsSubsetOf(expected, builder.Build().Configuration.Properties);
         }
 
+#if NET461
+
+
         [Test]
         public void Should_read_settings_from_hibernate_configuration_config_section_if_available()
         {
@@ -216,6 +222,7 @@ namespace NServiceBus.Persistence.NHibernate.Tests
 
             CollectionAssert.IsSubsetOf(expected, result);
         }
+#endif
 
         public class Worker2 : MarshalByRefObject
         {
