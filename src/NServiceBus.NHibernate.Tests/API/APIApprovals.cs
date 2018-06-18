@@ -12,9 +12,9 @@
 #if NET461
         [Test]
         [MethodImpl(MethodImplOptions.NoInlining)]
-        public void ApproveNServiceBus__NET452()
+        public void Approve__NET461()
         {
-            var publicApi = Filter(ApiGenerator.GeneratePublicApi(typeof(Endpoint).Assembly));
+            var publicApi = Filter(ApiGenerator.GeneratePublicApi(typeof(NHibernatePersistence).Assembly));
             TestApprover.Verify(publicApi);
         }
 #endif
@@ -22,14 +22,14 @@
 #if NETCOREAPP2_0
         [Test]
         [MethodImpl(MethodImplOptions.NoInlining)]
-        public void ApproveNServiceBus__NETSTANDARD2_0()
+        public void Approve__NETSTANDARD2_0()
         {
             var publicApi = Filter(ApiGenerator.GeneratePublicApi(typeof(Endpoint).Assembly));
             TestApprover.Verify(publicApi);
         }
 #endif
 
-        string Filter(string text)
+        static string Filter(string text)
         {
             return string.Join(Environment.NewLine, text.Split(new[]
                 {
