@@ -10,11 +10,8 @@
     <Description>NHibernate integration for NServiceBus</Description>
   </PropertyGroup>
 
-  <ItemGroup Condition="'$(TargetFramework)' == 'net461'">
-    <PackageReference Include="Particular.CodeRules" Version="0.2.0" PrivateAssets="All" />
-  </ItemGroup>
-
   <ItemGroup>
+    <PackageReference Include="Particular.CodeRules" Version="0.2.0" PrivateAssets="All" />
     <PackageReference Include="Particular.Packaging" Version="0.1.0" PrivateAssets="All" />
     <PackageReference Include="Fody" Version="3.0.4" PrivateAssets="All" />
     <PackageReference Include="Janitor.Fody" Version="1.6.1" PrivateAssets="All" />
