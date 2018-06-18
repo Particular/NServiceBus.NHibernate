@@ -21,6 +21,7 @@
     <PackageReference Include="NUnit3TestAdapter" Version="3.10.0" />
     <PackageReference Include="PublicApiGenerator" Version="7.0.0" />
     <PackageReference Include="System.Data.SQLite" Version="1.0.105.2" />
+    <PackageReference Include="System.Data.SqlClient" Version="4.5.0" />
   </ItemGroup>
 
   <ItemGroup>
