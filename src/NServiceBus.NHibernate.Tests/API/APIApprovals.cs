@@ -9,7 +9,7 @@
     [TestFixture]
     public class APIApprovals
     {
-#if NET452
+#if NET461
         [Test]
         [MethodImpl(MethodImplOptions.NoInlining)]
         public void ApproveNServiceBus__NET452()
