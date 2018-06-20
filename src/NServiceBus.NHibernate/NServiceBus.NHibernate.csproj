@@ -14,7 +14,7 @@
     <PackageReference Include="Fody" Version="3.0.4" PrivateAssets="All" />
     <PackageReference Include="Janitor.Fody" Version="1.6.1" PrivateAssets="All" />
     <PackageReference Include="Obsolete.Fody" Version="4.4.0" PrivateAssets="All" />
-    <PackageReference Include="NServiceBus" Version="[7.0.0, 8.0.0)" />
+    <PackageReference Include="NServiceBus" Version="[7.0.1, 8.0.0)" />
     <PackageReference Include="NHibernate" version="[5.1.0, 6.0.0)" />
   </ItemGroup>
 
