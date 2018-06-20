@@ -9,25 +9,13 @@
     [TestFixture]
     public class APIApprovals
     {
-#if NET461
         [Test]
         [MethodImpl(MethodImplOptions.NoInlining)]
-        public void Approve__NET461()
+        public void Approve()
         {
-            var publicApi = Filter(ApiGenerator.GeneratePublicApi(typeof(NHibernatePersistence).Assembly));
+            var publicApi = Filter(ApiGenerator.GeneratePublicApi(typeof(NHibernatePersistence).Assembly, excludeAttributes: new[] { "System.Runtime.Versioning.TargetFrameworkAttribute" }));
             TestApprover.Verify(publicApi);
         }
-#endif
-
-#if NETCOREAPP2_0
-        [Test]
-        [MethodImpl(MethodImplOptions.NoInlining)]
-        public void Approve__NETSTANDARD2_0()
-        {
-            var publicApi = Filter(ApiGenerator.GeneratePublicApi(typeof(Endpoint).Assembly));
-            TestApprover.Verify(publicApi);
-        }
-#endif
 
         static string Filter(string text)
         {
