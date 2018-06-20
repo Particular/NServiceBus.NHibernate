@@ -1,13 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net461</TargetFrameworks>
-    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+    <TargetFramework>net461</TargetFramework>
     <RootNamespace>NServiceBus.NHibernate.AcceptanceTests.Oracle</RootNamespace>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
   </PropertyGroup>
-  <ItemGroup>
-    <Compile Include="..\NServiceBus.NHibernate.AcceptanceTests\NServiceBusAcceptanceTest.cs" Link="NServiceBusAcceptanceTest.cs" />
-  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\NServiceBus.NHibernate\NServiceBus.NHibernate.csproj" />
@@ -15,10 +12,14 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.3.0" />
-    <PackageReference Include="NServiceBus.AcceptanceTests.Sources" Version="7.0.0" />
+    <PackageReference Include="NServiceBus.AcceptanceTests.Sources" Version="7.0.1" />
     <PackageReference Include="NUnit" Version="3.10.1" />
     <PackageReference Include="NUnit3TestAdapter" Version="3.10.0" />
     <PackageReference Include="Oracle.ManagedDataAccess" Version="12.1.2400" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="..\NServiceBus.NHibernate.AcceptanceTests\NServiceBusAcceptanceTest.cs" Link="NServiceBusAcceptanceTest.cs" />
   </ItemGroup>
 
 </Project>

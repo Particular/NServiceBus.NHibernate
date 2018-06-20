@@ -2,12 +2,9 @@
 
   <PropertyGroup>
     <TargetFrameworks>net461;netcoreapp2.0</TargetFrameworks>
-    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <RootNamespace>NServiceBus.NHibernate.AcceptanceTests.SqlTransport</RootNamespace>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
   </PropertyGroup>
-  <ItemGroup>
-    <Compile Include="..\NServiceBus.NHibernate.AcceptanceTests\NServiceBusAcceptanceTest.cs" Link="NServiceBusAcceptanceTest.cs" />
-  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\NServiceBus.NHibernate\NServiceBus.NHibernate.csproj" />
@@ -15,12 +12,14 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.3.0" />
-    <PackageReference Include="NServiceBus" Version="[7.0.0, 8.0.0)" />
-    <PackageReference Include="NServiceBus.SqlServer" Version="[4.0.0, 5.0.0)" />
-    <PackageReference Include="NServiceBus.AcceptanceTesting" Version="[7.0.0, 8.0.0)" />
-    <PackageReference Include="NServiceBus.AcceptanceTests.Sources" Version="[7.0.0, 8.0.0)" />
+    <PackageReference Include="NServiceBus.SqlServer" Version="4.0.0" />
+    <PackageReference Include="NServiceBus.AcceptanceTests.Sources" Version="7.0.1" />
     <PackageReference Include="NUnit" Version="3.10.1" />
     <PackageReference Include="NUnit3TestAdapter" Version="3.10.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="..\NServiceBus.NHibernate.AcceptanceTests\NServiceBusAcceptanceTest.cs" Link="NServiceBusAcceptanceTest.cs" />
   </ItemGroup>
 
 </Project>
