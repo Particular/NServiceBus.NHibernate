@@ -2,8 +2,6 @@
 
   <PropertyGroup>
     <TargetFrameworks>net461;netstandard2.0</TargetFrameworks>
-    <RootNamespace>NServiceBus.NHibernate</RootNamespace>
-    <AssemblyName>NServiceBus.NHibernate</AssemblyName>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\NServiceBus.snk</AssemblyOriginatorKeyFile>
     <OutputPath>..\..\binaries\</OutputPath>
@@ -18,11 +16,11 @@
     <PackageReference Include="Obsolete.Fody" Version="4.4.0" PrivateAssets="All" />
     <PackageReference Include="NServiceBus" Version="[7.0.0, 8.0.0)" />
     <PackageReference Include="NHibernate" version="[5.1.0, 6.0.0)" />
-    <PackageReference Include="Iesi.Collections" version="[4.0.4, 5.0.0)" /> 
+    <PackageReference Include="Iesi.Collections" version="[4.0.4, 5.0.0)" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="SourceLink.Create.GitHub" Version="2.6.0" PrivateAssets="All" /> 
+    <PackageReference Include="SourceLink.Create.GitHub" Version="2.6.0" PrivateAssets="All" />
     <DotNetCliToolReference Include="dotnet-sourcelink-git" Version="2.5.0" />
   </ItemGroup>
 
