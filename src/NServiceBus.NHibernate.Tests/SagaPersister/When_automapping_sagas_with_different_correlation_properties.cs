@@ -41,7 +41,7 @@
 
                 try
                 {
-                    transaction.Commit();
+                    await transaction.CommitAsync().ConfigureAwait(false);
                 }
                 catch (Exception)
                 {
@@ -71,7 +71,7 @@
 
                 try
                 {
-                    transaction.Commit();
+                    await transaction.CommitAsync().ConfigureAwait(false);
                 }
                 catch (Exception)
                 {

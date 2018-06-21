@@ -41,7 +41,7 @@
             }
             if (transaction != null)
             {
-                transaction.Commit();
+                await transaction.CommitAsync().ConfigureAwait(false);
                 transaction.Dispose();
                 transaction = null;
             }

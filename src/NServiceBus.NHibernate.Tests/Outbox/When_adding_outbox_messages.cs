@@ -79,7 +79,7 @@ namespace NServiceBus.NHibernate.Tests.Outbox
                     };
 
                     await persister.Store(new OutboxMessage(messageId, transportOperations), new NHibernateOutboxTransaction(session, transaction), new ContextBag());
-                    transaction.Commit();
+                    await transaction.CommitAsync();
                 }
             }
 
@@ -98,7 +98,7 @@ namespace NServiceBus.NHibernate.Tests.Outbox
             using (var transaction = session.BeginTransaction())
             {
                 await persister.Store(new OutboxMessage("MySpecialId", new TransportOperation[0]), new NHibernateOutboxTransaction(session, transaction), new ContextBag());
-                transaction.Commit();
+                await transaction.CommitAsync();
             }
             try
             {
@@ -106,7 +106,7 @@ namespace NServiceBus.NHibernate.Tests.Outbox
                 using (var transaction = session.BeginTransaction())
                 {
                     await persister.Store(new OutboxMessage("MySpecialId", new TransportOperation[0]), new NHibernateOutboxTransaction(session, transaction), new ContextBag());
-                    transaction.Commit();
+                    await transaction.CommitAsync();
                 }
             }
             catch (Exception)
@@ -127,7 +127,7 @@ namespace NServiceBus.NHibernate.Tests.Outbox
                 {
                         new TransportOperation(id, new Dictionary<string, string>(), new byte[1024*5], new Dictionary<string, string>()),
                     }), new NHibernateOutboxTransaction(session, transaction), new ContextBag());
-                transaction.Commit();
+                await transaction.CommitAsync();
             }
 
             var result = await persister.Get(id, new ContextBag());
@@ -149,7 +149,7 @@ namespace NServiceBus.NHibernate.Tests.Outbox
                     new TransportOperation(id, new Dictionary<string, string>(), new byte[1024*5], new Dictionary<string, string>()),
                 }), new NHibernateOutboxTransaction(session, transaction), new ContextBag());
 
-                transaction.Commit();
+                await transaction.CommitAsync();
             }
 
             await persister.SetAsDispatched(id, new ContextBag());
@@ -178,7 +178,7 @@ namespace NServiceBus.NHibernate.Tests.Outbox
                         new TransportOperation(id, new Dictionary<string, string>(), new byte[1024*5], new Dictionary<string, string>()),
                     }), new NHibernateOutboxTransaction(session, transaction), new ContextBag());
 
-                transaction.Commit();
+                await transaction.CommitAsync();
             }
 
             await persister.SetAsDispatched(id, new ContextBag());
