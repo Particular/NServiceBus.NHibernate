@@ -117,7 +117,7 @@
             return Task.FromResult(result);
         }
 
-        public void RemoveEntriesOlderThan(DateTime dateTime)
+        public async Task RemoveEntriesOlderThan(DateTime dateTime)
         {
             using (new TransactionScope(TransactionScopeOption.Suppress, TransactionScopeAsyncFlowOption.Enabled))
             using (var session = sessionFactory.OpenStatelessSession())
@@ -125,11 +125,11 @@
             {
                 var queryString = $"delete from {typeof(TEntity).Name} where Dispatched = true And DispatchedAt < :date";
 
-                session.CreateQuery(queryString)
+                await session.CreateQuery(queryString)
                     .SetDateTime("date", dateTime)
-                    .ExecuteUpdate();
+                    .ExecuteUpdateAsync().ConfigureAwait(false);
 
-                tx.Commit();
+                await tx.CommitAsync().ConfigureAwait(false);
             }
         }
 

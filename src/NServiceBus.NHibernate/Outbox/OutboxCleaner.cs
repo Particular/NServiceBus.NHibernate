@@ -60,43 +60,33 @@ namespace NServiceBus.Features
                 Logger.InfoFormat("Outbox cleanup task is disabled.");
             }
 
-            cleanupTimer = new Timer(PerformCleanup, null, frequencyToRunDeduplicationDataCleanup, Timeout.InfiniteTimeSpan);
+            cancellationTokenSource = new CancellationTokenSource();
 
-            return Task.FromResult(true);
+            cleanup = Task.Run(() => PerformCleanup(cancellationTokenSource.Token), CancellationToken.None);
+
+            return Task.CompletedTask;
         }
 
         protected override Task OnStop(IMessageSession busSession)
         {
-            using (var waitHandle = new ManualResetEvent(false))
-            {
-                cleanupTimer.Dispose(waitHandle);
-
-                waitHandle.WaitOne();
-            }
-
-            return Task.FromResult(true);
+            cancellationTokenSource.Cancel();
+            return cleanup;
         }
 
-        void PerformCleanup(object state)
+        async Task PerformCleanup(CancellationToken ct)
         {
-            try
-            {
-                outboxPersister.RemoveEntriesOlderThan(DateTime.UtcNow - timeToKeepDeduplicationData);
-                circuitBreaker.Success();
-            }
-            catch (Exception ex)
-            {
-                circuitBreaker.Failure(ex);
-            }
-            finally
+            while (ct.IsCancellationRequested == false)
             {
                 try
                 {
-                    cleanupTimer.Change(frequencyToRunDeduplicationDataCleanup, Timeout.InfiniteTimeSpan);
+                    await outboxPersister.RemoveEntriesOlderThan(DateTime.UtcNow - timeToKeepDeduplicationData).ConfigureAwait(false);
+                    circuitBreaker.Success();
+
+                    await Task.Delay(frequencyToRunDeduplicationDataCleanup, ct).ConfigureAwait(false);
                 }
-                catch (ObjectDisposedException)
+                catch (Exception ex)
                 {
-                    // Ignore, can happen during graceful shutdown.
+                    circuitBreaker.Failure(ex);
                 }
             }
         }
@@ -104,9 +94,9 @@ namespace NServiceBus.Features
         static readonly ILog Logger = LogManager.GetLogger(typeof(OutboxCleaner));
         RepeatedFailuresOverTimeCircuitBreaker circuitBreaker;
 
-        // ReSharper disable NotAccessedField.Local
-        Timer cleanupTimer;
-        // ReSharper restore NotAccessedField.Local
+        Task cleanup;
+        CancellationTokenSource cancellationTokenSource;
+
         TimeSpan timeToKeepDeduplicationData;
         CriticalError criticalError;
         TimeSpan frequencyToRunDeduplicationDataCleanup;

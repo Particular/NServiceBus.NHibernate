@@ -183,7 +183,7 @@ namespace NServiceBus.NHibernate.Tests.Outbox
 
             await persister.SetAsDispatched(id, new ContextBag());
 
-            persister.RemoveEntriesOlderThan(DateTime.UtcNow.AddMinutes(1));
+            await persister.RemoveEntriesOlderThan(DateTime.UtcNow.AddMinutes(1));
 
             using (var session = sessionFactory.OpenSession())
             {
