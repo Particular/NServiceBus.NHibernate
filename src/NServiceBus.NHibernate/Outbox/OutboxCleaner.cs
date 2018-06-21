@@ -81,12 +81,14 @@ namespace NServiceBus.Features
                 {
                     await outboxPersister.RemoveEntriesOlderThan(DateTime.UtcNow - timeToKeepDeduplicationData).ConfigureAwait(false);
                     circuitBreaker.Success();
-
-                    await Task.Delay(frequencyToRunDeduplicationDataCleanup, ct).ConfigureAwait(false);
                 }
                 catch (Exception ex)
                 {
                     circuitBreaker.Failure(ex);
+                }
+                finally
+                {
+                    await Task.Delay(frequencyToRunDeduplicationDataCleanup, ct).ConfigureAwait(false);
                 }
             }
         }
