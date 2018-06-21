@@ -77,10 +77,7 @@ namespace NServiceBus.Features
                 return persister.Init();
             }
 
-            protected override Task OnStop(IMessageSession session)
-            {
-                return Task.FromResult(0);
-            }
+            protected override Task OnStop(IMessageSession session) => Task.CompletedTask;
         }
     }
 }

@@ -25,10 +25,7 @@
 
         public ITransaction Transaction => outboxTransaction.Transaction;
 
-        public Task CompleteAsync()
-        {
-            return Task.FromResult(0);
-        }
+        public Task CompleteAsync() => Task.CompletedTask;
 
         public void Dispose()
         {

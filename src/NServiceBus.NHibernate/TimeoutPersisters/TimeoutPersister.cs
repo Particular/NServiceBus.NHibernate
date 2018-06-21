@@ -115,7 +115,7 @@ namespace NServiceBus.TimeoutPersisters.NHibernate
             using (var session = await OpenSession(context).ConfigureAwait(false))
             {
                 var queryString = $"delete {typeof(TimeoutEntity)} where Id = :id";
-                var found = session.Session().CreateQuery(queryString).SetParameter("id", id).ExecuteUpdate() > 0;
+                var found = await session.Session().CreateQuery(queryString).SetParameter("id", id).ExecuteUpdateAsync().ConfigureAwait(false) > 0;
                 await session.CompleteAsync().ConfigureAwait(false);
                 return found;
             }
