@@ -22,7 +22,7 @@ namespace NServiceBus.Outbox.NHibernate
             Property(p => p.DispatchedAt, pm =>
             {
                 pm.Index("OutboxRecord_DispatchedAt_Idx");
-                pm.Column(c => c.SqlType("datetime"));
+                pm.Column(c => c.SqlType("DATETIME"));
             });
             Property(p => p.TransportOperations, pm => pm.Type(NHibernateUtil.StringClob));
         }

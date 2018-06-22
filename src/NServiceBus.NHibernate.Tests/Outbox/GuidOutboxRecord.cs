@@ -29,7 +29,7 @@ namespace NServiceBus.NHibernate.Tests.Outbox
             {
                 pm.Column(c => c.NotNullable(true));
             });
-            Property(p => p.DispatchedAt, m => m.Column(c => c.SqlType("datetime")));
+            Property(p => p.DispatchedAt, m => m.Column(c => c.SqlType("DATETIME")));
             Property(p => p.TransportOperations, pm => pm.Type(NHibernateUtil.StringClob));
         }
     }

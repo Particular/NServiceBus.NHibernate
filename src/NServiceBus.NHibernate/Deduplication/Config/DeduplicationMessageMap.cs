@@ -15,7 +15,7 @@
         {
             Table("GatewayDeduplication");
             Id(x => x.Id, m => m.Generator(Generators.Assigned));
-            Property(p => p.TimeReceived, m => m.Column(c => c.SqlType("datetime")));
+            Property(p => p.TimeReceived, m => m.Column(c => c.SqlType("DATETIME")));
         }
     }
 }
