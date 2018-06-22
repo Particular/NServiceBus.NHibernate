@@ -9,6 +9,7 @@
     {
         public static void Verify(string text)
         {
+            text = text.Replace(System.Environment.NewLine, "\r\n");
             var writer = new ApprovalTextWriter(text);
             var namer = new ApprovalNamer();
             Approvals.Verify(writer, namer, Approvals.GetReporter());

@@ -112,7 +112,6 @@
             var formatter = FormatStyle.Ddl.Formatter;
             var script = new StringBuilder();
             export.Create(s => script.Append(formatter.Format(fixUpHelper.FixUp(s))), false);
-            script.Replace(System.Environment.NewLine, "\r\n");
             return script.ToString();
         }
     }
