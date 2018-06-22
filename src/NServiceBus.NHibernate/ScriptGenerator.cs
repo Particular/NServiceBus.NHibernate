@@ -15,7 +15,6 @@
     using TimeoutPersisters.NHibernate.Config;
     using TimeoutPersisters.NHibernate.Installer;
     using Unicast.Subscriptions.NHibernate.Config;
-    using Environment = global::NHibernate.Cfg.Environment;
 
     /// <summary>
     /// Allows offline schema generation.
@@ -113,7 +112,7 @@
             var formatter = FormatStyle.Ddl.Formatter;
             var script = new StringBuilder();
             export.Create(s => script.Append(formatter.Format(fixUpHelper.FixUp(s))), false);
-            script.Replace(global::System.Environment.NewLine, "\r\n");
+            script.Replace(System.Environment.NewLine, "\r\n");
             return script.ToString();
         }
     }
