@@ -3,6 +3,7 @@ namespace NServiceBus.TimeoutPersisters.NHibernate.Config
     using global::NHibernate;
     using global::NHibernate.Mapping.ByCode;
     using global::NHibernate.Mapping.ByCode.Conformist;
+    using global::NHibernate.Type;
 
     class TimeoutEntityMap : ClassMapping<TimeoutEntity>
     {
@@ -24,7 +25,7 @@ namespace NServiceBus.TimeoutPersisters.NHibernate.Config
             Property(p => p.Time, pm =>
             {
                 pm.Index(EndpointIndexName);
-                pm.Column(c => c.SqlType("DATETIME"));
+                pm.Type<DateTimeType>();
             });
             Property(p => p.Headers, pm => pm.Type(NHibernateUtil.StringClob));
         }
