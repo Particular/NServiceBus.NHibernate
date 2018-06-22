@@ -1,9 +1,9 @@
 namespace NServiceBus.Outbox.NHibernate
 {
+    using Deduplication.NHibernate.Config;
     using global::NHibernate;
     using global::NHibernate.Mapping.ByCode;
     using global::NHibernate.Mapping.ByCode.Conformist;
-    using global::NHibernate.Type;
 
     class OutboxRecordMapping : ClassMapping<OutboxRecord>
     {
@@ -23,7 +23,7 @@ namespace NServiceBus.Outbox.NHibernate
             Property(p => p.DispatchedAt, pm =>
             {
                 pm.Index("OutboxRecord_DispatchedAt_Idx");
-                pm.Type<DateTimeType>();
+                pm.Type<NSBDateTimeType>();
             });
             Property(p => p.TransportOperations, pm => pm.Type(NHibernateUtil.StringClob));
         }

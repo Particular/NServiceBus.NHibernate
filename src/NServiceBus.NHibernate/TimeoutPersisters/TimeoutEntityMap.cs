@@ -1,9 +1,9 @@
 namespace NServiceBus.TimeoutPersisters.NHibernate.Config
 {
+    using Deduplication.NHibernate.Config;
     using global::NHibernate;
     using global::NHibernate.Mapping.ByCode;
     using global::NHibernate.Mapping.ByCode.Conformist;
-    using global::NHibernate.Type;
 
     class TimeoutEntityMap : ClassMapping<TimeoutEntity>
     {
@@ -25,7 +25,7 @@ namespace NServiceBus.TimeoutPersisters.NHibernate.Config
             Property(p => p.Time, pm =>
             {
                 pm.Index(EndpointIndexName);
-                pm.Type<DateTimeType>();
+                pm.Type<NSBDateTimeType>();
             });
             Property(p => p.Headers, pm => pm.Type(NHibernateUtil.StringClob));
         }
