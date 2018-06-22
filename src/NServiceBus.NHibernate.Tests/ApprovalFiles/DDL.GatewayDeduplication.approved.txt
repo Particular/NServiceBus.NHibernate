@@ -4,6 +4,6 @@
     
     create table GatewayDeduplication (
         Id NVARCHAR(255) not null,
-       TimeReceived DATETIME2 null,
+       TimeReceived DATETIME null,
        primary key (Id)
     )

@@ -21,7 +21,11 @@ namespace NServiceBus.TimeoutPersisters.NHibernate.Config
                 pm.Index(EndpointIndexName);
                 pm.Length(440);
             });
-            Property(p => p.Time, pm => pm.Index(EndpointIndexName));
+            Property(p => p.Time, pm =>
+            {
+                pm.Index(EndpointIndexName);
+                pm.Column(c => c.SqlType("datetime"));
+            });
             Property(p => p.Headers, pm => pm.Type(NHibernateUtil.StringClob));
         }
 

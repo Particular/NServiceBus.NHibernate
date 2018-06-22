@@ -6,7 +6,7 @@
         Id BIGINT IDENTITY NOT NULL,
        MessageId NVARCHAR(255) not null unique,
        Dispatched BIT not null,
-       DispatchedAt DATETIME2 null,
+       DispatchedAt DATETIME null,
        TransportOperations NVARCHAR(MAX) null,
        primary key (Id)
     )

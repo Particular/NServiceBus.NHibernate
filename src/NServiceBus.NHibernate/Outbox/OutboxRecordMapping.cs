@@ -19,7 +19,11 @@ namespace NServiceBus.Outbox.NHibernate
                 pm.Column(c => c.NotNullable(true));
                 pm.Index("OutboxRecord_Dispatched_Idx");
             });
-            Property(p => p.DispatchedAt, pm => pm.Index("OutboxRecord_DispatchedAt_Idx"));
+            Property(p => p.DispatchedAt, pm =>
+            {
+                pm.Index("OutboxRecord_DispatchedAt_Idx");
+                pm.Column(c => c.SqlType("datetime"));
+            });
             Property(p => p.TransportOperations, pm => pm.Type(NHibernateUtil.StringClob));
         }
     }
