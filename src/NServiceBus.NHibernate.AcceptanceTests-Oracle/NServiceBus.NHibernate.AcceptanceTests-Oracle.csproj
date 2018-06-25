@@ -18,8 +18,4 @@
     <PackageReference Include="Oracle.ManagedDataAccess" Version="12.1.2400" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Compile Include="..\NServiceBus.NHibernate.AcceptanceTests\NServiceBusAcceptanceTest.cs" Link="NServiceBusAcceptanceTest.cs" />
-  </ItemGroup>
-
 </Project>
