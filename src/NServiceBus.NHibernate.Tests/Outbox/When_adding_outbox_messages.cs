@@ -35,9 +35,10 @@ namespace NServiceBus.NHibernate.Tests.Outbox
 
         INHibernateOutboxStorage persister;
         ISessionFactory sessionFactory;
+        SchemaExport schema;
 
         [SetUp]
-        public void Setup()
+        public async Task Setup()
         {
             var mapper = new ModelMapper();
             mapper.AddMapping(typeof(TMapping));
@@ -51,7 +52,8 @@ namespace NServiceBus.NHibernate.Tests.Outbox
 
             configuration.AddMapping(mapper.CompileMappingForAllExplicitlyAddedEntities());
 
-            new SchemaUpdate(configuration).Execute(false, true);
+            schema = new SchemaExport(configuration);
+            await schema.CreateAsync(false, true);
 
             sessionFactory = configuration.BuildSessionFactory();
 
@@ -59,9 +61,10 @@ namespace NServiceBus.NHibernate.Tests.Outbox
         }
 
         [TearDown]
-        public void TearDown()
+        public async Task TearDown()
         {
-            sessionFactory.Dispose();
+            await sessionFactory.CloseAsync();
+            await schema.DropAsync(false, true);
         }
 
         [Test]

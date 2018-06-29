@@ -3,6 +3,7 @@ namespace NServiceBus.TimeoutPersisters.NHibernate.Tests
     using System;
     using System.Collections.Generic;
     using System.IO;
+    using System.Threading.Tasks;
     using Config;
     using global::NHibernate;
     using global::NHibernate.Mapping.ByCode;
@@ -22,9 +23,10 @@ namespace NServiceBus.TimeoutPersisters.NHibernate.Tests
 
         protected TimeoutPersister persister;
         protected ISessionFactory sessionFactory;
+        SchemaExport schema;
 
         [SetUp]
-        public void Setup()
+        public async Task Setup()
         {
             var configuration = new global::NHibernate.Cfg.Configuration()
               .AddProperties(new Dictionary<string, string>
@@ -37,11 +39,15 @@ namespace NServiceBus.TimeoutPersisters.NHibernate.Tests
 
             configuration.AddMapping(mapper.CompileMappingForAllExplicitlyAddedEntities());
 
-            new SchemaExport(configuration).Create(false, true);
+            schema = new SchemaExport(configuration);
+            await schema.CreateAsync(false, true);
 
             sessionFactory = configuration.BuildSessionFactory();
 
             persister = new TimeoutPersister("MyTestEndpoint", sessionFactory, new NHibernateSynchronizedStorageAdapter(sessionFactory), new NHibernateSynchronizedStorage(sessionFactory), TimeSpan.FromMinutes(2));
         }
+
+        [TearDown]
+        public Task TearDown() => schema.DropAsync(false, true);
     }
 }

@@ -1,6 +1,7 @@
 namespace NServiceBus.NHibernate.Tests.SynchronizedStorage
 {
     using System.IO;
+    using System.Threading.Tasks;
     using global::NHibernate;
     using global::NHibernate.Cfg;
     using global::NHibernate.Dialect;
@@ -11,9 +12,10 @@ namespace NServiceBus.NHibernate.Tests.SynchronizedStorage
     class InMemoryDBFixture
     {
         protected ISessionFactory SessionFactory;
+        SchemaExport schema;
 
         [SetUp]
-        public void SetupContext()
+        public async Task SetupContext()
         {
             var cfg = new Configuration()
                 .DataBaseIntegration(x =>
@@ -26,8 +28,12 @@ namespace NServiceBus.NHibernate.Tests.SynchronizedStorage
             mapper.AddMapping<TestEntity.Mapping>();
             cfg.AddMapping(mapper.CompileMappingForAllExplicitlyAddedEntities());
 
-            new SchemaExport(cfg).Create(false, true);
+            schema = new SchemaExport(cfg);
+            await schema.CreateAsync(false, true);
             SessionFactory = cfg.BuildSessionFactory();
         }
+
+        [TearDown]
+        public Task TearDown() => schema.DropAsync(false, true);
     }
 }

@@ -1,6 +1,7 @@
 namespace NServiceBus.Unicast.Subscriptions.NHibernate.Tests
 {
     using System.IO;
+    using System.Threading.Tasks;
     using global::NHibernate;
     using global::NHibernate.Cfg;
     using global::NHibernate.Dialect;
@@ -12,9 +13,10 @@ namespace NServiceBus.Unicast.Subscriptions.NHibernate.Tests
     {
         protected SubscriptionPersister storage;
         protected ISessionFactory SessionFactory;
+        SchemaExport schema;
 
         [SetUp]
-        public void SetupContext()
+        public async Task SetupContext()
         {
             var cfg = new Configuration()
                 .DataBaseIntegration(x =>
@@ -28,10 +30,14 @@ namespace NServiceBus.Unicast.Subscriptions.NHibernate.Tests
 
             cfg.AddMapping(mapper.CompileMappingForAllExplicitlyAddedEntities());
 
-            new SchemaExport(cfg).Create(false, true);
+            schema = new SchemaExport(cfg);
+            await schema.CreateAsync(false, true);
 
             SessionFactory = cfg.BuildSessionFactory();
             storage = new SubscriptionPersister(SessionFactory);
         }
+
+        [TearDown]
+        public Task TearDown() => schema.DropAsync(false, true);
     }
 }

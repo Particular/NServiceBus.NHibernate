@@ -3,8 +3,10 @@
     using System;
     using System.Collections.Generic;
     using System.IO;
+    using System.Threading.Tasks;
     using global::NHibernate;
     using global::NHibernate.Cfg;
+    using global::NHibernate.Dialect;
     using global::NHibernate.Tool.hbm2ddl;
     using SagaPersisters.NHibernate;
     using SagaPersisters.NHibernate.AutoPersistence;
@@ -17,15 +19,15 @@
         protected abstract Type[] SagaTypes { get; }
 
         [SetUp]
-        public void SetUp()
+        public async Task SetUp()
         {
-            ConnectionString = $"Data Source={Path.GetTempFileName()};New=True;";
+            var connectionString = $"Data Source={Path.GetTempFileName()};New=True;";
 
             var configuration = new Configuration()
                 .AddProperties(new Dictionary<string, string>
                 {
-                    {"dialect", dialect},
-                    {Environment.ConnectionString, ConnectionString}
+                    {Environment.Dialect, typeof(SQLiteDialect).FullName},
+                    {Environment.ConnectionString, connectionString}
                 });
 
             var metaModel = new SagaMetadataCollection();
@@ -46,22 +48,21 @@
             SagaModelMapper.AddMappings(configuration, metaModel, sagaDataTypes);
             SessionFactory = configuration.BuildSessionFactory();
 
-            new SchemaUpdate(configuration).Execute(true, true);
+            schema = new SchemaExport(configuration);
+            await schema.CreateAsync(false, true);
 
             SagaPersister = new SagaPersister();
         }
 
         [TearDown]
-        public void Cleanup()
+        public async Task Cleanup()
         {
-            SessionFactory.Close();
+            await SessionFactory.CloseAsync();
+            await schema.DropAsync(false, true);
         }
-
-        string ConnectionString;
 
         protected SagaPersister SagaPersister;
         protected ISessionFactory SessionFactory;
-
-        const string dialect = "NHibernate.Dialect.SQLiteDialect";
+        SchemaExport schema;
     }
 }
