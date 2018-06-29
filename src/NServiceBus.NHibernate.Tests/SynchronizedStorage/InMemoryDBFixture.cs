@@ -1,6 +1,5 @@
 namespace NServiceBus.NHibernate.Tests.SynchronizedStorage
 {
-    using System.IO;
     using System.Threading.Tasks;
     using global::NHibernate;
     using global::NHibernate.Cfg;
@@ -20,8 +19,8 @@ namespace NServiceBus.NHibernate.Tests.SynchronizedStorage
             var cfg = new Configuration()
                 .DataBaseIntegration(x =>
                 {
-                    x.Dialect<SQLiteDialect>();
-                    x.ConnectionString = $"Data Source={Path.GetTempFileName()};Version=3;New=True;";
+                    x.Dialect<MsSql2012Dialect>();
+                    x.ConnectionString = Consts.SqlConnectionString;
                 });
 
             var mapper = new ModelMapper();

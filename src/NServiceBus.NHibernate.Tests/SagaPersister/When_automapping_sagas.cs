@@ -8,6 +8,8 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
     using global::NHibernate.Impl;
     using global::NHibernate.Persister.Entity;
     using Features;
+    using global::NHibernate.Dialect;
+    using NServiceBus.NHibernate.Tests;
     using Sagas;
     using Settings;
     using NUnit.Framework;
@@ -18,13 +20,18 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
         IEntityPersister persisterForTestSaga;
         SessionFactoryImpl sessionFactory;
 
-        [SetUp]
+        [OneTimeSetUp]
         public void SetUp()
         {
             var builder = new NHibernateSagaStorage();
-            var properties = SQLiteConfiguration.InMemory();
 
-            var configuration = new Configuration().AddProperties(properties);
+            var cfg = new Configuration()
+                .DataBaseIntegration(x =>
+                {
+                    x.Dialect<MsSql2012Dialect>();
+                    x.ConnectionString = Consts.SqlConnectionString;
+                });
+
             var settings = new SettingsHolder();
 
             var metaModel = new SagaMetadataCollection();
@@ -40,8 +47,8 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
             settings.Set<SagaMetadataCollection>(metaModel);
 
             settings.Set("TypesToScan", types);
-            builder.ApplyMappings(settings, configuration);
-            sessionFactory = configuration.BuildSessionFactory() as SessionFactoryImpl;
+            builder.ApplyMappings(settings, cfg);
+            sessionFactory = cfg.BuildSessionFactory() as SessionFactoryImpl;
 
             persisterForTestSaga = sessionFactory.GetEntityPersisterFor<TestSagaData>();
         }
@@ -77,8 +84,6 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
             persisterForTestSaga.ShouldContainMappingsFor<TestComponent>();
         }
 
-
-
         [Test]
         public void Users_can_override_autoMappings_by_embedding_hbm_files()
         {
@@ -86,14 +91,11 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
                                 .IdentifierGenerator.GetType(), typeof (IdentityGenerator));
         }
 
-
         [Test,Ignore("Not supported any more")]
         public void Inherited_property_classes_should_be_mapped()
         {
             persisterForTestSaga.ShouldContainMappingsFor<PolymorphicPropertyBase>();
-
             sessionFactory.ShouldContainPersisterFor<PolymorphicProperty>();
-
         }
 
         [Test]
@@ -102,7 +104,7 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
             var persister =
                 sessionFactory.GetEntityPersister(typeof (TestSagaWithTableNameAttribute).FullName).ClassMetadata as
                 AbstractEntityPersister;
-            Assert.AreEqual(persister.RootTableName, "MyTestSchema_MyTestTable");
+            Assert.AreEqual(persister.RootTableName, "MyTestSchema.MyTestTable");
         }
 
         [Test]

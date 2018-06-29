@@ -2,7 +2,6 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.IO;
     using System.Threading.Tasks;
     using global::NHibernate;
     using global::NHibernate.Cfg;
@@ -23,8 +22,8 @@
             var cfg = new Configuration()
                 .DataBaseIntegration(x =>
                 {
-                    x.Dialect<SQLiteDialect>();
-                    x.ConnectionString = $"Data Source={Path.GetTempFileName()};Version=3;New=True;";
+                    x.Dialect<MsSql2012Dialect>();
+                    x.ConnectionString = Consts.SqlConnectionString;
                 });
 
             var metaModel = new SagaMetadataCollection();

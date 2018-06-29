@@ -11,6 +11,7 @@ namespace NServiceBus.NHibernate.Tests.Outbox
     using global::NHibernate.Mapping.ByCode.Conformist;
     using global::NHibernate.Tool.hbm2ddl;
     using Extensibility;
+    using global::NHibernate.Dialect;
     using NServiceBus.Outbox;
     using NServiceBus.Outbox.NHibernate;
     using Persistence.NHibernate;
@@ -24,15 +25,6 @@ namespace NServiceBus.NHibernate.Tests.Outbox
         where TEntity : class, IOutboxRecord, new()
         where TMapping : ClassMapping<TEntity>
     {
-
-#if USE_SQLSERVER
-        private readonly string connectionString = @"Data Source=.\SQLEXPRESS;Initial Catalog=nservicebus;Integrated Security=True;";
-        private const string dialect = "NHibernate.Dialect.MsSql2012Dialect";
-#else
-        string connectionString = $"Data Source={Path.GetTempFileName()};Version=3;New=True;";
-        const string dialect = "NHibernate.Dialect.SQLiteDialect";
-#endif
-
         INHibernateOutboxStorage persister;
         ISessionFactory sessionFactory;
         SchemaExport schema;
@@ -43,19 +35,19 @@ namespace NServiceBus.NHibernate.Tests.Outbox
             var mapper = new ModelMapper();
             mapper.AddMapping(typeof(TMapping));
 
-            var configuration = new Configuration()
-                .AddProperties(new Dictionary<string, string>
+            var cfg = new Configuration()
+                .DataBaseIntegration(x =>
                 {
-                    {"dialect", dialect},
-                    {Environment.ConnectionString, connectionString}
+                    x.Dialect<MsSql2012Dialect>();
+                    x.ConnectionString = Consts.SqlConnectionString;
                 });
 
-            configuration.AddMapping(mapper.CompileMappingForAllExplicitlyAddedEntities());
+            cfg.AddMapping(mapper.CompileMappingForAllExplicitlyAddedEntities());
 
-            schema = new SchemaExport(configuration);
+            schema = new SchemaExport(cfg);
             await schema.CreateAsync(false, true);
 
-            sessionFactory = configuration.BuildSessionFactory();
+            sessionFactory = cfg.BuildSessionFactory();
 
             persister = new OutboxPersister<TEntity>(sessionFactory, "TestEndpoint");
         }

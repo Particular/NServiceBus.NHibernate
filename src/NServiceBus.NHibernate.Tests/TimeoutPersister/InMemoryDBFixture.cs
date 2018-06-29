@@ -1,7 +1,6 @@
 namespace NServiceBus.TimeoutPersisters.NHibernate.Tests
 {
     using System;
-    using System.IO;
     using System.Threading.Tasks;
     using Config;
     using global::NHibernate;
@@ -9,17 +8,12 @@ namespace NServiceBus.TimeoutPersisters.NHibernate.Tests
     using global::NHibernate.Dialect;
     using global::NHibernate.Mapping.ByCode;
     using global::NHibernate.Tool.hbm2ddl;
+    using NServiceBus.NHibernate.Tests;
     using Persistence.NHibernate;
     using NUnit.Framework;
 
     abstract class InMemoryDBFixture
     {
-#if USE_SQLSERVER
-        private readonly string connectionString = @"Data Source=.\SQLEXPRESS;Initial Catalog=nservicebus;Integrated Security=True;";
-        private const string dialect = "NHibernate.Dialect.MsSql2012Dialect";
-#else
-#endif
-
         protected TimeoutPersister persister;
         protected ISessionFactory sessionFactory;
         SchemaExport schema;
@@ -30,8 +24,8 @@ namespace NServiceBus.TimeoutPersisters.NHibernate.Tests
             var cfg = new Configuration()
                 .DataBaseIntegration(x =>
                 {
-                    x.Dialect<SQLiteDialect>();
-                    x.ConnectionString = $"Data Source={Path.GetTempFileName()};Version=3;New=True;";
+                    x.Dialect<MsSql2012Dialect>();
+                    x.ConnectionString = Consts.SqlConnectionString;
                 });
 
             var mapper = new ModelMapper();
