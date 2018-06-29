@@ -2,7 +2,6 @@ namespace NServiceBus.NHibernate.Tests.Outbox
 {
     using System;
     using System.Collections.Generic;
-    using System.IO;
     using System.Linq;
     using System.Threading.Tasks;
     using global::NHibernate;
@@ -16,7 +15,6 @@ namespace NServiceBus.NHibernate.Tests.Outbox
     using NServiceBus.Outbox.NHibernate;
     using Persistence.NHibernate;
     using NUnit.Framework;
-    using Environment = global::NHibernate.Cfg.Environment;
 
     [TestFixture(typeof(OutboxRecord), typeof(OutboxRecordMapping))]
     [TestFixture(typeof(GuidOutboxRecord), typeof(GuidOutboxRecordMapping))]
