@@ -12,7 +12,6 @@
     using SagaPersisters.NHibernate.AutoPersistence;
     using Sagas;
     using NUnit.Framework;
-    using Environment = global::NHibernate.Cfg.Environment;
 
     abstract class InMemoryFixture
     {
@@ -21,13 +20,11 @@
         [SetUp]
         public async Task SetUp()
         {
-            var connectionString = $"Data Source={Path.GetTempFileName()};New=True;";
-
-            var configuration = new Configuration()
-                .AddProperties(new Dictionary<string, string>
+            var cfg = new Configuration()
+                .DataBaseIntegration(x =>
                 {
-                    {Environment.Dialect, typeof(SQLiteDialect).FullName},
-                    {Environment.ConnectionString, connectionString}
+                    x.Dialect<SQLiteDialect>();
+                    x.ConnectionString = $"Data Source={Path.GetTempFileName()};Version=3;New=True;";
                 });
 
             var metaModel = new SagaMetadataCollection();
@@ -45,10 +42,10 @@
 
             sagaDataTypes.Add(typeof(ContainSagaData));
 
-            SagaModelMapper.AddMappings(configuration, metaModel, sagaDataTypes);
-            SessionFactory = configuration.BuildSessionFactory();
+            SagaModelMapper.AddMappings(cfg, metaModel, sagaDataTypes);
+            SessionFactory = cfg.BuildSessionFactory();
 
-            schema = new SchemaExport(configuration);
+            schema = new SchemaExport(cfg);
             await schema.CreateAsync(false, true);
 
             SagaPersister = new SagaPersister();

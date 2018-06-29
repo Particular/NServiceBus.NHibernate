@@ -1,11 +1,12 @@
 namespace NServiceBus.TimeoutPersisters.NHibernate.Tests
 {
     using System;
-    using System.Collections.Generic;
     using System.IO;
     using System.Threading.Tasks;
     using Config;
     using global::NHibernate;
+    using global::NHibernate.Cfg;
+    using global::NHibernate.Dialect;
     using global::NHibernate.Mapping.ByCode;
     using global::NHibernate.Tool.hbm2ddl;
     using Persistence.NHibernate;
@@ -17,8 +18,6 @@ namespace NServiceBus.TimeoutPersisters.NHibernate.Tests
         private readonly string connectionString = @"Data Source=.\SQLEXPRESS;Initial Catalog=nservicebus;Integrated Security=True;";
         private const string dialect = "NHibernate.Dialect.MsSql2012Dialect";
 #else
-        readonly string connectionString = $"Data Source={Path.GetTempFileName()};Version=3;New=True;";
-        const string dialect = "NHibernate.Dialect.SQLiteDialect";
 #endif
 
         protected TimeoutPersister persister;
@@ -28,21 +27,22 @@ namespace NServiceBus.TimeoutPersisters.NHibernate.Tests
         [SetUp]
         public async Task Setup()
         {
-            var configuration = new global::NHibernate.Cfg.Configuration()
-              .AddProperties(new Dictionary<string, string>
+            var cfg = new Configuration()
+                .DataBaseIntegration(x =>
                 {
-                    { "dialect", dialect },
-                    { global::NHibernate.Cfg.Environment.ConnectionString, connectionString }
+                    x.Dialect<SQLiteDialect>();
+                    x.ConnectionString = $"Data Source={Path.GetTempFileName()};Version=3;New=True;";
                 });
+
             var mapper = new ModelMapper();
             mapper.AddMapping<TimeoutEntityMap>();
 
-            configuration.AddMapping(mapper.CompileMappingForAllExplicitlyAddedEntities());
+            cfg.AddMapping(mapper.CompileMappingForAllExplicitlyAddedEntities());
 
-            schema = new SchemaExport(configuration);
+            schema = new SchemaExport(cfg);
             await schema.CreateAsync(false, true);
 
-            sessionFactory = configuration.BuildSessionFactory();
+            sessionFactory = cfg.BuildSessionFactory();
 
             persister = new TimeoutPersister("MyTestEndpoint", sessionFactory, new NHibernateSynchronizedStorageAdapter(sessionFactory), new NHibernateSynchronizedStorage(sessionFactory), TimeSpan.FromMinutes(2));
         }
