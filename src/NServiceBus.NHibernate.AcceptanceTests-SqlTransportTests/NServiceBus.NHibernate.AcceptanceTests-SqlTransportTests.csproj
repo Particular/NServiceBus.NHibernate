@@ -4,7 +4,7 @@
     <TargetFrameworks>net461;netcoreapp2.0</TargetFrameworks>
     <RootNamespace>NServiceBus.NHibernate.AcceptanceTests.SqlTransport</RootNamespace>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
-    <AssemblyName>NServiceBus.NHibernate.AcceptanceTests-SqlTransport</AssemblyName>
+    <AssemblyName>NServiceBus.NHibernate.AcceptanceTests-SqlTransportTests</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>
