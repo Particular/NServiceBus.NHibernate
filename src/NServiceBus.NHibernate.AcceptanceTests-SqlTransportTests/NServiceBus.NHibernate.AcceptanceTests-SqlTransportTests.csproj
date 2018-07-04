@@ -17,6 +17,6 @@
     <PackageReference Include="NServiceBus.AcceptanceTests.Sources" Version="7.0.1" />
     <PackageReference Include="NUnit" Version="3.10.1" />
     <PackageReference Include="NUnit3TestAdapter" Version="3.10.0" />
+    <PackageReference Include="System.Data.SqlClient" Version="[4.5.1, 5.0.0)" />
   </ItemGroup>
-
 </Project>
