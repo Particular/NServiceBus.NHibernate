@@ -4,7 +4,6 @@
     <TargetFrameworks>net461;netcoreapp2.0</TargetFrameworks>
     <RootNamespace>NServiceBus.NHibernate.AcceptanceTests.SqlTransport</RootNamespace>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
-    <AssemblyName>NServiceBus.NHibernate.AcceptanceTests-SqlTransportTests</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>
@@ -13,10 +12,11 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.3.0" />
-    <PackageReference Include="NServiceBus.SqlServer" Version="4.0.0" />
+    <PackageReference Include="NHibernate" Version="5.1.3" />
+    <PackageReference Include="NServiceBus.SqlServer" Version="4.1.0" />
     <PackageReference Include="NServiceBus.AcceptanceTests.Sources" Version="7.0.1" />
     <PackageReference Include="NUnit" Version="3.10.1" />
     <PackageReference Include="NUnit3TestAdapter" Version="3.10.0" />
-    <PackageReference Include="System.Data.SqlClient" Version="[4.5.1, 5.0.0)" />
+    <PackageReference Include="System.Data.SqlClient" Version="4.5.1" />
   </ItemGroup>
 </Project>

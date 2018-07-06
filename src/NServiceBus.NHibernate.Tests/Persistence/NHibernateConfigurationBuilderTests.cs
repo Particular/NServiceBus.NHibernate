@@ -7,7 +7,7 @@ namespace NServiceBus.Persistence.NHibernate.Tests
     using NUnit.Framework;
     using Settings;
 
-#if NET461
+#if NETFRAMEWORK
     using System.Reflection;
 #endif
 
@@ -130,7 +130,7 @@ namespace NServiceBus.Persistence.NHibernate.Tests
             CollectionAssert.IsSubsetOf(expected, builder.Build().Configuration.Properties);
         }
 
-#if NET461
+#if NETFRAMEWORK
 
         [Test]
         public void Should_read_settings_from_hibernate_configuration_config_section_if_available()

@@ -45,7 +45,7 @@ namespace NServiceBus.NHibernate.Tests
             TestApprover.Verify(script);
         }
 
-#if !NETCOREAPP2_0
+#if !NETCOREAPP
         // This test is ignored for .NETCore because of the unstable foreing key name generation in NHibernate https://github.com/nhibernate/nhibernate-core/issues/1769
         [Test]
         [MethodImpl(MethodImplOptions.NoInlining)]
