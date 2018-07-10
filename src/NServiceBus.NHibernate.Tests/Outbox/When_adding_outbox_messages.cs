@@ -2,7 +2,6 @@ namespace NServiceBus.NHibernate.Tests.Outbox
 {
     using System;
     using System.Collections.Generic;
-    using System.IO;
     using System.Linq;
     using System.Threading.Tasks;
     using global::NHibernate;
@@ -11,11 +10,11 @@ namespace NServiceBus.NHibernate.Tests.Outbox
     using global::NHibernate.Mapping.ByCode.Conformist;
     using global::NHibernate.Tool.hbm2ddl;
     using Extensibility;
+    using global::NHibernate.Dialect;
     using NServiceBus.Outbox;
     using NServiceBus.Outbox.NHibernate;
     using Persistence.NHibernate;
     using NUnit.Framework;
-    using Environment = global::NHibernate.Cfg.Environment;
 
     [TestFixture(typeof(OutboxRecord), typeof(OutboxRecordMapping))]
     [TestFixture(typeof(GuidOutboxRecord), typeof(GuidOutboxRecordMapping))]
@@ -24,44 +23,38 @@ namespace NServiceBus.NHibernate.Tests.Outbox
         where TEntity : class, IOutboxRecord, new()
         where TMapping : ClassMapping<TEntity>
     {
-
-#if USE_SQLSERVER
-        private readonly string connectionString = @"Data Source=.\SQLEXPRESS;Initial Catalog=nservicebus;Integrated Security=True;";
-        private const string dialect = "NHibernate.Dialect.MsSql2012Dialect";
-#else
-        string connectionString = $"Data Source={Path.GetTempFileName()};Version=3;New=True;";
-        const string dialect = "NHibernate.Dialect.SQLiteDialect";
-#endif
-
         INHibernateOutboxStorage persister;
         ISessionFactory sessionFactory;
+        SchemaExport schema;
 
         [SetUp]
-        public void Setup()
+        public async Task Setup()
         {
             var mapper = new ModelMapper();
             mapper.AddMapping(typeof(TMapping));
 
-            var configuration = new Configuration()
-                .AddProperties(new Dictionary<string, string>
+            var cfg = new Configuration()
+                .DataBaseIntegration(x =>
                 {
-                    {"dialect", dialect},
-                    {Environment.ConnectionString, connectionString}
+                    x.Dialect<MsSql2012Dialect>();
+                    x.ConnectionString = Consts.SqlConnectionString;
                 });
 
-            configuration.AddMapping(mapper.CompileMappingForAllExplicitlyAddedEntities());
+            cfg.AddMapping(mapper.CompileMappingForAllExplicitlyAddedEntities());
 
-            new SchemaUpdate(configuration).Execute(false, true);
+            schema = new SchemaExport(cfg);
+            await schema.CreateAsync(false, true);
 
-            sessionFactory = configuration.BuildSessionFactory();
+            sessionFactory = cfg.BuildSessionFactory();
 
             persister = new OutboxPersister<TEntity>(sessionFactory, "TestEndpoint");
         }
 
         [TearDown]
-        public void TearDown()
+        public async Task TearDown()
         {
-            sessionFactory.Dispose();
+            await sessionFactory.CloseAsync();
+            await schema.DropAsync(false, true);
         }
 
         [Test]
@@ -79,7 +72,7 @@ namespace NServiceBus.NHibernate.Tests.Outbox
                     };
 
                     await persister.Store(new OutboxMessage(messageId, transportOperations), new NHibernateOutboxTransaction(session, transaction), new ContextBag());
-                    transaction.Commit();
+                    await transaction.CommitAsync();
                 }
             }
 
@@ -98,7 +91,7 @@ namespace NServiceBus.NHibernate.Tests.Outbox
             using (var transaction = session.BeginTransaction())
             {
                 await persister.Store(new OutboxMessage("MySpecialId", new TransportOperation[0]), new NHibernateOutboxTransaction(session, transaction), new ContextBag());
-                transaction.Commit();
+                await transaction.CommitAsync();
             }
             try
             {
@@ -106,7 +99,7 @@ namespace NServiceBus.NHibernate.Tests.Outbox
                 using (var transaction = session.BeginTransaction())
                 {
                     await persister.Store(new OutboxMessage("MySpecialId", new TransportOperation[0]), new NHibernateOutboxTransaction(session, transaction), new ContextBag());
-                    transaction.Commit();
+                    await transaction.CommitAsync();
                 }
             }
             catch (Exception)
@@ -127,7 +120,7 @@ namespace NServiceBus.NHibernate.Tests.Outbox
                 {
                         new TransportOperation(id, new Dictionary<string, string>(), new byte[1024*5], new Dictionary<string, string>()),
                     }), new NHibernateOutboxTransaction(session, transaction), new ContextBag());
-                transaction.Commit();
+                await transaction.CommitAsync();
             }
 
             var result = await persister.Get(id, new ContextBag());
@@ -149,7 +142,7 @@ namespace NServiceBus.NHibernate.Tests.Outbox
                     new TransportOperation(id, new Dictionary<string, string>(), new byte[1024*5], new Dictionary<string, string>()),
                 }), new NHibernateOutboxTransaction(session, transaction), new ContextBag());
 
-                transaction.Commit();
+                await transaction.CommitAsync();
             }
 
             await persister.SetAsDispatched(id, new ContextBag());
@@ -178,16 +171,16 @@ namespace NServiceBus.NHibernate.Tests.Outbox
                         new TransportOperation(id, new Dictionary<string, string>(), new byte[1024*5], new Dictionary<string, string>()),
                     }), new NHibernateOutboxTransaction(session, transaction), new ContextBag());
 
-                transaction.Commit();
+                await transaction.CommitAsync();
             }
 
             await persister.SetAsDispatched(id, new ContextBag());
 
-            persister.RemoveEntriesOlderThan(DateTime.UtcNow.AddMinutes(1));
+            await persister.RemoveEntriesOlderThan(DateTime.UtcNow.AddMinutes(1));
 
             using (var session = sessionFactory.OpenSession())
             {
-                var result = session.QueryOver<IOutboxRecord>().List();
+                var result = await session.QueryOver<IOutboxRecord>().ListAsync();
 
                 Assert.AreEqual(1, result.Count);
                 Assert.AreEqual("TestEndpoint/NotDispatched", result[0].MessageId);

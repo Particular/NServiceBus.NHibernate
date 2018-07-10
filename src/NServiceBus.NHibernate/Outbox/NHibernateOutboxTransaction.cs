@@ -34,7 +34,7 @@
             {
                 await onSaveChangesCallback().ConfigureAwait(false);
             }
-            transaction.Commit();
+            await transaction.CommitAsync().ConfigureAwait(false);
             transaction.Dispose();
             transaction = null;
         }

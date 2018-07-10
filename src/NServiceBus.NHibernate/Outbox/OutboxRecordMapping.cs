@@ -1,5 +1,6 @@
 namespace NServiceBus.Outbox.NHibernate
 {
+    using Deduplication.NHibernate.Config;
     using global::NHibernate;
     using global::NHibernate.Mapping.ByCode;
     using global::NHibernate.Mapping.ByCode.Conformist;
@@ -19,7 +20,11 @@ namespace NServiceBus.Outbox.NHibernate
                 pm.Column(c => c.NotNullable(true));
                 pm.Index("OutboxRecord_Dispatched_Idx");
             });
-            Property(p => p.DispatchedAt, pm => pm.Index("OutboxRecord_DispatchedAt_Idx"));
+            Property(p => p.DispatchedAt, pm =>
+            {
+                pm.Index("OutboxRecord_DispatchedAt_Idx");
+                pm.Type<NSBDateTimeType>();
+            });
             Property(p => p.TransportOperations, pm => pm.Type(NHibernateUtil.StringClob));
         }
     }

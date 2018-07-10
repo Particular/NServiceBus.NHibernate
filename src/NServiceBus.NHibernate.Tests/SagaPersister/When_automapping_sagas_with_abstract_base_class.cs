@@ -4,8 +4,10 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
     using System.Threading.Tasks;
     using Features;
     using global::NHibernate.Cfg;
+    using global::NHibernate.Dialect;
     using global::NHibernate.Impl;
     using global::NHibernate.Persister.Entity;
+    using NServiceBus.NHibernate.Tests;
     using Sagas;
     using NUnit.Framework;
     using Settings;
@@ -19,9 +21,14 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
         public void SetUp()
         {
             var builder = new NHibernateSagaStorage();
-            var properties = SQLiteConfiguration.InMemory();
 
-            var configuration = new Configuration().AddProperties(properties);
+            var cfg = new Configuration()
+                .DataBaseIntegration(x =>
+                {
+                    x.Dialect<MsSql2012Dialect>();
+                    x.ConnectionString = Consts.SqlConnectionString;
+                });
+
             var types = new[] { typeof(SagaWithAbstractBaseClassActualSaga), typeof(SagaWithAbstractBaseClass), typeof(ContainSagaData), typeof(MyOwnAbstractBase) };
 
             var allMetadata = new SagaMetadataCollection();
@@ -31,8 +38,8 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
             settings.Set("TypesToScan", types);
             settings.Set<SagaMetadataCollection>(allMetadata);
 
-            builder.ApplyMappings(settings, configuration);
-            sessionFactory = configuration.BuildSessionFactory() as SessionFactoryImpl;
+            builder.ApplyMappings(settings, cfg);
+            sessionFactory = cfg.BuildSessionFactory() as SessionFactoryImpl;
         }
 
         [Test]

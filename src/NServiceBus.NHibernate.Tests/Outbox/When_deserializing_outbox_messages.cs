@@ -2,7 +2,6 @@
 {
     using System.Collections.Generic;
     using System.Globalization;
-    using System.Runtime.Serialization.Formatters;
     using Newtonsoft.Json;
     using Newtonsoft.Json.Converters;
     using Persistence.NHibernate;
@@ -32,7 +31,7 @@
         {
             var serializerSettings = new JsonSerializerSettings
             {
-                TypeNameAssemblyFormat = FormatterAssemblyStyle.Simple,
+                TypeNameAssemblyFormatHandling =  TypeNameAssemblyFormatHandling.Simple,
                 TypeNameHandling = TypeNameHandling.Auto,
                 Converters =
                 {
