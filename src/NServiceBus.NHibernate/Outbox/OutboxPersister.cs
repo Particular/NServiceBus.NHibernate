@@ -24,7 +24,7 @@
             this.endpointName = endpointName;
         }
 
-        public Task<OutboxMessage> Get(string messageId, ContextBag context)
+        public async Task<OutboxMessage> Get(string messageId, ContextBag context)
         {
             object[] possibleIds = {
                 EndpointQualifiedMessageId(messageId),
@@ -37,37 +37,36 @@
                     + $"TransactionScope. Do not configure the transport to use '{nameof(TransportTransactionMode.TransactionScope)}' transaction mode with Outbox.");
             }
 
-            using (new TransactionScope(TransactionScopeOption.Suppress))
+            using (new TransactionScope(TransactionScopeOption.Suppress, TransactionScopeAsyncFlowOption.Enabled))
             {
                 TEntity result;
                 using (var session = sessionFactory.OpenStatelessSession())
+                using (var tx = session.BeginTransaction(IsolationLevel.ReadCommitted))
                 {
-                    using (var tx = session.BeginTransaction(IsolationLevel.ReadCommitted))
-                    {
-                        //Explicitly using ICriteria instead of QueryOver for performance reasons.
-                        //It seems QueryOver uses quite a bit reflection and that takes longer.
-                        result = session.CreateCriteria<TEntity>()
-                            .Add(Restrictions.In(nameof(IOutboxRecord.MessageId), possibleIds))
-                            .UniqueResult<TEntity>();
+                    //Explicitly using ICriteria instead of QueryOver for performance reasons.
+                    //It seems QueryOver uses quite a bit reflection and that takes longer.
+                    result = await session.CreateCriteria<TEntity>()
+                        .Add(Restrictions.In(nameof(IOutboxRecord.MessageId), possibleIds))
+                        .UniqueResultAsync<TEntity>()
+                        .ConfigureAwait(false);
 
-                        tx.Commit();
-                    }
+                    await tx.CommitAsync()
+                        .ConfigureAwait(false);
                 }
 
                 if (result == null)
                 {
-                    return Task.FromResult<OutboxMessage>(null);
+                    return null;
                 }
                 if (result.Dispatched)
                 {
-                    return Task.FromResult(new OutboxMessage(result.MessageId, new TransportOperation[0]));
+                    return new OutboxMessage(result.MessageId, new TransportOperation[0]);
                 }
                 var transportOperations = ConvertStringToObject(result.TransportOperations)
                     .Select(t => new TransportOperation(t.MessageId, t.Options, t.Message, t.Headers))
                     .ToArray();
 
-                var message = new OutboxMessage(result.MessageId, transportOperations);
-                return Task.FromResult(message);
+                return new OutboxMessage(result.MessageId, transportOperations);
             }
         }
 
@@ -87,31 +86,26 @@
                 Dispatched = false,
                 TransportOperations = ConvertObjectToString(operations)
             };
-            nhibernateTransaction.Session.Save(record);
-            return Task.FromResult(0);
+            return nhibernateTransaction.Session.SaveAsync(record);
         }
 
-        public Task SetAsDispatched(string messageId, ContextBag context)
+        public async Task SetAsDispatched(string messageId, ContextBag context)
         {
-            using (new TransactionScope(TransactionScopeOption.Suppress))
+            using (new TransactionScope(TransactionScopeOption.Suppress, TransactionScopeAsyncFlowOption.Enabled))
+            using (var session = sessionFactory.OpenStatelessSession())
+            using (var tx = session.BeginTransaction(IsolationLevel.ReadCommitted))
             {
-                using (var session = sessionFactory.OpenStatelessSession())
-                {
-                    using (var tx = session.BeginTransaction(IsolationLevel.ReadCommitted))
-                    {
-                        var queryString = $"update {typeof(TEntity).Name} set Dispatched = true, DispatchedAt = :date, TransportOperations = NULL where MessageId IN ( :messageid, :qualifiedMessageId ) And Dispatched = false";
-                        session.CreateQuery(queryString)
-                            .SetString("messageid", messageId)
-                            .SetString("qualifiedMessageId", EndpointQualifiedMessageId(messageId))
-                            .SetDateTime("date", DateTime.UtcNow)
-                            .ExecuteUpdate();
+                var queryString = $"update {typeof(TEntity).Name} set Dispatched = true, DispatchedAt = :date, TransportOperations = NULL where MessageId IN ( :messageid, :qualifiedMessageId ) And Dispatched = false";
+                await session.CreateQuery(queryString)
+                    .SetString("messageid", messageId)
+                    .SetString("qualifiedMessageId", EndpointQualifiedMessageId(messageId))
+                    .SetDateTime("date", DateTime.UtcNow)
+                    .ExecuteUpdateAsync()
+                    .ConfigureAwait(false);
 
-                        tx.Commit();
-                    }
-                }
+                await tx.CommitAsync()
+                    .ConfigureAwait(false);
             }
-
-            return Task.FromResult(0);
         }
 
         public Task<OutboxTransaction> BeginTransaction(ContextBag context)
@@ -123,23 +117,19 @@
             return Task.FromResult(result);
         }
 
-        public void RemoveEntriesOlderThan(DateTime dateTime)
+        public async Task RemoveEntriesOlderThan(DateTime dateTime)
         {
-            using (new TransactionScope(TransactionScopeOption.Suppress))
+            using (new TransactionScope(TransactionScopeOption.Suppress, TransactionScopeAsyncFlowOption.Enabled))
+            using (var session = sessionFactory.OpenStatelessSession())
+            using (var tx = session.BeginTransaction(IsolationLevel.ReadCommitted))
             {
-                using (var session = sessionFactory.OpenStatelessSession())
-                {
-                    using (var tx = session.BeginTransaction(IsolationLevel.ReadCommitted))
-                    {
-                        var queryString = $"delete from {typeof(TEntity).Name} where Dispatched = true And DispatchedAt < :date";
+                var queryString = $"delete from {typeof(TEntity).Name} where Dispatched = true And DispatchedAt < :date";
 
-                        session.CreateQuery(queryString)
-                            .SetDateTime("date", dateTime)
-                            .ExecuteUpdate();
+                await session.CreateQuery(queryString)
+                    .SetDateTime("date", dateTime)
+                    .ExecuteUpdateAsync().ConfigureAwait(false);
 
-                        tx.Commit();
-                    }
-                }
+                await tx.CommitAsync().ConfigureAwait(false);
             }
         }
 

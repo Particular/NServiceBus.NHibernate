@@ -11,7 +11,7 @@
         [MethodImpl(MethodImplOptions.NoInlining)]
         public void Approve()
         {
-            var publicApi = ApiGenerator.GeneratePublicApi(typeof(NHibernatePersistence).Assembly);
+            var publicApi = ApiGenerator.GeneratePublicApi(typeof(NHibernatePersistence).Assembly, excludeAttributes: new[] { "System.Runtime.Versioning.TargetFrameworkAttribute" });
             TestApprover.Verify(publicApi);
         }
     }

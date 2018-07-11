@@ -4,9 +4,12 @@ namespace NServiceBus.Persistence.NHibernate.Tests
     using System.Collections.Generic;
     using System.Collections.Specialized;
     using System.Configuration;
-    using System.Reflection;
     using NUnit.Framework;
     using Settings;
+
+#if NETFRAMEWORK
+    using System.Reflection;
+#endif
 
     [TestFixture]
     public class NHibernateConfigurationBuilderTests
@@ -52,7 +55,6 @@ namespace NServiceBus.Persistence.NHibernate.Tests
                 {
                      {"dialect", NHibernateConfigurationBuilder.DefaultDialect},
                      {"connection.connection_string", connectionString}
-                   
                 };
 
             CollectionAssert.IsSubsetOf(expected, builder.Build().Configuration.Properties);
@@ -128,6 +130,8 @@ namespace NServiceBus.Persistence.NHibernate.Tests
             CollectionAssert.IsSubsetOf(expected, builder.Build().Configuration.Properties);
         }
 
+#if NETFRAMEWORK
+
         [Test]
         public void Should_read_settings_from_hibernate_configuration_config_section_if_available()
         {
@@ -137,7 +141,7 @@ namespace NServiceBus.Persistence.NHibernate.Tests
                                                            ApplicationBase = AppDomain.CurrentDomain.SetupInformation.ApplicationBase,
                                                            ConfigurationFile = "Testing.config"
                                                        });
-            
+
             var worker = (Worker)appDomain.CreateInstanceAndUnwrap(Assembly.GetExecutingAssembly().FullName, typeof (Worker).FullName);
             var result = worker.Execute();
             AppDomain.Unload(appDomain);
@@ -146,7 +150,7 @@ namespace NServiceBus.Persistence.NHibernate.Tests
                 {
                     {"connection.connection_string", "Data Source=:memory:;New=True;"},
                 };
-            
+
             CollectionAssert.IsSubsetOf(expected, result);
         }
 
@@ -216,6 +220,7 @@ namespace NServiceBus.Persistence.NHibernate.Tests
 
             CollectionAssert.IsSubsetOf(expected, result);
         }
+#endif
 
         public class Worker2 : MarshalByRefObject
         {

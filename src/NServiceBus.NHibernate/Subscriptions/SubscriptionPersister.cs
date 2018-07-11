@@ -14,7 +14,6 @@ namespace NServiceBus.Unicast.Subscriptions.NHibernate
 
     class SubscriptionPersister : ISubscriptionStorage
     {
-
         static ILog Logger = LogManager.GetLogger(typeof(ISubscriptionStorage));
         static IEqualityComparer<Subscription> SubscriptionComparer = new SubscriptionByTransportAddressComparer();
         ISessionFactory sessionFactory;
@@ -29,21 +28,23 @@ namespace NServiceBus.Unicast.Subscriptions.NHibernate
             return Retry(() => SubscribeInternal(subscriber, messageType));
         }
 
-        void SubscribeInternal(Subscriber subscriber, MessageType messageType)
+        async Task SubscribeInternal(Subscriber subscriber, MessageType messageType)
         {
-            using (new TransactionScope(TransactionScopeOption.Suppress))
+            using (new TransactionScope(TransactionScopeOption.Suppress, TransactionScopeAsyncFlowOption.Enabled))
             using (var session = sessionFactory.OpenSession())
             using (var tx = session.BeginTransaction(IsolationLevel.ReadCommitted))
             {
-                session.SaveOrUpdate(new Subscription
-                {
-                    SubscriberEndpoint = subscriber.TransportAddress,
-                    LogicalEndpoint = subscriber.Endpoint,
-                    MessageType = messageType.TypeName + "," + messageType.Version,
-                    Version = messageType.Version.ToString(),
-                    TypeName = messageType.TypeName
-                });
-                tx.Commit();
+                await session.SaveOrUpdateAsync(new Subscription
+                    {
+                        SubscriberEndpoint = subscriber.TransportAddress,
+                        LogicalEndpoint = subscriber.Endpoint,
+                        MessageType = messageType.TypeName + "," + messageType.Version,
+                        Version = messageType.Version.ToString(),
+                        TypeName = messageType.TypeName
+                    })
+                    .ConfigureAwait(false);
+                await tx.CommitAsync()
+                    .ConfigureAwait(false);
             }
         }
 
@@ -52,40 +53,40 @@ namespace NServiceBus.Unicast.Subscriptions.NHibernate
             return Retry(() => UnsubscribeInternal(address, messageType));
         }
 
-        void UnsubscribeInternal(Subscriber address, MessageType messageType)
+        async Task UnsubscribeInternal(Subscriber address, MessageType messageType)
         {
             var messageTypes = new List<MessageType>
             {
                 messageType
             };
-            using (new TransactionScope(TransactionScopeOption.Suppress))
+            using (new TransactionScope(TransactionScopeOption.Suppress, TransactionScopeAsyncFlowOption.Enabled))
             using (var session = sessionFactory.OpenSession())
             using (var tx = session.BeginTransaction(IsolationLevel.ReadCommitted))
             {
                 var transportAddress = address.TransportAddress;
-                var subscriptions = session.QueryOver<Subscription>()
+                var subscriptions = await session.QueryOver<Subscription>()
                     .Where(
                         s => s.TypeName.IsIn(messageTypes.Select(mt => mt.TypeName).ToList()) &&
                              s.SubscriberEndpoint == transportAddress)
-                    .List();
+                    .ListAsync().ConfigureAwait(false);
 
                 foreach (var subscription in subscriptions.Where(s => messageTypes.Contains(new MessageType(s.TypeName, s.Version))))
                 {
-                    session.Delete(subscription);
+                    await session.DeleteAsync(subscription).ConfigureAwait(false);
                 }
 
-                tx.Commit();
+                await tx.CommitAsync().ConfigureAwait(false);
             }
         }
 
-        static async Task Retry(Action function, int maximumAttempts = 5)
+        static async Task Retry(Func<Task> function, int maximumAttempts = 5)
         {
             var attempt = 0;
             while (true)
             {
                 try
                 {
-                    function();
+                    await function().ConfigureAwait(false);
                     return;
                 }
                 catch (Exception)
@@ -100,37 +101,37 @@ namespace NServiceBus.Unicast.Subscriptions.NHibernate
             }
         }
 
-        public virtual Task<IEnumerable<Subscriber>> GetSubscriberAddressesForMessage(IEnumerable<MessageType> messageTypes, ContextBag context)
+        public virtual async Task<IEnumerable<Subscriber>> GetSubscriberAddressesForMessage(IEnumerable<MessageType> messageTypes, ContextBag context)
         {
-            using (new TransactionScope(TransactionScopeOption.Suppress))
+            using (new TransactionScope(TransactionScopeOption.Suppress, TransactionScopeAsyncFlowOption.Enabled))
             using (var session = sessionFactory.OpenStatelessSession())
             using (var tx = session.BeginTransaction(IsolationLevel.ReadCommitted))
             {
-                var tmp = session.QueryOver<Subscription>()
+                var tmp = await session.QueryOver<Subscription>()
                     .Where(s => s.TypeName.IsIn(messageTypes.Select(mt => mt.TypeName).ToList()))
-                    .List();
+                    .ListAsync()
+                    .ConfigureAwait(false);
 
-                var results = tmp
+                await tx.CommitAsync()
+                    .ConfigureAwait(false);
+
+                return tmp
                     .Where(s => messageTypes.Contains(new MessageType(s.TypeName, s.Version)))
                     .Distinct(SubscriptionComparer)
-                    .Select(s => new Subscriber(s.SubscriberEndpoint, s.LogicalEndpoint))
-                    .ToList();
-
-                tx.Commit();
-
-                return Task.FromResult(results.AsEnumerable());
+                    .Select(s => new Subscriber(s.SubscriberEndpoint, s.LogicalEndpoint));
             }
         }
 
-        internal void Init()
+        internal async Task Init()
         {
-            using (new TransactionScope(TransactionScopeOption.Suppress))
+            using (new TransactionScope(TransactionScopeOption.Suppress, TransactionScopeAsyncFlowOption.Enabled))
             using (var session = sessionFactory.OpenStatelessSession())
             using (var tx = session.BeginTransaction(IsolationLevel.ReadCommitted))
             {
-                var v2XSubscriptions = session.QueryOver<Subscription>()
+                var v2XSubscriptions = await session.QueryOver<Subscription>()
                     .Where(s => s.TypeName == null)
-                    .List();
+                    .ListAsync().ConfigureAwait(false);
+
                 if (v2XSubscriptions.Count == 0)
                 {
                     return;
@@ -144,10 +145,12 @@ namespace NServiceBus.Unicast.Subscriptions.NHibernate
                     v2XSubscription.Version = mt.Version.ToString();
                     v2XSubscription.TypeName = mt.TypeName;
 
-                    session.Update(v2XSubscription);
+                    await session.UpdateAsync(v2XSubscription)
+                        .ConfigureAwait(false);
                 }
 
-                tx.Commit();
+                await tx.CommitAsync()
+                    .ConfigureAwait(false);
                 Logger.InfoFormat("{0} v2X subscriptions upgraded", v2XSubscriptions.Count);
             }
         }
@@ -164,6 +167,5 @@ namespace NServiceBus.Unicast.Subscriptions.NHibernate
                 return obj.SubscriberEndpoint.GetHashCode();
             }
         }
-
     }
 }

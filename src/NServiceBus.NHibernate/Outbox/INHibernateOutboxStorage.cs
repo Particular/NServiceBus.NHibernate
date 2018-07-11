@@ -1,10 +1,11 @@
 ﻿namespace NServiceBus
 {
     using System;
+    using System.Threading.Tasks;
     using Outbox;
 
     interface INHibernateOutboxStorage : IOutboxStorage
     {
-        void RemoveEntriesOlderThan(DateTime dateTime);
+        Task RemoveEntriesOlderThan(DateTime dateTime);
     }
 }

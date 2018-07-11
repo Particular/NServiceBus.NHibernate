@@ -1,10 +1,7 @@
 ﻿[assembly: System.Runtime.CompilerServices.InternalsVisibleToAttribute(@"NServiceBus.NHibernate.Tests, PublicKey=0024000004800000940000000602000000240000525341310004000001000100dde965e6172e019ac82c2639ffe494dd2e7dd16347c34762a05732b492e110f2e4e2e1b5ef2d85c848ccfb671ee20a47c8d1376276708dc30a90ff1121b647ba3b7259a6bc383b2034938ef0e275b58b920375ac605076178123693c6c4f1331661a62eba28c249386855637780e3ff5f23a6d854700eaa6803ef48907513b92")]
 [assembly: System.Runtime.InteropServices.ComVisibleAttribute(false)]
-[assembly: System.Runtime.Versioning.TargetFrameworkAttribute(".NETFramework,Version=v4.5.2", FrameworkDisplayName=".NET Framework 4.5.2")]
-
 namespace NServiceBus.Features
 {
-    
     public class NHibernateGatewayDeduplication : NServiceBus.Features.Feature
     {
         public NHibernateGatewayDeduplication() { }
@@ -27,7 +24,6 @@ namespace NServiceBus.Features
 }
 namespace NServiceBus.NHibernate.Outbox
 {
-    
     public class static OutboxConfig
     {
         public static NServiceBus.PersistenceExtensions<NServiceBus.NHibernatePersistence> UseOutboxRecord<TEntity, TMapping>(this NServiceBus.PersistenceExtensions<NServiceBus.NHibernatePersistence> persistenceConfiguration)
@@ -37,7 +33,6 @@ namespace NServiceBus.NHibernate.Outbox
 }
 namespace NServiceBus.NHibernate
 {
-    
     public class ScriptGenerator<T>
         where T : NHibernate.Dialect.Dialect, new ()
     {
@@ -52,7 +47,6 @@ namespace NServiceBus.NHibernate
 }
 namespace NServiceBus
 {
-    
     public class NHibernatePersistence : NServiceBus.Persistence.PersistenceDefinition
     {
         public NHibernatePersistence() { }
@@ -65,7 +59,6 @@ namespace NServiceBus
 }
 namespace NServiceBus.Outbox.NHibernate
 {
-    
     public interface IOutboxRecord
     {
         bool Dispatched { get; set; }
@@ -76,7 +69,6 @@ namespace NServiceBus.Outbox.NHibernate
 }
 namespace NServiceBus.Persistence.NHibernate
 {
-    
     public class static DeduplicationConfig
     {
         public static NServiceBus.PersistenceExtensions<NServiceBus.NHibernatePersistence> DisableGatewayDeduplicationSchemaUpdate(this NServiceBus.PersistenceExtensions<NServiceBus.NHibernatePersistence> persistenceConfiguration) { }
@@ -105,7 +97,6 @@ namespace NServiceBus.Persistence.NHibernate
 }
 namespace NServiceBus.Persistence
 {
-    
     public class static SharedConfig
     {
         public static NServiceBus.PersistenceExtensions<NServiceBus.NHibernatePersistence> ConnectionString(this NServiceBus.PersistenceExtensions<NServiceBus.NHibernatePersistence> persistenceConfiguration, string connectionString) { }
@@ -115,7 +106,6 @@ namespace NServiceBus.Persistence
 }
 namespace NServiceBus.SagaPersisters.NHibernate
 {
-    
     [System.AttributeUsageAttribute(System.AttributeTargets.Class | System.AttributeTargets.All)]
     public sealed class LockModeAttribute : System.Attribute
     {
@@ -146,7 +136,6 @@ namespace NServiceBus.SagaPersisters.NHibernate
 }
 namespace NServiceBus.Testing
 {
-    
     public class TestingNHibernateSynchronizedStorageSession : NServiceBus.Persistence.SynchronizedStorageSession
     {
         public TestingNHibernateSynchronizedStorageSession(NHibernate.ISession session) { }

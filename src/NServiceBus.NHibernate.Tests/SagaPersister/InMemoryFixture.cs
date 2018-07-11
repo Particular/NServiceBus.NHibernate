@@ -2,30 +2,28 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.IO;
+    using System.Threading.Tasks;
     using global::NHibernate;
     using global::NHibernate.Cfg;
+    using global::NHibernate.Dialect;
     using global::NHibernate.Tool.hbm2ddl;
     using SagaPersisters.NHibernate;
     using SagaPersisters.NHibernate.AutoPersistence;
     using Sagas;
     using NUnit.Framework;
-    using Environment = global::NHibernate.Cfg.Environment;
 
     abstract class InMemoryFixture
     {
         protected abstract Type[] SagaTypes { get; }
 
         [SetUp]
-        public void SetUp()
+        public async Task SetUp()
         {
-            ConnectionString = $"Data Source={Path.GetTempFileName()};New=True;";
-
-            var configuration = new Configuration()
-                .AddProperties(new Dictionary<string, string>
+            var cfg = new Configuration()
+                .DataBaseIntegration(x =>
                 {
-                    {"dialect", dialect},
-                    {Environment.ConnectionString, ConnectionString}
+                    x.Dialect<MsSql2012Dialect>();
+                    x.ConnectionString = Consts.SqlConnectionString;
                 });
 
             var metaModel = new SagaMetadataCollection();
@@ -43,25 +41,24 @@
 
             sagaDataTypes.Add(typeof(ContainSagaData));
 
-            SagaModelMapper.AddMappings(configuration, metaModel, sagaDataTypes);
-            SessionFactory = configuration.BuildSessionFactory();
+            SagaModelMapper.AddMappings(cfg, metaModel, sagaDataTypes);
+            SessionFactory = cfg.BuildSessionFactory();
 
-            new SchemaUpdate(configuration).Execute(true, true);
+            schema = new SchemaExport(cfg);
+            await schema.CreateAsync(false, true);
 
             SagaPersister = new SagaPersister();
         }
 
         [TearDown]
-        public void Cleanup()
+        public async Task Cleanup()
         {
-            SessionFactory.Close();
+            await SessionFactory.CloseAsync();
+            await schema.DropAsync(false, true);
         }
-
-        string ConnectionString;
 
         protected SagaPersister SagaPersister;
         protected ISessionFactory SessionFactory;
-
-        const string dialect = "NHibernate.Dialect.SQLiteDialect";
+        SchemaExport schema;
     }
 }

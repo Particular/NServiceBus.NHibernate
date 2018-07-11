@@ -1,5 +1,6 @@
 namespace NServiceBus.TimeoutPersisters.NHibernate.Config
 {
+    using Deduplication.NHibernate.Config;
     using global::NHibernate;
     using global::NHibernate.Mapping.ByCode;
     using global::NHibernate.Mapping.ByCode.Conformist;
@@ -21,7 +22,11 @@ namespace NServiceBus.TimeoutPersisters.NHibernate.Config
                 pm.Index(EndpointIndexName);
                 pm.Length(440);
             });
-            Property(p => p.Time, pm => pm.Index(EndpointIndexName));
+            Property(p => p.Time, pm =>
+            {
+                pm.Index(EndpointIndexName);
+                pm.Type<NSBDateTimeType>();
+            });
             Property(p => p.Headers, pm => pm.Type(NHibernateUtil.StringClob));
         }
 
