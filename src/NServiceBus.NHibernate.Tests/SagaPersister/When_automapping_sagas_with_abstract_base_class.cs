@@ -36,7 +36,7 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
 
             var settings = new SettingsHolder();
             settings.Set("TypesToScan", types);
-            settings.Set<SagaMetadataCollection>(allMetadata);
+            settings.Set(allMetadata);
 
             builder.ApplyMappings(settings, cfg);
             sessionFactory = cfg.BuildSessionFactory() as SessionFactoryImpl;
