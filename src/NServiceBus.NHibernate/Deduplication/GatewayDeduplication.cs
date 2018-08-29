@@ -44,8 +44,7 @@
                 }
                 catch (ADOException)
                 {
-                    await tx.RollbackAsync()
-                        .ConfigureAwait(false);
+                    tx.Rollback();
                     throw;
                 }
             }
