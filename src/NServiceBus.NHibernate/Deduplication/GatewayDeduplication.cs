@@ -42,10 +42,15 @@
                     session.Save(gatewayMessage);
                     tx.Commit();
                 }
-                catch (GenericADOException)
+                catch (ConstraintViolationException)
                 {
                     tx.Rollback();
                     return Task.FromResult(false);
+                }
+                catch (ADOException)
+                {
+                    tx.Rollback();
+                    throw;
                 }
             }
 
