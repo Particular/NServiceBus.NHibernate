@@ -37,10 +37,16 @@
                     session.Save(gatewayMessage);
                     tx.Commit();
                 }
-                catch (GenericADOException)
+                catch (ConstraintViolationException)
                 {
                     tx.Rollback();
                     return false;
+                }
+                catch (ADOException)
+                {
+                    await tx.RollbackAsync()
+                        .ConfigureAwait(false);
+                    throw;
                 }
             }
 
