@@ -46,11 +46,17 @@
                     await tx.CommitAsync()
                         .ConfigureAwait(false);
                 }
-                catch (GenericADOException)
+                catch (ConstraintViolationException)
                 {
                     await tx.RollbackAsync()
                         .ConfigureAwait(false);
                     return false;
+                }
+                catch (ADOException)
+                {
+                    await tx.RollbackAsync()
+                        .ConfigureAwait(false);
+                    throw;
                 }
             }
 
