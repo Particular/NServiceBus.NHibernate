@@ -47,7 +47,7 @@ namespace NServiceBus.NHibernate.Tests
         }
 
 #if !NETCOREAPP
-        // This test is ignored for .NETCore because of the unstable foreing key name generation in NHibernate https://github.com/nhibernate/nhibernate-core/issues/1769
+        // This test is ignored for .NETCore because of the unstable foreign key name generation in NHibernate https://github.com/nhibernate/nhibernate-core/issues/1769
         [Test]
         [MethodImpl(MethodImplOptions.NoInlining)]
         public void MySaga()
@@ -69,12 +69,19 @@ namespace NServiceBus.NHibernate.Tests
         {
             public virtual string UniqueId { get; set; }
             public virtual IList<CollectionEntry> Entries { get; set; }
+            public virtual IList<CollectionEntryWithoutId> EntriesWithoutId { get; set; }
         }
 
         public class CollectionEntry
         {
             public virtual Guid Id { get; set; }
             public virtual decimal Value { get; set; }
+        }
+
+        public class CollectionEntryWithoutId
+        {
+            public virtual decimal Value1 { get; set; }
+            public virtual decimal Value2 { get; set; }
         }
 
         public Task Handle(MyMessage message, IMessageHandlerContext context)
