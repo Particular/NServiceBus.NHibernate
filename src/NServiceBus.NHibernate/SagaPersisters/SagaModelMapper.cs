@@ -55,13 +55,10 @@ namespace NServiceBus.SagaPersisters.NHibernate.AutoPersistence
             configuration.AddMapping(modelMapper.Compile());
             configuration.BuildMappings();
             var mappings = configuration.CreateMappings(Dialect.GetDialect(configuration.Properties));
-            foreach (var type in modelMapper.childTables)
+
+            foreach (var collection in mappings.IterateCollections)
             {
-                var table = mappings.GetClass(type.FullName)?.Table;
-                if (table == null)
-                {
-                    continue;
-                }
+                var table = collection.CollectionTable;
                 foreach (var foreignKey in table.ForeignKeyIterator)
                 {
                     var idx = new Index();
