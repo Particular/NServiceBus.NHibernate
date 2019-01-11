@@ -9,6 +9,7 @@ namespace NServiceBus.NHibernate.Tests
     using NServiceBus;
     using NHibernate;
     using NUnit.Framework;
+    using Particular.Approvals;
 
     [TestFixture]
     public class DDL
@@ -18,7 +19,7 @@ namespace NServiceBus.NHibernate.Tests
         public void Outbox()
         {
             var script = ScriptGenerator<MsSql2012Dialect>.GenerateOutboxScript();
-            TestApprover.Verify(script);
+            Approver.Verify(script);
         }
 
         [Test]
@@ -26,7 +27,7 @@ namespace NServiceBus.NHibernate.Tests
         public void Subscriptions()
         {
             var script = ScriptGenerator<MsSql2012Dialect>.GenerateSubscriptionStoreScript();
-            TestApprover.Verify(script);
+            Approver.Verify(script);
         }
 
         [Test]
@@ -34,7 +35,7 @@ namespace NServiceBus.NHibernate.Tests
         public void Timeouts()
         {
             var script = ScriptGenerator<MsSql2012Dialect>.GenerateTimeoutStoreScript();
-            TestApprover.Verify(script);
+            Approver.Verify(script);
         }
 
         [Test]
@@ -42,7 +43,7 @@ namespace NServiceBus.NHibernate.Tests
         public void GatewayDeduplication()
         {
             var script = ScriptGenerator<MsSql2012Dialect>.GenerateGatewayDeduplicationStoreScript();
-            TestApprover.Verify(script);
+            Approver.Verify(script);
         }
 
 #if !NETCOREAPP
@@ -52,7 +53,7 @@ namespace NServiceBus.NHibernate.Tests
         public void MySaga()
         {
             var script = ScriptGenerator<MsSql2012Dialect>.GenerateSagaScript<MySaga>();
-            TestApprover.Verify(script);
+            Approver.Verify(script);
         }
 #endif
     }
