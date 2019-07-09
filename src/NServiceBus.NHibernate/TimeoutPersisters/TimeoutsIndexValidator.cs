@@ -94,12 +94,28 @@
             // Check if running on SQL Server.
             if (typeof(MsSql2005Dialect).IsAssignableFrom(dialect.GetType()))
             {
-                var restrictions = new string[5]
+                string EnsureUnquoted(string name)
                 {
-                    entity.Table.Catalog,
-                    entity.Table.Schema,
-                    entity.Table.Name,
-                    indexName,
+                    if (null == name || name.Length < 2)
+                    {
+                        return name;
+                    }
+
+                    if ('[' == name[0] && ']' == name[name.Length - 1]) // quoted?
+                    {
+                        name = name.Substring(1, name.Length - 2); // remove outer brackets
+                        name = name.Replace("]]", "]"); // un-escape right-bracket
+                    }
+
+                    return name;
+                }
+
+                var restrictions = new []
+                {
+                    EnsureUnquoted(entity.Table.Catalog),
+                    EnsureUnquoted(entity.Table.Schema),
+                    EnsureUnquoted(entity.Table.Name),
+                    EnsureUnquoted(indexName),
                     null
                 };
                 return new SqlServerIndex(connection.GetSchema("IndexColumns", restrictions));
