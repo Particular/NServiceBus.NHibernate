@@ -64,7 +64,7 @@
 
             var validationResult = new TimeoutsIndexValidator(configuration).Validate();
 
-            Assert.IsTrue(validationResult.IsValid, "Validation should fail if index is missing in quoted schema.");
+            Assert.IsFalse(validationResult.IsValid, "Validation should fail if index is missing in quoted schema.");
         }
 
         async Task<Configuration> CreateTimeoutManagerObjects()
