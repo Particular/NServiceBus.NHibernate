@@ -3,6 +3,7 @@ namespace NServiceBus.Features
     using System;
     using System.Threading.Tasks;
     using global::NHibernate.Cfg;
+    using Logging;
     using Persistence.NHibernate;
     using TimeoutPersisters.NHibernate;
     using TimeoutPersisters.NHibernate.Config;
@@ -67,6 +68,8 @@ namespace NServiceBus.Features
 
         class DetectIncorrectIndexesStartupTask : FeatureStartupTask
         {
+            static readonly ILog Logger = LogManager.GetLogger(typeof(DetectIncorrectIndexesStartupTask));
+
             public DetectIncorrectIndexesStartupTask(Configuration configuration)
             {
                 this.configuration = configuration;
@@ -74,7 +77,22 @@ namespace NServiceBus.Features
 
             protected override Task OnStart(IMessageSession session)
             {
-                new IncorrectIndexDetector(configuration).LogWarningIfTimeoutEntityIndexIsIncorrect();
+                var result = new TimeoutsIndexValidator(configuration).Validate();
+
+                if (result.IsValid)
+                {
+                    return Task.FromResult(0);
+                }
+
+                if (result.Exception != null)
+                {
+                    Logger.Warn(result.ErrorDescription, result.Exception);
+                }
+                else
+                {
+                    Logger.Warn(result.ErrorDescription);
+                }
+
                 return Task.FromResult(0);
             }
 

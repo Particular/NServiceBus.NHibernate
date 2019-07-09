@@ -12,11 +12,11 @@
     using System.Data.Common;
     using System.Linq;
 
-    class IncorrectIndexDetector
+    class TimeoutsIndexValidator
     {
-        static readonly ILog Logger = LogManager.GetLogger(typeof(IncorrectIndexDetector));
+        static readonly ILog Logger = LogManager.GetLogger(typeof(TimeoutsIndexValidator));
 
-        public IncorrectIndexDetector(Configuration configuration)
+        public TimeoutsIndexValidator(Configuration configuration)
         {
             dialect = Dialect.GetDialect(configuration.Properties);
             connectionHelper = new ManagedProviderConnectionHelper(MergeProperties(configuration.Properties));
@@ -33,7 +33,7 @@
             return props;
         }
 
-        public void LogWarningIfTimeoutEntityIndexIsIncorrect()
+        public IndexValidationResult Validate()
         {
             try
             {
@@ -43,24 +43,38 @@
                 var index = GetIndex(connection, timeoutEntityMapping, TimeoutEntityMap.EndpointIndexName);
                 if (index == null)
                 {
-                    Logger.Warn($"Could not find {TimeoutEntityMap.EndpointIndexName} index. This may cause significant performance degradation of message deferral. Consult NServiceBus NHibernate persistence documentation for details on how to create this index.");
-                    return;
+                    return new IndexValidationResult
+                    {
+                        IsValid = false,
+                        ErrorDescription = $"Could not find {TimeoutEntityMap.EndpointIndexName} index. This may cause significant performance degradation of message deferral. Consult NServiceBus NHibernate persistence documentation for details on how to create this index."
+                    };
                 }
-
-                var indexCorrect = index.ColumnsCount == 2
-                    && index.ColumnNameAt(1).Equals(nameof(TimeoutEntity.Endpoint), StringComparison.InvariantCultureIgnoreCase)
-                    && index.ColumnNameAt(2).Equals(nameof(TimeoutEntity.Time), StringComparison.InvariantCultureIgnoreCase);
 
                 Logger.Debug($"Detected {TimeoutEntityMap.EndpointIndexName} ({index.ColumnNameAt(1)}, {index.ColumnNameAt(2)})");
 
-                if (!indexCorrect)
+                var validColumns = index.ColumnsCount == 2
+                    && index.ColumnNameAt(1).Equals(nameof(TimeoutEntity.Endpoint), StringComparison.InvariantCultureIgnoreCase)
+                    && index.ColumnNameAt(2).Equals(nameof(TimeoutEntity.Time), StringComparison.InvariantCultureIgnoreCase);
+
+                if (!validColumns)
                 {
-                    Logger.Warn($"The {TimeoutEntityMap.EndpointIndexName} index has incorrect column order. This may cause significant performance degradation of message deferral. Consult NServiceBus NHibernate persistence documentation for details on how to create this index.");
+                    return new IndexValidationResult
+                    {
+                        IsValid = false,
+                        ErrorDescription = $"The {TimeoutEntityMap.EndpointIndexName} index has incorrect column order. This may cause significant performance degradation of message deferral. Consult NServiceBus NHibernate persistence documentation for details on how to create this index."
+                    };
                 }
+
+                return new IndexValidationResult {IsValid = true};
             }
             catch (Exception e)
             {
-                Logger.Warn($"Could not inspect {TimeoutEntityMap.EndpointIndexName} index definition.", e);
+                return new IndexValidationResult
+                {
+                    IsValid = false,
+                    ErrorDescription = $"Could not inspect {TimeoutEntityMap.EndpointIndexName} index definition.",
+                    Exception = e
+                };
             }
             finally
             {
@@ -75,10 +89,8 @@
             }
         }
 
-        private IIndex GetIndex(DbConnection connection, PersistentClass entity, string indexName)
+        IIndex GetIndex(DbConnection connection, PersistentClass entity, string indexName)
         {
-
-
             // Check if running on SQL Server.
             if (typeof(MsSql2005Dialect).IsAssignableFrom(dialect.GetType()))
             {
@@ -107,6 +119,15 @@
             }
 
             return null;
+        }
+
+        public class IndexValidationResult
+        {
+            public bool IsValid { get; set; }
+
+            public string ErrorDescription { get; set; }
+
+            public Exception Exception { get; set; }
         }
 
         interface IIndex
