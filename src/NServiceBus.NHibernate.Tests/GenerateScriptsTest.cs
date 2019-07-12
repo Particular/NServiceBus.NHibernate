@@ -50,9 +50,17 @@ namespace NServiceBus.NHibernate.Tests
         // This test is ignored for .NETCore because of the unstable foreign key name generation in NHibernate https://github.com/nhibernate/nhibernate-core/issues/1769
         [Test]
         [MethodImpl(MethodImplOptions.NoInlining)]
-        public void MySaga()
+        public void Sagas_MsSql2012()
         {
             var script = ScriptGenerator<MsSql2012Dialect>.GenerateSagaScript<MySaga>();
+            Approver.Verify(script);
+        }
+
+        [Test]
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        public void Sagas_Oracle10g()
+        {
+            var script = ScriptGenerator<Oracle10gDialect>.GenerateSagaScript<MySaga>();
             Approver.Verify(script);
         }
 #endif

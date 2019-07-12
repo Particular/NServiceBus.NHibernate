@@ -59,6 +59,7 @@ namespace NServiceBus.SagaPersisters.NHibernate.AutoPersistence
             foreach (var collection in mappings.IterateCollections)
             {
                 var table = collection.CollectionTable;
+
                 foreach (var foreignKey in table.ForeignKeyIterator)
                 {
                     var idx = new Index();
