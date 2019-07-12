@@ -1,0 +1,42 @@
+
+    
+    drop table MySaga_CollectionEntry cascade constraints
+    
+    drop table MySaga cascade constraints
+    
+    drop table EntriesWithoutId cascade constraints
+    
+    create table MySaga_CollectionEntry (
+        Id RAW(16) not null,
+       Value NUMBER(19,5),
+       SagaData_id RAW(16),
+       primary key (Id)
+    )
+    
+    create table MySaga (
+        Id RAW(16) not null,
+       Originator VARCHAR2(255),
+       OriginalMessageId VARCHAR2(255),
+       UniqueId VARCHAR2(255) unique,
+       primary key (Id)
+    )
+    
+    create table EntriesWithoutId (
+        SagaData_id RAW(16) not null,
+       Value1 NUMBER(19,5),
+       Value2 NUMBER(19,5)
+    )
+    
+    create index IDX236CFC11C9055018 on MySaga_CollectionEntry (SagaData_id)
+    
+    alter table MySaga_CollectionEntry 
+        add constraint FK236CFC11C9055018 
+        foreign key (SagaData_id) 
+        references MySaga
+    
+    create index IDX7519A193C9055018 on EntriesWithoutId (SagaData_id)
+    
+    alter table EntriesWithoutId 
+        add constraint FK7519A193C9055018 
+        foreign key (SagaData_id) 
+        references MySaga
