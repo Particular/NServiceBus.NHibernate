@@ -61,9 +61,9 @@
                     if (Data.RelatedData == null)
                         Data.RelatedData = new List<ChildData>
                                        {
-                                           new ChildData{NhNestedCollectionSagaData = Data},
-                                           new ChildData{NhNestedCollectionSagaData = Data},
-                                           new ChildData{NhNestedCollectionSagaData = Data}
+                                           new ChildData{NHNestedCollectionSagaData = Data},
+                                           new ChildData{NHNestedCollectionSagaData = Data},
+                                           new ChildData{NHNestedCollectionSagaData = Data}
                                        };
                     if (Data.MessageOneReceived && Data.MessageTwoReceived && Data.MessageThreeReceived)
                     {
@@ -140,7 +140,7 @@
         public class ChildData
         {
             public virtual Guid Id { get; set; }
-            public virtual NHNestedCollectionSagaData NhNestedCollectionSagaData { get; set; }
+            public virtual NHNestedCollectionSagaData NHNestedCollectionSagaData { get; set; }
         }
 
         [Serializable]
