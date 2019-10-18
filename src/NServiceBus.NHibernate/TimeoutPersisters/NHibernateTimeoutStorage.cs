@@ -50,7 +50,7 @@ namespace NServiceBus.Features
             {
                 var sessionFactory = config.Configuration.BuildSessionFactory();
                 return new TimeoutPersister(
-                    context.Settings.EndpointName().ToString(),
+                    context.Settings.EndpointName(),
                     sessionFactory,
                     new NHibernateSynchronizedStorageAdapter(sessionFactory), new NHibernateSynchronizedStorage(sessionFactory),
                     timeoutsCleanupExecutionInterval);
