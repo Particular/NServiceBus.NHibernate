@@ -42,7 +42,9 @@ namespace NServiceBus.NHibernate.Tests
         [MethodImpl(MethodImplOptions.NoInlining)]
         public void GatewayDeduplication()
         {
+#pragma warning disable 0618
             var script = ScriptGenerator<MsSql2012Dialect>.GenerateGatewayDeduplicationStoreScript();
+#pragma warning restore 0618
             Approver.Verify(script);
         }
 
