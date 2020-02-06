@@ -10,6 +10,10 @@ namespace NServiceBus.Features
     /// <summary>
     /// NHibernate Gateway Deduplication.
     /// </summary>
+    [ObsoleteEx(
+            Message = "NHibernate gateway persistence is deprecated. Use the new NServiceBus.Gateway.Sql dedicated package.",
+            RemoveInVersion = "10.0.0",
+            TreatAsErrorFromVersion = "9.0.0")]
     public class NHibernateGatewayDeduplication : Feature
     {
         /// <summary>
