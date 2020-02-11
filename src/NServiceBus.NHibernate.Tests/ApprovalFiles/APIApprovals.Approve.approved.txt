@@ -31,7 +31,7 @@ namespace NServiceBus.NHibernate.Outbox
     {
         public static NServiceBus.PersistenceExtensions<NServiceBus.NHibernatePersistence> UseOutboxRecord<TEntity, TMapping>(this NServiceBus.PersistenceExtensions<NServiceBus.NHibernatePersistence> persistenceConfiguration)
             where TEntity :  class, NServiceBus.Outbox.NHibernate.IOutboxRecord, new ()
-            where TMapping : NHibernate.Mapping.ByCode.Conformist.ClassMapping<> { }
+            where TMapping : NHibernate.Mapping.ByCode.Conformist.ClassMapping<TEntity> { }
     }
 }
 namespace NServiceBus.NHibernate
