@@ -104,7 +104,7 @@ namespace NServiceBus.TimeoutPersisters.NHibernate.Installer
                             stmt.ExecuteNonQuery();
                         }
                     }
-                    catch (Exception e)
+                    catch (Exception e) when (!e.Message.StartsWith("There is already an object named")) // race condition when two endpoints upgrade the schema
                     {
                         exceptions.Add(e);
                         log.Error(e, "Unsuccessful: " + updateSqlStatement);
