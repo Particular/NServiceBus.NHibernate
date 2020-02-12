@@ -54,7 +54,7 @@ namespace NServiceBus.SagaPersisters.NHibernate.AutoPersistence
             var modelMapper = new SagaModelMapper(allSagaMetadata, types, tableNamingConvention);
             configuration.AddMapping(modelMapper.Compile());
             configuration.BuildMappings();
-            var mappings = configuration.CreateMappings(Dialect.GetDialect(configuration.Properties));
+            var mappings = configuration.CreateMappings();
 
             foreach (var collection in mappings.IterateCollections)
             {
