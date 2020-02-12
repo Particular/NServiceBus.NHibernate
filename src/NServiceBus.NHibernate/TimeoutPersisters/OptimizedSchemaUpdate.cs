@@ -3,12 +3,12 @@ namespace NServiceBus.TimeoutPersisters.NHibernate.Installer
     using System;
     using System.Collections.Generic;
     using System.Data;
-    using global::NHibernate;
     using global::NHibernate.AdoNet.Util;
     using global::NHibernate.Cfg;
     using global::NHibernate.Dialect;
     using global::NHibernate.Tool.hbm2ddl;
     using global::NHibernate.Util;
+    using Logging;
     using Environment = global::NHibernate.Cfg.Environment;
 
     class OptimizedSchemaUpdate
@@ -81,7 +81,7 @@ namespace NServiceBus.TimeoutPersisters.NHibernate.Installer
                 catch (Exception sqlException)
                 {
                     exceptions.Add(sqlException);
-                    log.Error(sqlException, "could not get database metadata");
+                    log.Error("could not get database metadata", sqlException);
                     throw;
                 }
 
@@ -104,10 +104,14 @@ namespace NServiceBus.TimeoutPersisters.NHibernate.Installer
                             stmt.ExecuteNonQuery();
                         }
                     }
-                    catch (Exception e) when (!e.Message.StartsWith("There is already an object named")) // race condition when two endpoints upgrade the schema
+                    catch (Exception e) when (e.Message.StartsWith("There is already an object named") || e.Message.StartsWith("The operation failed because an index or statistics with name"))
+                    {
+                        // ignored because of race when multiple endpoints start
+                    }
+                    catch (Exception e)
                     {
                         exceptions.Add(e);
-                        log.Error(e, "Unsuccessful: " + updateSqlStatement);
+                        log.Error("Unsuccessful: " + updateSqlStatement, e);
                     }
                 }
 
@@ -116,7 +120,7 @@ namespace NServiceBus.TimeoutPersisters.NHibernate.Installer
             catch (Exception e)
             {
                 exceptions.Add(e);
-                log.Error(e, "could not complete schema update");
+                log.Error("could not complete schema update", e);
             }
             finally
             {
@@ -128,7 +132,7 @@ namespace NServiceBus.TimeoutPersisters.NHibernate.Installer
                 catch (Exception e)
                 {
                     exceptions.Add(e);
-                    log.Error(e, "Error closing connection");
+                    log.Error("Error closing connection", e);
                 }
             }
         }
@@ -139,6 +143,6 @@ namespace NServiceBus.TimeoutPersisters.NHibernate.Installer
         List<Exception> exceptions;
         IFormatter formatter;
         SchemaFixUpHelper fixUpHelper;
-        static INHibernateLogger log = NHibernateLogger.For(typeof(OptimizedSchemaUpdate));
+        static ILog log = LogManager.GetLogger<OptimizedSchemaUpdate>();
     }
 }
