@@ -8,7 +8,6 @@ namespace NServiceBus.SagaPersisters.NHibernate.AutoPersistence
     using global::NHibernate;
     using global::NHibernate.Cfg;
     using global::NHibernate.Cfg.MappingSchema;
-    using global::NHibernate.Dialect;
     using global::NHibernate.Mapping;
     using global::NHibernate.Mapping.ByCode;
     using global::NHibernate.Type;
@@ -54,7 +53,7 @@ namespace NServiceBus.SagaPersisters.NHibernate.AutoPersistence
             var modelMapper = new SagaModelMapper(allSagaMetadata, types, tableNamingConvention);
             configuration.AddMapping(modelMapper.Compile());
             configuration.BuildMappings();
-            var mappings = configuration.CreateMappings(Dialect.GetDialect(configuration.Properties));
+            var mappings = configuration.CreateMappings();
 
             foreach (var collection in mappings.IterateCollections)
             {

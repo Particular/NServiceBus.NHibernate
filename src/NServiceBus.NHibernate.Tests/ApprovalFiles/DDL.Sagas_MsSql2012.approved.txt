@@ -1,11 +1,11 @@
 ﻿
     
-    if exists (select 1 from sys.objects where object_id = OBJECT_ID(N'[FK236CFC11C9055018]') and parent_object_id = OBJECT_ID(N'MySaga_CollectionEntry'))
-alter table MySaga_CollectionEntry  drop constraint FK236CFC11C9055018
+    if exists (select 1 from sys.objects where object_id = OBJECT_ID(N'[FK_BAE15720]') and parent_object_id = OBJECT_ID(N'MySaga_CollectionEntry'))
+alter table MySaga_CollectionEntry  drop constraint FK_BAE15720
 
     
-    if exists (select 1 from sys.objects where object_id = OBJECT_ID(N'[FK7519A193C9055018]') and parent_object_id = OBJECT_ID(N'EntriesWithoutId'))
-alter table EntriesWithoutId  drop constraint FK7519A193C9055018
+    if exists (select 1 from sys.objects where object_id = OBJECT_ID(N'[FK_AED12FB9]') and parent_object_id = OBJECT_ID(N'EntriesWithoutId'))
+alter table EntriesWithoutId  drop constraint FK_AED12FB9
 
     
     if exists (select * from dbo.sysobjects where id = object_id(N'MySaga_CollectionEntry') and OBJECTPROPERTY(id, N'IsUserTable') = 1) drop table MySaga_CollectionEntry
@@ -35,16 +35,16 @@ alter table EntriesWithoutId  drop constraint FK7519A193C9055018
        Value2 DECIMAL(19,5) null
     )
     
-    create index IDX236CFC11C9055018 on MySaga_CollectionEntry (SagaData_id)
+    create index IDX_BAE15720 on MySaga_CollectionEntry (SagaData_id)
     
     alter table MySaga_CollectionEntry 
-        add constraint FK236CFC11C9055018 
+        add constraint FK_BAE15720 
         foreign key (SagaData_id) 
         references MySaga
     
-    create index IDX7519A193C9055018 on EntriesWithoutId (SagaData_id)
+    create index IDX_AED12FB9 on EntriesWithoutId (SagaData_id)
     
     alter table EntriesWithoutId 
-        add constraint FK7519A193C9055018 
+        add constraint FK_AED12FB9 
         foreign key (SagaData_id) 
         references MySaga
