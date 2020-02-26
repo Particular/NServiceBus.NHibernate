@@ -44,7 +44,7 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
                 typeof(object)
             };
             metaModel.Initialize(types);
-            settings.Set<SagaMetadataCollection>(metaModel);
+            settings.Set(metaModel);
 
             settings.Set("TypesToScan", types);
             builder.ApplyMappings(settings, cfg);
