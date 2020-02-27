@@ -18,4 +18,9 @@
     <PackageReference Include="NUnit3TestAdapter" Version="3.16.1" />
     <PackageReference Include="System.Data.SqlClient" Version="4.5.1" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="\**\When_handling_concurrent_messages.cs" />
+  </ItemGroup>
+
 </Project>
