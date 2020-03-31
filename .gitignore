@@ -12,9 +12,12 @@ results
 CommonAssemblyInfo.cs
 lib/sqlite/System.Data.SQLite.dll
 *.orig
+*.zip
 Samples/DataBus/storage
 packages
 PrecompiledWeb
+tempstorage
+.learningtransport
 core-only
 Release
 Artifacts
@@ -40,6 +43,9 @@ installer/ServiceControl-cache
 # User-specific files
 *.suo
 *.user
+*.json.lock
+*.nuget.targets
+*.lock.json
 *.userosscache
 *.sln.docstates
 .vs/
@@ -83,3 +89,7 @@ src/scaffolding.config
 
 # Approval tests temp file
 *.received.*
+
+# JetBrains Rider
+.idea/
+*.sln.iml
