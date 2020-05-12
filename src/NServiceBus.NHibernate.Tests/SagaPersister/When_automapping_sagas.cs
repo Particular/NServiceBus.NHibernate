@@ -7,7 +7,6 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
     using global::NHibernate.Id;
     using global::NHibernate.Impl;
     using global::NHibernate.Persister.Entity;
-    using Features;
     using global::NHibernate.Dialect;
     using NServiceBus.NHibernate.Tests;
     using Sagas;
@@ -41,6 +40,8 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
             };
 
             metaModel.Initialize(types);
+
+            cfg.AddAssembly(typeof(TestSaga).Assembly);
 
             SagaModelMapper.AddMappings(cfg, metaModel, types);
 
