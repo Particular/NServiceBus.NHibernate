@@ -9,7 +9,9 @@
     using global::NHibernate.Exceptions;
     using Extensibility;
 
+#pragma warning disable CS0618 // Type or member is obsolete
     class GatewayDeduplication : IDeduplicateMessages
+#pragma warning restore CS0618 // Type or member is obsolete
     {
         readonly ISessionFactory sessionFactory;
 

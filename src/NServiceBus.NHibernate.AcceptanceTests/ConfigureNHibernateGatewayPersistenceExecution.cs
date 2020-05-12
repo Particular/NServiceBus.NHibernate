@@ -8,7 +8,9 @@
     {
         public Task Configure(string endpointName, EndpointConfiguration configuration, RunSettings settings)
         {
+#pragma warning disable CS0618 // Type or member is obsolete
             configuration.UsePersistence<NHibernatePersistence, StorageType.GatewayDeduplication>()
+#pragma warning restore CS0618 // Type or member is obsolete
                 .ConnectionString(EndpointConfigurer.ConnectionString);
 
             return Task.FromResult(0);
