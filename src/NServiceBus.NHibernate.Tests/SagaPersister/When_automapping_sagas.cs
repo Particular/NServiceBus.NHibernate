@@ -2,16 +2,11 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
 {
     using System;
     using System.Linq;
-    using global::NHibernate.Cfg;
     using global::NHibernate.Engine;
     using global::NHibernate.Id;
     using global::NHibernate.Impl;
     using global::NHibernate.Persister.Entity;
-    using global::NHibernate.Dialect;
-    using NServiceBus.NHibernate.Tests;
-    using Sagas;
     using NUnit.Framework;
-    using SagaPersisters.NHibernate.AutoPersistence;
 
     [TestFixture]
     public class When_autoMapping_sagas
@@ -22,14 +17,6 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
         [OneTimeSetUp]
         public void SetUp()
         {
-            var cfg = new Configuration()
-                .DataBaseIntegration(x =>
-                {
-                    x.Dialect<MsSql2012Dialect>();
-                    x.ConnectionString = Consts.SqlConnectionString;
-                });
-
-            var metaModel = new SagaMetadataCollection();
             var types = new[] {typeof(TestSaga), typeof(TestSagaData), typeof(TestComponent), typeof(PolymorphicPropertyBase),
                 typeof(AlsoDerivedFromTestSagaWithTableNameAttributeActualSaga), typeof(AlsoDerivedFromTestSagaWithTableNameAttribute),
                 typeof(DerivedFromTestSagaWithTableNameAttributeActualSaga), typeof(DerivedFromTestSagaWithTableNameAttribute),
@@ -39,13 +26,7 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
                 typeof(object)
             };
 
-            metaModel.Initialize(types);
-
-            cfg.AddAssembly(typeof(TestSaga).Assembly);
-
-            SagaModelMapper.AddMappings(cfg, metaModel, types);
-
-            sessionFactory = cfg.BuildSessionFactory() as SessionFactoryImpl;
+            sessionFactory = SessionFactoryHelper.Build(types);
 
             persisterForTestSaga = sessionFactory.GetEntityPersisterFor<TestSagaData>();
         }
