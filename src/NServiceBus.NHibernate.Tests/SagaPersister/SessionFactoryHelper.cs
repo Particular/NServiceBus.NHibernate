@@ -2,12 +2,11 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
 {
     using System;
     using System.Linq;
-    using Features;
     using global::NHibernate.Cfg;
     using global::NHibernate.Dialect;
     using global::NHibernate.Impl;
     using NServiceBus.NHibernate.Tests;
-    using SagaPersisters.NHibernate.AutoPersistence;
+    using AutoPersistence;
     using Sagas;
 
     public static class SessionFactoryHelper
