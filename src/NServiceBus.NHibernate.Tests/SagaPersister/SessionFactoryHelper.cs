@@ -1,20 +1,18 @@
 namespace NServiceBus.SagaPersisters.NHibernate.Tests
 {
     using System;
-    using Features;
+    using System.Linq;
     using global::NHibernate.Cfg;
     using global::NHibernate.Dialect;
     using global::NHibernate.Impl;
     using NServiceBus.NHibernate.Tests;
+    using AutoPersistence;
     using Sagas;
-    using Settings;
 
     public static class SessionFactoryHelper
     {
         public static SessionFactoryImpl Build(Type[] types)
         {
-            var builder = new NHibernateSagaStorage();
-
             var cfg = new Configuration()
                 .DataBaseIntegration(x =>
                 {
@@ -22,14 +20,19 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
                     x.ConnectionString = Consts.SqlConnectionString;
                 });
 
-            var settings = new SettingsHolder();
-
             var metaModel = new SagaMetadataCollection();
-            metaModel.Initialize(types);
-            settings.Set(metaModel);
 
-            settings.Set("TypesToScan", types);
-            builder.ApplyMappings(settings, cfg);
+            metaModel.Initialize(types);
+
+            var assemblies = types.Select(t => t.Assembly).Distinct();
+
+            foreach (var assembly in assemblies)
+            {
+                cfg.AddAssembly(assembly);
+            }
+
+            SagaModelMapper.AddMappings(cfg, metaModel, types);
+
             return cfg.BuildSessionFactory() as SessionFactoryImpl;
         }
     }

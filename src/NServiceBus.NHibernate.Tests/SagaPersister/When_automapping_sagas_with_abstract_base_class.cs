@@ -2,15 +2,9 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
 {
     using System;
     using System.Threading.Tasks;
-    using Features;
-    using global::NHibernate.Cfg;
-    using global::NHibernate.Dialect;
     using global::NHibernate.Impl;
     using global::NHibernate.Persister.Entity;
-    using NServiceBus.NHibernate.Tests;
-    using Sagas;
     using NUnit.Framework;
-    using Settings;
 
     [TestFixture]
     public class When_autoMapping_sagas_with_abstract_base_class
@@ -20,26 +14,11 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
         [SetUp]
         public void SetUp()
         {
-            var builder = new NHibernateSagaStorage();
-
-            var cfg = new Configuration()
-                .DataBaseIntegration(x =>
-                {
-                    x.Dialect<MsSql2012Dialect>();
-                    x.ConnectionString = Consts.SqlConnectionString;
-                });
-
-            var types = new[] { typeof(SagaWithAbstractBaseClassActualSaga), typeof(SagaWithAbstractBaseClass), typeof(ContainSagaData), typeof(MyOwnAbstractBase) };
-
-            var allMetadata = new SagaMetadataCollection();
-            allMetadata.Initialize(types);
-
-            var settings = new SettingsHolder();
-            settings.Set("TypesToScan", types);
-            settings.Set(allMetadata);
-
-            builder.ApplyMappings(settings, cfg);
-            sessionFactory = cfg.BuildSessionFactory() as SessionFactoryImpl;
+            sessionFactory = SessionFactoryHelper.Build(new[] {
+                typeof(SagaWithAbstractBaseClassActualSaga),
+                typeof(SagaWithAbstractBaseClass),
+                typeof(ContainSagaData),
+                typeof(MyOwnAbstractBase) });
         }
 
         [Test]
