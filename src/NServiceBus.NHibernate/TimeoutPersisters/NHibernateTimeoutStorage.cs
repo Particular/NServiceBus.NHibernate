@@ -1,6 +1,7 @@
 namespace NServiceBus.Features
 {
     using System;
+    using System.Dynamic;
     using System.Threading.Tasks;
     using global::NHibernate.Cfg;
     using Logging;
@@ -31,7 +32,9 @@ namespace NServiceBus.Features
         /// </summary>
         protected override void Setup(FeatureConfigurationContext context)
         {
-            var builder = new NHibernateConfigurationBuilder(context.Settings, "Timeout", "NHibernate.Timeouts.Configuration", "StorageConfiguration");
+            dynamic diagnostics = new ExpandoObject();
+
+            var builder = new NHibernateConfigurationBuilder(context.Settings, diagnostics, "Timeout", "NHibernate.Timeouts.Configuration");
             builder.AddMappings<TimeoutEntityMap>();
             var config = builder.Build();
 
@@ -45,6 +48,7 @@ namespace NServiceBus.Features
             }
 
             var timeoutsCleanupExecutionInterval = context.Settings.GetOrDefault<TimeSpan?>("NHibernate.Timeouts.CleanupExecutionInterval") ?? TimeSpan.FromMinutes(2);
+            diagnostics.CleanupInterval = timeoutsCleanupExecutionInterval;
 
             context.Container.ConfigureComponent(b =>
             {
@@ -57,6 +61,8 @@ namespace NServiceBus.Features
             }, DependencyLifecycle.SingleInstance);
 
             context.RegisterStartupTask(new DetectIncorrectIndexesStartupTask(config.Configuration));
+
+            context.Settings.AddStartupDiagnosticsSection("NServiceBus.Persistence.NHibernate.Timeouts", (object)diagnostics);
         }
 
         static bool RunInstaller(FeatureConfigurationContext context)

@@ -4,6 +4,7 @@ namespace NServiceBus.Persistence.NHibernate.Tests
     using System.Collections.Generic;
     using System.Collections.Specialized;
     using System.Configuration;
+    using System.Dynamic;
     using NUnit.Framework;
     using Settings;
 
@@ -49,7 +50,7 @@ namespace NServiceBus.Persistence.NHibernate.Tests
                     new ConnectionStringSettings("NServiceBus/Persistence", connectionString)
                 };
 
-            var builder = new NHibernateConfigurationBuilder(new SettingsHolder(), "NotUsed", "NotUsed");
+            var builder = new NHibernateConfigurationBuilder(new SettingsHolder(), new ExpandoObject(), "NotUsed", "NotUsed");
 
             var expected = new Dictionary<string, string>
                 {
@@ -71,7 +72,7 @@ namespace NServiceBus.Persistence.NHibernate.Tests
                                                  "timeout_connection_string")
                 };
 
-            var builder = new NHibernateConfigurationBuilder(new SettingsHolder(),"Timeout","NotUsed");
+            var builder = new NHibernateConfigurationBuilder(new SettingsHolder(), new ExpandoObject(), "Timeout","NotUsed");
 
             var expected = new Dictionary<string, string>
                 {
@@ -95,7 +96,7 @@ namespace NServiceBus.Persistence.NHibernate.Tests
                     new ConnectionStringSettings("NServiceBus/Persistence", connectionString)
                 };
 
-            var builder = new NHibernateConfigurationBuilder(new SettingsHolder(), "NotUsed", "NotUsed");
+            var builder = new NHibernateConfigurationBuilder(new SettingsHolder(), new ExpandoObject(), "NotUsed", "NotUsed");
 
             var expected = new Dictionary<string, string>
                 {
@@ -120,7 +121,7 @@ namespace NServiceBus.Persistence.NHibernate.Tests
                 {
                     new ConnectionStringSettings("NServiceBus/Persistence", connectionString)
                 };
-            var builder = new NHibernateConfigurationBuilder(new SettingsHolder(), "NotUsed","NotUsed");
+            var builder = new NHibernateConfigurationBuilder(new SettingsHolder(), new ExpandoObject(), "NotUsed","NotUsed");
 
             var expected = new Dictionary<string, string>
                 {
@@ -231,7 +232,7 @@ namespace NServiceBus.Persistence.NHibernate.Tests
                     new ConnectionStringSettings("NServiceBus/Persistence", "specified")
                 };
 
-                var builder = new NHibernateConfigurationBuilder(new SettingsHolder(), "NotUsed", "NotUsed");
+                var builder = new NHibernateConfigurationBuilder(new SettingsHolder(), new ExpandoObject(), "NotUsed", "NotUsed");
                 return builder.Build().Configuration.Properties;
             }
         }
@@ -240,7 +241,7 @@ namespace NServiceBus.Persistence.NHibernate.Tests
         {
             public IDictionary<string, string> Execute()
             {
-                var builder = new NHibernateConfigurationBuilder(new SettingsHolder(), "NotUsed", "NotUsed");
+                var builder = new NHibernateConfigurationBuilder(new SettingsHolder(), new ExpandoObject(), "NotUsed", "NotUsed");
                 return builder.Build().Configuration.Properties;
             }
         }

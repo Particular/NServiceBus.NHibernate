@@ -1,5 +1,6 @@
 namespace NServiceBus.Features
 {
+    using System.Dynamic;
     using System.Threading.Tasks;
     using Deduplication.NHibernate.Config;
     using Deduplication.NHibernate;
@@ -33,7 +34,9 @@ namespace NServiceBus.Features
         /// </summary>
         protected override void Setup(FeatureConfigurationContext context)
         {
-            var builder = new NHibernateConfigurationBuilder(context.Settings, "Deduplication", "NHibernate.GatewayDeduplication.Configuration", "StorageConfiguration");
+            dynamic diagnostics = new ExpandoObject();
+
+            var builder = new NHibernateConfigurationBuilder(context.Settings, diagnostics, "Deduplication", "NHibernate.GatewayDeduplication.Configuration");
             builder.AddMappings<DeduplicationMessageMap>();
             var config = builder.Build();
 
@@ -47,6 +50,8 @@ namespace NServiceBus.Features
                 };
             }
             context.Container.ConfigureComponent(b => new GatewayDeduplication(config.Configuration.BuildSessionFactory()), DependencyLifecycle.SingleInstance);
+
+            context.Settings.AddStartupDiagnosticsSection("NServiceBus.Persistence.NHibernate.Gateway", (object)diagnostics);
         }
 
         static bool RunInstaller(FeatureConfigurationContext context)
