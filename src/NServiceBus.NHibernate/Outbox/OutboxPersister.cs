@@ -15,12 +15,15 @@
     class OutboxPersister<TEntity> : INHibernateOutboxStorage
         where TEntity : class, IOutboxRecord, new()
     {
+        const string EndpointQualifiedMessageIdContextKey = "NServiceBus.Persistence.NHibernate.EndpointQualifiedMessageId";
         ISessionFactory sessionFactory;
+        Func<ISession, ITransaction, INHibernateOutboxTransaction> outboxTransactionFactory;
         string endpointName;
 
-        public OutboxPersister(ISessionFactory sessionFactory, string endpointName)
+        public OutboxPersister(ISessionFactory sessionFactory, Func<ISession, ITransaction, INHibernateOutboxTransaction> outboxTransactionFactory, string endpointName)
         {
             this.sessionFactory = sessionFactory;
+            this.outboxTransactionFactory = outboxTransactionFactory;
             this.endpointName = endpointName;
         }
 
@@ -36,6 +39,9 @@
                 throw new Exception("The endpoint is configured to use Outbox but a TransactionScope has been detected. Outbox mode is not compatible with "
                     + $"TransactionScope. Do not configure the transport to use '{nameof(TransportTransactionMode.TransactionScope)}' transaction mode with Outbox.");
             }
+
+            //Required by BeginTransaction
+            context.Set(EndpointQualifiedMessageIdContextKey, EndpointQualifiedMessageId(messageId));
 
             using (new TransactionScope(TransactionScopeOption.Suppress, TransactionScopeAsyncFlowOption.Enabled))
             {
@@ -72,21 +78,8 @@
 
         public Task Store(OutboxMessage outboxMessage, OutboxTransaction transaction, ContextBag context)
         {
-            var operations = outboxMessage.TransportOperations.Select(t => new OutboxOperation
-            {
-                Message = t.Body,
-                Headers = t.Headers,
-                MessageId = t.MessageId,
-                Options = t.Options,
-            });
-            var nhibernateTransaction = (NHibernateOutboxTransaction)transaction;
-            var record = new TEntity
-            {
-                MessageId = EndpointQualifiedMessageId(outboxMessage.MessageId),
-                Dispatched = false,
-                TransportOperations = ConvertObjectToString(operations)
-            };
-            return nhibernateTransaction.Session.SaveAsync(record);
+            var nhibernateTransaction = (INHibernateOutboxTransaction)transaction;
+            return nhibernateTransaction.Complete<TEntity>(EndpointQualifiedMessageId(outboxMessage.MessageId), outboxMessage, context);
         }
 
         public async Task SetAsDispatched(string messageId, ContextBag context)
@@ -108,13 +101,25 @@
             }
         }
 
-        public Task<OutboxTransaction> BeginTransaction(ContextBag context)
+        public async Task<OutboxTransaction> BeginTransaction(ContextBag context)
         {
+            //Provided by Get
+            var endpointQualifiedMessageId = context.Get<string>(EndpointQualifiedMessageIdContextKey);
+
             var session = sessionFactory.OpenSession();
             var transaction = session.BeginTransaction();
 
-            OutboxTransaction result = new NHibernateOutboxTransaction(session, transaction);
-            return Task.FromResult(result);
+            var result = outboxTransactionFactory(session, transaction);
+            try
+            {
+                await result.Open<TEntity>(endpointQualifiedMessageId).ConfigureAwait(false);
+                return result;
+            }
+            catch (Exception e)
+            {
+                result.Dispose();
+                throw new Exception("Error while opening outbox transaction", e);
+            }
         }
 
         public async Task RemoveEntriesOlderThan(DateTime dateTime)
@@ -141,16 +146,6 @@
             }
 
             return ObjectSerializer.DeSerialize<IEnumerable<OutboxOperation>>(data);
-        }
-
-        static string ConvertObjectToString(IEnumerable<OutboxOperation> operations)
-        {
-            if (operations == null || !operations.Any())
-            {
-                return null;
-            }
-
-            return ObjectSerializer.Serialize(operations);
         }
 
         string EndpointQualifiedMessageId(string messageId)

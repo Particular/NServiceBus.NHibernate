@@ -10,9 +10,9 @@
     [SkipWeaving]
     class NHibernateOutboxTransactionSynchronizedStorageSession : CompletableSynchronizedStorageSession, INHibernateSynchronizedStorageSession
     {
-        NHibernateOutboxTransaction outboxTransaction;
+        NHibernateOptimisticOutboxTransaction outboxTransaction;
 
-        public NHibernateOutboxTransactionSynchronizedStorageSession(NHibernateOutboxTransaction outboxTransaction)
+        public NHibernateOutboxTransactionSynchronizedStorageSession(NHibernateOptimisticOutboxTransaction outboxTransaction)
         {
             this.outboxTransaction = outboxTransaction;
         }

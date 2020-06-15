@@ -22,6 +22,7 @@ namespace NServiceBus.Features
     public class NHibernateStorageSession : Feature
     {
         internal const string OutboxMappingSettingsKey = "NServiceBus.NHibernate.OutboxMapping";
+        internal const string OutboxModeSettingsKey = "NServiceBus.NHibernate.OutboxPessimisticMode";
 
         internal NHibernateStorageSession()
         {
@@ -66,8 +67,9 @@ namespace NServiceBus.Features
 
             if (outboxEnabled)
             {
-                var factory = context.Settings.Get<IOutboxPersisterFactory>();
-                var persister = factory.Create(sessionFactory, context.Settings.EndpointName());
+                var persisterFactory = context.Settings.Get<IOutboxPersisterFactory>();
+                var pessimisticMode = context.Settings.GetOrDefault<bool>(OutboxModeSettingsKey);
+                var persister = persisterFactory.Create(sessionFactory, context.Settings.EndpointName(), pessimisticMode);
                 context.Container.ConfigureComponent(b => persister, DependencyLifecycle.SingleInstance);
 
                 var timeToKeepDeduplicationData = GetTimeToKeepDeduplicationData();

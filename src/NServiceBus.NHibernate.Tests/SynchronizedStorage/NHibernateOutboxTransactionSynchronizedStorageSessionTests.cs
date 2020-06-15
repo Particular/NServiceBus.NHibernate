@@ -17,7 +17,7 @@
             var transaction = session.BeginTransaction();
 
             var callbackInvoked = false;
-            using (var outboxTransaction = new NHibernateOutboxTransaction(session, transaction))
+            using (var outboxTransaction = new NHibernateOptimisticOutboxTransaction(session, transaction))
             {
                 var adapter = new NHibernateSynchronizedStorageAdapter(SessionFactory);
 
@@ -44,7 +44,7 @@
             var transaction = session.BeginTransaction();
 
             var callbackInvoked = false;
-            using (var outboxTransaction = new NHibernateOutboxTransaction(session, transaction))
+            using (var outboxTransaction = new NHibernateOptimisticOutboxTransaction(session, transaction))
             {
                 var adapter = new NHibernateSynchronizedStorageAdapter(SessionFactory);
 
@@ -75,7 +75,7 @@
             {
                 var transaction = session.BeginTransaction();
 
-                using (var outboxTransaction = new NHibernateOutboxTransaction(session, transaction))
+                using (var outboxTransaction = new NHibernateOptimisticOutboxTransaction(session, transaction))
                 {
                     var adapter = new NHibernateSynchronizedStorageAdapter(SessionFactory);
 
