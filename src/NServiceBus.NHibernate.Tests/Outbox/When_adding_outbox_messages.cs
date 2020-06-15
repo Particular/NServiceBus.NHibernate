@@ -47,7 +47,7 @@ namespace NServiceBus.NHibernate.Tests.Outbox
 
             sessionFactory = cfg.BuildSessionFactory();
 
-            persister = new OutboxPersister<TEntity>(sessionFactory, "TestEndpoint");
+            persister = new OutboxPersister<TEntity>(sessionFactory, (session, transaction) => new NHibernateOptimisticOutboxTransaction(session, transaction),  "TestEndpoint");
         }
 
         [TearDown]
@@ -71,7 +71,7 @@ namespace NServiceBus.NHibernate.Tests.Outbox
                         new TransportOperation("1", new Dictionary<string, string>(), new byte[0], new Dictionary<string, string>())
                     };
 
-                    await persister.Store(new OutboxMessage(messageId, transportOperations), new NHibernateOutboxTransaction(session, transaction), new ContextBag());
+                    await persister.Store(new OutboxMessage(messageId, transportOperations), new NHibernateOptimisticOutboxTransaction(session, transaction), new ContextBag());
                     await transaction.CommitAsync();
                 }
             }
@@ -90,7 +90,7 @@ namespace NServiceBus.NHibernate.Tests.Outbox
             using (var session = sessionFactory.OpenSession())
             using (var transaction = session.BeginTransaction())
             {
-                await persister.Store(new OutboxMessage("MySpecialId", new TransportOperation[0]), new NHibernateOutboxTransaction(session, transaction), new ContextBag());
+                await persister.Store(new OutboxMessage("MySpecialId", new TransportOperation[0]), new NHibernateOptimisticOutboxTransaction(session, transaction), new ContextBag());
                 await transaction.CommitAsync();
             }
             try
@@ -98,7 +98,7 @@ namespace NServiceBus.NHibernate.Tests.Outbox
                 using (var session = sessionFactory.OpenSession())
                 using (var transaction = session.BeginTransaction())
                 {
-                    await persister.Store(new OutboxMessage("MySpecialId", new TransportOperation[0]), new NHibernateOutboxTransaction(session, transaction), new ContextBag());
+                    await persister.Store(new OutboxMessage("MySpecialId", new TransportOperation[0]), new NHibernateOptimisticOutboxTransaction(session, transaction), new ContextBag());
                     await transaction.CommitAsync();
                 }
             }
@@ -119,7 +119,7 @@ namespace NServiceBus.NHibernate.Tests.Outbox
                 await persister.Store(new OutboxMessage(id, new[]
                 {
                         new TransportOperation(id, new Dictionary<string, string>(), new byte[1024*5], new Dictionary<string, string>()),
-                    }), new NHibernateOutboxTransaction(session, transaction), new ContextBag());
+                    }), new NHibernateOptimisticOutboxTransaction(session, transaction), new ContextBag());
                 await transaction.CommitAsync();
             }
 
@@ -140,7 +140,7 @@ namespace NServiceBus.NHibernate.Tests.Outbox
                 await persister.Store(new OutboxMessage(id, new[]
                 {
                     new TransportOperation(id, new Dictionary<string, string>(), new byte[1024*5], new Dictionary<string, string>()),
-                }), new NHibernateOutboxTransaction(session, transaction), new ContextBag());
+                }), new NHibernateOptimisticOutboxTransaction(session, transaction), new ContextBag());
 
                 await transaction.CommitAsync();
             }
@@ -165,11 +165,11 @@ namespace NServiceBus.NHibernate.Tests.Outbox
             using (var session = sessionFactory.OpenSession())
             using (var transaction = session.BeginTransaction())
             {
-                await persister.Store(new OutboxMessage("NotDispatched", new TransportOperation[0]), new NHibernateOutboxTransaction(session, transaction), new ContextBag());
+                await persister.Store(new OutboxMessage("NotDispatched", new TransportOperation[0]), new NHibernateOptimisticOutboxTransaction(session, transaction), new ContextBag());
                 await persister.Store(new OutboxMessage(id, new[]
                 {
                         new TransportOperation(id, new Dictionary<string, string>(), new byte[1024*5], new Dictionary<string, string>()),
-                    }), new NHibernateOutboxTransaction(session, transaction), new ContextBag());
+                    }), new NHibernateOptimisticOutboxTransaction(session, transaction), new ContextBag());
 
                 await transaction.CommitAsync();
             }

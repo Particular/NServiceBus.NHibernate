@@ -26,7 +26,7 @@
 
         public Task<CompletableSynchronizedStorageSession> TryAdapt(OutboxTransaction transaction, ContextBag context)
         {
-            var nhibernateTransaction = transaction as NHibernateOutboxTransaction;
+            var nhibernateTransaction = transaction as NHibernateOptimisticOutboxTransaction;
             if (nhibernateTransaction != null)
             {
                 if (Transaction.Current != null)
