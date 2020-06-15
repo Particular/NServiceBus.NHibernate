@@ -23,19 +23,40 @@ namespace NServiceBus.Persistence.NHibernate
 
         readonly Configuration configuration;
 
-        public NHibernateConfigurationBuilder(ReadOnlySettings settings, string connectionStringKeySuffix, params string[] settingsKeys)
+        public NHibernateConfigurationBuilder(ReadOnlySettings settings, dynamic diagnosticsObject, string connectionStringKeySuffix, string specificConfigSetting)
         {
-            configuration = settingsKeys.Select(settings.GetOrDefault<Configuration>).FirstOrDefault(x => x != null);
-            if (configuration == null)
+            if (settings.TryGet(specificConfigSetting, out configuration))
+            {
+                ValidateConfigurationViaCode(configuration.Properties);
+
+                diagnosticsObject.ConfigurationFromCode = true;
+                diagnosticsObject.SharedConfig = false;
+            }
+            else if (settings.TryGet("StorageConfiguration", out configuration))
+            {
+                ValidateConfigurationViaCode(configuration.Properties);
+
+                diagnosticsObject.ConfigurationFromCode = true;
+                diagnosticsObject.SharedConfig = false;
+            }
+            else
             {
                 var configurationProperties = InitFromConfiguration(settings);
                 var overriddenProperties = OverrideConnectionStringSettingIfNotNull(configurationProperties, connectionStringKeySuffix);
                 configuration = new Configuration().SetProperties(overriddenProperties);
                 ValidateConfigurationViaConfigFile(configuration, connectionStringKeySuffix);
+
+                diagnosticsObject.ConfigurationFromAppSettings = true;
             }
-            else
+
+            AddDialect(diagnosticsObject, configuration);
+        }
+
+        static void AddDialect(dynamic diagnosticsObject, Configuration configuration)
+        {
+            if (configuration.Properties.TryGetValue(Environment.Dialect, out var dialect))
             {
-                ValidateConfigurationViaCode(configuration.Properties);
+                diagnosticsObject.Dialect = dialect;
             }
         }
 
@@ -160,7 +181,7 @@ For most scenarios the 'NServiceBus/Persistence' connection string is the best o
 
         static IDictionary<string, string> OverrideConnectionStringSettingIfNotNull(IDictionary<string, string> configurationProperties, string connectionStringSuffix)
         {
-            var connectionStringOverride = GetConnectionStringOrNull("NServiceBus/Persistence/NHibernate/"+connectionStringSuffix);
+            var connectionStringOverride = GetConnectionStringOrNull("NServiceBus/Persistence/NHibernate/" + connectionStringSuffix);
 
             if (string.IsNullOrEmpty(connectionStringOverride))
             {
@@ -179,8 +200,8 @@ For most scenarios the 'NServiceBus/Persistence' connection string is the best o
         {
             var connectionStringSettings = connectionStringSettingsCollection[name];
 
-            return connectionStringSettings == null 
-                ? null 
+            return connectionStringSettings == null
+                ? null
                 : connectionStringSettings.ConnectionString;
         }
     }

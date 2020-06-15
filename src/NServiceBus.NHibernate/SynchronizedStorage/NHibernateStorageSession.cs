@@ -1,16 +1,18 @@
 namespace NServiceBus.Features
 {
     using System;
+    using System.Configuration;
+    using System.Dynamic;
     using System.Linq;
     using System.Text;
     using System.Threading.Tasks;
-    using global::NHibernate.Cfg;
     using global::NHibernate.Mapping.ByCode;
     using NHibernate.Outbox;
     using global::NHibernate.Transaction;
     using NServiceBus.Outbox.NHibernate;
     using TimeoutPersisters.NHibernate.Installer;
     using Persistence.NHibernate;
+    using Configuration = global::NHibernate.Cfg.Configuration;
     using Environment = global::NHibernate.Cfg.Environment;
     using Installer = Persistence.NHibernate.Installer.Installer;
 
@@ -42,7 +44,9 @@ namespace NServiceBus.Features
         /// </summary>
         protected override void Setup(FeatureConfigurationContext context)
         {
-            var builder = new NHibernateConfigurationBuilder(context.Settings, "Saga", "StorageConfiguration");
+            dynamic diagnostics = new ExpandoObject();
+
+            var builder = new NHibernateConfigurationBuilder(context.Settings, diagnostics, "Saga", "StorageConfiguration");
             var config = builder.Build();
             var sharedMappings = context.Settings.Get<SharedMappings>();
 
@@ -65,7 +69,20 @@ namespace NServiceBus.Features
                 var factory = context.Settings.Get<IOutboxPersisterFactory>();
                 var persister = factory.Create(sessionFactory, context.Settings.EndpointName());
                 context.Container.ConfigureComponent(b => persister, DependencyLifecycle.SingleInstance);
-                context.RegisterStartupTask(b => new OutboxCleaner(persister, b.Build<CriticalError>()));
+
+                var timeToKeepDeduplicationData = GetTimeToKeepDeduplicationData();
+                var deduplicationDataCleanupPeriod = GetDeduplicationDataCleanupPeriod();
+                var outboxCleanupCriticalErrorTriggerTime = GetOutboxCleanupCriticalErrorTriggerTime();
+
+                context.RegisterStartupTask(b => new OutboxCleaner(persister, b.Build<CriticalError>(), timeToKeepDeduplicationData, deduplicationDataCleanupPeriod, outboxCleanupCriticalErrorTriggerTime));
+
+                context.Settings.AddStartupDiagnosticsSection("NServiceBus.Persistence.NHibernate.Outbox", new
+                {
+                    TimeToKeepDeduplicationData = timeToKeepDeduplicationData,
+                    DeduplicationDataCleanupPeriod = deduplicationDataCleanupPeriod,
+                    OutboxCleanupCriticalErrorTriggerTime = outboxCleanupCriticalErrorTriggerTime,
+                    RecordType = context.Settings.Get<Type>(OutboxMappingSettingsKey).FullName
+                });
             }
 
             var runInstaller = context.Settings.Get<bool>("NHibernate.Common.AutoUpdateSchema");
@@ -90,12 +107,12 @@ TSql Script:
 {1}";
                         throw new Exception(string.Format(errorMessage, aggregate.Flatten(), sb));
                     }
-
-
-
                     return Task.FromResult(0);
                 };
             }
+
+
+            context.Settings.AddStartupDiagnosticsSection("NServiceBus.Persistence.NHibernate.SynchronizedSession", (object)diagnostics);
         }
 
         void ApplyMappings(Configuration config, FeatureConfigurationContext context)
@@ -103,6 +120,50 @@ TSql Script:
             var mapper = new ModelMapper();
             mapper.AddMapping(context.Settings.Get<Type>(OutboxMappingSettingsKey));
             config.AddMapping(mapper.CompileMappingForAllExplicitlyAddedEntities());
+        }
+
+        static TimeSpan GetOutboxCleanupCriticalErrorTriggerTime()
+        {
+            var configValue = ConfigurationManager.AppSettings.Get("NServiceBus/Outbox/NHibernate/TimeToWaitBeforeTriggeringCriticalErrorWhenCleanupTaskFails");
+            if (configValue == null)
+            {
+                return TimeSpan.FromMinutes(2);
+            }
+            if (TimeSpan.TryParse(configValue, out var typedValue))
+            {
+                return typedValue;
+            }
+            throw new Exception("Invalid value in \"NServiceBus/Outbox/NHibernate/TimeToWaitBeforeTriggeringCriticalErrorWhenCleanupTaskFails\" AppSetting. Please ensure it is a TimeSpan.");
+
+        }
+
+        static TimeSpan GetDeduplicationDataCleanupPeriod()
+        {
+            var configValue = ConfigurationManager.AppSettings.Get("NServiceBus/Outbox/NHibernate/FrequencyToRunDeduplicationDataCleanup");
+            if (configValue == null)
+            {
+                return TimeSpan.FromMinutes(1);
+            }
+            if (TimeSpan.TryParse(configValue, out var typedValue))
+            {
+                return typedValue;
+            }
+            throw new Exception("Invalid value in \"NServiceBus/Outbox/NHibernate/FrequencyToRunDeduplicationDataCleanup\" AppSetting. Please ensure it is a TimeSpan.");
+
+        }
+
+        static TimeSpan GetTimeToKeepDeduplicationData()
+        {
+            var configValue = ConfigurationManager.AppSettings.Get("NServiceBus/Outbox/NHibernate/TimeToKeepDeduplicationData");
+            if (configValue == null)
+            {
+                return TimeSpan.FromDays(7);
+            }
+            if (TimeSpan.TryParse(configValue, out var typedValue))
+            {
+                return typedValue;
+            }
+            throw new Exception("Invalid value in \"NServiceBus/Outbox/NHibernate/TimeToKeepDeduplicationData\" AppSetting. Please ensure it is a TimeSpan.");
         }
     }
 }

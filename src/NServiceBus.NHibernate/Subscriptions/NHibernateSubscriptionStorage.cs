@@ -1,6 +1,7 @@
 namespace NServiceBus.Features
 {
     using System;
+    using System.Dynamic;
     using System.Threading.Tasks;
     using TimeoutPersisters.NHibernate.Installer;
     using Persistence.NHibernate;
@@ -35,7 +36,9 @@ namespace NServiceBus.Features
         /// </summary>
         protected override void Setup(FeatureConfigurationContext context)
         {
-            var builder = new NHibernateConfigurationBuilder(context.Settings, "Subscription", "NHibernate.Subscriptions.Configuration", "StorageConfiguration");
+            dynamic diagnostics = new ExpandoObject();
+
+            var builder = new NHibernateConfigurationBuilder(context.Settings, diagnostics, "Subscription", "NHibernate.Subscriptions.Configuration");
             builder.AddMappings<SubscriptionMap>();
             var config = builder.Build();
 
@@ -50,12 +53,25 @@ namespace NServiceBus.Features
             }
 
             var sessionFactory = config.Configuration.BuildSessionFactory();
-            var persister = context.Settings.HasSetting(CacheExpirationSettingsKey) 
-                ? new CachedSubscriptionPersister(sessionFactory, context.Settings.Get<TimeSpan>(CacheExpirationSettingsKey)) 
-                : new SubscriptionPersister(sessionFactory);
+            SubscriptionPersister persister;
+            if (context.Settings.HasSetting(CacheExpirationSettingsKey))
+            {
+                var cacheFor = context.Settings.Get<TimeSpan>(CacheExpirationSettingsKey);
+                persister = new CachedSubscriptionPersister(sessionFactory, cacheFor);
+
+                diagnostics.Cache = true;
+                diagnostics.EntriesCashedFor = cacheFor;
+            }
+            else
+            {
+                persister = new SubscriptionPersister(sessionFactory);
+                diagnostics.Cache = false;
+            }
 
             context.Container.ConfigureComponent(b => persister, DependencyLifecycle.SingleInstance);
             context.RegisterStartupTask(new SubscriptionPersisterInitTask(persister));
+
+            context.Settings.AddStartupDiagnosticsSection("NServiceBus.Persistence.NHibernate.Subscriptions", (object)diagnostics);
         }
 
         static bool RunInstaller(FeatureConfigurationContext context)

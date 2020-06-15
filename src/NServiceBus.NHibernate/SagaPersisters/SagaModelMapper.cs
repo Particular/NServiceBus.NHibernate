@@ -48,10 +48,11 @@ namespace NServiceBus.SagaPersisters.NHibernate.AutoPersistence
             mapper.BeforeMapManyToOne += ApplyManyToOneConvention;
         }
 
-        public static void AddMappings(Configuration configuration, SagaMetadataCollection allSagaMetadata, IEnumerable<Type> types, Func<Type, string> tableNamingConvention = null)
+        public static List<string> AddMappings(Configuration configuration, SagaMetadataCollection allSagaMetadata, IEnumerable<Type> types, Func<Type, string> tableNamingConvention = null)
         {
             var modelMapper = new SagaModelMapper(allSagaMetadata, types, tableNamingConvention);
-            configuration.AddMapping(modelMapper.Compile());
+            var conventionMapping = modelMapper.Compile();
+            configuration.AddMapping(conventionMapping);
             configuration.BuildMappings();
             var mappings = configuration.CreateMappings();
 
@@ -68,6 +69,8 @@ namespace NServiceBus.SagaPersisters.NHibernate.AutoPersistence
                     table.AddIndex(idx);
                 }
             }
+
+            return conventionMapping.RootClasses.Select(x => x.Name).ToList();
         }
 
         void ApplyClassConvention(IModelInspector mi, Type type, IClassAttributesMapper map)
