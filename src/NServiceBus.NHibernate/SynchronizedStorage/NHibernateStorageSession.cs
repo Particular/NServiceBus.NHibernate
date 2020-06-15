@@ -24,6 +24,9 @@ namespace NServiceBus.Features
         internal const string OutboxMappingSettingsKey = "NServiceBus.NHibernate.OutboxMapping";
         internal const string OutboxTableNameSettingsKey = "NServiceBus.NHibernate.OutboxTableName";
         internal const string OutboxSchemaNameSettingsKey = "NServiceBus.NHibernate.OutboxSchemaName";
+        internal const string OutboxConcurrencyModeSettingsKey = "NServiceBus.NHibernate.OutboxPessimisticMode";
+        internal const string OutboxTransactionModeSettingsKey = "NServiceBus.NHibernate.OutboxTransactionScopeMode";
+
         internal NHibernateStorageSession()
         {
             DependsOnOptionally<Outbox>();
