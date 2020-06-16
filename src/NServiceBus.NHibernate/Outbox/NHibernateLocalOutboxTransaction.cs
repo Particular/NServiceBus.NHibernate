@@ -2,14 +2,18 @@
 {
     using System;
     using System.Threading.Tasks;
+    using System.Transactions;
     using Extensibility;
     using global::NHibernate;
     using Janitor;
+    using Logging;
     using Outbox;
 
     [SkipWeaving]
     class NHibernateLocalOutboxTransaction : INHibernateOutboxTransaction
     {
+        static ILog Log = LogManager.GetLogger<NHibernateLocalOutboxTransaction>();
+
         readonly OutboxBehavior behavior;
         readonly ISessionFactory sessionFactory;
 
@@ -66,6 +70,17 @@
         public Task Complete(string endpointQualifiedMessageId, OutboxMessage outboxMessage, ContextBag context)
         {
             return behavior.Complete(endpointQualifiedMessageId, Session, outboxMessage, context);
+        }
+
+        public void BeginSynchronizedSession(ContextBag context)
+        {
+            if (Transaction.Current != null)
+            {
+                Log.Warn("The endpoint is configured to use Outbox but a TransactionScope has been detected. " +
+                         "In order to make the Outbox compatible with TransactionScope, use " +
+                         "config.EnableOutbox().UseTransactionScope(). " +
+                         "Do not use config.UnitOfWork().WrapHandlersInATransactionScope().");
+            }
         }
     }
 }

@@ -26,6 +26,7 @@
         {
             if (transaction is INHibernateOutboxTransaction nhibernateTransaction)
             {
+                nhibernateTransaction.BeginSynchronizedSession(context);
                 CompletableSynchronizedStorageSession session = new NHibernateOutboxTransactionSynchronizedStorageSession(nhibernateTransaction);
                 return Task.FromResult(session);
             }

@@ -8,12 +8,14 @@
     using global::NHibernate;
     using global::NHibernate.Impl;
     using Janitor;
+    using Logging;
 
     [SkipWeaving]
     class NHibernateTransactionScopeTransaction : INHibernateOutboxTransaction
     {
-        OutboxBehavior behavior;
+        static ILog Log = LogManager.GetLogger<NHibernateTransactionScopeTransaction>();
 
+        OutboxBehavior behavior;
         Func<Task> onSaveChangesCallback;
         TransactionScope transactionScope;
         Transaction ambientTransaction;
@@ -89,6 +91,16 @@
         {
             await behavior.Complete(endpointQualifiedMessageId, Session, outboxMessage, context).ConfigureAwait(false);
             await Session.FlushAsync().ConfigureAwait(false);
+        }
+
+        public void BeginSynchronizedSession(ContextBag context)
+        {
+            if (Transaction.Current != null && Transaction.Current != ambientTransaction)
+            {
+                Log.Warn("The endpoint is configured to use Outbox with TransactionScope but a different TransactionScope " +
+                         "has been detected in the current context. " +
+                         "Do not use config.UnitOfWork().WrapHandlersInATransactionScope().");
+            }
         }
 
         ISession OpenSession()

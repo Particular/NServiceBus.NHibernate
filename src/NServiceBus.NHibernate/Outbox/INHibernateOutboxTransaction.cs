@@ -11,5 +11,6 @@
         void OnSaveChanges(Func<Task> callback);
         Task Begin(string endpointQualifiedMessageId);
         Task Complete(string endpointQualifiedMessageId, OutboxMessage outboxMessage, ContextBag context);
+        void BeginSynchronizedSession(ContextBag context);
     }
 }
