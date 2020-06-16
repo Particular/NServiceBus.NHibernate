@@ -6,19 +6,29 @@
 
     interface IOutboxPersisterFactory
     {
-        INHibernateOutboxStorage Create(ISessionFactory sessionFactory, string endpointName, bool pessimisticMode);
+        INHibernateOutboxStorage Create(ISessionFactory sessionFactory, string endpointName, bool pessimisticMode, bool transactionScope);
     }
 
     class OutboxPersisterFactory<T> : IOutboxPersisterFactory
         where T : class, IOutboxRecord, new()
     {
-        public INHibernateOutboxStorage Create(ISessionFactory sessionFactory, string endpointName, bool pessimisticMode)
+        public INHibernateOutboxStorage Create(ISessionFactory sessionFactory, string endpointName, bool pessimisticMode, bool transactionScope)
         {
-            INHibernateOutboxTransaction transactionFactory(ISession session, ITransaction transaction)
+            OutboxBehavior behavior;
+            if (pessimisticMode)
             {
-                return pessimisticMode
-                    ? (INHibernateOutboxTransaction)new NHibernatePessimisticOutboxTransaction(session, transaction)
-                    : new NHibernateOptimisticOutboxTransaction(session, transaction);
+                behavior = new PessimisticOutboxBehavior<T>();
+            }
+            else
+            {
+                behavior = new OptimisticOutboxBehavior<T>();
+            }
+
+            INHibernateOutboxTransaction transactionFactory()
+            {
+                return transactionScope
+                    ? (INHibernateOutboxTransaction)new NHibernateTransactionScopeTransaction(behavior, sessionFactory)
+                    : new NHibernateLocalOutboxTransaction(behavior, sessionFactory);
             }
 
             var persister = new OutboxPersister<T>(sessionFactory, transactionFactory, endpointName);

@@ -22,7 +22,8 @@ namespace NServiceBus.Features
     public class NHibernateStorageSession : Feature
     {
         internal const string OutboxMappingSettingsKey = "NServiceBus.NHibernate.OutboxMapping";
-        internal const string OutboxModeSettingsKey = "NServiceBus.NHibernate.OutboxPessimisticMode";
+        internal const string OutboxConcurrencyModeSettingsKey = "NServiceBus.NHibernate.OutboxPessimisticMode";
+        internal const string OutboxTransactionModeSettingsKey = "NServiceBus.NHibernate.OutboxTransactionScopeMode";
 
         internal NHibernateStorageSession()
         {
@@ -68,8 +69,9 @@ namespace NServiceBus.Features
             if (outboxEnabled)
             {
                 var persisterFactory = context.Settings.Get<IOutboxPersisterFactory>();
-                var pessimisticMode = context.Settings.GetOrDefault<bool>(OutboxModeSettingsKey);
-                var persister = persisterFactory.Create(sessionFactory, context.Settings.EndpointName(), pessimisticMode);
+                var pessimisticMode = context.Settings.GetOrDefault<bool>(OutboxConcurrencyModeSettingsKey);
+                var transactionScopeMode = context.Settings.GetOrDefault<bool>(OutboxTransactionModeSettingsKey);
+                var persister = persisterFactory.Create(sessionFactory, context.Settings.EndpointName(), pessimisticMode, transactionScopeMode);
                 context.Container.ConfigureComponent(b => persister, DependencyLifecycle.SingleInstance);
 
                 var timeToKeepDeduplicationData = GetTimeToKeepDeduplicationData();

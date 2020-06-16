@@ -7,7 +7,6 @@
     using global::NHibernate;
     using global::NHibernate.Impl;
     using Extensibility;
-    using Logging;
     using Outbox;
     using Outbox.NHibernate;
     using Persistence;
@@ -17,7 +16,6 @@
     {
         ISessionFactory sessionFactory;
         static readonly Task<CompletableSynchronizedStorageSession> EmptyResult = Task.FromResult((CompletableSynchronizedStorageSession)null);
-        static ILog Log = LogManager.GetLogger<NHibernateSynchronizedStorageAdapter>();
 
         public NHibernateSynchronizedStorageAdapter(ISessionFactory sessionFactory)
         {
@@ -26,15 +24,8 @@
 
         public Task<CompletableSynchronizedStorageSession> TryAdapt(OutboxTransaction transaction, ContextBag context)
         {
-            var nhibernateTransaction = transaction as NHibernateOptimisticOutboxTransaction;
-            if (nhibernateTransaction != null)
+            if (transaction is INHibernateOutboxTransaction nhibernateTransaction)
             {
-                if (Transaction.Current != null)
-                {
-                    Log.Warn("The endpoint is configured to use Outbox but a TransactionScope has been detected. Outbox mode is not compatible with "
-                        + "TransactionScope. Do not use config.UnitOfWork().WrapHandlersInATransactionScope() when Outbox is enabled.");
-                }
-
                 CompletableSynchronizedStorageSession session = new NHibernateOutboxTransactionSynchronizedStorageSession(nhibernateTransaction);
                 return Task.FromResult(session);
             }

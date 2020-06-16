@@ -17,10 +17,10 @@
     {
         const string EndpointQualifiedMessageIdContextKey = "NServiceBus.Persistence.NHibernate.EndpointQualifiedMessageId";
         ISessionFactory sessionFactory;
-        Func<ISession, ITransaction, INHibernateOutboxTransaction> outboxTransactionFactory;
+        Func<INHibernateOutboxTransaction> outboxTransactionFactory;
         string endpointName;
 
-        public OutboxPersister(ISessionFactory sessionFactory, Func<ISession, ITransaction, INHibernateOutboxTransaction> outboxTransactionFactory, string endpointName)
+        public OutboxPersister(ISessionFactory sessionFactory, Func<INHibernateOutboxTransaction> outboxTransactionFactory, string endpointName)
         {
             this.sessionFactory = sessionFactory;
             this.outboxTransactionFactory = outboxTransactionFactory;
@@ -79,7 +79,7 @@
         public Task Store(OutboxMessage outboxMessage, OutboxTransaction transaction, ContextBag context)
         {
             var nhibernateTransaction = (INHibernateOutboxTransaction)transaction;
-            return nhibernateTransaction.Complete<TEntity>(EndpointQualifiedMessageId(outboxMessage.MessageId), outboxMessage, context);
+            return nhibernateTransaction.Complete(EndpointQualifiedMessageId(outboxMessage.MessageId), outboxMessage, context);
         }
 
         public async Task SetAsDispatched(string messageId, ContextBag context)
@@ -106,13 +106,10 @@
             //Provided by Get
             var endpointQualifiedMessageId = context.Get<string>(EndpointQualifiedMessageIdContextKey);
 
-            var session = sessionFactory.OpenSession();
-            var transaction = session.BeginTransaction();
-
-            var result = outboxTransactionFactory(session, transaction);
+            var result = outboxTransactionFactory();
             try
             {
-                await result.Open<TEntity>(endpointQualifiedMessageId).ConfigureAwait(false);
+                await result.Begin(endpointQualifiedMessageId).ConfigureAwait(false);
                 return result;
             }
             catch (Exception e)

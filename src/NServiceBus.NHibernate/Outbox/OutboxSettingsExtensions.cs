@@ -17,9 +17,19 @@
         /// mode only affects non-transactional side effects. In the pessimistic mode the latter are less likely to be applied
         /// multiple times but that can still happen e.g. when a message processing attempt is interrupted.
         /// </summary>
-        public static void PessimisticMode(this OutboxSettings outboxSettings)
+        public static void UsePessimisticConcurrencyControl(this OutboxSettings outboxSettings)
         {
-            outboxSettings.GetSettings().Set(NHibernateStorageSession.OutboxModeSettingsKey, true);
+            outboxSettings.GetSettings().Set(NHibernateStorageSession.OutboxConcurrencyModeSettingsKey, true);
+        }
+
+        /// <summary>
+        /// Configures the outbox to use TransactionScope instead of native NHibernate transactions. This allows extending the
+        /// scope of the outbox transaction (and synchronized storage session it protects) to other databases provided that
+        /// Distributed Transaction Coordinator (DTC) infrastructure is configured.
+        /// </summary>
+        public static void UseTransactionScope(this OutboxSettings outboxSettings)
+        {
+            outboxSettings.GetSettings().Set(NHibernateStorageSession.OutboxTransactionModeSettingsKey, true);
         }
     }
 }

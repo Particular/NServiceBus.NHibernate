@@ -64,7 +64,7 @@
                 EndpointSetup<DefaultServer>(b =>
                 {
                     var outboxSettings = b.EnableOutbox();
-                    outboxSettings.PessimisticMode();
+                    outboxSettings.UsePessimisticConcurrencyControl();
 
                     b.Pipeline.Register(typeof(TerminatorBehavior), "Terminator");
                     var recoverability = b.Recoverability();

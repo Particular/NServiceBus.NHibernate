@@ -1,13 +1,15 @@
 ﻿namespace NServiceBus.Outbox.NHibernate
 {
+    using System;
     using System.Threading.Tasks;
     using Extensibility;
+    using global::NHibernate;
 
     interface INHibernateOutboxTransaction : OutboxTransaction
     {
-        Task Open<TEntity>(string endpointQualifiedMessageId)
-            where TEntity : class, IOutboxRecord, new();
-        Task Complete<TEntity>(string endpointQualifiedMessageId, OutboxMessage outboxMessage, ContextBag context)
-            where TEntity : class, IOutboxRecord, new();
+        ISession Session { get; }
+        void OnSaveChanges(Func<Task> callback);
+        Task Begin(string endpointQualifiedMessageId);
+        Task Complete(string endpointQualifiedMessageId, OutboxMessage outboxMessage, ContextBag context);
     }
 }
