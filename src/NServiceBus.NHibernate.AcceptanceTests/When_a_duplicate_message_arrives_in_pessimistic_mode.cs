@@ -8,8 +8,17 @@
     using NServiceBus.Pipeline;
     using NUnit.Framework;
 
+    [TestFixture(false)]
+    [TestFixture(true)]
     public class When_a_duplicate_message_arrives_in_pessimistic_mode : NServiceBusAcceptanceTest
     {
+        bool transactionScope;
+
+        public When_a_duplicate_message_arrives_in_pessimistic_mode(bool transactionScope)
+        {
+            this.transactionScope = transactionScope;
+        }
+
         [Test]
         public async Task Should_not_invoke_handler_for_a_duplicate_message()
         {
@@ -21,6 +30,14 @@
                     var duplicateMessageId = Guid.NewGuid().ToString();
                     await Send(duplicateMessageId, session);
                     await Send(duplicateMessageId, session);
+                }).CustomConfig(c =>
+                {
+                    var outboxSettings = c.EnableOutbox();
+                    outboxSettings.UsePessimisticConcurrencyControl();
+                    if (transactionScope)
+                    {
+                        outboxSettings.UseTransactionScope();
+                    }
                 }))
                 .Done(c => c.MessagesReceived >= 2)
                 .Run();
@@ -63,9 +80,6 @@
             {
                 EndpointSetup<DefaultServer>(b =>
                 {
-                    var outboxSettings = b.EnableOutbox();
-                    outboxSettings.UsePessimisticConcurrencyControl();
-
                     b.Pipeline.Register(typeof(TerminatorBehavior), "Terminator");
                     var recoverability = b.Recoverability();
                     recoverability.Immediate(immediate => immediate.NumberOfRetries(5));

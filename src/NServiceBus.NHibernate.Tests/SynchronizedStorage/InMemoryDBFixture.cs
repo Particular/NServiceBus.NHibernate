@@ -6,6 +6,7 @@ namespace NServiceBus.NHibernate.Tests.SynchronizedStorage
     using global::NHibernate.Dialect;
     using global::NHibernate.Mapping.ByCode;
     using global::NHibernate.Tool.hbm2ddl;
+    using NServiceBus.Outbox.NHibernate;
     using NUnit.Framework;
 
     class InMemoryDBFixture
@@ -25,6 +26,7 @@ namespace NServiceBus.NHibernate.Tests.SynchronizedStorage
 
             var mapper = new ModelMapper();
             mapper.AddMapping<TestEntity.Mapping>();
+            mapper.AddMapping<OutboxRecordMapping>();
             cfg.AddMapping(mapper.CompileMappingForAllExplicitlyAddedEntities());
 
             schema = new SchemaExport(cfg);

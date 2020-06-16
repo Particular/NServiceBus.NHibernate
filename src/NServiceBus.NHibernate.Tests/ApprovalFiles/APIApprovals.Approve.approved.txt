@@ -59,7 +59,8 @@ namespace NServiceBus
     }
     public class static OutboxSettingsExtensions
     {
-        public static void PessimisticMode(this NServiceBus.Outbox.OutboxSettings outboxSettings) { }
+        public static void UsePessimisticConcurrencyControl(this NServiceBus.Outbox.OutboxSettings outboxSettings) { }
+        public static void UseTransactionScope(this NServiceBus.Outbox.OutboxSettings outboxSettings) { }
     }
     public class static SynchronizedStorageSessionExtensions
     {

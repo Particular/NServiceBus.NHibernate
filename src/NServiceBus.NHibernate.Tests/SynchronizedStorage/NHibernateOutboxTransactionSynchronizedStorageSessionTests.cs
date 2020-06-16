@@ -3,23 +3,43 @@
     using System;
     using System.Threading.Tasks;
     using Extensibility;
+    using NHibernate.Outbox;
     using NServiceBus.Outbox.NHibernate;
     using Persistence.NHibernate;
     using NUnit.Framework;
 
-    [TestFixture]
+    [TestFixture(false, false)]
+    [TestFixture(true, false)]
+    [TestFixture(false, true)]
+    [TestFixture(true, true)]
     class NHibernateOutboxTransactionSynchronizedStorageSessionTests : InMemoryDBFixture
     {
+        bool pessimistic;
+        bool transactionScope;
+
+        public NHibernateOutboxTransactionSynchronizedStorageSessionTests(bool pessimistic, bool transactionScope)
+        {
+            this.pessimistic = pessimistic;
+            this.transactionScope = transactionScope;
+        }
+
         [Test]
-        public async Task It_does_not_invoke_callbacks_when_session_is_completed_and_dispoased()
+        public async Task It_does_not_invoke_callbacks_when_session_is_completed_and_disposed()
         {
             var callbackInvoked = false;
-            using (var outboxTransaction = new NHibernateLocalOutboxTransaction(new OptimisticOutboxBehavior<OutboxRecord>(), SessionFactory))
+
+            var outboxPersisterFactory = new OutboxPersisterFactory<OutboxRecord>();
+            var persister = outboxPersisterFactory.Create(SessionFactory, "TestEndpoint", pessimistic, transactionScope);
+            
+            var messageId = Guid.NewGuid().ToString("N");
+            var contextBag = new ContextBag();
+            await persister.Get(messageId, contextBag);
+
+            using (var outboxTransaction = await persister.BeginTransaction(contextBag))
             {
-                await outboxTransaction.Begin(Guid.NewGuid().ToString());
                 var adapter = new NHibernateSynchronizedStorageAdapter(SessionFactory);
 
-                using (var storageSession = await adapter.TryAdapt(outboxTransaction, new ContextBag()))
+                using (var storageSession = await adapter.TryAdapt(outboxTransaction, contextBag))
                 {
                     storageSession.Session(); //Make sure session is initialized
                     storageSession.OnSaveChanges(s =>
@@ -39,12 +59,19 @@
         public async Task It_invokes_callbacks_when_outbox_transaction_is_completed()
         {
             var callbackInvoked = false;
-            using (var outboxTransaction = new NHibernateLocalOutboxTransaction(new OptimisticOutboxBehavior<OutboxRecord>(), SessionFactory))
+
+            var outboxPersisterFactory = new OutboxPersisterFactory<OutboxRecord>();
+            var persister = outboxPersisterFactory.Create(SessionFactory, "TestEndpoint", pessimistic, transactionScope);
+
+            var messageId = Guid.NewGuid().ToString("N");
+            var contextBag = new ContextBag();
+            await persister.Get(messageId, contextBag);
+
+            using (var outboxTransaction = await persister.BeginTransaction(contextBag))
             {
-                await outboxTransaction.Begin(Guid.NewGuid().ToString());
                 var adapter = new NHibernateSynchronizedStorageAdapter(SessionFactory);
 
-                using (var storageSession = await adapter.TryAdapt(outboxTransaction, new ContextBag()))
+                using (var storageSession = await adapter.TryAdapt(outboxTransaction, contextBag))
                 {
                     storageSession.Session(); //Make sure session is initialized
                     storageSession.OnSaveChanges(s =>
@@ -67,12 +94,19 @@
         {
             var entityId = Guid.NewGuid().ToString();
             var exceptionThrown = false;
-            using (var outboxTransaction = new NHibernateLocalOutboxTransaction(new OptimisticOutboxBehavior<OutboxRecord>(), SessionFactory))
+
+            var outboxPersisterFactory = new OutboxPersisterFactory<OutboxRecord>();
+            var persister = outboxPersisterFactory.Create(SessionFactory, "TestEndpoint", pessimistic, transactionScope);
+
+            var messageId = Guid.NewGuid().ToString("N");
+            var contextBag = new ContextBag();
+            await persister.Get(messageId, contextBag);
+
+            using (var outboxTransaction = await persister.BeginTransaction(contextBag))
             {
-                await outboxTransaction.Begin(Guid.NewGuid().ToString());
                 var adapter = new NHibernateSynchronizedStorageAdapter(SessionFactory);
 
-                using (var storageSession = await adapter.TryAdapt(outboxTransaction, new ContextBag()))
+                using (var storageSession = await adapter.TryAdapt(outboxTransaction, contextBag))
                 {
                     storageSession.Session().Save(new TestEntity
                     {
