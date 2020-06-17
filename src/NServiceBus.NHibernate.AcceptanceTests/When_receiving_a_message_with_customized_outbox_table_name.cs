@@ -1,6 +1,5 @@
 ﻿namespace NServiceBus.AcceptanceTests
 {
-    using System;
     using System.Threading.Tasks;
     using AcceptanceTesting;
     using EndpointTemplates;
@@ -8,8 +7,6 @@
     using global::NHibernate.Cfg;
     using global::NHibernate.Dialect;
     using global::NHibernate.Driver;
-    using global::NHibernate.Mapping.ByCode;
-    using global::NHibernate.Mapping.ByCode.Conformist;
     using global::NHibernate.SqlCommand;
     using NHibernate.Outbox;
     using NServiceBus.Outbox.NHibernate;
@@ -18,7 +15,7 @@
     using Persistence;
     using Environment = global::NHibernate.Cfg.Environment;
 
-    public class When_receiving_a_message_with_customized_outbox_record_mapping : NServiceBusAcceptanceTest
+    public class When_receiving_a_message_with_customized_outbox_table_name : NServiceBusAcceptanceTest
     {
         [Test]
         public async Task Should_handle_it()
@@ -37,14 +34,14 @@
 
                         var persistence = configuration.UsePersistence<NHibernatePersistence>();
                         persistence.UseConfiguration(cfg);
-                        persistence.UseOutboxRecord<MessageIdOutboxRecord, MessageIdOutboxRecordMapping>();
+                        persistence.CustomizeOutboxTableName("MyOutbox", "dbo");
                     })
                     .When(session => session.SendLocal(new PlaceOrder())))
-                .Done(c => c.OrderAckReceived == 1)
+                .Done(c => c.Done)
                 .Run();
 
-            Assert.AreEqual(1, result.OrderAckReceived);
-            Assert.IsTrue(result.CorrectTableNameDetected);
+            Assert.IsTrue(result.Done);
+            StringAssert.StartsWith("INSERT INTO dbo.MyOutbox", result.OutboxTableInsert);
         }
 
         class LoggingInterceptor : EmptyInterceptor
@@ -58,9 +55,9 @@
 
             public override SqlString OnPrepareStatement(SqlString sql)
             {
-                if (sql.StartsWithCaseInsensitive("insert into MessageIdOutboxRecordMapping"))
+                if (sql.StartsWithCaseInsensitive("insert into "))
                 {
-                    context.CorrectTableNameDetected = true;
+                    context.OutboxTableInsert = sql.ToString();
                 }
                 return sql;
             }
@@ -68,8 +65,8 @@
 
         class Context : ScenarioContext
         {
-            public int OrderAckReceived { get; set; }
-            public bool CorrectTableNameDetected { get; set; }
+            public bool Done { get; set; }
+            public string OutboxTableInsert { get; set; }
         }
 
         public class Endpoint : EndpointConfigurationBuilder
@@ -86,10 +83,7 @@
             {
                 public Task Handle(PlaceOrder message, IMessageHandlerContext context)
                 {
-                    return context.SendLocal(new SendOrderAcknowledgement
-                    {
-                        MessageId = context.MessageId
-                    });
+                    return context.SendLocal(new SendOrderAcknowledgement());
                 }
             }
 
@@ -97,17 +91,9 @@
             {
                 public Context Context { get; set; }
 
-                public ReadOnlySettings Settings { get; set; }
-
                 public Task Handle(SendOrderAcknowledgement message, IMessageHandlerContext context)
                 {
-                    var session = context.SynchronizedStorageSession.Session();
-                    var recordId = Settings.EndpointName() + "/" + message.MessageId;
-                    var record = session.Get<MessageIdOutboxRecord>(recordId);
-                    if (record != null)
-                    {
-                        Context.OrderAckReceived++;
-                    }
+                    Context.Done = true;
                     return Task.FromResult(0);
                 }
             }
@@ -119,31 +105,6 @@
 
         public class SendOrderAcknowledgement : IMessage
         {
-            public string MessageId { get; set; }
-        }
-
-        class MessageIdOutboxRecord : IOutboxRecord
-        {
-            public virtual string MessageId { get; set; }
-            public virtual bool Dispatched { get; set; }
-            public virtual DateTime? DispatchedAt { get; set; }
-            public virtual string TransportOperations { get; set; }
-        }
-
-        class MessageIdOutboxRecordMapping : ClassMapping<MessageIdOutboxRecord>
-        {
-            public MessageIdOutboxRecordMapping()
-            {
-                Table("MessageIdOutboxRecordMapping");
-                EntityName("MessageIdOutboxRecord");
-                Id(x => x.MessageId, m => m.Generator(Generators.Assigned));
-                Property(p => p.Dispatched, pm =>
-                {
-                    pm.Column(c => c.NotNullable(true));
-                });
-                Property(p => p.DispatchedAt);
-                Property(p => p.TransportOperations, pm => pm.Type(NHibernateUtil.StringClob));
-            }
         }
     }
 }

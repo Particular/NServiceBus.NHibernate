@@ -31,21 +31,11 @@
         /// </summary>
         /// <param name="persistenceConfiguration">The NHibernate persister configuration instance.</param>
         /// <param name="outboxTableName">Table name to use for outbox records.</param>
+        /// <param name="outboxSchemaName">Schema to use for the outbox table (optional, defaults to the default schema).</param>
         /// <returns>The NHibernate configuration.</returns>
-        public static PersistenceExtensions<NHibernatePersistence> UseOutboxTableName(this PersistenceExtensions<NHibernatePersistence> persistenceConfiguration, string outboxTableName)
+        public static PersistenceExtensions<NHibernatePersistence> CustomizeOutboxTableName(this PersistenceExtensions<NHibernatePersistence> persistenceConfiguration, string outboxTableName, string outboxSchemaName = null)
         {
             persistenceConfiguration.GetSettings().Set(NHibernateStorageSession.OutboxTableNameSettingsKey, outboxTableName);
-            return persistenceConfiguration;
-        }
-
-        /// <summary>
-        /// Assign a custom schema name for the outbox record.
-        /// </summary>
-        /// <param name="persistenceConfiguration">The NHibernate persister configuration instance.</param>
-        /// <param name="outboxSchemaName">Schema to use for outbox table.</param>
-        /// <returns>The NHibernate configuration.</returns>
-        public static PersistenceExtensions<NHibernatePersistence> UseOutboxSchemaName(this PersistenceExtensions<NHibernatePersistence> persistenceConfiguration, string outboxSchemaName)
-        {
             persistenceConfiguration.GetSettings().Set(NHibernateStorageSession.OutboxSchemaNameSettingsKey, outboxSchemaName);
             return persistenceConfiguration;
         }

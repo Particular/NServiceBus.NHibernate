@@ -32,7 +32,6 @@ namespace NServiceBus.Features
             {
                 s.SetDefault<SharedMappings>(new SharedMappings());
                 s.SetDefault<IOutboxPersisterFactory>(new OutboxPersisterFactory<OutboxRecord>());
-                s.SetDefault(OutboxMappingSettingsKey, typeof(OutboxRecordMapping));
             });
 
             // since the installers are registered even if the feature isn't enabled we need to make
@@ -49,42 +48,42 @@ namespace NServiceBus.Features
 
             var builder = new NHibernateConfigurationBuilder(context.Settings, diagnostics, "Saga", "StorageConfiguration");
             var config = builder.Build();
-            var sharedMappings = context.Settings.Get<SharedMappings>();
 
+            
             var outboxEnabled = context.Settings.IsFeatureActive(typeof(Outbox));
             if (outboxEnabled)
             {
-                sharedMappings.AddMapping(configuration => ApplyMappings(configuration, context));
                 config.Configuration.Properties[Environment.TransactionStrategy] = typeof(AdoNetTransactionFactory).FullName;
 
-                if (context.Settings.TryGet(OutboxTableNameSettingsKey, out string tableName))
-                {
-                    outboxTableName = tableName;
-                }
+                var sharedMappings = context.Settings.Get<SharedMappings>();
 
-                if (context.Settings.TryGet(OutboxSchemaNameSettingsKey, out string schemaName))
-                {
-                    outboxSchemaName = schemaName;
-                }
-            }
-
-            sharedMappings.ApplyTo(config.Configuration);
-
-            var sessionFactory = config.Configuration.BuildSessionFactory();
-
-            context.Container.ConfigureComponent(b => new NHibernateSynchronizedStorage(sessionFactory), DependencyLifecycle.SingleInstance);
-            context.Container.ConfigureComponent(b => new NHibernateSynchronizedStorageAdapter(sessionFactory), DependencyLifecycle.SingleInstance);
-
-            if (outboxEnabled)
-            {
-                var factory = context.Settings.Get<IOutboxPersisterFactory>();
-                var persister = factory.Create(sessionFactory, context.Settings.EndpointName());
-                context.Container.ConfigureComponent(b => persister, DependencyLifecycle.SingleInstance);
+                var configuredOutboxRecordType = context.Settings.GetOrDefault<Type>(OutboxMappingSettingsKey);
+                var actualOutboxRecordType = configuredOutboxRecordType ?? typeof(OutboxRecordMapping);
+                var outboxTableName = context.Settings.GetOrDefault<string>(OutboxTableNameSettingsKey);
+                var outboxSchemaName = context.Settings.GetOrDefault<string>(OutboxSchemaNameSettingsKey);
 
                 var timeToKeepDeduplicationData = GetTimeToKeepDeduplicationData();
                 var deduplicationDataCleanupPeriod = GetDeduplicationDataCleanupPeriod();
                 var outboxCleanupCriticalErrorTriggerTime = GetOutboxCleanupCriticalErrorTriggerTime();
 
+                if (outboxTableName != null && configuredOutboxRecordType != null)
+                {
+                    throw new Exception("Custom outbox table name and custom outbox record type cannot be specified at the same time.");
+                }
+
+                sharedMappings.AddMapping(configuration =>
+                {
+                    ApplyMappings(configuration, actualOutboxRecordType, outboxTableName, outboxSchemaName);
+                });
+
+                sharedMappings.ApplyTo(config.Configuration);
+                var sessionFactory = config.Configuration.BuildSessionFactory();
+                var persisterFactory = context.Settings.Get<IOutboxPersisterFactory>();
+                var persister = persisterFactory.Create(sessionFactory, context.Settings.EndpointName());
+                
+                context.Container.ConfigureComponent(b => persister, DependencyLifecycle.SingleInstance);
+                context.Container.ConfigureComponent(b => new NHibernateSynchronizedStorage(sessionFactory), DependencyLifecycle.SingleInstance);
+                context.Container.ConfigureComponent(b => new NHibernateSynchronizedStorageAdapter(sessionFactory), DependencyLifecycle.SingleInstance);
                 context.RegisterStartupTask(b => new OutboxCleaner(persister, b.Build<CriticalError>(), timeToKeepDeduplicationData, deduplicationDataCleanupPeriod, outboxCleanupCriticalErrorTriggerTime));
 
                 context.Settings.AddStartupDiagnosticsSection("NServiceBus.Persistence.NHibernate.Outbox", new
@@ -92,10 +91,19 @@ namespace NServiceBus.Features
                     TimeToKeepDeduplicationData = timeToKeepDeduplicationData,
                     DeduplicationDataCleanupPeriod = deduplicationDataCleanupPeriod,
                     OutboxCleanupCriticalErrorTriggerTime = outboxCleanupCriticalErrorTriggerTime,
-                    RecordType = context.Settings.Get<Type>(OutboxMappingSettingsKey).FullName
+                    RecordType = actualOutboxRecordType.FullName,
+                    CustomOutboxTableName = outboxTableName,
+                    CustomOutboxSchemaName = outboxSchemaName
                 });
             }
-
+            else
+            {
+                var sharedMappings = context.Settings.Get<SharedMappings>();
+                sharedMappings.ApplyTo(config.Configuration);
+                var sessionFactory = config.Configuration.BuildSessionFactory();
+                context.Container.ConfigureComponent(b => new NHibernateSynchronizedStorage(sessionFactory), DependencyLifecycle.SingleInstance);
+                context.Container.ConfigureComponent(b => new NHibernateSynchronizedStorageAdapter(sessionFactory), DependencyLifecycle.SingleInstance);
+            }
             var runInstaller = context.Settings.Get<bool>("NHibernate.Common.AutoUpdateSchema");
 
             if (runInstaller)
@@ -126,11 +134,21 @@ TSql Script:
             context.Settings.AddStartupDiagnosticsSection("NServiceBus.Persistence.NHibernate.SynchronizedSession", (object)diagnostics);
         }
 
-        void ApplyMappings(Configuration config, FeatureConfigurationContext context)
+        static void ApplyMappings(Configuration config, Type outboxRecordType, string customOutboxTableName, string customOutboxSchemaName)
         {
             var mapper = new ModelMapper();
-            mapper.BeforeMapClass += OutboxTableAndSchemaOverride;
-            mapper.AddMapping(context.Settings.Get<Type>(OutboxMappingSettingsKey));
+            mapper.BeforeMapClass += (inspector, type, customizer) =>
+            {
+                if (customOutboxTableName != null)
+                {
+                    customizer.Table(customOutboxTableName);
+                }
+                if (customOutboxSchemaName != null)
+                {
+                    customizer.Schema(customOutboxSchemaName);
+                }
+            };
+            mapper.AddMapping(outboxRecordType);
             config.AddMapping(mapper.CompileMappingForAllExplicitlyAddedEntities());
         }
 

@@ -29,6 +29,7 @@ namespace NServiceBus.NHibernate.Outbox
 {
     public class static OutboxConfig
     {
+        public static NServiceBus.PersistenceExtensions<NServiceBus.NHibernatePersistence> CustomizeOutboxTableName(this NServiceBus.PersistenceExtensions<NServiceBus.NHibernatePersistence> persistenceConfiguration, string outboxTableName, string outboxSchemaName = null) { }
         public static NServiceBus.PersistenceExtensions<NServiceBus.NHibernatePersistence> UseOutboxRecord<TEntity, TMapping>(this NServiceBus.PersistenceExtensions<NServiceBus.NHibernatePersistence> persistenceConfiguration)
             where TEntity :  class, NServiceBus.Outbox.NHibernate.IOutboxRecord, new ()
             where TMapping : NHibernate.Mapping.ByCode.Conformist.ClassMapping<TEntity> { }
