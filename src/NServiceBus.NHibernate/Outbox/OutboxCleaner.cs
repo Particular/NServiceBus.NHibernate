@@ -49,16 +49,16 @@ namespace NServiceBus.Features
             {
                 try
                 {
+                    await Task.Delay(deduplicationDataCleanupPeriod, ct).ConfigureAwait(false);
                     await outboxPersister.RemoveEntriesOlderThan(DateTime.UtcNow - timeToKeepDeduplicationData).ConfigureAwait(false);
-                    circuitBreaker.Success();
+                }
+                catch (OperationCanceledException)
+                {
+                    // no-op
                 }
                 catch (Exception ex)
                 {
                     circuitBreaker.Failure(ex);
-                }
-                finally
-                {
-                    await Task.Delay(deduplicationDataCleanupPeriod, ct).ConfigureAwait(false);
                 }
             }
         }
