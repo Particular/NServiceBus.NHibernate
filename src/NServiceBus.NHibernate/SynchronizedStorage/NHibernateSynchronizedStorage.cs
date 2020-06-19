@@ -8,16 +8,19 @@
     class NHibernateSynchronizedStorage : ISynchronizedStorage
     {
         ISessionFactory sessionFactory;
+        CurrentSessionHolder currentSessionHolder;
 
-        public NHibernateSynchronizedStorage(ISessionFactory sessionFactory)
+        public NHibernateSynchronizedStorage(ISessionFactory sessionFactory, CurrentSessionHolder currentSessionHolder)
         {
             this.sessionFactory = sessionFactory;
+            this.currentSessionHolder = currentSessionHolder;
         }
 
         public Task<CompletableSynchronizedStorageSession> OpenSession(ContextBag contextBag)
         {
-            CompletableSynchronizedStorageSession result = new NHibernateLazyNativeTransactionSynchronizedStorageSession(() => sessionFactory.OpenSession());
-            return Task.FromResult(result);
+            var session = new NHibernateLazyNativeTransactionSynchronizedStorageSession(() => sessionFactory.OpenSession());
+            currentSessionHolder?.SetCurrentSession(session);
+            return Task.FromResult<CompletableSynchronizedStorageSession>(session);
         }
     }
 }

@@ -8,7 +8,7 @@
     using Persistence;
 
     [SkipWeaving]
-    class NHibernateLazyAmbientTransactionSynchronizedStorageSession : CompletableSynchronizedStorageSession, INHibernateSynchronizedStorageSession
+    class NHibernateLazyAmbientTransactionSynchronizedStorageSession : CompletableSynchronizedStorageSession, INHibernateStorageSession
     {
         Lazy<ISession> session;
         Lazy<DbConnection> connection;

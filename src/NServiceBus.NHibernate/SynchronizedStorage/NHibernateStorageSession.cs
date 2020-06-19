@@ -68,6 +68,18 @@ namespace NServiceBus.Features
                 var outboxTableName = context.Settings.GetOrDefault<string>(OutboxTableNameSettingsKey);
                 var outboxSchemaName = context.Settings.GetOrDefault<string>(OutboxSchemaNameSettingsKey);
 
+            context.Container.ConfigureComponent(b => new NHibernateSynchronizedStorage(sessionFactory, sessionHolder), DependencyLifecycle.SingleInstance);
+            context.Container.ConfigureComponent(b => new NHibernateSynchronizedStorageAdapter(sessionFactory, sessionHolder), DependencyLifecycle.SingleInstance);
+
+            context.Container.ConfigureComponent(() => sessionHolder.Current, DependencyLifecycle.InstancePerUnitOfWork);
+            context.Pipeline.Register(new CurrentSessionBehavior(sessionHolder), "Manages the lifecycle of the current session holder.");
+
+            if (outboxEnabled)
+            {
+                var factory = context.Settings.Get<IOutboxPersisterFactory>();
+                var persister = factory.Create(sessionFactory, context.Settings.EndpointName());
+                context.Container.ConfigureComponent(b => persister, DependencyLifecycle.SingleInstance);
+
                 var timeToKeepDeduplicationData = GetTimeToKeepDeduplicationData();
                 var deduplicationDataCleanupPeriod = GetDeduplicationDataCleanupPeriod();
                 var outboxCleanupCriticalErrorTriggerTime = GetOutboxCleanupCriticalErrorTriggerTime();

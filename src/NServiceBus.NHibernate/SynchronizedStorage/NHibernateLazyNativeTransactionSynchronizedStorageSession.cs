@@ -6,7 +6,7 @@
     using Janitor;
 
     [SkipWeaving]
-    class NHibernateLazyNativeTransactionSynchronizedStorageSession : CompletableSynchronizedStorageSession, INHibernateSynchronizedStorageSession
+    class NHibernateLazyNativeTransactionSynchronizedStorageSession : CompletableSynchronizedStorageSession, INHibernateStorageSession
     {
         Lazy<ISession> session;
         Func<SynchronizedStorageSession, Task> onSaveChangesCallback;
