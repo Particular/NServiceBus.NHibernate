@@ -9,8 +9,6 @@
     using global::NHibernate.Driver;
     using global::NHibernate.SqlCommand;
     using NHibernate.Outbox;
-    using NServiceBus.Outbox.NHibernate;
-    using Settings;
     using NUnit.Framework;
     using Persistence;
     using Environment = global::NHibernate.Cfg.Environment;
