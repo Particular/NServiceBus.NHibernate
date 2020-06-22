@@ -1,4 +1,4 @@
-﻿namespace NServiceBus.AcceptanceTests.Reliability.Outbox
+﻿namespace NServiceBus.AcceptanceTests.Outbox
 {
     using System;
     using System.Linq;
@@ -22,10 +22,6 @@
                 {
                     var sagaId = Guid.NewGuid();
                     await session.SendLocal(new StartSagaMessage
-                    {
-                        UniqueId = sagaId
-                    }).ConfigureAwait(false);
-                    await session.SendLocal(new CheckSagaMessage
                     {
                         UniqueId = sagaId
                     }).ConfigureAwait(false);
@@ -71,7 +67,10 @@
                 public Task Handle(StartSagaMessage message, IMessageHandlerContext context)
                 {
                     Data.Started = true;
-                    return Task.FromResult(0);
+                    return context.SendLocal(new StartSagaResponse
+                    {
+                        UniqueId = message.UniqueId
+                    });
                 }
 
                 public Task Handle(CheckSagaMessage message, IMessageHandlerContext context)
@@ -89,7 +88,23 @@
             }
         }
 
+        public class StartSagaResponseHandler : IHandleMessages<StartSagaResponse>
+        {
+            public Task Handle(StartSagaResponse message, IMessageHandlerContext context)
+            {
+                return context.SendLocal(new CheckSagaMessage
+                {
+                    UniqueId = message.UniqueId
+                });
+            }
+        }
+
         public class StartSagaMessage : IMessage
+        {
+            public virtual Guid UniqueId { get; set; }
+        }
+
+        public class StartSagaResponse : IMessage
         {
             public virtual Guid UniqueId { get; set; }
         }
