@@ -15,17 +15,19 @@ namespace NServiceBus.AcceptanceTests.Sagas
         {
             var context = await Scenario.Define<Context>()
                 .WithEndpoint<Endpoint>(b => b.When(s => s.SendLocal(new MyMessage())))
-                .Done(c => c.Done)
+                .Done(c => c.SessionInjectedToFirstHandler != null && c.SessionInjectedToSecondHandler != null)
                 .Run()
                 .ConfigureAwait(false);
 
-            Assert.True(context.RepositoryHasSession);
+            Assert.IsNotNull(context.SessionInjectedToFirstHandler);
+            Assert.IsNotNull(context.SessionInjectedToSecondHandler);
+            Assert.AreSame(context.SessionInjectedToFirstHandler, context.SessionInjectedToSecondHandler);
         }
 
         public class Context : ScenarioContext
         {
-            public bool Done { get; set; }
-            public bool RepositoryHasSession { get; set; }
+            public ISession SessionInjectedToFirstHandler { get; set; }
+            public ISession SessionInjectedToSecondHandler { get; set; }
         }
 
         public class Endpoint : EndpointConfigurationBuilder
@@ -36,7 +38,6 @@ namespace NServiceBus.AcceptanceTests.Sagas
                 {
                     c.RegisterComponents(cc =>
                     {
-                        cc.ConfigureComponent<MyRepository>(DependencyLifecycle.InstancePerUnitOfWork);
                         cc.ConfigureComponent(b => b.Build<INHibernateStorageSession>().Session, DependencyLifecycle.InstancePerUnitOfWork);
                     });
                 });
@@ -45,38 +46,39 @@ namespace NServiceBus.AcceptanceTests.Sagas
             public class MyMessageHandler : IHandleMessages<MyMessage>
             {
                 Context context;
-                MyRepository repository;
+                ISession session;
 
-                public MyMessageHandler(MyRepository repository, Context context)
+                public MyMessageHandler(ISession session, Context context)
                 {
                     this.context = context;
-                    this.repository = repository;
+                    this.session = session;
                 }
 
 
                 public Task Handle(MyMessage message, IMessageHandlerContext handlerContext)
                 {
-                    repository.DoSomething();
-                    context.Done = true;
+                    context.SessionInjectedToFirstHandler = session;
                     return Task.CompletedTask;
                 }
             }
-        }
 
-        public class MyRepository
-        {
-            ISession session;
-            Context context;
-
-            public MyRepository(ISession session, Context context)
+            public class MyOtherMessageHandler : IHandleMessages<MyMessage>
             {
-                this.session = session;
-                this.context = context;
-            }
+                Context context;
+                ISession session;
 
-            public void DoSomething()
-            {
-                context.RepositoryHasSession = session != null;
+                public MyOtherMessageHandler(ISession session, Context context)
+                {
+                    this.context = context;
+                    this.session = session;
+                }
+
+
+                public Task Handle(MyMessage message, IMessageHandlerContext handlerContext)
+                {
+                    context.SessionInjectedToSecondHandler = session;
+                    return Task.CompletedTask;
+                }
             }
         }
 

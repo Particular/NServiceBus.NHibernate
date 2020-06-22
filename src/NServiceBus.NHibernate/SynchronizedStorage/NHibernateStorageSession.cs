@@ -68,6 +68,8 @@ namespace NServiceBus.Features
                 var outboxTableName = context.Settings.GetOrDefault<string>(OutboxTableNameSettingsKey);
                 var outboxSchemaName = context.Settings.GetOrDefault<string>(OutboxSchemaNameSettingsKey);
 
+            var sessionHolder = new CurrentSessionHolder();
+
             context.Container.ConfigureComponent(b => new NHibernateSynchronizedStorage(sessionFactory, sessionHolder), DependencyLifecycle.SingleInstance);
             context.Container.ConfigureComponent(b => new NHibernateSynchronizedStorageAdapter(sessionFactory, sessionHolder), DependencyLifecycle.SingleInstance);
 
