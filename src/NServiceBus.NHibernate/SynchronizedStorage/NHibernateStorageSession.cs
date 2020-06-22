@@ -52,8 +52,13 @@ namespace NServiceBus.Features
             var builder = new NHibernateConfigurationBuilder(context.Settings, diagnostics, "Saga", "StorageConfiguration");
             var config = builder.Build();
 
-            
             var outboxEnabled = context.Settings.IsFeatureActive(typeof(Outbox));
+                
+            var sessionHolder = new CurrentSessionHolder();
+
+            context.Container.ConfigureComponent(() => sessionHolder.Current, DependencyLifecycle.InstancePerUnitOfWork);
+            context.Pipeline.Register(new CurrentSessionBehavior(sessionHolder), "Manages the lifecycle of the current session holder.");
+
             if (outboxEnabled)
             {
                 var pessimisticMode = context.Settings.GetOrDefault<bool>(OutboxConcurrencyModeSettingsKey);
@@ -67,20 +72,6 @@ namespace NServiceBus.Features
                 var actualOutboxRecordType = configuredOutboxRecordType ?? typeof(OutboxRecordMapping);
                 var outboxTableName = context.Settings.GetOrDefault<string>(OutboxTableNameSettingsKey);
                 var outboxSchemaName = context.Settings.GetOrDefault<string>(OutboxSchemaNameSettingsKey);
-
-            var sessionHolder = new CurrentSessionHolder();
-
-            context.Container.ConfigureComponent(b => new NHibernateSynchronizedStorage(sessionFactory, sessionHolder), DependencyLifecycle.SingleInstance);
-            context.Container.ConfigureComponent(b => new NHibernateSynchronizedStorageAdapter(sessionFactory, sessionHolder), DependencyLifecycle.SingleInstance);
-
-            context.Container.ConfigureComponent(() => sessionHolder.Current, DependencyLifecycle.InstancePerUnitOfWork);
-            context.Pipeline.Register(new CurrentSessionBehavior(sessionHolder), "Manages the lifecycle of the current session holder.");
-
-            if (outboxEnabled)
-            {
-                var factory = context.Settings.Get<IOutboxPersisterFactory>();
-                var persister = factory.Create(sessionFactory, context.Settings.EndpointName());
-                context.Container.ConfigureComponent(b => persister, DependencyLifecycle.SingleInstance);
 
                 var timeToKeepDeduplicationData = GetTimeToKeepDeduplicationData();
                 var deduplicationDataCleanupPeriod = GetDeduplicationDataCleanupPeriod();
@@ -102,8 +93,8 @@ namespace NServiceBus.Features
                 var persister = persisterFactory.Create(sessionFactory, context.Settings.EndpointName(), pessimisticMode, transactionScopeMode);
                 
                 context.Container.ConfigureComponent(b => persister, DependencyLifecycle.SingleInstance);
-                context.Container.ConfigureComponent(b => new NHibernateSynchronizedStorage(sessionFactory), DependencyLifecycle.SingleInstance);
-                context.Container.ConfigureComponent(b => new NHibernateSynchronizedStorageAdapter(sessionFactory), DependencyLifecycle.SingleInstance);
+                context.Container.ConfigureComponent(b => new NHibernateSynchronizedStorage(sessionFactory, sessionHolder), DependencyLifecycle.SingleInstance);
+                context.Container.ConfigureComponent(b => new NHibernateSynchronizedStorageAdapter(sessionFactory, sessionHolder), DependencyLifecycle.SingleInstance);
                 context.RegisterStartupTask(b => new OutboxCleaner(persister, b.Build<CriticalError>(), timeToKeepDeduplicationData, deduplicationDataCleanupPeriod, outboxCleanupCriticalErrorTriggerTime));
 
                 context.Settings.AddStartupDiagnosticsSection("NServiceBus.Persistence.NHibernate.Outbox", new
@@ -121,8 +112,8 @@ namespace NServiceBus.Features
                 var sharedMappings = context.Settings.Get<SharedMappings>();
                 sharedMappings.ApplyTo(config.Configuration);
                 var sessionFactory = config.Configuration.BuildSessionFactory();
-                context.Container.ConfigureComponent(b => new NHibernateSynchronizedStorage(sessionFactory), DependencyLifecycle.SingleInstance);
-                context.Container.ConfigureComponent(b => new NHibernateSynchronizedStorageAdapter(sessionFactory), DependencyLifecycle.SingleInstance);
+                context.Container.ConfigureComponent(b => new NHibernateSynchronizedStorage(sessionFactory, sessionHolder), DependencyLifecycle.SingleInstance);
+                context.Container.ConfigureComponent(b => new NHibernateSynchronizedStorageAdapter(sessionFactory, sessionHolder), DependencyLifecycle.SingleInstance);
             }
             var runInstaller = context.Settings.Get<bool>("NHibernate.Common.AutoUpdateSchema");
 
