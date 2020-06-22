@@ -56,6 +56,9 @@ namespace NServiceBus.Features
             var outboxEnabled = context.Settings.IsFeatureActive(typeof(Outbox));
             if (outboxEnabled)
             {
+                var pessimisticMode = context.Settings.GetOrDefault<bool>(OutboxConcurrencyModeSettingsKey);
+                var transactionScopeMode = context.Settings.GetOrDefault<bool>(OutboxTransactionModeSettingsKey);
+
                 config.Configuration.Properties[Environment.TransactionStrategy] = typeof(AdoNetTransactionFactory).FullName;
 
                 var sharedMappings = context.Settings.Get<SharedMappings>();
@@ -82,7 +85,7 @@ namespace NServiceBus.Features
                 sharedMappings.ApplyTo(config.Configuration);
                 var sessionFactory = config.Configuration.BuildSessionFactory();
                 var persisterFactory = context.Settings.Get<IOutboxPersisterFactory>();
-                var persister = persisterFactory.Create(sessionFactory, context.Settings.EndpointName());
+                var persister = persisterFactory.Create(sessionFactory, context.Settings.EndpointName(), pessimisticMode, transactionScopeMode);
                 
                 context.Container.ConfigureComponent(b => persister, DependencyLifecycle.SingleInstance);
                 context.Container.ConfigureComponent(b => new NHibernateSynchronizedStorage(sessionFactory), DependencyLifecycle.SingleInstance);
