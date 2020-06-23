@@ -25,6 +25,28 @@ namespace NServiceBus.Features
         protected override void Setup(NServiceBus.Features.FeatureConfigurationContext context) { }
     }
 }
+namespace NServiceBus
+{
+    public interface INHibernateStorageSession
+    {
+        NHibernate.ISession Session { get; }
+        void OnSaveChanges(System.Func<NServiceBus.Persistence.SynchronizedStorageSession, System.Threading.Tasks.Task> callback);
+    }
+    public class NHibernatePersistence : NServiceBus.Persistence.PersistenceDefinition
+    {
+        public NHibernatePersistence() { }
+    }
+    public class static OutboxSettingsExtensions
+    {
+        public static void UsePessimisticConcurrencyControl(this NServiceBus.Outbox.OutboxSettings outboxSettings) { }
+        public static void UseTransactionScope(this NServiceBus.Outbox.OutboxSettings outboxSettings) { }
+    }
+    public class static SynchronizedStorageSessionExtensions
+    {
+        public static void OnSaveChanges(this NServiceBus.Persistence.SynchronizedStorageSession session, System.Func<NServiceBus.Persistence.SynchronizedStorageSession, System.Threading.Tasks.Task> callback) { }
+        public static NHibernate.ISession Session(this NServiceBus.Persistence.SynchronizedStorageSession session) { }
+    }
+}
 namespace NServiceBus.NHibernate.Outbox
 {
     public class static OutboxConfig
@@ -50,23 +72,6 @@ namespace NServiceBus.NHibernate
             where TSaga : NServiceBus.Saga { }
         public static string GenerateSubscriptionStoreScript() { }
         public static string GenerateTimeoutStoreScript() { }
-    }
-}
-namespace NServiceBus
-{
-    public class NHibernatePersistence : NServiceBus.Persistence.PersistenceDefinition
-    {
-        public NHibernatePersistence() { }
-    }
-    public class static OutboxSettingsExtensions
-    {
-        public static void UsePessimisticConcurrencyControl(this NServiceBus.Outbox.OutboxSettings outboxSettings) { }
-        public static void UseTransactionScope(this NServiceBus.Outbox.OutboxSettings outboxSettings) { }
-    }
-    public class static SynchronizedStorageSessionExtensions
-    {
-        public static void OnSaveChanges(this NServiceBus.Persistence.SynchronizedStorageSession session, System.Func<NServiceBus.Persistence.SynchronizedStorageSession, System.Threading.Tasks.Task> callback) { }
-        public static NHibernate.ISession Session(this NServiceBus.Persistence.SynchronizedStorageSession session) { }
     }
 }
 namespace NServiceBus.Outbox.NHibernate
@@ -154,7 +159,7 @@ namespace NServiceBus.SagaPersisters.NHibernate
 }
 namespace NServiceBus.Testing
 {
-    public class TestingNHibernateSynchronizedStorageSession : NServiceBus.Persistence.SynchronizedStorageSession
+    public class TestingNHibernateSynchronizedStorageSession : NServiceBus.INHibernateStorageSession, NServiceBus.Persistence.SynchronizedStorageSession
     {
         public TestingNHibernateSynchronizedStorageSession(NHibernate.ISession session) { }
         public NHibernate.ISession Session { get; }
