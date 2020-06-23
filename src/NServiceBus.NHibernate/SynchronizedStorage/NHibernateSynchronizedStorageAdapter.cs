@@ -15,11 +15,13 @@
     class NHibernateSynchronizedStorageAdapter : ISynchronizedStorageAdapter
     {
         ISessionFactory sessionFactory;
+        CurrentSessionHolder currentSessionHolder;
         static readonly Task<CompletableSynchronizedStorageSession> EmptyResult = Task.FromResult((CompletableSynchronizedStorageSession)null);
 
-        public NHibernateSynchronizedStorageAdapter(ISessionFactory sessionFactory)
+        public NHibernateSynchronizedStorageAdapter(ISessionFactory sessionFactory, CurrentSessionHolder currentSessionHolder)
         {
             this.sessionFactory = sessionFactory;
+            this.currentSessionHolder = currentSessionHolder;
         }
 
         public Task<CompletableSynchronizedStorageSession> TryAdapt(OutboxTransaction transaction, ContextBag context)
@@ -27,8 +29,9 @@
             if (transaction is INHibernateOutboxTransaction nhibernateTransaction)
             {
                 nhibernateTransaction.BeginSynchronizedSession(context);
-                CompletableSynchronizedStorageSession session = new NHibernateOutboxTransactionSynchronizedStorageSession(nhibernateTransaction);
-                return Task.FromResult(session);
+                var session = new NHibernateOutboxTransactionSynchronizedStorageSession(nhibernateTransaction);
+                currentSessionHolder?.SetCurrentSession(session);
+                return Task.FromResult<CompletableSynchronizedStorageSession>(session);
             }
             return EmptyResult;
         }
@@ -45,7 +48,7 @@
             {
                 throw new NotSupportedException("Overriding default implementation of ISessionFactory is not supported.");
             }
-            CompletableSynchronizedStorageSession session = new NHibernateLazyAmbientTransactionSynchronizedStorageSession(
+            var session = new NHibernateLazyAmbientTransactionSynchronizedStorageSession(
                 connectionFactory: () => OpenConnection(sessionFactoryImpl, ambientTransaction),
                 sessionFactory: conn =>
                 {
@@ -53,7 +56,9 @@
                     sessionBuilder.Connection(conn);
                     return sessionBuilder.OpenSession();
                 });
-            return Task.FromResult(session);
+
+            currentSessionHolder?.SetCurrentSession(session);
+            return Task.FromResult<CompletableSynchronizedStorageSession>(session);
         }
 
         static DbConnection OpenConnection(SessionFactoryImpl sessionFactoryImpl, Transaction ambientTransaction)

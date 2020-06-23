@@ -8,7 +8,7 @@
     using Persistence;
 
     [SkipWeaving]
-    class NHibernateOutboxTransactionSynchronizedStorageSession : CompletableSynchronizedStorageSession, INHibernateSynchronizedStorageSession
+    class NHibernateOutboxTransactionSynchronizedStorageSession : CompletableSynchronizedStorageSession, INHibernateStorageSession
     {
         INHibernateOutboxTransaction outboxTransaction;
 
