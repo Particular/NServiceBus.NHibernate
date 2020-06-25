@@ -43,7 +43,6 @@
                 await oldCallback().ConfigureAwait(false);
                 await callback().ConfigureAwait(false);
             };
-            onSaveChangesCallback = callback;
         }
 
         public async Task Commit()
