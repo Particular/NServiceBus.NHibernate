@@ -14,20 +14,25 @@
         {
             var storage = new NHibernateSynchronizedStorage(SessionFactory, null);
 
-            var callbackInvoked = false;
+            var callbackInvoked = 0;
 
             using (var storageSession = await storage.OpenSession(new ContextBag()))
             {
                 storageSession.Session(); //Make sure session is initialized
                 storageSession.OnSaveChanges(s =>
                 {
-                    callbackInvoked = true;
+                    callbackInvoked++;
+                    return Task.FromResult(0);
+                });
+                storageSession.OnSaveChanges(s =>
+                {
+                    callbackInvoked++;
                     return Task.FromResult(0);
                 });
 
                 await storageSession.CompleteAsync();
 
-                Assert.IsTrue(callbackInvoked);
+                Assert.AreEqual(2, callbackInvoked);
             }
         }
 
