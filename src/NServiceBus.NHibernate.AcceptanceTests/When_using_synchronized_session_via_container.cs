@@ -15,19 +15,23 @@ namespace NServiceBus.AcceptanceTests.Sagas
         {
             var context = await Scenario.Define<Context>()
                 .WithEndpoint<Endpoint>(b => b.When(s => s.SendLocal(new MyMessage())))
-                .Done(c => c.SessionInjectedToFirstHandler != null && c.SessionInjectedToSecondHandler != null)
+                .Done(c => c.Done)
                 .Run()
                 .ConfigureAwait(false);
 
             Assert.IsNotNull(context.SessionInjectedToFirstHandler);
             Assert.IsNotNull(context.SessionInjectedToSecondHandler);
+            Assert.IsNotNull(context.SessionInjectedToThirdHandler);
             Assert.AreSame(context.SessionInjectedToFirstHandler, context.SessionInjectedToSecondHandler);
+            Assert.AreNotSame(context.SessionInjectedToFirstHandler, context.SessionInjectedToThirdHandler);
         }
 
         public class Context : ScenarioContext
         {
             public ISession SessionInjectedToFirstHandler { get; set; }
             public ISession SessionInjectedToSecondHandler { get; set; }
+            public ISession SessionInjectedToThirdHandler { get; set; }
+            public bool Done { get; set; }
         }
 
         public class Endpoint : EndpointConfigurationBuilder
@@ -38,7 +42,8 @@ namespace NServiceBus.AcceptanceTests.Sagas
                 {
                     c.RegisterComponents(cc =>
                     {
-                        cc.ConfigureComponent(b => b.Build<INHibernateStorageSession>().Session, DependencyLifecycle.InstancePerUnitOfWork);
+                        cc.ConfigureComponent(b => b.Build<INHibernateStorageSession>().Session, 
+                            DependencyLifecycle.InstancePerUnitOfWork);
                     });
                 });
             }
@@ -58,7 +63,10 @@ namespace NServiceBus.AcceptanceTests.Sagas
                 public Task Handle(MyMessage message, IMessageHandlerContext handlerContext)
                 {
                     context.SessionInjectedToFirstHandler = session;
-                    return Task.CompletedTask;
+                    return handlerContext.SendLocal(new FollowUpMessage
+                    {
+                        Property = message.Property
+                    });
                 }
             }
 
@@ -80,9 +88,34 @@ namespace NServiceBus.AcceptanceTests.Sagas
                     return Task.CompletedTask;
                 }
             }
+
+            public class FollowUpMessageMessageHandler : IHandleMessages<FollowUpMessage>
+            {
+                Context context;
+                ISession session;
+
+                public FollowUpMessageMessageHandler(ISession session, Context context)
+                {
+                    this.context = context;
+                    this.session = session;
+                }
+
+
+                public Task Handle(FollowUpMessage message, IMessageHandlerContext handlerContext)
+                {
+                    context.SessionInjectedToThirdHandler = session;
+                    context.Done = true;
+                    return Task.CompletedTask;
+                }
+            }
         }
 
         public class MyMessage : IMessage
+        {
+            public string Property { get; set; }
+        }
+
+        public class FollowUpMessage : IMessage
         {
             public string Property { get; set; }
         }
