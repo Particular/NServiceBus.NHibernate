@@ -56,7 +56,7 @@ namespace NServiceBus.Features
                 
             var sessionHolder = new CurrentSessionHolder();
 
-            context.Container.ConfigureComponent(() => sessionHolder.Current, DependencyLifecycle.InstancePerUnitOfWork);
+            context.Container.ConfigureComponent(() => sessionHolder.Current, DependencyLifecycle.InstancePerCall);
             context.Pipeline.Register(new CurrentSessionBehavior(sessionHolder), "Manages the lifecycle of the current session holder.");
 
             if (outboxEnabled)
