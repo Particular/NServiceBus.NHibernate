@@ -27,19 +27,17 @@
 
         public void OnSaveChanges(Func<Task> callback)
         {
-            if (onSaveChangesCallback != null)
+            var oldCallback = onSaveChangesCallback;
+            onSaveChangesCallback = async () =>
             {
-                throw new Exception("Save changes callback for this session has already been registered.");
-            }
-            onSaveChangesCallback = callback;
+                await oldCallback().ConfigureAwait(false);
+                await callback().ConfigureAwait(false);
+            };
         }
 
         public async Task Commit()
         {
-            if (onSaveChangesCallback != null)
-            {
-                await onSaveChangesCallback().ConfigureAwait(false);
-            }
+            await onSaveChangesCallback().ConfigureAwait(false);
             await transaction.CommitAsync().ConfigureAwait(false);
             transaction.Dispose();
             transaction = null;
@@ -56,7 +54,7 @@
             Session.Dispose();
         }
 
-        Func<Task> onSaveChangesCallback;
+        Func<Task> onSaveChangesCallback = () => Task.CompletedTask;
         ITransaction transaction;
 
         public Task Begin(string endpointQualifiedMessageId)
