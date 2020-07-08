@@ -19,7 +19,7 @@
                 var transportTransaction = new TransportTransaction();
                 transportTransaction.Set(Transaction.Current);
 
-                var callbackInvoked = false;
+                var callbackInvoked = 0;
                 var adapter = new NHibernateSynchronizedStorageAdapter(SessionFactory, null);
 
                 using (var storageSession = await adapter.TryAdapt(transportTransaction, new ContextBag()))
@@ -27,18 +27,25 @@
                     storageSession.Session(); //Make sure session is initialized
                     storageSession.OnSaveChanges(s =>
                     {
-                        callbackInvoked = true;
+                        callbackInvoked++;
+                        return Task.FromResult(0);
+                    });
+                    storageSession.OnSaveChanges(s =>
+                    {
+                        callbackInvoked++;
                         return Task.FromResult(0);
                     });
 
                     await storageSession.CompleteAsync();
 
-                    Assert.IsTrue(callbackInvoked);
+                    Assert.AreEqual(2, callbackInvoked);
                 }
 
                 scope.Complete();
             }
         }
+
+
 
         [Test]
         public async Task It_does_not_commit_if_callback_throws()

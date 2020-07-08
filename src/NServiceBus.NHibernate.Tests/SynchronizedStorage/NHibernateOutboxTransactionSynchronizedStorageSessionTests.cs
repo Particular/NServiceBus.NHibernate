@@ -58,7 +58,7 @@
         [Test]
         public async Task It_invokes_callbacks_when_outbox_transaction_is_completed()
         {
-            var callbackInvoked = false;
+            var callbackInvoked = 0;
 
             var outboxPersisterFactory = new OutboxPersisterFactory<OutboxRecord>();
             var persister = outboxPersisterFactory.Create(SessionFactory, "TestEndpoint", pessimistic, transactionScope);
@@ -76,7 +76,12 @@
                     storageSession.Session(); //Make sure session is initialized
                     storageSession.OnSaveChanges(s =>
                     {
-                        callbackInvoked = true;
+                        callbackInvoked++;
+                        return Task.FromResult(0);
+                    });
+                    storageSession.OnSaveChanges(s =>
+                    {
+                        callbackInvoked++;
                         return Task.FromResult(0);
                     });
 
@@ -86,7 +91,7 @@
                 await outboxTransaction.Commit();
             }
 
-            Assert.IsTrue(callbackInvoked);
+            Assert.AreEqual(2, callbackInvoked);
         }
 
         [Test]

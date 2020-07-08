@@ -9,7 +9,7 @@
     class NHibernateLazyNativeTransactionSynchronizedStorageSession : CompletableSynchronizedStorageSession, INHibernateStorageSession
     {
         Lazy<ISession> session;
-        Func<SynchronizedStorageSession, Task> onSaveChangesCallback;
+        Func<SynchronizedStorageSession, Task> onSaveChangesCallback = s => Task.CompletedTask;
         ITransaction transaction;
 
         public NHibernateLazyNativeTransactionSynchronizedStorageSession(Func<ISession> sessionFactory)
@@ -26,19 +26,17 @@
 
         public void OnSaveChanges(Func<SynchronizedStorageSession, Task> callback)
         {
-            if (onSaveChangesCallback != null)
+            var oldCallback = onSaveChangesCallback;
+            onSaveChangesCallback = async s =>
             {
-                throw new Exception("Save changes callback for this session has already been registered.");
-            }
-            onSaveChangesCallback = callback;
+                await oldCallback(s).ConfigureAwait(false);
+                await callback(s).ConfigureAwait(false);
+            };
         }
 
         public async Task CompleteAsync()
         {
-            if (onSaveChangesCallback != null)
-            {
-                await onSaveChangesCallback(this).ConfigureAwait(false);
-            }
+            await onSaveChangesCallback(this).ConfigureAwait(false);
             if (transaction != null)
             {
                 await transaction.CommitAsync().ConfigureAwait(false);
