@@ -6,6 +6,7 @@
     using System.Threading.Tasks;
     using global::NHibernate.Cfg;
     using global::NHibernate.Dialect;
+    using global::NHibernate.Mapping.ByCode;
     using global::NHibernate.Tool.hbm2ddl;
     using NHibernate.Outbox;
     using NHibernate.PersistenceTests;
@@ -43,6 +44,11 @@
                     x.ConnectionString = Consts.SqlConnectionString;
                 });
 
+            //Add mapping for the outbox record
+            var mapper = new ModelMapper();
+            mapper.AddMapping(typeof(OutboxRecordMapping));
+            cfg.AddMapping(mapper.CompileMappingForAllExplicitlyAddedEntities());
+
             var allTypes = Assembly.GetExecutingAssembly().GetTypes().ToList();
             allTypes.Add(typeof(ContainSagaData));
             SagaModelMapper.AddMappings(cfg, SagaMetadataCollection, allTypes, type =>
@@ -54,6 +60,8 @@
                 }
                 return type.DeclaringType.Name + "_" + type.Name;
             });
+
+            
 
             //Mark all map classes as not lazy because they don't declare their properties virtual
             foreach (var mapping in cfg.ClassMappings)
