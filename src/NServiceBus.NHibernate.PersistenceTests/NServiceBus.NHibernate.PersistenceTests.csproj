@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFrameworks>net461;netcoreapp3.1</TargetFrameworks>
     <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>..\NServiceBus.snk</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>..\Test.snk</AssemblyOriginatorKeyFile>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
   </PropertyGroup>
 
@@ -15,22 +15,13 @@
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.6.1" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
     <PackageReference Include="NHibernate" Version="5.2.7" />
-    <PackageReference Include="NServiceBus" Version="7.3.0" />
+    <PackageReference Include="NServiceBus.PersistenceTests.Sources" Version="7.4.0-PullRequest5680.98" />
+    <PackageReference Include="NServiceBus" Version="7.4.0-PullRequest5680.98" />
     <PackageReference Include="NUnit" Version="3.12.0" />
     <PackageReference Include="NUnit3TestAdapter" Version="3.16.1" />
     <PackageReference Include="Particular.Approvals" Version="0.2.0" />
     <PackageReference Include="PublicApiGenerator" Version="9.3.0" />
     <PackageReference Include="System.Data.SqlClient" Version="4.8.1" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Remove="SagaPersister\TestSagaWithHbmlXmlOverride.hbm.xml" />
-    <EmbeddedResource Include="SagaPersister\TestSagaWithHbmlXmlOverride.hbm.xml" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Update="hibernate.cfg.xml" CopyToOutputDirectory="PreserveNewest" />
-    <None Update="Testing.config" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
 </Project>
