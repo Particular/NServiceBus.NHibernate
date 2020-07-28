@@ -129,15 +129,7 @@
 
             var allTypes = Assembly.GetExecutingAssembly().GetTypes().ToList();
             allTypes.Add(typeof(ContainSagaData));
-            SagaModelMapper.AddMappings(cfg, SagaMetadataCollection, allTypes, type =>
-            {
-                //If the type is nested, prefix it with the parent name
-                if (type.DeclaringType == null)
-                {
-                    return type.Name;
-                }
-                return type.DeclaringType.Name + "_" + type.Name;
-            });
+            SagaModelMapper.AddMappings(cfg, SagaMetadataCollection, allTypes, type => ShortenSagaName(type.Name));
 
             //Mark all map classes as not lazy because they don't declare their properties virtual
             foreach (var mapping in cfg.ClassMappings)
@@ -155,6 +147,16 @@
             SynchronizedStorage = new NHibernateSynchronizedStorage(sessionFactory, null);
             SynchronizedStorageAdapter = new NHibernateSynchronizedStorageAdapter(sessionFactory, null);
             OutboxStorage = variant.OutboxPersisterFactory.Create(sessionFactory, "TestEndpoint", variant.Pessimistic, variant.TransactionScope);
+        }
+
+        static string ShortenSagaName(string sagaName)
+        {
+            return sagaName
+                .Replace("AnotherSagaWithCorrelatedProperty", "ASWCP")
+                .Replace("SagaWithCorrelationProperty", "SWCP")
+                .Replace("SagaWithoutCorrelationProperty", "SWOCP")
+                .Replace("SagaWithComplexType", "SWCT")
+                .Replace("TestSaga", "TS");
         }
 
         public Task Cleanup()
