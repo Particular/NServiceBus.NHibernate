@@ -26,7 +26,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <!--Because it causes undeterministic test hangs-->
     <Compile Remove="\**\When_concurrent_update_exceed_lock_request_timeout_pessimistic.cs" />
+    <!--Because NHibernate does not support lists of primitive types-->
+    <Compile Remove="\**\When_persisting_a_saga_with_complex_types.cs" />
   </ItemGroup>
 
 </Project>
