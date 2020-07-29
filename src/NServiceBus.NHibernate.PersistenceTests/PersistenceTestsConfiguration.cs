@@ -115,6 +115,11 @@
             return CreateVariant<OutboxRecord>(description, configureDb, pessimistic, transactionScope);
         }
 
+        static bool BelongsToCurrentTest(Type t)
+        {
+            return t.DeclaringType != null && t.DeclaringType.FullName == TestContext.CurrentContext.Test.ClassName;
+        }
+
         public async Task Configure()
         {
             var variant = (NHibernateVariant) Variant.Values[0];
@@ -127,8 +132,21 @@
             mapper.AddMapping(typeof(OutboxRecordMapping));
             cfg.AddMapping(mapper.CompileMappingForAllExplicitlyAddedEntities());
 
-            var allTypes = Assembly.GetExecutingAssembly().GetTypes().ToList();
+            var allTypes = Assembly.GetExecutingAssembly().GetTypes().Where(t => BelongsToCurrentTest(t)).ToList();
             allTypes.Add(typeof(ContainSagaData));
+
+            var sagaTypes = Assembly.GetExecutingAssembly().GetTypes().Where(t =>
+            {
+                return BelongsToCurrentTest(t)
+                       && (typeof(Saga).IsAssignableFrom(t)
+                           || typeof(IFindSagas<>).IsAssignableFrom(t)
+                           || typeof(IFinder).IsAssignableFrom(t));
+
+            }).ToArray();
+
+            sagaMetadataCollection = new SagaMetadataCollection();
+            sagaMetadataCollection.Initialize(sagaTypes);
+
             SagaModelMapper.AddMappings(cfg, SagaMetadataCollection, allTypes, type => ShortenSagaName(type.Name));
 
             //Mark all map classes as not lazy because they don't declare their properties virtual
@@ -138,6 +156,7 @@
             }
 
             var schema = new SchemaExport(cfg);
+            await schema.DropAsync(false, true);
             await schema.CreateAsync(false, true);
 
             var sessionFactory = cfg.BuildSessionFactory();
