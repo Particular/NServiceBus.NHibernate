@@ -1,6 +1,7 @@
 ﻿namespace NServiceBus.PersistenceTesting
 {
     using System;
+    using System.Collections.Generic;
     using System.Linq;
     using System.Reflection;
     using System.Threading.Tasks;
@@ -65,20 +66,25 @@
 
         static PersistenceTestsConfiguration()
         {
-            SagaVariants = new[]
+            var sagaVariants = new List<object>
             {
                 CreateVariant("SQL Server", x =>
                 {
                     x.Dialect<MsSql2012Dialect>();
                     x.ConnectionString = Consts.ConnectionString;
-                }),
-                CreateVariant("Oracle", x =>
+                })
+            };
+
+            if (!string.IsNullOrWhiteSpace(System.Environment.GetEnvironmentVariable("OracleConnectionString")))
+            {
+                sagaVariants.Add(CreateVariant("Oracle", x =>
                 {
                     x.Dialect<Oracle10gDialect>();
                     x.Driver<OracleManagedDataClientDriver>();
                     x.ConnectionString = System.Environment.GetEnvironmentVariable("OracleConnectionString");
-                })
-            };
+                }));
+            }
+            SagaVariants = sagaVariants.ToArray();
             OutboxVariants = new[]
             {
                 CreateVariant("SQL Server Optimistic Native default OutboxRecord", x =>
