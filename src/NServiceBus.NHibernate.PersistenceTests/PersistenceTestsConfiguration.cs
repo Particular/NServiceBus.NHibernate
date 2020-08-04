@@ -47,17 +47,11 @@
 
     public partial class PersistenceTestsConfiguration
     {
-        public PersistenceTestsConfiguration()
-        {
-
-        }
-
-        public bool SupportsDtc => false; // TODO: verify if this is true
+        public bool SupportsDtc => false; // DTC tests are currently disabled due to CurrentSessionBehavior logic that is required to make this work
         public bool SupportsOutbox => true;
-        public bool SupportsFinders => true;  // TODO: verify if we actually need this as we think it should only be invoked by core
-        public bool SupportsSubscriptions => true;
-        public bool SupportsTimeouts => true;
+        public bool SupportsFinders => true;
         public bool SupportsPessimisticConcurrency => true;
+
         public ISagaIdGenerator SagaIdGenerator { get; private set; }
         public ISagaPersister SagaStorage { get; private set; }
         public ISynchronizedStorage SynchronizedStorage { get; private set; }
