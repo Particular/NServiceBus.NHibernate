@@ -34,9 +34,13 @@
         }
 
         public Action<IDbIntegrationConfigurationProperties> ConfigureDb { get; }
+
         public IOutboxPersisterFactory OutboxPersisterFactory { get; }
+
         public bool Pessimistic { get; }
+
         public bool TransactionScope { get; }
+
         public string Description { get; }
 
         public override string ToString()
@@ -48,14 +52,21 @@
     public partial class PersistenceTestsConfiguration
     {
         public bool SupportsDtc => false; // DTC tests are currently disabled due to CurrentSessionBehavior logic that is required to make this work
+
         public bool SupportsOutbox => true;
+
         public bool SupportsFinders => true;
+
         public bool SupportsPessimisticConcurrency => true;
 
         public ISagaIdGenerator SagaIdGenerator { get; private set; }
+
         public ISagaPersister SagaStorage { get; private set; }
+
         public ISynchronizedStorage SynchronizedStorage { get; private set; }
+
         public ISynchronizedStorageAdapter SynchronizedStorageAdapter { get; private set; }
+
         public IOutboxStorage OutboxStorage { get; private set; }
 
         static PersistenceTestsConfiguration()
@@ -104,7 +115,7 @@
             };
         }
 
-        static TestFixtureData CreateVariant<T>(string description, Action<IDbIntegrationConfigurationProperties> configureDb, bool pessimistic = false, bool transactionScope = false) 
+        static TestFixtureData CreateVariant<T>(string description, Action<IDbIntegrationConfigurationProperties> configureDb, bool pessimistic = false, bool transactionScope = false)
             where T : class, IOutboxRecord, new()
         {
             return new TestFixtureData(new TestVariant(new NHibernateVariant(description, configureDb, new OutboxPersisterFactory<T>(), pessimistic, transactionScope)));
