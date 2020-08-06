@@ -1,0 +1,32 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net461;netcoreapp3.1</TargetFrameworks>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>..\Test.snk</AssemblyOriginatorKeyFile>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\NServiceBus.NHibernate\NServiceBus.NHibernate.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.6.1" />
+    <PackageReference Include="NHibernate" Version="5.2.7" />
+    <PackageReference Include="NServiceBus.PersistenceTests.Sources" Version="7.4.0" />
+    <PackageReference Include="NUnit" Version="3.12.0" />
+    <PackageReference Include="NUnit3TestAdapter" Version="3.17.0" />
+    <PackageReference Include="System.Data.SqlClient" Version="4.8.1" />
+    <PackageReference Include="Oracle.ManagedDataAccess.Core" Version="2.19.80" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!--Because it causes undeterministic test hangs-->
+    <Compile Remove="\**\When_concurrent_update_exceed_lock_request_timeout_pessimistic.cs" />
+    <!--Because NHibernate does not support lists of primitive types-->
+    <Compile Remove="\**\When_persisting_a_saga_with_complex_types.cs" />
+    <Compile Remove="\**\When_worker_tries_to_complete_saga_update_by_another_pessimistic.cs" />
+  </ItemGroup>
+
+</Project>
