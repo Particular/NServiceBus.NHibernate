@@ -45,7 +45,6 @@
             };
         }
 
-        
         public async Task Commit()
         {
             await onSaveChangesCallback().ConfigureAwait(false);
@@ -75,6 +74,7 @@
             }
         }
 
+        // Prepare is deliberately kept sync to allow floating of TxScope where needed
         public void Prepare()
         {
             transactionScope = new TransactionScope(TransactionScopeOption.RequiresNew, TransactionScopeAsyncFlowOption.Enabled);
@@ -83,7 +83,7 @@
 
         public async Task<OutboxTransaction> Begin(string endpointQualifiedMessageId)
         {
-            
+
             Session = OpenSession();
             await concurrencyControlStrategy.Begin(endpointQualifiedMessageId, Session).ConfigureAwait(false);
             await Session.FlushAsync().ConfigureAwait(false);
