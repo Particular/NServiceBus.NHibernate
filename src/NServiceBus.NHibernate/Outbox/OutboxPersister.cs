@@ -107,6 +107,7 @@
             var endpointQualifiedMessageId = context.Get<string>(EndpointQualifiedMessageIdContextKey);
             var result = outboxTransactionFactory();
             result.Prepare();
+            // we always need to avoid using async/await in here so that the transaction scope can float!
             return result.Begin(endpointQualifiedMessageId);
         }
 
