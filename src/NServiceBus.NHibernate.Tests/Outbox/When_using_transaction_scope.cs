@@ -1,8 +1,6 @@
 namespace NServiceBus.NHibernate.Tests.Outbox
 {
     using System;
-    using System.Collections.Generic;
-    using System.Linq;
     using System.Threading.Tasks;
     using global::NHibernate;
     using global::NHibernate.Cfg;
@@ -11,7 +9,6 @@ namespace NServiceBus.NHibernate.Tests.Outbox
     using Extensibility;
     using global::NHibernate.Dialect;
     using NHibernate.Outbox;
-    using NServiceBus.Outbox;
     using NServiceBus.Outbox.NHibernate;
     using NUnit.Framework;
 
@@ -74,7 +71,7 @@ namespace NServiceBus.NHibernate.Tests.Outbox
                 var ambientTransaction = System.Transactions.Transaction.Current;
 
                 Assert.IsNotNull(ambientTransaction);
-                
+
                 await transaction.Commit();
             }
         }
