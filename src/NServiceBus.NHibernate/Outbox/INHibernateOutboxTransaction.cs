@@ -9,7 +9,8 @@
     {
         ISession Session { get; }
         void OnSaveChanges(Func<Task> callback);
-        Task Begin(string endpointQualifiedMessageId);
+        void Prepare();
+        Task<OutboxTransaction> Begin(string endpointQualifiedMessageId);
         Task Complete(string endpointQualifiedMessageId, OutboxMessage outboxMessage, ContextBag context);
         void BeginSynchronizedSession(ContextBag context);
     }

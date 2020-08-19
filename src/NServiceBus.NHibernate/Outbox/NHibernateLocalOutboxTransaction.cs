@@ -35,6 +35,7 @@
             };
         }
 
+
         public async Task Commit()
         {
             await onSaveChangesCallback().ConfigureAwait(false);
@@ -57,12 +58,18 @@
         Func<Task> onSaveChangesCallback = () => Task.CompletedTask;
         ITransaction transaction;
 
-        public Task Begin(string endpointQualifiedMessageId)
+        public void Prepare()
+        {
+            //NOOP
+        }
+
+        public async Task<OutboxTransaction> Begin(string endpointQualifiedMessageId)
         {
             Session = sessionFactory.OpenSession();
             transaction = Session.BeginTransaction();
 
-            return concurrencyControlStrategy.Begin(endpointQualifiedMessageId, Session);
+            await concurrencyControlStrategy.Begin(endpointQualifiedMessageId, Session).ConfigureAwait(false);
+            return this;
         }
 
         public Task Complete(string endpointQualifiedMessageId, OutboxMessage outboxMessage, ContextBag context)

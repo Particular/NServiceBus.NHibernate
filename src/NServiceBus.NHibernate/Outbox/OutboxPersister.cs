@@ -101,22 +101,13 @@
             }
         }
 
-        public async Task<OutboxTransaction> BeginTransaction(ContextBag context)
+        public Task<OutboxTransaction> BeginTransaction(ContextBag context)
         {
             //Provided by Get
             var endpointQualifiedMessageId = context.Get<string>(EndpointQualifiedMessageIdContextKey);
-
             var result = outboxTransactionFactory();
-            try
-            {
-                await result.Begin(endpointQualifiedMessageId).ConfigureAwait(false);
-                return result;
-            }
-            catch (Exception e)
-            {
-                result.Dispose();
-                throw new Exception("Error while opening outbox transaction", e);
-            }
+            result.Prepare();
+            return result.Begin(endpointQualifiedMessageId);
         }
 
         public async Task RemoveEntriesOlderThan(DateTime dateTime)

@@ -45,6 +45,7 @@
             };
         }
 
+        
         public async Task Commit()
         {
             await onSaveChangesCallback().ConfigureAwait(false);
@@ -74,13 +75,19 @@
             }
         }
 
-        public async Task Begin(string endpointQualifiedMessageId)
+        public void Prepare()
         {
             transactionScope = new TransactionScope(TransactionScopeOption.RequiresNew, TransactionScopeAsyncFlowOption.Enabled);
             ambientTransaction = Transaction.Current;
+        }
+
+        public async Task<OutboxTransaction> Begin(string endpointQualifiedMessageId)
+        {
+            
             Session = OpenSession();
             await concurrencyControlStrategy.Begin(endpointQualifiedMessageId, Session).ConfigureAwait(false);
             await Session.FlushAsync().ConfigureAwait(false);
+            return this;
         }
 
         public async Task Complete(string endpointQualifiedMessageId, OutboxMessage outboxMessage, ContextBag context)
