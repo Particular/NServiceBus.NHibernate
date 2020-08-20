@@ -59,7 +59,7 @@
             {
                 public override async Task Invoke(IIncomingLogicalMessageContext context, Func<Task> next)
                 {
-                    using(var txScope = new TransactionScope(TransactionScopeOption.RequiresNew, TransactionScopeAsyncFlowOption.Enabled))
+                    using (new TransactionScope(TransactionScopeOption.RequiresNew, TransactionScopeAsyncFlowOption.Enabled))
                     {
                         await next().ConfigureAwait(false);
                     }
