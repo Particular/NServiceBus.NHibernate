@@ -111,12 +111,12 @@
             return BeginTransactionInternal(result, endpointQualifiedMessageId);
         }
 
-        private static async Task<OutboxTransaction> BeginTransactionInternal(INHibernateOutboxTransaction result, string endpointQualifiedMessageId)
+        private static async Task<OutboxTransaction> BeginTransactionInternal(INHibernateOutboxTransaction transaction, string endpointQualifiedMessageId)
         {
             try
             {
-                await result.Begin(endpointQualifiedMessageId).ConfigureAwait(false);
-                return result;
+                await transaction.Begin(endpointQualifiedMessageId).ConfigureAwait(false);
+                return transaction;
             }
             catch (Exception e)
             {
@@ -124,7 +124,7 @@
                 // of the disposable resource. If it does the compiler generated code will not dispose anything
                 // therefore we need to dispose here to prevent the connection being returned to the pool being
                 // in a zombie state.
-                result.Dispose();
+                transaction.Dispose();
                 throw new Exception("Error while opening outbox transaction", e);
             }
         }
