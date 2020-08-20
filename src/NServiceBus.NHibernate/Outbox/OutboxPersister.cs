@@ -108,7 +108,25 @@
             var result = outboxTransactionFactory();
             result.Prepare();
             // we always need to avoid using async/await in here so that the transaction scope can float!
-            return result.Begin(endpointQualifiedMessageId);
+            return BeginTransactionInternal(result, endpointQualifiedMessageId);
+        }
+
+        private static async Task<OutboxTransaction> BeginTransactionInternal(INHibernateOutboxTransaction result, string endpointQualifiedMessageId)
+        {
+            try
+            {
+                await result.Begin(endpointQualifiedMessageId).ConfigureAwait(false);
+                return result;
+            }
+            catch (Exception e)
+            {
+                // A method that returns something that is disposable should not throw during the creation
+                // of the disposable resource. If it does the compiler generated code will not dispose anything
+                // therefore we need to dispose here to prevent the connection being returned to the pool being
+                // in a zombie state.
+                result.Dispose();
+                throw new Exception("Error while opening outbox transaction", e);
+            }
         }
 
         public async Task RemoveEntriesOlderThan(DateTime dateTime)
