@@ -73,7 +73,7 @@ namespace NServiceBus.NHibernate.Tests.Outbox
         public async Task TearDown()
         {
             await sessionFactory.CloseAsync();
-            //await schema.DropAsync(false, true);
+            await schema.DropAsync(false, true);
         }
 
         [Test]

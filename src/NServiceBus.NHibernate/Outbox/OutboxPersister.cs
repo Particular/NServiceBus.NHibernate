@@ -101,20 +101,30 @@
             }
         }
 
-        public async Task<OutboxTransaction> BeginTransaction(ContextBag context)
+        public Task<OutboxTransaction> BeginTransaction(ContextBag context)
         {
             //Provided by Get
             var endpointQualifiedMessageId = context.Get<string>(EndpointQualifiedMessageIdContextKey);
-
             var result = outboxTransactionFactory();
+            result.Prepare();
+            // we always need to avoid using async/await in here so that the transaction scope can float!
+            return BeginTransactionInternal(result, endpointQualifiedMessageId);
+        }
+
+        private static async Task<OutboxTransaction> BeginTransactionInternal(INHibernateOutboxTransaction transaction, string endpointQualifiedMessageId)
+        {
             try
             {
-                await result.Begin(endpointQualifiedMessageId).ConfigureAwait(false);
-                return result;
+                await transaction.Begin(endpointQualifiedMessageId).ConfigureAwait(false);
+                return transaction;
             }
             catch (Exception e)
             {
-                result.Dispose();
+                // A method that returns something that is disposable should not throw during the creation
+                // of the disposable resource. If it does the compiler generated code will not dispose anything
+                // therefore we need to dispose here to prevent the connection being returned to the pool being
+                // in a zombie state.
+                transaction.Dispose();
                 throw new Exception("Error while opening outbox transaction", e);
             }
         }

@@ -35,6 +35,7 @@
             };
         }
 
+
         public async Task Commit()
         {
             await onSaveChangesCallback().ConfigureAwait(false);
@@ -57,12 +58,17 @@
         Func<Task> onSaveChangesCallback = () => Task.CompletedTask;
         ITransaction transaction;
 
-        public Task Begin(string endpointQualifiedMessageId)
+        public void Prepare()
+        {
+            //NOOP
+        }
+
+        public async Task Begin(string endpointQualifiedMessageId)
         {
             Session = sessionFactory.OpenSession();
             transaction = Session.BeginTransaction();
 
-            return concurrencyControlStrategy.Begin(endpointQualifiedMessageId, Session);
+            await concurrencyControlStrategy.Begin(endpointQualifiedMessageId, Session).ConfigureAwait(false);
         }
 
         public Task Complete(string endpointQualifiedMessageId, OutboxMessage outboxMessage, ContextBag context)
@@ -77,7 +83,7 @@
                 Log.Warn("The endpoint is configured to use Outbox but a TransactionScope has been detected. " +
                          "In order to make the Outbox compatible with TransactionScope, use " +
                          "config.EnableOutbox().UseTransactionScope(). " +
-                         "Do not use config.UnitOfWork().WrapHandlersInATransactionScope().");
+                         "Remove any custom TransactionScope added to the pipeline.");
             }
         }
     }
