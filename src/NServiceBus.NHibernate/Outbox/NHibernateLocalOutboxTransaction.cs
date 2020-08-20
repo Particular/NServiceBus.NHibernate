@@ -63,13 +63,12 @@
             //NOOP
         }
 
-        public async Task<OutboxTransaction> Begin(string endpointQualifiedMessageId)
+        public async Task Begin(string endpointQualifiedMessageId)
         {
             Session = sessionFactory.OpenSession();
             transaction = Session.BeginTransaction();
 
             await concurrencyControlStrategy.Begin(endpointQualifiedMessageId, Session).ConfigureAwait(false);
-            return this;
         }
 
         public Task Complete(string endpointQualifiedMessageId, OutboxMessage outboxMessage, ContextBag context)

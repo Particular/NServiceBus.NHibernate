@@ -81,13 +81,11 @@
             ambientTransaction = Transaction.Current;
         }
 
-        public async Task<OutboxTransaction> Begin(string endpointQualifiedMessageId)
+        public async Task Begin(string endpointQualifiedMessageId)
         {
-
             Session = OpenSession();
             await concurrencyControlStrategy.Begin(endpointQualifiedMessageId, Session).ConfigureAwait(false);
             await Session.FlushAsync().ConfigureAwait(false);
-            return this;
         }
 
         public async Task Complete(string endpointQualifiedMessageId, OutboxMessage outboxMessage, ContextBag context)
