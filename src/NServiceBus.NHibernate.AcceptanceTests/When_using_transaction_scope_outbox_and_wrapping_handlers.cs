@@ -3,9 +3,11 @@
     using System;
     using System.Linq;
     using System.Threading.Tasks;
+    using System.Transactions;
     using AcceptanceTesting;
     using EndpointTemplates;
     using Logging;
+    using NServiceBus.Pipeline;
     using NUnit.Framework;
 
     public class When_using_transaction_scope_outbox_and_wrapping_handlers : NServiceBusAcceptanceTest
@@ -46,12 +48,24 @@
             {
                 EndpointSetup<DefaultServer>(b =>
                 {
+                    b.Pipeline.Register(new BehaviorThatCreatesACustomScope(), "Creates a custom transaction scope");
+
                     var outbox = b.EnableOutbox();
                     outbox.UseTransactionScope();
-                    b.UnitOfWork().WrapHandlersInATransactionScope();
                 });
             }
-            
+
+            class BehaviorThatCreatesACustomScope : Behavior<IIncomingLogicalMessageContext>
+            {
+                public override async Task Invoke(IIncomingLogicalMessageContext context, Func<Task> next)
+                {
+                    using(var txScope = new TransactionScope(TransactionScopeOption.RequiresNew, TransactionScopeAsyncFlowOption.Enabled))
+                    {
+                        await next().ConfigureAwait(false);
+                    }
+                }
+            }
+
             class OutboxTransactionScopeSaga : Saga<OutboxTransactionScopeSagaData>,
                 IAmStartedByMessages<StartSagaMessage>,
                 IAmStartedByMessages<CheckSagaMessage>
