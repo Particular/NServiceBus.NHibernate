@@ -74,10 +74,15 @@
             }
         }
 
-        public async Task Begin(string endpointQualifiedMessageId)
+        // Prepare is deliberately kept sync to allow floating of TxScope where needed
+        public void Prepare()
         {
             transactionScope = new TransactionScope(TransactionScopeOption.RequiresNew, TransactionScopeAsyncFlowOption.Enabled);
             ambientTransaction = Transaction.Current;
+        }
+
+        public async Task Begin(string endpointQualifiedMessageId)
+        {
             Session = OpenSession();
             await concurrencyControlStrategy.Begin(endpointQualifiedMessageId, Session).ConfigureAwait(false);
             await Session.FlushAsync().ConfigureAwait(false);
@@ -95,7 +100,7 @@
             {
                 Log.Warn("The endpoint is configured to use Outbox with TransactionScope but a different TransactionScope " +
                          "has been detected in the current context. " +
-                         "Do not use config.UnitOfWork().WrapHandlersInATransactionScope().");
+                         "Remove any custom TransactionScope added to the pipeline.");
             }
         }
 
