@@ -84,7 +84,7 @@
                 Log.Warn("The endpoint is configured to use Outbox but a TransactionScope has been detected. " +
                          "In order to make the Outbox compatible with TransactionScope, use " +
                          "config.EnableOutbox().UseTransactionScope(). " +
-                         "Do not use config.UnitOfWork().WrapHandlersInATransactionScope().");
+                         "Remove any custom TransactionScope added to the pipeline.");
             }
         }
     }

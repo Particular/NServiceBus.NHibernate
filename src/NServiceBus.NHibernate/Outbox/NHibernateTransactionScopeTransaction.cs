@@ -102,7 +102,7 @@
             {
                 Log.Warn("The endpoint is configured to use Outbox with TransactionScope but a different TransactionScope " +
                          "has been detected in the current context. " +
-                         "Do not use config.UnitOfWork().WrapHandlersInATransactionScope().");
+                         "Remove any custom TransactionScope added to the pipeline.");
             }
         }
 
