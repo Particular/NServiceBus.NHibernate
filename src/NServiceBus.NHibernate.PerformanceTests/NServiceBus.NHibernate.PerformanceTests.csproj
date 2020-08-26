@@ -11,9 +11,9 @@
 
   <ItemGroup>
     <PackageReference Include="NHibernate" Version="5.2.7" />
-    <PackageReference Include="NServiceBus" Version="7.3.0" />
+    <PackageReference Include="NServiceBus" Version="8.0.0-alpha.541" />
     <PackageReference Include="NServiceBus.Newtonsoft.Json" Version="2.2.0" />
-    <PackageReference Include="NServiceBus.Transport.Msmq" Version="1.1.0" />
+    <PackageReference Include="NServiceBus.Transport.Msmq" Version="2.0.0-alpha.152" />
   </ItemGroup>
 
 </Project>

@@ -12,8 +12,8 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.7.1" />
     <PackageReference Include="NHibernate" Version="5.2.7" />
-    <PackageReference Include="NServiceBus.Gateway.AcceptanceTests.Sources" Version="3.0.0" />
-    <PackageReference Include="NServiceBus.AcceptanceTests.Sources" Version="7.4.1" />
+    <PackageReference Include="NServiceBus.Gateway.AcceptanceTests.Sources" Version="3.2.0-alpha0014" />
+    <PackageReference Include="NServiceBus.AcceptanceTests.Sources" Version="8.0.0-alpha.541" />
     <PackageReference Include="NUnit" Version="3.12.0" />
     <PackageReference Include="NUnit3TestAdapter" Version="3.17.0" />
     <PackageReference Include="System.Data.SqlClient" Version="4.8.2" />
