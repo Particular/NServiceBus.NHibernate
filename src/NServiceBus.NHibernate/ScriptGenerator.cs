@@ -8,7 +8,6 @@
     using global::NHibernate.Dialect;
     using global::NHibernate.Mapping.ByCode;
     using global::NHibernate.Tool.hbm2ddl;
-    using Deduplication.NHibernate.Config;
     using NServiceBus.Outbox.NHibernate;
     using SagaPersisters.NHibernate.AutoPersistence;
     using Sagas;
@@ -48,19 +47,6 @@
         public static string GenerateTimeoutStoreScript()
         {
             return GenerateScript(typeof(TimeoutEntityMap));
-        }
-
-        /// <summary>
-        /// Generates the table creation script for the Gateway deduplication store.
-        /// </summary>
-        /// <returns></returns>
-        [ObsoleteEx(
-            Message = "NHibernate gateway persistence is deprecated. Use the new NServiceBus.Gateway.Sql dedicated package.",
-            RemoveInVersion = "10.0.0",
-            TreatAsErrorFromVersion = "9.0.0")]
-        public static string GenerateGatewayDeduplicationStoreScript()
-        {
-            return GenerateScript(typeof(DeduplicationMessageMap));
         }
 
         /// <summary>
