@@ -6,6 +6,7 @@ using NUnit.Framework;
 namespace NServiceBus.AcceptanceTests.Sagas
 {
     using global::NHibernate;
+    using Microsoft.Extensions.DependencyInjection;
 
     [TestFixture]
     public class When_using_outbox_synchronized_session_via_container : NServiceBusAcceptanceTest
@@ -38,7 +39,7 @@ namespace NServiceBus.AcceptanceTests.Sagas
                     c.RegisterComponents(cc =>
                     {
                         cc.ConfigureComponent<MyRepository>(DependencyLifecycle.InstancePerUnitOfWork);
-                        cc.ConfigureComponent(b => b.Build<INHibernateStorageSession>().Session, DependencyLifecycle.InstancePerUnitOfWork);
+                        cc.ConfigureComponent(b => b.GetRequiredService<INHibernateStorageSession>().Session, DependencyLifecycle.InstancePerUnitOfWork);
                     });
                 });
             }
