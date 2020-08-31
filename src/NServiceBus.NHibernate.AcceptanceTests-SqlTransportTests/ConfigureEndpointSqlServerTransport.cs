@@ -19,6 +19,7 @@ public class ConfigureEndpointSqlServerTransport : EndpointConfigurer
 
         var transportConfig = configuration.UseTransport<SqlServerTransport>();
 
+        transportConfig.SubscriptionSettings().DisableSubscriptionCache();
         transportConfig.ConnectionString(ConnectionString);
 
         return Task.FromResult(0);
