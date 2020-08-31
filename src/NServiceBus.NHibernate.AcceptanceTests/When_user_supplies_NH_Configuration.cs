@@ -58,7 +58,12 @@
 
             public class Saga13 : Saga<Saga13Data>, IAmStartedByMessages<Message1>, IHandleMessages<Message2>
             {
-                public Context Context { get; set; }
+                Context testContext;
+
+                public Saga13(Context testContext)
+                {
+                    this.testContext = testContext;
+                }
 
                 public Task Handle(Message1 message, IMessageHandlerContext context)
                 {
@@ -72,7 +77,7 @@
                 public Task Handle(Message2 _, IMessageHandlerContext context)
                 {
                     MarkAsComplete();
-                    Context.Completed = true;
+                    testContext.Completed = true;
                     return Task.FromResult(0);
                 }
 

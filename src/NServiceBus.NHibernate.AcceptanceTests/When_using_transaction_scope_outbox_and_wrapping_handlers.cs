@@ -70,7 +70,12 @@
                 IAmStartedByMessages<StartSagaMessage>,
                 IAmStartedByMessages<CheckSagaMessage>
             {
-                public Context Context { get; set; }
+                Context testContext;
+
+                public OutboxTransactionScopeSaga(Context testContext)
+                {
+                    this.testContext = testContext;
+                }
 
                 protected override void ConfigureHowToFindSaga(SagaPropertyMapper<OutboxTransactionScopeSagaData> mapper)
                 {
@@ -89,8 +94,8 @@
 
                 public Task Handle(CheckSagaMessage message, IMessageHandlerContext context)
                 {
-                    Context.SagaStarted = Data.Started;
-                    Context.Done = true;
+                    testContext.SagaStarted = Data.Started;
+                    testContext.Done = true;
                     return Task.FromResult(0);
                 }
             }
@@ -129,5 +134,5 @@
         }
     }
 
-    
+
 }

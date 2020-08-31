@@ -34,7 +34,12 @@
 
             public class NHUsingHbmsSaga : Saga<NHUsingHbmsSagaData>, IAmStartedByMessages<Message1>, IHandleMessages<Message2>
             {
-                public Context Context { get; set; }
+                Context testContext;
+
+                public NHUsingHbmsSaga(Context testContext)
+                {
+                    this.testContext = testContext;
+                }
 
                 public Task Handle(Message1 message, IMessageHandlerContext context)
                 {
@@ -48,7 +53,7 @@
                 public Task Handle(Message2 _, IMessageHandlerContext context)
                 {
                     MarkAsComplete();
-                    Context.SagaCompleted = true;
+                    testContext.SagaCompleted = true;
 
                     return Task.FromResult(0);
                 }
