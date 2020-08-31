@@ -96,18 +96,18 @@
             class SendOrderAcknowledgementHandler : IHandleMessages<SendOrderAcknowledgement>
             {
                 Context testContext;
+                ReadOnlySettings settings;
 
-                public SendOrderAcknowledgementHandler(Context testContext)
+                public SendOrderAcknowledgementHandler(Context testContext,ReadOnlySettings settings)
                 {
                     this.testContext = testContext;
+                    this.settings = settings;
                 }
-
-                public ReadOnlySettings Settings { get; set; }
 
                 public Task Handle(SendOrderAcknowledgement message, IMessageHandlerContext context)
                 {
                     var session = context.SynchronizedStorageSession.Session();
-                    var recordId = Settings.EndpointName() + "/" + message.MessageId;
+                    var recordId = settings.EndpointName() + "/" + message.MessageId;
                     var record = session.Get<MessageIdOutboxRecord>(recordId);
                     if (record != null)
                     {
