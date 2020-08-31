@@ -6,7 +6,7 @@
     {
         public bool SupportsDtc => true;
         public bool SupportsCrossQueueTransactions => true;
-        public bool SupportsNativePubSub => false;
+        public bool SupportsNativePubSub => true;
         public bool SupportsNativeDeferral => true;
         public bool SupportsOutbox => true;
         public IConfigureEndpointTestExecution CreateTransportConfiguration() => new ConfigureEndpointSqlServerTransport();
