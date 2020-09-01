@@ -3,6 +3,13 @@
 [assembly: System.Runtime.InteropServices.ComVisibleAttribute(false)]
 namespace NServiceBus.Features
 {
+    [System.ObsoleteAttribute("NHibernate gateway persistence is deprecated. Use the new NServiceBus.Gateway.Sql" +
+        " dedicated package. Will be removed in version 10.0.0.", true)]
+    public class NHibernateGatewayDeduplication : NServiceBus.Features.Feature
+    {
+        public NHibernateGatewayDeduplication() { }
+        protected override void Setup(NServiceBus.Features.FeatureConfigurationContext context) { }
+    }
     public class NHibernateSagaStorage : NServiceBus.Features.Feature
     {
         public NHibernateSagaStorage() { }
@@ -75,6 +82,15 @@ namespace NServiceBus.Outbox.NHibernate
 }
 namespace NServiceBus.Persistence.NHibernate
 {
+    public class static DeduplicationConfig
+    {
+        [System.ObsoleteAttribute("NHibernate gateway persistence is deprecated. Use the new NServiceBus.Gateway.Sql" +
+            " dedicated package. Will be removed in version 10.0.0.", true)]
+        public static NServiceBus.PersistenceExtensions<NServiceBus.NHibernatePersistence> DisableGatewayDeduplicationSchemaUpdate(this NServiceBus.PersistenceExtensions<NServiceBus.NHibernatePersistence> persistenceConfiguration) { }
+        [System.ObsoleteAttribute("NHibernate gateway persistence is deprecated. Use the new NServiceBus.Gateway.Sql" +
+            " dedicated package. Will be removed in version 10.0.0.", true)]
+        public static NServiceBus.PersistenceExtensions<NServiceBus.NHibernatePersistence> UseGatewayDeduplicationConfiguration(this NServiceBus.PersistenceExtensions<NServiceBus.NHibernatePersistence> persistenceConfiguration, NHibernate.Cfg.Configuration configuration) { }
+    }
     public class static NHibernateSettingRetriever
     {
         public static System.Func<System.Collections.Specialized.NameValueCollection> AppSettings { get; set; }
