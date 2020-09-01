@@ -28,7 +28,7 @@ namespace NServiceBus.Features
 
             // since the installers are registered even if the feature isn't enabled we need to make
             // this a no-op of there is no "schema updater" available
-            Defaults(c => c.Set<Installer.SchemaUpdater>(new Installer.SchemaUpdater()));
+            Defaults(c => c.Set(new Installer.SchemaUpdater()));
         }
 
         /// <summary>

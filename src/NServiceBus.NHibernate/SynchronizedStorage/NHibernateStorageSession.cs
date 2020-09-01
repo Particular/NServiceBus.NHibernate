@@ -9,6 +9,7 @@ namespace NServiceBus.Features
     using global::NHibernate.Mapping.ByCode;
     using NHibernate.Outbox;
     using global::NHibernate.Transaction;
+    using Microsoft.Extensions.DependencyInjection;
     using NServiceBus.Outbox.NHibernate;
     using TimeoutPersisters.NHibernate.Installer;
     using Persistence.NHibernate;
@@ -33,13 +34,13 @@ namespace NServiceBus.Features
 
             Defaults(s =>
             {
-                s.SetDefault<SharedMappings>(new SharedMappings());
+                s.SetDefault(new SharedMappings());
                 s.SetDefault<IOutboxPersisterFactory>(new OutboxPersisterFactory<OutboxRecord>());
             });
 
             // since the installers are registered even if the feature isn't enabled we need to make
             // this a no-op of there is no "schema updater" available
-            Defaults(c => c.Set<Installer.SchemaUpdater>(new Installer.SchemaUpdater()));
+            Defaults(c => c.Set(new Installer.SchemaUpdater()));
         }
 
         /// <summary>
@@ -53,7 +54,7 @@ namespace NServiceBus.Features
             var config = builder.Build();
 
             var outboxEnabled = context.Settings.IsFeatureActive(typeof(Outbox));
-                
+
             var sessionHolder = new CurrentSessionHolder();
 
             context.Container.ConfigureComponent(() => sessionHolder.Current, DependencyLifecycle.InstancePerCall);
@@ -91,11 +92,11 @@ namespace NServiceBus.Features
                 var sessionFactory = config.Configuration.BuildSessionFactory();
                 var persisterFactory = context.Settings.Get<IOutboxPersisterFactory>();
                 var persister = persisterFactory.Create(sessionFactory, context.Settings.EndpointName(), pessimisticMode, transactionScopeMode);
-                
+
                 context.Container.ConfigureComponent(b => persister, DependencyLifecycle.SingleInstance);
                 context.Container.ConfigureComponent(b => new NHibernateSynchronizedStorage(sessionFactory, sessionHolder), DependencyLifecycle.SingleInstance);
                 context.Container.ConfigureComponent(b => new NHibernateSynchronizedStorageAdapter(sessionFactory, sessionHolder), DependencyLifecycle.SingleInstance);
-                context.RegisterStartupTask(b => new OutboxCleaner(persister, b.Build<CriticalError>(), timeToKeepDeduplicationData, deduplicationDataCleanupPeriod, outboxCleanupCriticalErrorTriggerTime));
+                context.RegisterStartupTask(b => new OutboxCleaner(persister, b.GetRequiredService<CriticalError>(), timeToKeepDeduplicationData, deduplicationDataCleanupPeriod, outboxCleanupCriticalErrorTriggerTime));
 
                 context.Settings.AddStartupDiagnosticsSection("NServiceBus.Persistence.NHibernate.Outbox", new
                 {

@@ -76,7 +76,7 @@
                     b.EnableOutbox();
                 });
             }
-            
+
             class PlaceOrderHandler : IHandleMessages<PlaceOrder>
             {
                 public Task Handle(PlaceOrder message, IMessageHandlerContext context)
@@ -87,11 +87,16 @@
 
             class SendOrderAcknowledgementHandler : IHandleMessages<SendOrderAcknowledgement>
             {
-                public Context Context { get; set; }
+                Context testContext;
+
+                public SendOrderAcknowledgementHandler(Context testContext)
+                {
+                    this.testContext = testContext;
+                }
 
                 public Task Handle(SendOrderAcknowledgement message, IMessageHandlerContext context)
                 {
-                    Context.Done = true;
+                    testContext.Done = true;
                     return Task.FromResult(0);
                 }
             }

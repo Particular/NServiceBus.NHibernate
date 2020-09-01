@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net461;netstandard2.0</TargetFrameworks>
+    <TargetFrameworks>net472;netstandard2.0</TargetFrameworks>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\NServiceBus.snk</AssemblyOriginatorKeyFile>
     <OutputPath>..\..\binaries\</OutputPath>
@@ -14,9 +14,9 @@
     <PackageReference Include="Fody" Version="6.2.4" PrivateAssets="All" />
     <PackageReference Include="Janitor.Fody" Version="1.8.0" PrivateAssets="All" />
     <PackageReference Include="Obsolete.Fody" Version="5.2.1" PrivateAssets="All" />
-    <PackageReference Include="NServiceBus" Version="[7.0.1, 8.0.0)" />
-    <PackageReference Include="NHibernate" version="[5.2.0, 6.0.0)" />
-    <PackageReference Include="Microsoft.CSharp" version="4.7.0" />
+    <PackageReference Include="NServiceBus" Version="[8.0.0-alpha.554, 9.0.0)" />
+    <PackageReference Include="NHibernate" Version="[5.2.0, 6.0.0)" />
+    <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
   </ItemGroup>
 
 </Project>

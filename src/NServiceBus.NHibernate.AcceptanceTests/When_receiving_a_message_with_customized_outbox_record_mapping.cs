@@ -81,7 +81,7 @@
                     b.EnableOutbox();
                 });
             }
-            
+
             class PlaceOrderHandler : IHandleMessages<PlaceOrder>
             {
                 public Task Handle(PlaceOrder message, IMessageHandlerContext context)
@@ -95,18 +95,23 @@
 
             class SendOrderAcknowledgementHandler : IHandleMessages<SendOrderAcknowledgement>
             {
-                public Context Context { get; set; }
+                Context testContext;
+                ReadOnlySettings settings;
 
-                public ReadOnlySettings Settings { get; set; }
+                public SendOrderAcknowledgementHandler(Context testContext,ReadOnlySettings settings)
+                {
+                    this.testContext = testContext;
+                    this.settings = settings;
+                }
 
                 public Task Handle(SendOrderAcknowledgement message, IMessageHandlerContext context)
                 {
                     var session = context.SynchronizedStorageSession.Session();
-                    var recordId = Settings.EndpointName() + "/" + message.MessageId;
+                    var recordId = settings.EndpointName() + "/" + message.MessageId;
                     var record = session.Get<MessageIdOutboxRecord>(recordId);
                     if (record != null)
                     {
-                        Context.OrderAckReceived++;
+                        testContext.OrderAckReceived++;
                     }
                     return Task.FromResult(0);
                 }

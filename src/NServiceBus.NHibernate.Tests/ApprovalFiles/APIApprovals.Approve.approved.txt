@@ -4,8 +4,7 @@
 namespace NServiceBus.Features
 {
     [System.ObsoleteAttribute("NHibernate gateway persistence is deprecated. Use the new NServiceBus.Gateway.Sql" +
-        " dedicated package. Will be treated as an error from version 9.0.0. Will be remo" +
-        "ved in version 10.0.0.", false)]
+        " dedicated package. Will be removed in version 10.0.0.", true)]
     public class NHibernateGatewayDeduplication : NServiceBus.Features.Feature
     {
         public NHibernateGatewayDeduplication() { }
@@ -64,10 +63,6 @@ namespace NServiceBus.NHibernate
         where T : NHibernate.Dialect.Dialect, new ()
     {
         public ScriptGenerator() { }
-        [System.ObsoleteAttribute("NHibernate gateway persistence is deprecated. Use the new NServiceBus.Gateway.Sql" +
-            " dedicated package. Will be treated as an error from version 9.0.0. Will be remo" +
-            "ved in version 10.0.0.", false)]
-        public static string GenerateGatewayDeduplicationStoreScript() { }
         public static string GenerateOutboxScript(System.Type outboxRecordMappingType = null) { }
         public static string GenerateSagaScript<TSaga>(System.Func<System.Type, string> tableNamingConvention = null)
             where TSaga : NServiceBus.Saga { }
@@ -90,12 +85,10 @@ namespace NServiceBus.Persistence.NHibernate
     public class static DeduplicationConfig
     {
         [System.ObsoleteAttribute("NHibernate gateway persistence is deprecated. Use the new NServiceBus.Gateway.Sql" +
-            " dedicated package. Will be treated as an error from version 9.0.0. Will be remo" +
-            "ved in version 10.0.0.", false)]
+            " dedicated package. Will be removed in version 10.0.0.", true)]
         public static NServiceBus.PersistenceExtensions<NServiceBus.NHibernatePersistence> DisableGatewayDeduplicationSchemaUpdate(this NServiceBus.PersistenceExtensions<NServiceBus.NHibernatePersistence> persistenceConfiguration) { }
         [System.ObsoleteAttribute("NHibernate gateway persistence is deprecated. Use the new NServiceBus.Gateway.Sql" +
-            " dedicated package. Will be treated as an error from version 9.0.0. Will be remo" +
-            "ved in version 10.0.0.", false)]
+            " dedicated package. Will be removed in version 10.0.0.", true)]
         public static NServiceBus.PersistenceExtensions<NServiceBus.NHibernatePersistence> UseGatewayDeduplicationConfiguration(this NServiceBus.PersistenceExtensions<NServiceBus.NHibernatePersistence> persistenceConfiguration, NHibernate.Cfg.Configuration configuration) { }
     }
     public class static NHibernateSettingRetriever

@@ -98,11 +98,16 @@
         }
         public class CompletionHandler : IHandleMessages<SagaCompleted>
         {
-            public Context Context { get; set; }
+            Context testContext;
+
+                public CompletionHandler(Context testContext)
+                {
+                    this.testContext = testContext;
+                }
 
             public Task Handle(SagaCompleted message, IMessageHandlerContext context)
             {
-                Context.SagaCompleted = true;
+                testContext.SagaCompleted = true;
 
                 return Task.FromResult(0);
             }

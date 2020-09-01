@@ -88,24 +88,34 @@
 
             class PlaceOrderHandler : IHandleMessages<MyMessage>
             {
-                public Context Context { get; set; }
+                Context testContext;
+
+                public PlaceOrderHandler(Context testContext)
+                {
+                    this.testContext = testContext;
+                }
 
                 public async Task Handle(MyMessage message, IMessageHandlerContext context)
                 {
                     await Task.Delay(2000);
-                    Context.IncrementHandlerExecutions();
+                    testContext.IncrementHandlerExecutions();
                 }
             }
         }
 
         public class TerminatorBehavior : Behavior<ITransportReceiveContext>
         {
-            public Context Context { get; set; }
+            Context testContext;
+
+                public TerminatorBehavior(Context testContext)
+                {
+                    this.testContext = testContext;
+                }
 
             public override async Task Invoke(ITransportReceiveContext context, Func<Task> next)
             {
                 await next().ConfigureAwait(false);
-                Context.IncrementMessagesReceived();
+                testContext.IncrementMessagesReceived();
             }
         }
 

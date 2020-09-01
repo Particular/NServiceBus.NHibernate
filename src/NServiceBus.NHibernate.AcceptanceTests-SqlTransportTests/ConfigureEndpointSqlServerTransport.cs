@@ -19,17 +19,8 @@ public class ConfigureEndpointSqlServerTransport : EndpointConfigurer
 
         var transportConfig = configuration.UseTransport<SqlServerTransport>();
 
+        transportConfig.SubscriptionSettings().DisableSubscriptionCache();
         transportConfig.ConnectionString(ConnectionString);
-
-        var routingConfig = transportConfig.Routing();
-
-        foreach (var publisher in publisherMetadata.Publishers)
-        {
-            foreach (var eventType in publisher.Events)
-            {
-                routingConfig.RegisterPublisher(eventType, publisher.PublisherName);
-            }
-        }
 
         return Task.FromResult(0);
     }
