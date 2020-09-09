@@ -43,8 +43,7 @@ namespace NServiceBus.AcceptanceTests.Sagas
                 {
                     c.RegisterComponents(cc =>
                     {
-                        cc.ConfigureComponent(b => b.GetRequiredService<INHibernateStorageSession>().Session,
-                            DependencyLifecycle.InstancePerUnitOfWork);
+                        cc.AddScoped(b => b.GetRequiredService<INHibernateStorageSession>().Session);
                     });
                 });
             }

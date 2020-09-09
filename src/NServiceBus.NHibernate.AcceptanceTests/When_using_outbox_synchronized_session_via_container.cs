@@ -38,8 +38,8 @@ namespace NServiceBus.AcceptanceTests.Sagas
                     c.EnableOutbox();
                     c.RegisterComponents(cc =>
                     {
-                        cc.ConfigureComponent<MyRepository>(DependencyLifecycle.InstancePerUnitOfWork);
-                        cc.ConfigureComponent(b => b.GetRequiredService<INHibernateStorageSession>().Session, DependencyLifecycle.InstancePerUnitOfWork);
+                        cc.AddScoped<MyRepository>();
+                        cc.AddScoped(b => b.GetRequiredService<INHibernateStorageSession>().Session);
                     });
                 });
             }
