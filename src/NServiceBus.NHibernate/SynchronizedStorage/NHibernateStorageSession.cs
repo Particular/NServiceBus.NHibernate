@@ -95,7 +95,7 @@ namespace NServiceBus.Features
                 var persisterFactory = context.Settings.Get<IOutboxPersisterFactory>();
                 var persister = persisterFactory.Create(sessionFactory, context.Settings.EndpointName(), pessimisticMode, transactionScopeMode);
 
-                context.Services.AddSingleton<IOutboxStorage>(_ => persister);
+                context.Services.AddSingleton<IOutboxStorage>(persister);
                 context.Services.AddSingleton<ISynchronizedStorage>(new NHibernateSynchronizedStorage(sessionFactory, sessionHolder));
                 context.Services.AddSingleton<ISynchronizedStorageAdapter>(new NHibernateSynchronizedStorageAdapter(sessionFactory, sessionHolder));
                 context.RegisterStartupTask(b => new OutboxCleaner(persister, b.GetRequiredService<CriticalError>(), timeToKeepDeduplicationData, deduplicationDataCleanupPeriod, outboxCleanupCriticalErrorTriggerTime));
