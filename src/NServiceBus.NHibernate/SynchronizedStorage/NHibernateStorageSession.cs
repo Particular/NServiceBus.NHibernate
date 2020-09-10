@@ -10,6 +10,7 @@ namespace NServiceBus.Features
     using NHibernate.Outbox;
     using global::NHibernate.Transaction;
     using Microsoft.Extensions.DependencyInjection;
+    using NServiceBus.Outbox;
     using NServiceBus.Outbox.NHibernate;
     using Persistence;
     using TimeoutPersisters.NHibernate.Installer;
@@ -94,8 +95,7 @@ namespace NServiceBus.Features
                 var persisterFactory = context.Settings.Get<IOutboxPersisterFactory>();
                 var persister = persisterFactory.Create(sessionFactory, context.Settings.EndpointName(), pessimisticMode, transactionScopeMode);
 
-                // ReSharper disable once RedundantTypeArgumentsOfMethod
-                context.Services.AddSingleton<INHibernateOutboxStorage>(_ => persister);
+                context.Services.AddSingleton<IOutboxStorage>(_ => persister);
                 context.Services.AddSingleton<ISynchronizedStorage>(new NHibernateSynchronizedStorage(sessionFactory, sessionHolder));
                 context.Services.AddSingleton<ISynchronizedStorageAdapter>(new NHibernateSynchronizedStorageAdapter(sessionFactory, sessionHolder));
                 context.RegisterStartupTask(b => new OutboxCleaner(persister, b.GetRequiredService<CriticalError>(), timeToKeepDeduplicationData, deduplicationDataCleanupPeriod, outboxCleanupCriticalErrorTriggerTime));
