@@ -3,6 +3,7 @@ namespace NServiceBus.Features
     using System;
     using System.Linq;
     using global::NHibernate.Cfg;
+    using Microsoft.Extensions.DependencyInjection;
     using NServiceBus.Sagas;
     using SagaPersisters.NHibernate;
     using SagaPersisters.NHibernate.AutoPersistence;
@@ -29,7 +30,7 @@ namespace NServiceBus.Features
             context.Settings.Get<SharedMappings>()
                 .AddMapping(configuration => ApplyMappings(context.Settings, configuration));
 
-            context.Container.ConfigureComponent<SagaPersister>(DependencyLifecycle.SingleInstance);
+            context.Services.AddSingleton<ISagaPersister, SagaPersister>();
         }
 
         internal void ApplyMappings(ReadOnlySettings settings, Configuration configuration)

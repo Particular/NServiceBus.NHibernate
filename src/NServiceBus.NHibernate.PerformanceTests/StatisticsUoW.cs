@@ -4,6 +4,7 @@
     using System.Threading;
     using System.Threading.Tasks;
     using System.Transactions;
+    using Microsoft.Extensions.DependencyInjection;
     using NServiceBus;
     using NServiceBus.UnitOfWork;
 
@@ -60,7 +61,7 @@
 
         public void Customize(EndpointConfiguration builder)
         {
-            builder.RegisterComponents(c=> c.ConfigureComponent<StatisticsUoW>(DependencyLifecycle.InstancePerUnitOfWork));
+            builder.RegisterComponents(c=> c.AddScoped<IManageUnitsOfWork, StatisticsUoW>());
         }
     }
 }

@@ -3,8 +3,10 @@ namespace NServiceBus.Features
     using System;
     using System.Dynamic;
     using System.Threading.Tasks;
+    using Microsoft.Extensions.DependencyInjection;
     using TimeoutPersisters.NHibernate.Installer;
     using Persistence.NHibernate;
+    using Unicast.Subscriptions.MessageDrivenSubscriptions;
     using Unicast.Subscriptions.NHibernate;
     using Unicast.Subscriptions.NHibernate.Config;
     using Installer = Unicast.Subscriptions.NHibernate.Installer.Installer;
@@ -68,7 +70,8 @@ namespace NServiceBus.Features
                 diagnostics.Cache = false;
             }
 
-            context.Container.ConfigureComponent(b => persister, DependencyLifecycle.SingleInstance);
+            context.Services.AddSingleton(persister);
+            context.Services.AddSingleton<ISubscriptionStorage>(sp => sp.GetRequiredService<SubscriptionPersister>());
             context.RegisterStartupTask(new SubscriptionPersisterInitTask(persister));
 
             context.Settings.AddStartupDiagnosticsSection("NServiceBus.Persistence.NHibernate.Subscriptions", (object)diagnostics);

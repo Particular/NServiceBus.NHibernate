@@ -5,7 +5,9 @@ namespace NServiceBus.Features
     using System.Threading.Tasks;
     using global::NHibernate.Cfg;
     using Logging;
+    using Microsoft.Extensions.DependencyInjection;
     using Persistence.NHibernate;
+    using Timeout.Core;
     using TimeoutPersisters.NHibernate;
     using TimeoutPersisters.NHibernate.Config;
     using TimeoutPersisters.NHibernate.Installer;
@@ -50,7 +52,7 @@ namespace NServiceBus.Features
             var timeoutsCleanupExecutionInterval = context.Settings.GetOrDefault<TimeSpan?>("NHibernate.Timeouts.CleanupExecutionInterval") ?? TimeSpan.FromMinutes(2);
             diagnostics.CleanupInterval = timeoutsCleanupExecutionInterval;
 
-            context.Container.ConfigureComponent(b =>
+            context.Services.AddSingleton(_ =>
             {
                 var sessionFactory = config.Configuration.BuildSessionFactory();
                 return new TimeoutPersister(
@@ -58,7 +60,9 @@ namespace NServiceBus.Features
                     sessionFactory,
                     new NHibernateSynchronizedStorageAdapter(sessionFactory, null), new NHibernateSynchronizedStorage(sessionFactory, null),
                     timeoutsCleanupExecutionInterval);
-            }, DependencyLifecycle.SingleInstance);
+            });
+            context.Services.AddSingleton<IPersistTimeouts>(sp => sp.GetRequiredService<TimeoutPersister>());
+            context.Services.AddSingleton<IQueryTimeouts>(sp => sp.GetRequiredService<TimeoutPersister>());
 
             context.RegisterStartupTask(new DetectIncorrectIndexesStartupTask(config.Configuration));
 
