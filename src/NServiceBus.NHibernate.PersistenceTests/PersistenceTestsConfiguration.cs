@@ -24,7 +24,7 @@
 
     class NHibernateVariant
     {
-        public NHibernateVariant(string description, Action<IDbIntegrationConfigurationProperties> configureDb, IOutboxPersisterFactory outboxPersisterFactory, bool pessimistic = false, bool transactionScope = false)
+        public NHibernateVariant(string description, Action<DbIntegrationConfigurationProperties> configureDb, IOutboxPersisterFactory outboxPersisterFactory, bool pessimistic = false, bool transactionScope = false)
         {
             ConfigureDb = configureDb;
             OutboxPersisterFactory = outboxPersisterFactory;
@@ -33,7 +33,7 @@
             TransactionScope = transactionScope;
         }
 
-        public Action<IDbIntegrationConfigurationProperties> ConfigureDb { get; }
+        public Action<DbIntegrationConfigurationProperties> ConfigureDb { get; }
 
         public IOutboxPersisterFactory OutboxPersisterFactory { get; }
 
@@ -115,13 +115,13 @@
             };
         }
 
-        static TestFixtureData CreateVariant<T>(string description, Action<IDbIntegrationConfigurationProperties> configureDb, bool pessimistic = false, bool transactionScope = false)
+        static TestFixtureData CreateVariant<T>(string description, Action<DbIntegrationConfigurationProperties> configureDb, bool pessimistic = false, bool transactionScope = false)
             where T : class, IOutboxRecord, new()
         {
             return new TestFixtureData(new TestVariant(new NHibernateVariant(description, configureDb, new OutboxPersisterFactory<T>(), pessimistic, transactionScope)));
         }
 
-        static TestFixtureData CreateVariant(string description, Action<IDbIntegrationConfigurationProperties> configureDb, bool pessimistic = false, bool transactionScope = false)
+        static TestFixtureData CreateVariant(string description, Action<DbIntegrationConfigurationProperties> configureDb, bool pessimistic = false, bool transactionScope = false)
         {
             return CreateVariant<OutboxRecord>(description, configureDb, pessimistic, transactionScope);
         }
