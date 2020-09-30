@@ -11,14 +11,17 @@ namespace NServiceBus.Outbox.NHibernate
         /// Id of the incoming message.
         /// </summary>
         string MessageId { get; set; }
+
         /// <summary>
         /// Gets or sets if the messages has already been dispatched to destinations.
         /// </summary>
         bool Dispatched { get; set; }
+
         /// <summary>
         /// Gets or sets when the messages has been dispatched.
         /// </summary>
         DateTime? DispatchedAt { get; set; }
+
         /// <summary>
         /// Gets or sets the serialized transport operations.
         /// </summary>

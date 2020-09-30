@@ -14,7 +14,7 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
                 typeof(TestSagaData),
                 typeof(TestSaga)
             });
-            Assert.NotNull(sessionFactory.GetEntityPersister(typeof (RelatedClass).FullName));
+            Assert.NotNull(sessionFactory.GetEntityPersister(typeof(RelatedClass).FullName));
         }
     }
 }

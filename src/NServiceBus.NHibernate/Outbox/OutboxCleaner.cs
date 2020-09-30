@@ -24,7 +24,7 @@ namespace NServiceBus.Features
                 ex => criticalError.Raise("Failed to clean the Outbox.", ex)
             );
 
-            if (Timeout.InfiniteTimeSpan == deduplicationDataCleanupPeriod)
+            if (deduplicationDataCleanupPeriod == Timeout.InfiniteTimeSpan)
             {
                 Logger.InfoFormat("Outbox cleanup task is disabled.");
             }

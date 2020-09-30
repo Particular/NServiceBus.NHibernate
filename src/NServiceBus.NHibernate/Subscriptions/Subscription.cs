@@ -15,7 +15,7 @@ namespace NServiceBus.Unicast.Subscriptions.NHibernate
         {
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != typeof (Subscription)) return false;
+            if (obj.GetType() != typeof(Subscription)) return false;
             return Equals((Subscription) obj);
         }
 

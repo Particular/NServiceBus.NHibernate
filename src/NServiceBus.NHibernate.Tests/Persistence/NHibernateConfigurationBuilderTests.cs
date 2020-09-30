@@ -143,7 +143,7 @@ namespace NServiceBus.Persistence.NHibernate.Tests
                                                            ConfigurationFile = "Testing.config"
                                                        });
 
-            var worker = (Worker)appDomain.CreateInstanceAndUnwrap(Assembly.GetExecutingAssembly().FullName, typeof (Worker).FullName);
+            var worker = (Worker)appDomain.CreateInstanceAndUnwrap(Assembly.GetExecutingAssembly().FullName, typeof(Worker).FullName);
             var result = worker.Execute();
             AppDomain.Unload(appDomain);
 

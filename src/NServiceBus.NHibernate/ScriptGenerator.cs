@@ -34,7 +34,6 @@
         /// <summary>
         /// Generates the table creation script for the subscription store.
         /// </summary>
-        /// <returns></returns>
         public static string GenerateSubscriptionStoreScript()
         {
             return GenerateScript(typeof(SubscriptionMap));
@@ -43,7 +42,6 @@
         /// <summary>
         /// Generates the table creation script for the timeout store.
         /// </summary>
-        /// <returns></returns>
         public static string GenerateTimeoutStoreScript()
         {
             return GenerateScript(typeof(TimeoutEntityMap));

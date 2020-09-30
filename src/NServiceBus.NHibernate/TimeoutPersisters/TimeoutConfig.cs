@@ -11,7 +11,6 @@ namespace NServiceBus.Persistence.NHibernate
         /// <summary>
         /// Disables automatic schema update.
         /// </summary>
-        /// <param name="persistenceConfiguration"></param>
         public static PersistenceExtensions<NHibernatePersistence> DisableTimeoutStorageSchemaUpdate(this PersistenceExtensions<NHibernatePersistence> persistenceConfiguration)
         {
             persistenceConfiguration.GetSettings().Set("NHibernate.Timeouts.AutoUpdateSchema", false);
@@ -21,7 +20,7 @@ namespace NServiceBus.Persistence.NHibernate
         /// <summary>
         /// Configures Timeout Storage to use the <paramref name="configuration"/>.
         /// </summary>
-        /// <param name="persistenceConfiguration"></param>
+        /// <param name="persistenceConfiguration">The persistence config object</param>
         /// <param name="configuration">The <see cref="Configuration"/> object.</param>
         public static PersistenceExtensions<NHibernatePersistence> UseTimeoutStorageConfiguration(this PersistenceExtensions<NHibernatePersistence> persistenceConfiguration, Configuration configuration)
         {

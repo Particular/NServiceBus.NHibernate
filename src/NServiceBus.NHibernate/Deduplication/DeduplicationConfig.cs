@@ -11,7 +11,6 @@
         /// <summary>
         /// Disables automatic schema update.
         /// </summary>
-        /// <param name="persistenceConfiguration"></param>
         [ObsoleteEx(
             Message = "NHibernate gateway persistence is deprecated. Use the new NServiceBus.Gateway.Sql dedicated package.",
             RemoveInVersion = "10.0.0",
@@ -24,7 +23,7 @@
         /// <summary>
         /// Configures Subscription Storage to use the <paramref name="configuration"/>.
         /// </summary>
-        /// <param name="persistenceConfiguration"></param>
+        /// <param name="persistenceConfiguration">The persistence config object</param>
         /// <param name="configuration">The <see cref="Configuration"/> object.</param>
         [ObsoleteEx(
             Message = "NHibernate gateway persistence is deprecated. Use the new NServiceBus.Gateway.Sql dedicated package.",

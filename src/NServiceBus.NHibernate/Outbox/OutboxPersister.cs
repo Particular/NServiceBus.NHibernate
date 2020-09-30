@@ -29,7 +29,8 @@
 
         public async Task<OutboxMessage> Get(string messageId, ContextBag context)
         {
-            object[] possibleIds = {
+            object[] possibleIds =
+            {
                 EndpointQualifiedMessageId(messageId),
                 messageId,
             };

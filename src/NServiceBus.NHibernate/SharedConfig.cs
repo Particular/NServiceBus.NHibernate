@@ -11,7 +11,7 @@
         /// <summary>
         /// Sets the connection string to use for all storages
         /// </summary>
-        /// <param name="persistenceConfiguration"></param>
+        /// <param name="persistenceConfiguration">The persistence config object</param>
         /// <param name="connectionString">The connection string to use.</param>
         public static PersistenceExtensions<NHibernatePersistence> ConnectionString(this PersistenceExtensions<NHibernatePersistence> persistenceConfiguration, string connectionString)
         {
@@ -22,7 +22,7 @@
         /// <summary>
         /// Disables automatic schema update.
         /// </summary>
-        /// <param name="persistenceConfiguration"></param>
+        /// <param name="persistenceConfiguration">The persistence config object</param>
         public static PersistenceExtensions<NHibernatePersistence> DisableSchemaUpdate(this PersistenceExtensions<NHibernatePersistence> persistenceConfiguration)
         {
             persistenceConfiguration.GetSettings().Set("NHibernate.Common.AutoUpdateSchema", false);
@@ -32,7 +32,7 @@
         /// <summary>
         /// Configures Subscription Storage to use the <paramref name="configuration"/>.
         /// </summary>
-        /// <param name="persistenceConfiguration"></param>
+        /// <param name="persistenceConfiguration">The persistence config object</param>
         /// <param name="configuration">The <see cref="Configuration"/> object.</param>
         public static PersistenceExtensions<NHibernatePersistence> UseConfiguration(this PersistenceExtensions<NHibernatePersistence> persistenceConfiguration, Configuration configuration)
         {

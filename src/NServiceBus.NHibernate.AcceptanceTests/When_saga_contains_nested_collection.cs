@@ -59,12 +59,15 @@
                 Task PerformSagaCompletionCheck(IMessageHandlerContext context)
                 {
                     if (Data.RelatedData == null)
+                    {
                         Data.RelatedData = new List<ChildData>
                                        {
                                            new ChildData{NHNestedCollectionSagaData = Data},
                                            new ChildData{NHNestedCollectionSagaData = Data},
                                            new ChildData{NHNestedCollectionSagaData = Data}
                                        };
+                    }
+
                     if (Data.MessageOneReceived && Data.MessageTwoReceived && Data.MessageThreeReceived)
                     {
                         MarkAsComplete();
