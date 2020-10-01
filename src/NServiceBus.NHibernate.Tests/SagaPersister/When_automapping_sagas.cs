@@ -17,7 +17,9 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
         [OneTimeSetUp]
         public void SetUp()
         {
-            var types = new[] {typeof(TestSaga), typeof(TestSagaData), typeof(TestComponent), typeof(PolymorphicPropertyBase),
+            var types = new[] 
+            {
+                typeof(TestSaga), typeof(TestSagaData), typeof(TestComponent), typeof(PolymorphicPropertyBase),
                 typeof(AlsoDerivedFromTestSagaWithTableNameAttributeActualSaga), typeof(AlsoDerivedFromTestSagaWithTableNameAttribute),
                 typeof(DerivedFromTestSagaWithTableNameAttributeActualSaga), typeof(DerivedFromTestSagaWithTableNameAttribute),
                 typeof(TestSagaWithTableNameAttributeActualSaga), typeof(TestSagaWithTableNameAttribute),
@@ -69,7 +71,8 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
                                 .IdentifierGenerator.GetType(), typeof(IdentityGenerator));
         }
 
-        [Test, Ignore("Not supported any more")]
+        [Test]
+        [Ignore("Not supported any more")]
         public void Inherited_property_classes_should_be_mapped()
         {
             persisterForTestSaga.ShouldContainMappingsFor<PolymorphicPropertyBase>();

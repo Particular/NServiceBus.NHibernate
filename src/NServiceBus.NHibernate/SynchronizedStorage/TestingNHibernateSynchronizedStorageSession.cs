@@ -10,7 +10,7 @@
     /// Allows writing automated tests against handlers which use NServiceBus-managed NHibernate session.
     /// </summary>
     [SkipWeaving]
-    public class TestingNHibernateSynchronizedStorageSession: SynchronizedStorageSession, INHibernateStorageSession
+    public class TestingNHibernateSynchronizedStorageSession : SynchronizedStorageSession, INHibernateStorageSession
     {
         /// <summary>
         /// Creates new instance of the session.

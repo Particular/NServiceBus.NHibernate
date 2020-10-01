@@ -17,14 +17,13 @@
                 Statistics.First = DateTime.Now;
             }
 
-            if(Transaction.Current != null)
+            if (Transaction.Current != null)
                 Transaction.Current.TransactionCompleted += OnCompleted;
 
             //            if (message.TwoPhaseCommit)
             //{
             //    Transaction.Current.EnlistDurable(Guid.NewGuid(), enlistment, EnlistmentOptions.None);
             //}static readonly TwoPhaseCommitEnlistment enlistment = new TwoPhaseCommitEnlistment();  
-
             return Task.FromResult(9);
         }
 

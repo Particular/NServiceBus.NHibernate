@@ -14,11 +14,13 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
         [SetUp]
         public void SetUp()
         {
-            sessionFactory = SessionFactoryHelper.Build(new[] {
+            sessionFactory = SessionFactoryHelper.Build(new[]
+            {
                 typeof(SagaWithAbstractBaseClassActualSaga),
                 typeof(SagaWithAbstractBaseClass),
                 typeof(ContainSagaData),
-                typeof(MyOwnAbstractBase) });
+                typeof(MyOwnAbstractBase)
+            });
         }
 
         [Test]

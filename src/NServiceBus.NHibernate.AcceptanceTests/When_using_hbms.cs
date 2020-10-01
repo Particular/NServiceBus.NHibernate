@@ -48,8 +48,6 @@
                     return context.SendLocal(new Message2{SomeId = Data.SomeId});
                 }
 
-// ReSharper disable once UnusedParameter.Global
-
                 public Task Handle(Message2 _, IMessageHandlerContext context)
                 {
                     MarkAsComplete();

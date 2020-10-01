@@ -18,7 +18,6 @@
         /// <summary>
         /// Registers a callback to be executed before the storage session changes are committed.
         /// </summary>
-        /// <param name="callback"></param>
         void OnSaveChanges(Func<SynchronizedStorageSession, Task> callback);
     }
 }

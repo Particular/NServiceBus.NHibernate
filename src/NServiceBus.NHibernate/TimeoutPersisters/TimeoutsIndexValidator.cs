@@ -96,12 +96,12 @@
             {
                 string EnsureUnquoted(string name)
                 {
-                    if (null == name || name.Length < 2)
+                    if (name == null || name.Length < 2)
                     {
                         return name;
                     }
 
-                    if ('[' == name[0] && ']' == name[name.Length - 1]) // quoted?
+                    if (name[0] == '[' && name[name.Length - 1] == ']') // quoted?
                     {
                         name = name.Substring(1, name.Length - 2); // remove outer brackets
                         name = name.Replace("]]", "]"); // un-escape right-bracket
@@ -110,7 +110,7 @@
                     return name;
                 }
 
-                var restrictions = new []
+                var restrictions = new[]
                 {
                     EnsureUnquoted(entity.Table.Catalog),
                     EnsureUnquoted(entity.Table.Schema),

@@ -13,6 +13,7 @@ namespace NServiceBus.SagaPersisters.NHibernate
         /// might be obtained if necessary.
         /// </remarks>
         None = 1,
+
         /// <summary>
         /// A shared lock. 
         /// </summary>
@@ -20,6 +21,7 @@ namespace NServiceBus.SagaPersisters.NHibernate
         /// Objects are loaded in <c>Read</c> mode by default
         /// </remarks>
         Read = 2,
+
         /// <summary>
         /// An upgrade lock. 
         /// </summary>
@@ -28,6 +30,7 @@ namespace NServiceBus.SagaPersisters.NHibernate
         /// SQL <c>SELECT ... FOR UPDATE</c>
         /// </remarks>
         Upgrade = 3,
+
         /// <summary>
         /// Attempt to obtain an upgrade lock, using an Oracle-style
         /// <c>SELECT ... FOR UPGRADE NOWAIT</c>. 
@@ -36,6 +39,7 @@ namespace NServiceBus.SagaPersisters.NHibernate
         /// The semantics of this lock mode, once obtained, are the same as <c>Upgrade</c>
         /// </remarks>
         UpgradeNoWait = 4,
+        
         /// <summary>
         /// A <c>Write</c> lock is obtained when an object is updated or inserted.
         /// </summary>
@@ -43,6 +47,7 @@ namespace NServiceBus.SagaPersisters.NHibernate
         /// This is not a valid mode for <c>Load()</c> or <c>Lock()</c>.
         /// </remarks>
         Write = 5,
+
         /// <summary> 
         /// Similar to <see cref="Upgrade"/> except that, for versioned entities,
         /// it results in a forced version increment.

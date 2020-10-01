@@ -54,7 +54,8 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
 
     public enum StatusEnum
     {
-        SomeStatus, AnotherStatus
+        SomeStatus,
+        AnotherStatus
     }
 
     public class TestComponent

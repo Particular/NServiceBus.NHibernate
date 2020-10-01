@@ -171,7 +171,6 @@ For most scenarios the 'NServiceBus/Persistence' connection string is the best o
             var baseDir = AppDomain.CurrentDomain.BaseDirectory;
 
             // Note RelativeSearchPath can be null even if the doc say something else; don't remove the check
-            // ReSharper disable once ConstantNullCoalescingCondition
             var searchPath = AppDomain.CurrentDomain.RelativeSearchPath ?? string.Empty;
 
             var relativeSearchPath = searchPath.Split(';').First();

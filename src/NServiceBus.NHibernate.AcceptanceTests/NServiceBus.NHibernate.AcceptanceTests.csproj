@@ -15,6 +15,7 @@
     <PackageReference Include="NServiceBus.AcceptanceTests.Sources" Version="8.0.0-alpha.561" />
     <PackageReference Include="NUnit" Version="3.12.0" />
     <PackageReference Include="NUnit3TestAdapter" Version="3.17.0" />
+    <PackageReference Include="Particular.CodeRules" Version="0.7.0" PrivateAssets="All" />
     <PackageReference Include="System.Data.SqlClient" Version="4.8.2" />
   </ItemGroup>
 
@@ -26,6 +27,11 @@
   <ItemGroup>
     <Compile Remove="\**\When_handling_concurrent_messages.cs" />
     <Compile Remove="\**\NSB.AcceptanceTests\DelayedDelivery\When_deferring_a_message.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="..\AcceptanceTestSuppressions.cs" Link="AcceptanceTestSuppressions.cs" />
+    <Compile Include="..\TestSuppressions.cs" Link="TestSuppressions.cs" />
   </ItemGroup>
 
 </Project>

@@ -81,7 +81,8 @@ namespace NServiceBus.TimeoutPersisters.NHibernate.Tests
             }
         }
 
-        [Test][Explicit("SQL Server specific")]
+        [Test]
+        [Explicit("SQL Server specific")]
         public async Task When_in_transaction_scope_with_sql_connection_should_hook_up_to_that_connection()
         {
             var data = new TimeoutData
