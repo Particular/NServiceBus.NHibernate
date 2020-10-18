@@ -22,7 +22,7 @@ namespace NServiceBus.TimeoutPersisters.NHibernate
         TimeSpan timeoutsCleanupExecutionInterval;
         string EndpointName;
 
-        DateTime lastTimeoutsCleanupExecution = DateTime.MinValue;
+        DateTimeOffset lastTimeoutsCleanupExecution = DateTimeOffset.MinValue;
 
         public TimeoutPersister(string endpointName,
             ISessionFactory sessionFactory,
@@ -37,9 +37,9 @@ namespace NServiceBus.TimeoutPersisters.NHibernate
             this.timeoutsCleanupExecutionInterval = timeoutsCleanupExecutionInterval;
         }
 
-        public async Task<TimeoutsChunk> GetNextChunk(DateTime startSlice)
+        public async Task<TimeoutsChunk> GetNextChunk(DateTimeOffset startSlice)
         {
-            var now = DateTime.UtcNow;
+            var now = DateTimeOffset.UtcNow;
 
             //Every timeoutsCleanupExecutionInterval we extend the query window back in time to make
             //sure we will pick-up any missed timeouts which might exists due to TimeoutManager timeout storage race-condition
@@ -95,7 +95,7 @@ namespace NServiceBus.TimeoutPersisters.NHibernate
                     Destination = timeout.Destination,
                     SagaId = timeout.SagaId,
                     State = timeout.State,
-                    Time = timeout.Time,
+                    Time = timeout.Time.DateTime,
                     Headers = ConvertDictionaryToString(timeout.Headers),
                     Endpoint = timeout.OwningTimeoutManager
                 };
