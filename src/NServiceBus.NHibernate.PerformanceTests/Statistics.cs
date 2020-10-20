@@ -4,9 +4,9 @@
 
     class Statistics
     {
-        public static DateTime? First;
-        public static DateTime Last;
-        public static DateTime StartTime;
+        public static DateTimeOffset? First;
+        public static DateTimeOffset Last;
+        public static DateTimeOffset StartTime;
         public static long NumberOfMessages;
         public static long NumberOfRetries;
         public static TimeSpan SendTimeNoTx = TimeSpan.Zero;

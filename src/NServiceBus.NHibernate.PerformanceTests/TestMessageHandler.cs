@@ -15,7 +15,7 @@
         {
             if (!Statistics.First.HasValue)
             {
-                Statistics.First = DateTime.Now;
+                Statistics.First = DateTimeOffset.UtcNow;
             }
             Interlocked.Increment(ref Statistics.NumberOfMessages);
 
@@ -24,7 +24,7 @@
                 Transaction.Current.EnlistDurable(Guid.NewGuid(), enlistment, EnlistmentOptions.None);
             }
 
-            Statistics.Last = DateTime.Now;
+            Statistics.Last = DateTimeOffset.UtcNow;
 
             return Task.FromResult(0);
         }

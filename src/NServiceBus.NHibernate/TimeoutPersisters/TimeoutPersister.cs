@@ -47,7 +47,7 @@ namespace NServiceBus.TimeoutPersisters.NHibernate
             {
                 lastTimeoutsCleanupExecution = now;
                 //We cannot use DateTime.MinValue as sql supports dates only back to 1 January 1753
-                startSlice = SqlDateTime.MinValue.Value;
+                startSlice = new DateTimeOffset(SqlDateTime.MinValue.Value, TimeSpan.Zero);
             }
 
             using (new TransactionScope(TransactionScopeOption.Suppress, TransactionScopeAsyncFlowOption.Enabled))
@@ -56,7 +56,7 @@ namespace NServiceBus.TimeoutPersisters.NHibernate
             {
                 var list = await session.QueryOver<TimeoutEntity>()
                     .Where(x => x.Endpoint == EndpointName)
-                    .And(x => x.Time > startSlice && x.Time <= now)
+                    .And(x => x.Time > startSlice.UtcDateTime && x.Time <= now.UtcDateTime)
                     .OrderBy(x => x.Time).Asc
                     .Select(x => x.Id, x => x.Time)
                     .ListAsync<object[]>().ConfigureAwait(false);
@@ -72,7 +72,7 @@ namespace NServiceBus.TimeoutPersisters.NHibernate
 
                 //Retrieve next time we need to run query
                 var startOfNextChunk = await session.QueryOver<TimeoutEntity>()
-                    .Where(x => x.Endpoint == EndpointName && x.Time > now)
+                    .Where(x => x.Endpoint == EndpointName && x.Time > now.UtcDateTime)
                     .OrderBy(x => x.Time).Asc
                     .Select(x => x.Time)
                     .Take(1)
@@ -82,7 +82,7 @@ namespace NServiceBus.TimeoutPersisters.NHibernate
 
                 await tx.CommitAsync()
                     .ConfigureAwait(false);
-                return new TimeoutsChunk(results, nextTimeToRunQuery);
+                return new TimeoutsChunk(results, new DateTimeOffset(nextTimeToRunQuery, TimeSpan.Zero));
             }
         }
 
@@ -95,7 +95,7 @@ namespace NServiceBus.TimeoutPersisters.NHibernate
                     Destination = timeout.Destination,
                     SagaId = timeout.SagaId,
                     State = timeout.State,
-                    Time = timeout.Time.DateTime,
+                    Time = timeout.Time.UtcDateTime,
                     Headers = ConvertDictionaryToString(timeout.Headers),
                     Endpoint = timeout.OwningTimeoutManager
                 };

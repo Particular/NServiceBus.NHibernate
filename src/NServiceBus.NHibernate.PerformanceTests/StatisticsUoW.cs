@@ -14,7 +14,7 @@
         {
             if (!Statistics.First.HasValue)
             {
-                Statistics.First = DateTime.Now;
+                Statistics.First = DateTimeOffset.UtcNow;
             }
 
             if (Transaction.Current != null)
@@ -39,7 +39,7 @@
 
         static void RecordSuccess()
         {
-            Statistics.Last = DateTime.Now;
+            Statistics.Last = DateTimeOffset.UtcNow;
             Interlocked.Increment(ref Statistics.NumberOfMessages);
         }
 
