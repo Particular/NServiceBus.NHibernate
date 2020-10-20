@@ -50,8 +50,8 @@ namespace NServiceBus.TimeoutPersisters.NHibernate.Tests
 
 
             var result = await persister.GetNextChunk(DateTime.UtcNow.AddYears(-3)).ConfigureAwait(false);
-
-            Assert.IsTrue((nextTime - result.NextTimeToQuery).TotalSeconds < 1);
+            var difference = nextTime - result.NextTimeToQuery;
+            Assert.Less(difference, TimeSpan.FromSeconds(1));
         }
 
         [Test]

@@ -21,7 +21,7 @@ namespace NServiceBus.TimeoutPersisters.NHibernate.Tests
         {
             var t1 = new TimeoutData
             {
-                Time = DateTime.Now.AddYears(-1),
+                Time = DateTimeOffset.UtcNow.AddYears(-1),
                 OwningTimeoutManager = "MyTestEndpoint",
                 Headers = new Dictionary<string, string>
                                    {
@@ -30,7 +30,7 @@ namespace NServiceBus.TimeoutPersisters.NHibernate.Tests
             };
             var t2 = new TimeoutData
             {
-                Time = DateTime.Now.AddYears(-1),
+                Time = DateTimeOffset.UtcNow.AddYears(-1),
                 OwningTimeoutManager = "MyTestEndpoint",
                 Headers = new Dictionary<string, string>
                                    {
@@ -41,7 +41,7 @@ namespace NServiceBus.TimeoutPersisters.NHibernate.Tests
             await persister.Add(t1, new ContextBag()).ConfigureAwait(false);
             await persister.Add(t2, new ContextBag()).ConfigureAwait(false);
 
-            var timeouts = await persister.GetNextChunk(DateTime.UtcNow.AddYears(-3)).ConfigureAwait(false);
+            var timeouts = await persister.GetNextChunk(DateTimeOffset.UtcNow.AddYears(-3)).ConfigureAwait(false);
 
             foreach (var timeout in timeouts.DueTimeouts)
             {
@@ -61,7 +61,7 @@ namespace NServiceBus.TimeoutPersisters.NHibernate.Tests
         {
             var data = new TimeoutData
             {
-                Time = DateTime.Now.AddYears(-1),
+                Time = DateTimeOffset.UtcNow.AddYears(-1),
                 OwningTimeoutManager = "MyTestEndpoint",
             };
 
@@ -87,7 +87,7 @@ namespace NServiceBus.TimeoutPersisters.NHibernate.Tests
         {
             var data = new TimeoutData
             {
-                Time = DateTime.Now,
+                Time = DateTimeOffset.UtcNow,
                 OwningTimeoutManager = "MyTestEndpoint",
             };
 
@@ -119,7 +119,7 @@ namespace NServiceBus.TimeoutPersisters.NHibernate.Tests
         {
             var data = new TimeoutData
             {
-                Time = DateTime.Now.AddYears(-1),
+                Time = DateTimeOffset.UtcNow.AddYears(-1),
                 OwningTimeoutManager = "MyTestEndpoint",
             };
 
@@ -145,7 +145,7 @@ namespace NServiceBus.TimeoutPersisters.NHibernate.Tests
         {
             var timeout = new TimeoutData
             {
-                Time = DateTime.Now
+                Time = DateTimeOffset.UtcNow
             };
 
             await persister.Add(timeout, new ContextBag()).ConfigureAwait(false);
@@ -159,7 +159,7 @@ namespace NServiceBus.TimeoutPersisters.NHibernate.Tests
         {
             var timeout = new TimeoutData
             {
-                Time = DateTime.Now
+                Time = DateTimeOffset.UtcNow
             };
 
             await persister.Add(timeout, new ContextBag()).ConfigureAwait(false);
@@ -175,7 +175,7 @@ namespace NServiceBus.TimeoutPersisters.NHibernate.Tests
         {
             var timeout = new TimeoutData
             {
-                Time = DateTime.Now
+                Time = DateTimeOffset.UtcNow
             };
 
             await persister.Add(timeout, new ContextBag()).ConfigureAwait(false);
@@ -209,7 +209,7 @@ namespace NServiceBus.TimeoutPersisters.NHibernate.Tests
             var t1 = new TimeoutData
             {
                 SagaId = sagaId1,
-                Time = DateTime.Now.AddYears(1),
+                Time = DateTimeOffset.UtcNow.AddYears(1),
                 OwningTimeoutManager = "MyTestEndpoint",
                 Headers = new Dictionary<string, string>
                                    {
@@ -219,7 +219,7 @@ namespace NServiceBus.TimeoutPersisters.NHibernate.Tests
             var t2 = new TimeoutData
             {
                 SagaId = sagaId2,
-                Time = DateTime.Now.AddYears(1),
+                Time = DateTimeOffset.UtcNow.AddYears(1),
                 OwningTimeoutManager = "MyTestEndpoint",
                 Headers = new Dictionary<string, string>
                                    {

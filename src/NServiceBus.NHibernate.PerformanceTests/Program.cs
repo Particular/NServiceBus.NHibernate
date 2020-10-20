@@ -146,7 +146,7 @@
         {
             var startableBus = await Endpoint.Create(config).ConfigureAwait(false);
 
-            Statistics.StartTime = DateTime.Now;
+            Statistics.StartTime = DateTime.UtcNow;
 
             await startableBus.Start().ConfigureAwait(false);
 
