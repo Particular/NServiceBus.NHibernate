@@ -1,3 +1,5 @@
+using NServiceBus.TimeoutPersisters.NHibernate.Installer;
+
 namespace NServiceBus.Features
 {
     using System;
@@ -13,7 +15,6 @@ namespace NServiceBus.Features
     using NServiceBus.Outbox;
     using NServiceBus.Outbox.NHibernate;
     using Persistence;
-    using TimeoutPersisters.NHibernate.Installer;
     using Persistence.NHibernate;
     using Configuration = global::NHibernate.Cfg.Configuration;
     using Environment = global::NHibernate.Cfg.Environment;

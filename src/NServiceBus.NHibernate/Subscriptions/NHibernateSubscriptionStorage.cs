@@ -48,7 +48,7 @@ namespace NServiceBus.Features
             {
                 context.Settings.Get<Installer.SchemaUpdater>().Execute = identity =>
                 {
-                    new OptimizedSchemaUpdate(config.Configuration).Execute(false, true);
+                    new OptimizedSchemaUpdate(config.Configuration).Execute(true);
 
                     return Task.FromResult(0);
                 };

@@ -13,12 +13,9 @@ namespace NServiceBus.TimeoutPersisters.NHibernate.Installer
 
     class OptimizedSchemaUpdate
     {
-        public OptimizedSchemaUpdate(Configuration cfg) : this(cfg, cfg.Properties)
+        public OptimizedSchemaUpdate(Configuration cfg)
         {
-        }
-
-        public OptimizedSchemaUpdate(Configuration cfg, IDictionary<string, string> configProperties)
-        {
+            var configProperties = cfg.Properties;
             configuration = cfg;
             dialect = Dialect.GetDialect(configProperties);
             var props = new Dictionary<string, string>(dialect.DefaultProperties);
@@ -28,23 +25,15 @@ namespace NServiceBus.TimeoutPersisters.NHibernate.Installer
             }
             connectionHelper = new ManagedProviderConnectionHelper(props);
             exceptions = new List<Exception>();
-            fixUpHelper = new SchemaFixUpHelper(configuration, dialect);
             formatter = (PropertiesHelper.GetBoolean(Environment.FormatSql, configProperties, true) ? FormatStyle.Ddl : FormatStyle.None).Formatter;
         }
 
         // List of all Exceptions which occured during the export.
         public IList<Exception> Exceptions => exceptions;
 
-        public void Execute(bool script, bool doUpdate)
+        public void Execute(bool doUpdate)
         {
-            if (script)
-            {
-                Execute(Console.WriteLine, doUpdate);
-            }
-            else
-            {
-                Execute(null, doUpdate);
-            }
+            Execute(null, doUpdate);
         }
 
         /// <summary>
@@ -91,8 +80,8 @@ namespace NServiceBus.TimeoutPersisters.NHibernate.Installer
 
                 foreach (var item in updateSQL)
                 {
-                    var updateSqlStatement = fixUpHelper.FixUp(item);
-                    var formatted = formatter.Format(updateSqlStatement);
+                    var updateSqlStatement = item;
+                    var formatted = formatter.Format(item);
 
                     try
                     {
@@ -142,7 +131,6 @@ namespace NServiceBus.TimeoutPersisters.NHibernate.Installer
         Dialect dialect;
         List<Exception> exceptions;
         IFormatter formatter;
-        SchemaFixUpHelper fixUpHelper;
         static ILog log = LogManager.GetLogger<OptimizedSchemaUpdate>();
     }
 }
