@@ -11,7 +11,6 @@
     using NServiceBus.Outbox.NHibernate;
     using SagaPersisters.NHibernate.AutoPersistence;
     using Sagas;
-    using TimeoutPersisters.NHibernate.Installer;
     using Unicast.Subscriptions.NHibernate.Config;
 
     /// <summary>

@@ -1,5 +1,3 @@
-using NServiceBus.TimeoutPersisters.NHibernate.Installer;
-
 namespace NServiceBus.Features
 {
     using System;
@@ -16,6 +14,7 @@ namespace NServiceBus.Features
     using NServiceBus.Outbox.NHibernate;
     using Persistence;
     using Persistence.NHibernate;
+    using global::NHibernate.Tool.hbm2ddl;
     using Configuration = global::NHibernate.Cfg.Configuration;
     using Environment = global::NHibernate.Cfg.Environment;
     using Installer = Persistence.NHibernate.Installer.Installer;
@@ -125,7 +124,7 @@ namespace NServiceBus.Features
             {
                 context.Settings.Get<Installer.SchemaUpdater>().Execute = identity =>
                 {
-                    var schemaUpdate = new OptimizedSchemaUpdate(config.Configuration);
+                    var schemaUpdate = new SchemaUpdate(config.Configuration);
                     var sb = new StringBuilder();
                     schemaUpdate.Execute(s => sb.AppendLine(s), true);
 
