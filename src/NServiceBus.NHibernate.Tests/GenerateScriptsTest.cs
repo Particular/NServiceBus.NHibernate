@@ -30,14 +30,6 @@ namespace NServiceBus.NHibernate.Tests
             Approver.Verify(script);
         }
 
-        [Test]
-        [MethodImpl(MethodImplOptions.NoInlining)]
-        public void Timeouts()
-        {
-            var script = ScriptGenerator<MsSql2012Dialect>.GenerateTimeoutStoreScript();
-            Approver.Verify(script);
-        }
-
 #if !NETCOREAPP
         // This test is ignored for .NETCore because of the unstable foreign key name generation in NHibernate https://github.com/nhibernate/nhibernate-core/issues/1769
         [Test]

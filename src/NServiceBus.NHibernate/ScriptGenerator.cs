@@ -11,15 +11,13 @@
     using NServiceBus.Outbox.NHibernate;
     using SagaPersisters.NHibernate.AutoPersistence;
     using Sagas;
-    using TimeoutPersisters.NHibernate.Config;
-    using TimeoutPersisters.NHibernate.Installer;
     using Unicast.Subscriptions.NHibernate.Config;
 
     /// <summary>
     /// Allows offline schema generation.
     /// </summary>
     /// <typeparam name="T">Dialect.</typeparam>
-    public class ScriptGenerator<T>
+    public partial class ScriptGenerator<T>
         where T : Dialect, new()
     {
         /// <summary>
@@ -37,14 +35,6 @@
         public static string GenerateSubscriptionStoreScript()
         {
             return GenerateScript(typeof(SubscriptionMap));
-        }
-
-        /// <summary>
-        /// Generates the table creation script for the timeout store.
-        /// </summary>
-        public static string GenerateTimeoutStoreScript()
-        {
-            return GenerateScript(typeof(TimeoutEntityMap));
         }
 
         /// <summary>
@@ -94,12 +84,11 @@
 
         static string GenerateScript(Configuration config)
         {
-            var dialect = new T();
             var export = new SchemaExport(config);
-            var fixUpHelper = new SchemaFixUpHelper(config, dialect);
             var formatter = FormatStyle.Ddl.Formatter;
+            
             var script = new StringBuilder();
-            export.Create(s => script.Append(formatter.Format(fixUpHelper.FixUp(s))), false);
+            export.Create(s => script.Append(formatter.Format(s)), false);
             return script.ToString();
         }
     }

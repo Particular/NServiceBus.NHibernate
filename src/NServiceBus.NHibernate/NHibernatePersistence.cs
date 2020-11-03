@@ -21,7 +21,6 @@
                 s.EnableFeatureByDefault<NHibernateStorageSession>();
             });
 
-            Supports<StorageType.Timeouts>(s => s.EnableFeatureByDefault<NHibernateTimeoutStorage>());
             Supports<StorageType.Sagas>(s => s.EnableFeatureByDefault<NHibernateSagaStorage>());
             Supports<StorageType.Subscriptions>(s => s.EnableFeatureByDefault<NHibernateSubscriptionStorage>());
             Supports<StorageType.Outbox>(s => { });
