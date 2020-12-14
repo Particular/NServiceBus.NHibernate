@@ -1,9 +1,9 @@
-﻿[assembly: System.Runtime.CompilerServices.InternalsVisibleToAttribute(@"NServiceBus.NHibernate.PersistenceTests, PublicKey=00240000048000009400000006020000002400005253413100040000010001007f16e21368ff041183fab592d9e8ed37e7be355e93323147a1d29983d6e591b04282e4da0c9e18bd901e112c0033925eb7d7872c2f1706655891c5c9d57297994f707d16ee9a8f40d978f064ee1ffc73c0db3f4712691b23bf596f75130f4ec978cf78757ec034625a5f27e6bb50c618931ea49f6f628fd74271c32959efb1c5")]
-[assembly: System.Runtime.CompilerServices.InternalsVisibleToAttribute(@"NServiceBus.NHibernate.Tests, PublicKey=0024000004800000940000000602000000240000525341310004000001000100dde965e6172e019ac82c2639ffe494dd2e7dd16347c34762a05732b492e110f2e4e2e1b5ef2d85c848ccfb671ee20a47c8d1376276708dc30a90ff1121b647ba3b7259a6bc383b2034938ef0e275b58b920375ac605076178123693c6c4f1331661a62eba28c249386855637780e3ff5f23a6d854700eaa6803ef48907513b92")]
-[assembly: System.Runtime.InteropServices.ComVisibleAttribute(false)]
+﻿[assembly: System.Runtime.CompilerServices.InternalsVisibleTo(@"NServiceBus.NHibernate.PersistenceTests, PublicKey=00240000048000009400000006020000002400005253413100040000010001007f16e21368ff041183fab592d9e8ed37e7be355e93323147a1d29983d6e591b04282e4da0c9e18bd901e112c0033925eb7d7872c2f1706655891c5c9d57297994f707d16ee9a8f40d978f064ee1ffc73c0db3f4712691b23bf596f75130f4ec978cf78757ec034625a5f27e6bb50c618931ea49f6f628fd74271c32959efb1c5")]
+[assembly: System.Runtime.CompilerServices.InternalsVisibleTo(@"NServiceBus.NHibernate.Tests, PublicKey=0024000004800000940000000602000000240000525341310004000001000100dde965e6172e019ac82c2639ffe494dd2e7dd16347c34762a05732b492e110f2e4e2e1b5ef2d85c848ccfb671ee20a47c8d1376276708dc30a90ff1121b647ba3b7259a6bc383b2034938ef0e275b58b920375ac605076178123693c6c4f1331661a62eba28c249386855637780e3ff5f23a6d854700eaa6803ef48907513b92")]
+[assembly: System.Runtime.InteropServices.ComVisible(false)]
 namespace NServiceBus.Features
 {
-    [System.ObsoleteAttribute("NHibernate gateway persistence is deprecated. Use the new NServiceBus.Gateway.Sql" +
+    [System.Obsolete("NHibernate gateway persistence is deprecated. Use the new NServiceBus.Gateway.Sql" +
         " dedicated package. Will be removed in version 10.0.0.", true)]
     public class NHibernateGatewayDeduplication : NServiceBus.Features.Feature
     {
@@ -19,7 +19,7 @@ namespace NServiceBus.Features
     {
         protected override void Setup(NServiceBus.Features.FeatureConfigurationContext context) { }
     }
-    [System.ObsoleteAttribute("The timeout manager has been removed. Timeout storage configuration can be remove" +
+    [System.Obsolete("The timeout manager has been removed. Timeout storage configuration can be remove" +
         "d. Will be removed in version 10.0.0.", true)]
     public class NHibernateTimeoutStorage : NServiceBus.Features.Feature
     {
@@ -38,12 +38,12 @@ namespace NServiceBus
     {
         public NHibernatePersistence() { }
     }
-    public class static OutboxSettingsExtensions
+    public static class OutboxSettingsExtensions
     {
         public static void UsePessimisticConcurrencyControl(this NServiceBus.Outbox.OutboxSettings outboxSettings) { }
         public static void UseTransactionScope(this NServiceBus.Outbox.OutboxSettings outboxSettings) { }
     }
-    public class static SynchronizedStorageSessionExtensions
+    public static class SynchronizedStorageSessionExtensions
     {
         public static void OnSaveChanges(this NServiceBus.Persistence.SynchronizedStorageSession session, System.Func<NServiceBus.Persistence.SynchronizedStorageSession, System.Threading.Tasks.Task> callback) { }
         public static NHibernate.ISession Session(this NServiceBus.Persistence.SynchronizedStorageSession session) { }
@@ -51,7 +51,7 @@ namespace NServiceBus
 }
 namespace NServiceBus.NHibernate.Outbox
 {
-    public class static OutboxConfig
+    public static class OutboxConfig
     {
         public static NServiceBus.PersistenceExtensions<NServiceBus.NHibernatePersistence> CustomizeOutboxTableName(this NServiceBus.PersistenceExtensions<NServiceBus.NHibernatePersistence> persistenceConfiguration, string outboxTableName, string outboxSchemaName = null) { }
         public static NServiceBus.PersistenceExtensions<NServiceBus.NHibernatePersistence> UseOutboxRecord<TEntity, TMapping>(this NServiceBus.PersistenceExtensions<NServiceBus.NHibernatePersistence> persistenceConfiguration)
@@ -69,7 +69,7 @@ namespace NServiceBus.NHibernate
         public static string GenerateSagaScript<TSaga>(System.Func<System.Type, string> tableNamingConvention = null)
             where TSaga : NServiceBus.Saga { }
         public static string GenerateSubscriptionStoreScript() { }
-        [System.ObsoleteAttribute("The timeout manager has been removed. Timeout storage script can be removed. The " +
+        [System.Obsolete("The timeout manager has been removed. Timeout storage script can be removed. The " +
             "member currently throws a NotImplementedException. Will be removed in version 10" +
             ".0.0.", true)]
         public static string GenerateTimeoutStoreScript() { }
@@ -80,40 +80,40 @@ namespace NServiceBus.Outbox.NHibernate
     public interface IOutboxRecord
     {
         bool Dispatched { get; set; }
-        System.Nullable<System.DateTime> DispatchedAt { get; set; }
+        System.DateTime? DispatchedAt { get; set; }
         string MessageId { get; set; }
         string TransportOperations { get; set; }
     }
 }
 namespace NServiceBus.Persistence.NHibernate
 {
-    public class static DeduplicationConfig
+    public static class DeduplicationConfig
     {
-        [System.ObsoleteAttribute("NHibernate gateway persistence is deprecated. Use the new NServiceBus.Gateway.Sql" +
+        [System.Obsolete("NHibernate gateway persistence is deprecated. Use the new NServiceBus.Gateway.Sql" +
             " dedicated package. Will be removed in version 10.0.0.", true)]
         public static NServiceBus.PersistenceExtensions<NServiceBus.NHibernatePersistence> DisableGatewayDeduplicationSchemaUpdate(this NServiceBus.PersistenceExtensions<NServiceBus.NHibernatePersistence> persistenceConfiguration) { }
-        [System.ObsoleteAttribute("NHibernate gateway persistence is deprecated. Use the new NServiceBus.Gateway.Sql" +
+        [System.Obsolete("NHibernate gateway persistence is deprecated. Use the new NServiceBus.Gateway.Sql" +
             " dedicated package. Will be removed in version 10.0.0.", true)]
         public static NServiceBus.PersistenceExtensions<NServiceBus.NHibernatePersistence> UseGatewayDeduplicationConfiguration(this NServiceBus.PersistenceExtensions<NServiceBus.NHibernatePersistence> persistenceConfiguration, NHibernate.Cfg.Configuration configuration) { }
     }
-    public class static NHibernateSettingRetriever
+    public static class NHibernateSettingRetriever
     {
         public static System.Func<System.Collections.Specialized.NameValueCollection> AppSettings { get; set; }
         public static System.Func<System.Configuration.ConnectionStringSettingsCollection> ConnectionStrings { get; set; }
     }
-    public class static SagaConfig
+    public static class SagaConfig
     {
         public static NServiceBus.PersistenceExtensions<NServiceBus.NHibernatePersistence> SagaTableNamingConvention(this NServiceBus.PersistenceExtensions<NServiceBus.NHibernatePersistence> persistenceConfiguration, System.Func<System.Type, string> tableNamingConvention) { }
     }
-    public class static SubscriptionConfig
+    public static class SubscriptionConfig
     {
         public static NServiceBus.PersistenceExtensions<NServiceBus.NHibernatePersistence> DisableSubscriptionStorageSchemaUpdate(this NServiceBus.PersistenceExtensions<NServiceBus.NHibernatePersistence> persistenceConfiguration) { }
         public static NServiceBus.PersistenceExtensions<NServiceBus.NHibernatePersistence> EnableCachingForSubscriptionStorage(this NServiceBus.PersistenceExtensions<NServiceBus.NHibernatePersistence> persistenceConfiguration, System.TimeSpan expiration) { }
         public static NServiceBus.PersistenceExtensions<NServiceBus.NHibernatePersistence> UseSubscriptionStorageConfiguration(this NServiceBus.PersistenceExtensions<NServiceBus.NHibernatePersistence> persistenceConfiguration, NHibernate.Cfg.Configuration configuration) { }
     }
-    [System.ObsoleteAttribute("The timeout manager has been removed. Timeout storage configuration can be remove" +
+    [System.Obsolete("The timeout manager has been removed. Timeout storage configuration can be remove" +
         "d. Will be removed in version 10.0.0.", true)]
-    public class static TimeoutConfig
+    public static class TimeoutConfig
     {
         public static NServiceBus.PersistenceExtensions<NServiceBus.NHibernatePersistence> DisableTimeoutStorageSchemaUpdate(this NServiceBus.PersistenceExtensions<NServiceBus.NHibernatePersistence> persistenceConfiguration) { }
         public static NServiceBus.PersistenceExtensions<NServiceBus.NHibernatePersistence> UseTimeoutStorageConfiguration(this NServiceBus.PersistenceExtensions<NServiceBus.NHibernatePersistence> persistenceConfiguration, NHibernate.Cfg.Configuration configuration) { }
@@ -121,7 +121,7 @@ namespace NServiceBus.Persistence.NHibernate
 }
 namespace NServiceBus.Persistence
 {
-    public class static SharedConfig
+    public static class SharedConfig
     {
         public static NServiceBus.PersistenceExtensions<NServiceBus.NHibernatePersistence> ConnectionString(this NServiceBus.PersistenceExtensions<NServiceBus.NHibernatePersistence> persistenceConfiguration, string connectionString) { }
         public static NServiceBus.PersistenceExtensions<NServiceBus.NHibernatePersistence> DisableSchemaUpdate(this NServiceBus.PersistenceExtensions<NServiceBus.NHibernatePersistence> persistenceConfiguration) { }
@@ -130,7 +130,7 @@ namespace NServiceBus.Persistence
 }
 namespace NServiceBus.SagaPersisters.NHibernate
 {
-    [System.AttributeUsageAttribute(System.AttributeTargets.Class | System.AttributeTargets.All)]
+    [System.AttributeUsage(System.AttributeTargets.Class | System.AttributeTargets.All)]
     public sealed class LockModeAttribute : System.Attribute
     {
         public LockModeAttribute(NServiceBus.SagaPersisters.NHibernate.LockModes lockModeToUse) { }
@@ -145,12 +145,12 @@ namespace NServiceBus.SagaPersisters.NHibernate
         Write = 5,
         Force = 6,
     }
-    [System.AttributeUsageAttribute(System.AttributeTargets.Property | System.AttributeTargets.All)]
+    [System.AttributeUsage(System.AttributeTargets.Property | System.AttributeTargets.All)]
     public class RowVersionAttribute : System.Attribute
     {
         public RowVersionAttribute() { }
     }
-    [System.AttributeUsageAttribute(System.AttributeTargets.Class | System.AttributeTargets.All)]
+    [System.AttributeUsage(System.AttributeTargets.Class | System.AttributeTargets.All)]
     public class TableNameAttribute : System.Attribute
     {
         public TableNameAttribute(string tableName) { }
