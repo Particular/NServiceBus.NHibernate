@@ -10,7 +10,7 @@
         [Test]
         public void Approve()
         {
-            var publicApi = ApiGenerator.GeneratePublicApi(typeof(NHibernatePersistence).Assembly, excludeAttributes: new[] { "System.Runtime.Versioning.TargetFrameworkAttribute" });
+            var publicApi = ApiGenerator.GeneratePublicApi(typeof(NHibernatePersistence).Assembly, excludeAttributes: new[] { "System.Runtime.Versioning.TargetFrameworkAttribute", "System.Reflection.AssemblyMetadataAttribute" });
             Approver.Verify(publicApi);
         }
     }
