@@ -1,8 +1,9 @@
-﻿namespace NServiceBus.Outbox.NHibernate
+﻿using System.Data;
+
+namespace NServiceBus.Outbox.NHibernate
 {
     using System;
     using System.Threading.Tasks;
-    using System.Transactions;
     using Extensibility;
     using global::NHibernate;
     using Janitor;
@@ -16,13 +17,16 @@
 
         readonly ConcurrencyControlStrategy concurrencyControlStrategy;
         readonly ISessionFactory sessionFactory;
+        readonly IsolationLevel isolationLevel;
 
         public ISession Session { get; private set; }
 
-        public NHibernateLocalOutboxTransaction(ConcurrencyControlStrategy concurrencyControlStrategy, ISessionFactory sessionFactory)
+        public NHibernateLocalOutboxTransaction(ConcurrencyControlStrategy concurrencyControlStrategy,
+            ISessionFactory sessionFactory, IsolationLevel isolationLevel)
         {
             this.concurrencyControlStrategy = concurrencyControlStrategy;
             this.sessionFactory = sessionFactory;
+            this.isolationLevel = isolationLevel;
         }
 
         public void OnSaveChanges(Func<Task> callback)
@@ -66,7 +70,7 @@
         public async Task Begin(string endpointQualifiedMessageId)
         {
             Session = sessionFactory.OpenSession();
-            transaction = Session.BeginTransaction();
+            transaction = Session.BeginTransaction(isolationLevel);
 
             await concurrencyControlStrategy.Begin(endpointQualifiedMessageId, Session).ConfigureAwait(false);
         }
@@ -78,7 +82,7 @@
 
         public void BeginSynchronizedSession(ContextBag context)
         {
-            if (Transaction.Current != null)
+            if (System.Transactions.Transaction.Current != null)
             {
                 Log.Warn("The endpoint is configured to use Outbox but a TransactionScope has been detected. " +
                          "In order to make the Outbox compatible with TransactionScope, use " +

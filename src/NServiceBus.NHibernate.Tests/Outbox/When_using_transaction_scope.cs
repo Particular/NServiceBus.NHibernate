@@ -1,3 +1,5 @@
+using System.Data;
+
 namespace NServiceBus.NHibernate.Tests.Outbox
 {
     using System;
@@ -48,7 +50,7 @@ namespace NServiceBus.NHibernate.Tests.Outbox
 
             sessionFactory = cfg.BuildSessionFactory();
             outboxPersisterFactory = new OutboxPersisterFactory<OutboxRecord>();
-            persister = outboxPersisterFactory.Create(sessionFactory, "TestEndpoint", pessimistic, true);
+            persister = outboxPersisterFactory.Create(sessionFactory, "TestEndpoint", pessimistic, true, IsolationLevel.ReadCommitted, System.Transactions.IsolationLevel.ReadCommitted);
         }
 
         [TearDown]

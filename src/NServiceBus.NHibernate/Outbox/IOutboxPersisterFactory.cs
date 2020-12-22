@@ -1,4 +1,6 @@
-﻿namespace NServiceBus.NHibernate.Outbox
+﻿using System.Transactions;
+
+namespace NServiceBus.NHibernate.Outbox
 {
     using global::NHibernate;
     using NServiceBus.Outbox.NHibernate;
@@ -6,13 +8,16 @@
 
     interface IOutboxPersisterFactory
     {
-        INHibernateOutboxStorage Create(ISessionFactory sessionFactory, string endpointName, bool pessimisticMode, bool transactionScope);
+        INHibernateOutboxStorage Create(ISessionFactory sessionFactory, string endpointName, bool pessimisticMode,
+            bool transactionScope, System.Data.IsolationLevel adoIsolationLevel, IsolationLevel transactionScopeIsolationLevel);
     }
 
     class OutboxPersisterFactory<T> : IOutboxPersisterFactory
         where T : class, IOutboxRecord, new()
     {
-        public INHibernateOutboxStorage Create(ISessionFactory sessionFactory, string endpointName, bool pessimisticMode, bool transactionScope)
+        public INHibernateOutboxStorage Create(ISessionFactory sessionFactory, string endpointName,
+            bool pessimisticMode, bool transactionScope, System.Data.IsolationLevel adoIsolationLevel,
+            IsolationLevel transactionScopeIsolationLevel)
         {
             ConcurrencyControlStrategy concurrencyControlStrategy;
             if (pessimisticMode)
@@ -27,8 +32,8 @@
             INHibernateOutboxTransaction transactionFactory()
             {
                 return transactionScope
-                    ? (INHibernateOutboxTransaction)new NHibernateTransactionScopeTransaction(concurrencyControlStrategy, sessionFactory)
-                    : new NHibernateLocalOutboxTransaction(concurrencyControlStrategy, sessionFactory);
+                    ? (INHibernateOutboxTransaction)new NHibernateTransactionScopeTransaction(concurrencyControlStrategy, sessionFactory, transactionScopeIsolationLevel)
+                    : new NHibernateLocalOutboxTransaction(concurrencyControlStrategy, sessionFactory, adoIsolationLevel);
             }
 
             var persister = new OutboxPersister<T>(sessionFactory, transactionFactory, endpointName);

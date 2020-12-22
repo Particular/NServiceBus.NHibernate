@@ -1,4 +1,6 @@
-﻿namespace NServiceBus.PersistenceTesting
+﻿using System.Data;
+
+namespace NServiceBus.PersistenceTesting
 {
     using System;
     using System.Collections.Generic;
@@ -176,7 +178,7 @@
             SagaStorage = new SagaPersister();
             SynchronizedStorage = new NHibernateSynchronizedStorage(sessionFactory, null);
             SynchronizedStorageAdapter = new NHibernateSynchronizedStorageAdapter(sessionFactory, null);
-            OutboxStorage = variant.OutboxPersisterFactory.Create(sessionFactory, "TestEndpoint", variant.Pessimistic, variant.TransactionScope);
+            OutboxStorage = variant.OutboxPersisterFactory.Create(sessionFactory, "TestEndpoint", variant.Pessimistic, variant.TransactionScope, IsolationLevel.ReadCommitted, System.Transactions.IsolationLevel.ReadCommitted);
         }
 
         static string ShortenSagaName(string sagaName)

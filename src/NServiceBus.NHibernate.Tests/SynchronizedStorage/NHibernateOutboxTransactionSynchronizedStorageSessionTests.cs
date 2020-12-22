@@ -1,4 +1,6 @@
-﻿namespace NServiceBus.NHibernate.Tests.SynchronizedStorage
+﻿using System.Data;
+
+namespace NServiceBus.NHibernate.Tests.SynchronizedStorage
 {
     using System;
     using System.Threading.Tasks;
@@ -29,7 +31,7 @@
             var callbackInvoked = false;
 
             var outboxPersisterFactory = new OutboxPersisterFactory<OutboxRecord>();
-            var persister = outboxPersisterFactory.Create(SessionFactory, "TestEndpoint", pessimistic, transactionScope);
+            var persister = outboxPersisterFactory.Create(SessionFactory, "TestEndpoint", pessimistic, transactionScope, IsolationLevel.ReadCommitted, System.Transactions.IsolationLevel.ReadCommitted);
             
             var messageId = Guid.NewGuid().ToString("N");
             var contextBag = new ContextBag();
@@ -61,7 +63,7 @@
             var callbackInvoked = 0;
 
             var outboxPersisterFactory = new OutboxPersisterFactory<OutboxRecord>();
-            var persister = outboxPersisterFactory.Create(SessionFactory, "TestEndpoint", pessimistic, transactionScope);
+            var persister = outboxPersisterFactory.Create(SessionFactory, "TestEndpoint", pessimistic, transactionScope, IsolationLevel.ReadCommitted, System.Transactions.IsolationLevel.ReadCommitted);
 
             var messageId = Guid.NewGuid().ToString("N");
             var contextBag = new ContextBag();
@@ -101,7 +103,7 @@
             var exceptionThrown = false;
 
             var outboxPersisterFactory = new OutboxPersisterFactory<OutboxRecord>();
-            var persister = outboxPersisterFactory.Create(SessionFactory, "TestEndpoint", pessimistic, transactionScope);
+            var persister = outboxPersisterFactory.Create(SessionFactory, "TestEndpoint", pessimistic, transactionScope, IsolationLevel.ReadCommitted, System.Transactions.IsolationLevel.ReadCommitted);
 
             var messageId = Guid.NewGuid().ToString("N");
             var contextBag = new ContextBag();
