@@ -46,12 +46,11 @@ namespace NServiceBus
         /// scope of the outbox transaction (and synchronized storage session it protects) to other databases provided that
         /// Distributed Transaction Coordinator (DTC) infrastructure is configured.
         ///
-        /// Uses the default isolation level.
+        /// Uses the default isolation level (Serializable).
         /// </summary>
         public static void UseTransactionScope(this OutboxSettings outboxSettings)
         {
-            outboxSettings.GetSettings().Set(NHibernateStorageSession.OutboxTransactionModeSettingsKey, true);
-            outboxSettings.GetSettings().Set(NHibernateStorageSession.OutboxTransactionScopeModeIsolationLevelSettingsKey, IsolationLevel.Serializable);
+            UseTransactionScope(outboxSettings, IsolationLevel.Serializable);
         }
 
         /// <summary>
