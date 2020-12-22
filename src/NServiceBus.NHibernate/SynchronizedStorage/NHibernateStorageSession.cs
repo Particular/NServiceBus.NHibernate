@@ -72,6 +72,11 @@ namespace NServiceBus.Features
                 var transactionScopeMode = context.Settings.GetOrDefault<bool>(OutboxTransactionModeSettingsKey);
                 var transactionScopeIsolationLevel = context.Settings.GetOrDefault<IsolationLevel>(OutboxTransactionScopeModeIsolationLevelSettingsKey);
                 var adoIsolationLevel = context.Settings.GetOrDefault<System.Data.IsolationLevel>(OutboxTransactionIsolationLevelSettingsKey);
+                if (adoIsolationLevel == default)
+                {
+                    //Default to Read Committed
+                    adoIsolationLevel = System.Data.IsolationLevel.ReadCommitted;
+                }
 
                 config.Configuration.Properties[Environment.TransactionStrategy] = typeof(AdoNetTransactionFactory).FullName;
 
