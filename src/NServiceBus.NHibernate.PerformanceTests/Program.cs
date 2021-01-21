@@ -13,18 +13,18 @@
     using NServiceBus.Persistence.NHibernate;
     using Saga;
 
-    
-    internal class Program
+
+    class Program
     {
         static void Main(string[] args)
         {
             var numberOfThreads = int.Parse(args[0]);
-            var volatileMode = (args[4].ToLower() == "volatile");
-            var suppressDTC = (args[4].ToLower() == "suppressdtc");
-            var twoPhaseCommit = (args[4].ToLower() == "twophasecommit");
-            var outbox = (args[4].ToLower() == "outbox");
-            var saga = (args[5].ToLower() == "sagamessages");
-            var publish = (args[5].ToLower() == "publishmessages");
+            var volatileMode = args[4].ToLower() == "volatile";
+            var suppressDTC = args[4].ToLower() == "suppressdtc";
+            var twoPhaseCommit = args[4].ToLower() == "twophasecommit";
+            var outbox = args[4].ToLower() == "outbox";
+            var saga = args[5].ToLower() == "sagamessages";
+            var publish = args[5].ToLower() == "publishmessages";
             var concurrency = int.Parse(args[7]);
             var numberOfMessages = int.Parse(args[1]);
 
@@ -96,7 +96,7 @@
                     Statistics.SendTimeWithTx = await SeedInputQueue(session, numberOfMessages / 2, endpointName, numberOfThreads, !outbox, twoPhaseCommit).ConfigureAwait(false);
                 }
             }));
-            PerformTest(args, config, saga, numberOfMessages, endpointName, concurrency, publish, numberOfThreads, outbox, twoPhaseCommit).GetAwaiter().GetResult();
+            PerformTest(args, config, numberOfMessages).GetAwaiter().GetResult();
         }
 
         class LoaderFeature : Feature
@@ -142,7 +142,7 @@
             }
         }
 
-        static async Task PerformTest(string[] args, EndpointConfiguration config, bool saga, int numberOfMessages, string endpointName, int concurrency, bool publish, int numberOfThreads, bool outbox, bool twoPhaseCommit)
+        static async Task PerformTest(string[] args, EndpointConfiguration config, int numberOfMessages)
         {
             var startableBus = await Endpoint.Create(config).ConfigureAwait(false);
 
@@ -229,13 +229,13 @@
                         {
                             using (var tx = new TransactionScope())
                             {
-                                await bus.Publish<TestEvent>().ConfigureAwait(false);
+                                await bus.Publish<ITestEvent>().ConfigureAwait(false);
                                 tx.Complete();
                             }
                         }
                         else
                         {
-                            await bus.Publish<TestEvent>().ConfigureAwait(false);
+                            await bus.Publish<ITestEvent>().ConfigureAwait(false);
                         }
                         Interlocked.Increment(ref Statistics.NumberOfMessages);
                     }

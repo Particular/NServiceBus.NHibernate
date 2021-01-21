@@ -31,7 +31,7 @@
         {
             var serializerSettings = new JsonSerializerSettings
             {
-                TypeNameAssemblyFormatHandling =  TypeNameAssemblyFormatHandling.Simple,
+                TypeNameAssemblyFormatHandling = TypeNameAssemblyFormatHandling.Simple,
                 TypeNameHandling = TypeNameHandling.Auto,
                 Converters =
                 {

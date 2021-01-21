@@ -83,10 +83,10 @@
         {
             Context testContext;
 
-                public CompletionHandler(Context testContext)
-                {
-                    this.testContext = testContext;
-                }
+            public CompletionHandler(Context testContext)
+            {
+                this.testContext = testContext;
+            }
 
             public Task Handle(SagaCompleted message, IMessageHandlerContext context)
             {

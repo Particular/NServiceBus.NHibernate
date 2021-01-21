@@ -39,7 +39,7 @@ namespace NServiceBus.SagaPersisters.NHibernate
         /// The semantics of this lock mode, once obtained, are the same as <c>Upgrade</c>
         /// </remarks>
         UpgradeNoWait = 4,
-        
+
         /// <summary>
         /// A <c>Write</c> lock is obtained when an object is updated or inserted.
         /// </summary>

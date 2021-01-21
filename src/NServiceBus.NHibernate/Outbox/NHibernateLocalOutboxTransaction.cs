@@ -1,14 +1,13 @@
-﻿using System.Data;
-
-namespace NServiceBus.Outbox.NHibernate
+﻿namespace NServiceBus.Outbox.NHibernate
 {
+    using System.Data;
     using System;
     using System.Threading.Tasks;
-    using Extensibility;
+    using NServiceBus.Extensibility;
     using global::NHibernate;
     using Janitor;
-    using Logging;
-    using Outbox;
+    using NServiceBus.Logging;
+    using NServiceBus.Outbox;
 
     [SkipWeaving]
     class NHibernateLocalOutboxTransaction : INHibernateOutboxTransaction

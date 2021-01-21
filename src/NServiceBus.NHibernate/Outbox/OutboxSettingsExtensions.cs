@@ -1,11 +1,10 @@
-﻿using System;
-using System.Transactions;
-
-namespace NServiceBus
+﻿namespace NServiceBus
 {
-    using Configuration.AdvancedExtensibility;
-    using Features;
-    using Outbox;
+    using System;
+    using System.Transactions;
+    using NServiceBus.Configuration.AdvancedExtensibility;
+    using NServiceBus.Features;
+    using NServiceBus.Outbox;
 
     /// <summary>
     /// Contains extensions methods which allow to configure NHibernate persistence specific outbox configuration

@@ -1,10 +1,9 @@
-﻿using System.Transactions;
-
-namespace NServiceBus.NHibernate.Outbox
+﻿namespace NServiceBus.NHibernate.Outbox
 {
+    using System.Transactions;
     using global::NHibernate;
     using NServiceBus.Outbox.NHibernate;
-    using Persistence.NHibernate;
+    using NServiceBus.Persistence.NHibernate;
 
     interface IOutboxPersisterFactory
     {

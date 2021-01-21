@@ -168,7 +168,7 @@ namespace NServiceBus.SagaPersisters.NHibernate.AutoPersistence
         {
             if (type.PreviousPath != null)
             {
-                if (mi.IsComponent(((PropertyInfo) type.PreviousPath.LocalMember).PropertyType))
+                if (mi.IsComponent(((PropertyInfo)type.PreviousPath.LocalMember).PropertyType))
                 {
                     map.Column(type.PreviousPath.LocalMember.Name + type.LocalMember.Name);
                 }
@@ -180,8 +180,7 @@ namespace NServiceBus.SagaPersisters.NHibernate.AutoPersistence
 
                 if (sagaMetadata != null)
                 {
-                    SagaMetadata.CorrelationPropertyMetadata correlationProperty;
-                    if (sagaMetadata.TryGetCorrelationProperty(out correlationProperty) && correlationProperty.Name == type.LocalMember.Name)
+                    if (sagaMetadata.TryGetCorrelationProperty(out SagaMetadata.CorrelationPropertyMetadata correlationProperty) && correlationProperty.Name == type.LocalMember.Name)
                     {
                         map.Unique(true);
                     }
@@ -349,7 +348,7 @@ namespace NServiceBus.SagaPersisters.NHibernate.AutoPersistence
         Func<Type, string> tableNamingConvention;
         List<Type> typesToScan;
         List<Type> childTables = new List<Type>();
-		List<Type> entityTypes = new List<Type>();
+        List<Type> entityTypes = new List<Type>();
         ConventionModelMapper mapper;
     }
 }

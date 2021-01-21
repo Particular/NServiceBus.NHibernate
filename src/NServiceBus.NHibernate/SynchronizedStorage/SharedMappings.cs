@@ -12,7 +12,7 @@ namespace NServiceBus.Features
 
         public void ApplyTo(Configuration configuration)
         {
-            mappings.ForEach(m=>m(configuration));
+            mappings.ForEach(m => m(configuration));
         }
 
         System.Collections.Generic.List<Action<Configuration>> mappings = new System.Collections.Generic.List<Action<Configuration>>();

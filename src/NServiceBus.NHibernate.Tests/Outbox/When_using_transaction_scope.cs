@@ -1,16 +1,15 @@
-using System.Data;
-
 namespace NServiceBus.NHibernate.Tests.Outbox
 {
+    using System.Data;
     using System;
     using System.Threading.Tasks;
     using global::NHibernate;
     using global::NHibernate.Cfg;
     using global::NHibernate.Mapping.ByCode;
     using global::NHibernate.Tool.hbm2ddl;
-    using Extensibility;
+    using NServiceBus.Extensibility;
     using global::NHibernate.Dialect;
-    using NHibernate.Outbox;
+    using NServiceBus.NHibernate.Outbox;
     using NServiceBus.Outbox.NHibernate;
     using NUnit.Framework;
 

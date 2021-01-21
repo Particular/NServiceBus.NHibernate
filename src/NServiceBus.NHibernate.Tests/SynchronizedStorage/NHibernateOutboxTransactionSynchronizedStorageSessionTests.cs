@@ -1,13 +1,12 @@
-﻿using System.Data;
-
-namespace NServiceBus.NHibernate.Tests.SynchronizedStorage
+﻿namespace NServiceBus.NHibernate.Tests.SynchronizedStorage
 {
+    using System.Data;
     using System;
     using System.Threading.Tasks;
-    using Extensibility;
-    using NHibernate.Outbox;
+    using NServiceBus.Extensibility;
+    using NServiceBus.NHibernate.Outbox;
     using NServiceBus.Outbox.NHibernate;
-    using Persistence.NHibernate;
+    using NServiceBus.Persistence.NHibernate;
     using NUnit.Framework;
 
     [TestFixture(false, false)]
@@ -32,7 +31,7 @@ namespace NServiceBus.NHibernate.Tests.SynchronizedStorage
 
             var outboxPersisterFactory = new OutboxPersisterFactory<OutboxRecord>();
             var persister = outboxPersisterFactory.Create(SessionFactory, "TestEndpoint", pessimistic, transactionScope, IsolationLevel.ReadCommitted, System.Transactions.IsolationLevel.ReadCommitted);
-            
+
             var messageId = Guid.NewGuid().ToString("N");
             var contextBag = new ContextBag();
             await persister.Get(messageId, contextBag);

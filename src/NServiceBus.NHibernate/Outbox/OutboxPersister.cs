@@ -112,7 +112,7 @@
             return BeginTransactionInternal(result, endpointQualifiedMessageId);
         }
 
-        private static async Task<OutboxTransaction> BeginTransactionInternal(INHibernateOutboxTransaction transaction, string endpointQualifiedMessageId)
+        static async Task<OutboxTransaction> BeginTransactionInternal(INHibernateOutboxTransaction transaction, string endpointQualifiedMessageId)
         {
             try
             {

@@ -1,6 +1,9 @@
 #pragma warning disable 1591
+
+#pragma warning disable IDE0065 // Misplaced using directive
 using System;
 using NHibernate.Dialect;
+#pragma warning restore IDE0065 // Misplaced using directive
 
 namespace NServiceBus.Features
 {
@@ -8,7 +11,7 @@ namespace NServiceBus.Features
         Message = "The timeout manager has been removed. Timeout storage configuration can be removed.",
         TreatAsErrorFromVersion = "9",
         RemoveInVersion = "10")]
-    public class NHibernateTimeoutStorage : NServiceBus.Features.Feature
+    public class NHibernateTimeoutStorage : Feature
     {
         protected override void Setup(FeatureConfigurationContext context)
         {

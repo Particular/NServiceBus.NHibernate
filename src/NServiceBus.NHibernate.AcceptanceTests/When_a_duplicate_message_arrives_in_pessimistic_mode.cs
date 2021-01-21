@@ -107,10 +107,10 @@
         {
             Context testContext;
 
-                public TerminatorBehavior(Context testContext)
-                {
-                    this.testContext = testContext;
-                }
+            public TerminatorBehavior(Context testContext)
+            {
+                this.testContext = testContext;
+            }
 
             public override async Task Invoke(ITransportReceiveContext context, Func<Task> next)
             {

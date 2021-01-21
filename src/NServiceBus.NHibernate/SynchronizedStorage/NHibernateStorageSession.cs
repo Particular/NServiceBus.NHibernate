@@ -1,7 +1,6 @@
-using System.Transactions;
-
 namespace NServiceBus.Features
 {
+    using System.Transactions;
     using System;
     using System.Configuration;
     using System.Dynamic;
@@ -9,13 +8,13 @@ namespace NServiceBus.Features
     using System.Text;
     using System.Threading.Tasks;
     using global::NHibernate.Mapping.ByCode;
-    using NHibernate.Outbox;
+    using NServiceBus.NHibernate.Outbox;
     using global::NHibernate.Transaction;
     using Microsoft.Extensions.DependencyInjection;
     using NServiceBus.Outbox;
     using NServiceBus.Outbox.NHibernate;
-    using Persistence;
-    using Persistence.NHibernate;
+    using NServiceBus.Persistence;
+    using NServiceBus.Persistence.NHibernate;
     using global::NHibernate.Tool.hbm2ddl;
     using Configuration = global::NHibernate.Cfg.Configuration;
     using Environment = global::NHibernate.Cfg.Environment;

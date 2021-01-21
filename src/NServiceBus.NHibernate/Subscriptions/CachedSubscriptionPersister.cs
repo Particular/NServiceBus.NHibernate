@@ -34,8 +34,7 @@ namespace NServiceBus.Unicast.Subscriptions.NHibernate
             var types = messageTypes.ToList();
             var typeNames = types.Select(mt => mt.TypeName).ToArray();
             var key = string.Join(",", typeNames);
-            Tuple<DateTimeOffset, IEnumerable<Subscriber>> cacheItem;
-            var cacheItemFound = cache.TryGetValue(key, out cacheItem);
+            var cacheItemFound = cache.TryGetValue(key, out Tuple<DateTimeOffset, IEnumerable<Subscriber>> cacheItem);
 
             if (cacheItemFound && (DateTimeOffset.UtcNow - cacheItem.Item1) < expiration)
             {
