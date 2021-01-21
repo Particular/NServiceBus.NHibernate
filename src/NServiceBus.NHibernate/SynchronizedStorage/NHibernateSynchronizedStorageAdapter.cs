@@ -38,13 +38,11 @@
 
         public Task<CompletableSynchronizedStorageSession> TryAdapt(TransportTransaction transportTransaction, ContextBag context)
         {
-            Transaction ambientTransaction;
-            if (!transportTransaction.TryGet(out ambientTransaction))
+            if (!transportTransaction.TryGet(out Transaction ambientTransaction))
             {
                 return EmptyResult;
             }
-            var sessionFactoryImpl = sessionFactory as SessionFactoryImpl;
-            if (sessionFactoryImpl == null)
+            if (!(sessionFactory is SessionFactoryImpl sessionFactoryImpl))
             {
                 throw new NotSupportedException("Overriding default implementation of ISessionFactory is not supported.");
             }

@@ -17,7 +17,6 @@
     <PackageReference Include="NServiceBus.PersistenceTests.Sources" Version="8.0.0-alpha.644" />
     <PackageReference Include="NUnit" Version="3.13.0" />
     <PackageReference Include="NUnit3TestAdapter" Version="3.17.0" />
-    <PackageReference Include="Particular.CodeRules" Version="0.8.0" PrivateAssets="All" />
     <PackageReference Include="System.Data.SqlClient" Version="4.8.2" />
     <PackageReference Include="Oracle.ManagedDataAccess.Core" Version="2.19.91" />
   </ItemGroup>
@@ -28,10 +27,6 @@
     <!--Because NHibernate does not support lists of primitive types-->
     <Compile Remove="\**\When_persisting_a_saga_with_complex_types.cs" />
     <Compile Remove="\**\When_worker_tries_to_complete_saga_update_by_another_pessimistic.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Compile Include="..\TestSuppressions.cs" Link="TestSuppressions.cs" />
   </ItemGroup>
 
 </Project>

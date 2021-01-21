@@ -35,7 +35,7 @@ namespace NServiceBus.Features
 
             return Task.CompletedTask;
         }
-        
+
 
         protected override Task OnStop(IMessageSession busSession)
         {

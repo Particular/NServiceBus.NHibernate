@@ -16,16 +16,10 @@
     <PackageReference Include="NServiceBus.AcceptanceTests.Sources" Version="8.0.0-alpha.644" />
     <PackageReference Include="NUnit" Version="3.13.0" />
     <PackageReference Include="NUnit3TestAdapter" Version="3.17.0" />
-    <PackageReference Include="Particular.CodeRules" Version="0.8.0" PrivateAssets="All" />
     <PackageReference Include="System.Data.SqlClient" Version="4.8.2" />
   </ItemGroup>
 
   <ItemGroup>
     <Compile Remove="\**\When_handling_concurrent_messages.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Compile Include="..\AcceptanceTestSuppressions.cs" Link="AcceptanceTestSuppressions.cs" />
-    <Compile Include="..\TestSuppressions.cs" Link="TestSuppressions.cs" />
   </ItemGroup>
 </Project>

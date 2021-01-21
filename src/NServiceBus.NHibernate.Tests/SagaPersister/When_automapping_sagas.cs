@@ -17,7 +17,7 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
         [OneTimeSetUp]
         public void SetUp()
         {
-            var types = new[] 
+            var types = new[]
             {
                 typeof(TestSaga), typeof(TestSagaData), typeof(TestComponent), typeof(PolymorphicPropertyBase),
                 typeof(AlsoDerivedFromTestSagaWithTableNameAttributeActualSaga), typeof(AlsoDerivedFromTestSagaWithTableNameAttribute),

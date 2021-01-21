@@ -86,7 +86,7 @@
         {
             var export = new SchemaExport(config);
             var formatter = FormatStyle.Ddl.Formatter;
-            
+
             var script = new StringBuilder();
             export.Create(s => script.Append(formatter.Format(s)), false);
             return script.ToString();

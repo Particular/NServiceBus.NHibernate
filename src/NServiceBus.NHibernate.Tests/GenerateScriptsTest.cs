@@ -1,13 +1,12 @@
-﻿using NHibernate.Dialect;
-
-namespace NServiceBus.NHibernate.Tests
+﻿namespace NServiceBus.NHibernate.Tests
 {
+    using global::NHibernate.Dialect;
     using System;
     using System.Collections.Generic;
     using System.Runtime.CompilerServices;
     using System.Threading.Tasks;
     using NServiceBus;
-    using NHibernate;
+    using NServiceBus.NHibernate;
     using NUnit.Framework;
     using Particular.Approvals;
 

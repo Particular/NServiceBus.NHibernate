@@ -1,9 +1,9 @@
-﻿using System;
-using System.Threading.Tasks;
-using NServiceBus.Pipeline;
-
-namespace NServiceBus.Persistence.NHibernate
+﻿namespace NServiceBus.Persistence.NHibernate
 {
+    using System;
+    using System.Threading.Tasks;
+    using NServiceBus.Pipeline;
+
     class CurrentSessionBehavior : Behavior<IIncomingLogicalMessageContext>
     {
         readonly CurrentSessionHolder currentSessionHolder;

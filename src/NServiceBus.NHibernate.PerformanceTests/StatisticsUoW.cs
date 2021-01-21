@@ -18,7 +18,9 @@
             }
 
             if (Transaction.Current != null)
+            {
                 Transaction.Current.TransactionCompleted += OnCompleted;
+            }
 
             //            if (message.TwoPhaseCommit)
             //{
@@ -60,7 +62,7 @@
 
         public void Customize(EndpointConfiguration builder)
         {
-            builder.RegisterComponents(c=> c.AddScoped<IManageUnitsOfWork, StatisticsUoW>());
+            builder.RegisterComponents(c => c.AddScoped<IManageUnitsOfWork, StatisticsUoW>());
         }
     }
 }

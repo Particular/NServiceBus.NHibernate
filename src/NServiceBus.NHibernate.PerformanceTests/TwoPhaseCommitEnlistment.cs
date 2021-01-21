@@ -8,7 +8,7 @@
         {
             preparingEnlistment.Prepared();
         }
-        
+
         public void Commit(Enlistment enlistment)
         {
             enlistment.Done();
@@ -18,7 +18,7 @@
         {
             enlistment.Done();
         }
-        
+
         public void InDoubt(Enlistment enlistment)
         {
             enlistment.Done();

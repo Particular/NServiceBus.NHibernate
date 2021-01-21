@@ -1,7 +1,6 @@
-using System.Data;
-
 namespace NServiceBus.NHibernate.Tests.Outbox
 {
+    using System.Data;
     using System;
     using System.Collections.Generic;
     using System.Linq;
@@ -11,9 +10,9 @@ namespace NServiceBus.NHibernate.Tests.Outbox
     using global::NHibernate.Mapping.ByCode;
     using global::NHibernate.Mapping.ByCode.Conformist;
     using global::NHibernate.Tool.hbm2ddl;
-    using Extensibility;
+    using NServiceBus.Extensibility;
     using global::NHibernate.Dialect;
-    using NHibernate.Outbox;
+    using NServiceBus.NHibernate.Outbox;
     using NServiceBus.Outbox;
     using NServiceBus.Outbox.NHibernate;
     using NUnit.Framework;
@@ -192,7 +191,7 @@ namespace NServiceBus.NHibernate.Tests.Outbox
         {
             var id = Guid.NewGuid().ToString("N");
             var dispatchedBag = new ContextBag();
-            
+
             await persister.Get(id, dispatchedBag);
             using (var transactionA = await persister.BeginTransaction(dispatchedBag))
             {

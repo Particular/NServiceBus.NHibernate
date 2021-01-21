@@ -61,7 +61,7 @@
 
                 using (var storageSession = await adapter.TryAdapt(transportTransaction, new ContextBag()))
                 {
-                    storageSession.Session().Save(new TestEntity {Id = entityId});
+                    storageSession.Session().Save(new TestEntity { Id = entityId });
                     storageSession.OnSaveChanges(s =>
                     {
                         throw new Exception("Simulated");

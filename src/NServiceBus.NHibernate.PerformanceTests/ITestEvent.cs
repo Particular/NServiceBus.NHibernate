@@ -2,7 +2,7 @@
 {
     using NServiceBus;
 
-    public interface TestEvent : IEvent
+    public interface ITestEvent : IEvent
     {
     }
 }

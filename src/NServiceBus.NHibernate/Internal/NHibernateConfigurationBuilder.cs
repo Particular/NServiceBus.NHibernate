@@ -62,12 +62,9 @@ namespace NServiceBus.Persistence.NHibernate
 
         public NHibernateConfiguration Build()
         {
-            string connString;
-            if (!configuration.Properties.TryGetValue(Environment.ConnectionString, out connString))
+            if (!configuration.Properties.TryGetValue(Environment.ConnectionString, out string connString))
             {
-                string connStringName;
-
-                if (configuration.Properties.TryGetValue(Environment.ConnectionStringName, out connStringName))
+                if (configuration.Properties.TryGetValue(Environment.ConnectionStringName, out string connStringName))
                 {
                     var connectionStringSettings = ConfigurationManager.ConnectionStrings[connStringName];
 
@@ -132,7 +129,7 @@ namespace NServiceBus.Persistence.NHibernate
 
         public static bool ContainsRequiredProperties(IDictionary<string, string> props)
         {
-            return (props.ContainsKey(Environment.ConnectionString) || props.ContainsKey(Environment.ConnectionStringName));
+            return props.ContainsKey(Environment.ConnectionString) || props.ContainsKey(Environment.ConnectionStringName);
         }
 
         static void ValidateConfigurationViaConfigFile(Configuration configuration, string configPrefix)
@@ -154,8 +151,7 @@ For most scenarios the 'NServiceBus/Persistence' connection string is the best o
         static Configuration CreateNHibernateConfiguration()
         {
             var configuration = new Configuration();
-            var hc = ConfigurationManager.GetSection(CfgXmlHelper.CfgSectionName) as IHibernateConfiguration;
-            if (hc != null && hc.SessionFactory != null)
+            if (ConfigurationManager.GetSection(CfgXmlHelper.CfgSectionName) is IHibernateConfiguration hc && hc.SessionFactory != null)
             {
                 configuration = configuration.Configure();
             }
@@ -199,9 +195,7 @@ For most scenarios the 'NServiceBus/Persistence' connection string is the best o
         {
             var connectionStringSettings = connectionStringSettingsCollection[name];
 
-            return connectionStringSettings == null
-                ? null
-                : connectionStringSettings.ConnectionString;
+            return connectionStringSettings?.ConnectionString;
         }
     }
 }

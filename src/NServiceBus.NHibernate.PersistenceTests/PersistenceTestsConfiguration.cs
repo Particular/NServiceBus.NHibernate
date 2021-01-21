@@ -1,7 +1,6 @@
-﻿using System.Data;
-
-namespace NServiceBus.PersistenceTesting
+﻿namespace NServiceBus.PersistenceTesting
 {
+    using System.Data;
     using System;
     using System.Collections.Generic;
     using System.Linq;
@@ -13,16 +12,16 @@ namespace NServiceBus.PersistenceTesting
     using global::NHibernate.Driver;
     using global::NHibernate.Mapping.ByCode;
     using global::NHibernate.Tool.hbm2ddl;
-    using NHibernate.Outbox;
-    using NHibernate.PersistenceTests;
+    using NServiceBus.NHibernate.Outbox;
+    using NServiceBus.NHibernate.PersistenceTests;
     using NServiceBus.Outbox;
     using NServiceBus.Outbox.NHibernate;
     using NServiceBus.Sagas;
     using NUnit.Framework;
-    using Persistence;
-    using Persistence.NHibernate;
-    using SagaPersisters.NHibernate;
-    using SagaPersisters.NHibernate.AutoPersistence;
+    using NServiceBus.Persistence;
+    using NServiceBus.Persistence.NHibernate;
+    using NServiceBus.SagaPersisters.NHibernate;
+    using NServiceBus.SagaPersisters.NHibernate.AutoPersistence;
 
     class NHibernateVariant
     {
@@ -135,7 +134,7 @@ namespace NServiceBus.PersistenceTesting
 
         public async Task Configure()
         {
-            var variant = (NHibernateVariant) Variant.Values[0];
+            var variant = (NHibernateVariant)Variant.Values[0];
 
             var cfg = new Configuration()
                 .DataBaseIntegration(variant.ConfigureDb);

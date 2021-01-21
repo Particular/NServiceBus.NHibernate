@@ -98,7 +98,7 @@
                 Context testContext;
                 ReadOnlySettings settings;
 
-                public SendOrderAcknowledgementHandler(Context testContext,ReadOnlySettings settings)
+                public SendOrderAcknowledgementHandler(Context testContext, ReadOnlySettings settings)
                 {
                     this.testContext = testContext;
                     this.settings = settings;
