@@ -72,7 +72,7 @@ namespace NServiceBus.Persistence.NHibernate.Tests
                                                  "timeout_connection_string")
                 };
 
-            var builder = new NHibernateConfigurationBuilder(new SettingsHolder(), new ExpandoObject(), "Timeout","NotUsed");
+            var builder = new NHibernateConfigurationBuilder(new SettingsHolder(), new ExpandoObject(), "Timeout", "NotUsed");
 
             var expected = new Dictionary<string, string>
                 {
@@ -121,7 +121,7 @@ namespace NServiceBus.Persistence.NHibernate.Tests
                 {
                     new ConnectionStringSettings("NServiceBus/Persistence", connectionString)
                 };
-            var builder = new NHibernateConfigurationBuilder(new SettingsHolder(), new ExpandoObject(), "NotUsed","NotUsed");
+            var builder = new NHibernateConfigurationBuilder(new SettingsHolder(), new ExpandoObject(), "NotUsed", "NotUsed");
 
             var expected = new Dictionary<string, string>
                 {
@@ -138,12 +138,12 @@ namespace NServiceBus.Persistence.NHibernate.Tests
         {
             var appDomain = AppDomain.CreateDomain("Testing", AppDomain.CurrentDomain.Evidence,
                                                    new AppDomainSetup
-                                                       {
-                                                           ApplicationBase = AppDomain.CurrentDomain.SetupInformation.ApplicationBase,
-                                                           ConfigurationFile = "Testing.config"
-                                                       });
+                                                   {
+                                                       ApplicationBase = AppDomain.CurrentDomain.SetupInformation.ApplicationBase,
+                                                       ConfigurationFile = "Testing.config"
+                                                   });
 
-            var worker = (Worker)appDomain.CreateInstanceAndUnwrap(Assembly.GetExecutingAssembly().FullName, typeof (Worker).FullName);
+            var worker = (Worker)appDomain.CreateInstanceAndUnwrap(Assembly.GetExecutingAssembly().FullName, typeof(Worker).FullName);
             var result = worker.Execute();
             AppDomain.Unload(appDomain);
 

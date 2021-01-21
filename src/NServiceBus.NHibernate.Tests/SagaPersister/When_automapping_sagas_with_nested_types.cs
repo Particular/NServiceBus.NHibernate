@@ -34,7 +34,7 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
             var persister = sessionFactory.GetEntityPersister(typeof(SagaWithNestedType.Customer).FullName).
                    ClassMetadata as global::NHibernate.Persister.Entity.AbstractEntityPersister;
 
-            Assert.AreEqual( "SagaWithNestedType_Customer", persister.TableName);
+            Assert.AreEqual("SagaWithNestedType_Customer", persister.TableName);
         }
 
         [Test]

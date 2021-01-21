@@ -53,7 +53,7 @@ namespace NServiceBus.Features
             var config = builder.Build();
 
             var outboxEnabled = context.Settings.IsFeatureActive(typeof(Outbox));
-                
+
             var sessionHolder = new CurrentSessionHolder();
 
             context.Container.ConfigureComponent(() => sessionHolder.Current, DependencyLifecycle.InstancePerCall);
@@ -91,7 +91,7 @@ namespace NServiceBus.Features
                 var sessionFactory = config.Configuration.BuildSessionFactory();
                 var persisterFactory = context.Settings.Get<IOutboxPersisterFactory>();
                 var persister = persisterFactory.Create(sessionFactory, context.Settings.EndpointName(), pessimisticMode, transactionScopeMode);
-                
+
                 context.Container.ConfigureComponent(b => persister, DependencyLifecycle.SingleInstance);
                 context.Container.ConfigureComponent(b => new NHibernateSynchronizedStorage(sessionFactory, sessionHolder), DependencyLifecycle.SingleInstance);
                 context.Container.ConfigureComponent(b => new NHibernateSynchronizedStorageAdapter(sessionFactory, sessionHolder), DependencyLifecycle.SingleInstance);

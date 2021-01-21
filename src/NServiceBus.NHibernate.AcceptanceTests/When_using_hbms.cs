@@ -40,10 +40,10 @@
                 {
                     Data.SomeId = message.SomeId;
                     Data.LargeText = new string('a', 1000);
-                    return context.SendLocal(new Message2{SomeId = Data.SomeId});
+                    return context.SendLocal(new Message2 { SomeId = Data.SomeId });
                 }
 
-// ReSharper disable once UnusedParameter.Global
+                // ReSharper disable once UnusedParameter.Global
 
                 public Task Handle(Message2 _, IMessageHandlerContext context)
                 {

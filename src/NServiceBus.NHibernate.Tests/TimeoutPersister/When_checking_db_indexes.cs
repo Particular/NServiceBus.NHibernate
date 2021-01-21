@@ -112,12 +112,12 @@
         [TearDown]
         public async Task TearDown()
         {
-             await schemaExport.DropAsync(false, true);
+            await schemaExport.DropAsync(false, true);
 
-             if (dbSchemaName != null)
-             {
-                 await DropDbSchema();
-             }
+            if (dbSchemaName != null)
+            {
+                await DropDbSchema();
+            }
         }
     }
 }

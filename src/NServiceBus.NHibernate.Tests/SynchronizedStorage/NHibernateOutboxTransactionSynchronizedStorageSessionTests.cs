@@ -30,7 +30,7 @@
 
             var outboxPersisterFactory = new OutboxPersisterFactory<OutboxRecord>();
             var persister = outboxPersisterFactory.Create(SessionFactory, "TestEndpoint", pessimistic, transactionScope);
-            
+
             var messageId = Guid.NewGuid().ToString("N");
             var contextBag = new ContextBag();
             await persister.Get(messageId, contextBag);

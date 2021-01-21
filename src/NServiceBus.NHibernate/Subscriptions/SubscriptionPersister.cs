@@ -35,13 +35,13 @@ namespace NServiceBus.Unicast.Subscriptions.NHibernate
             using (var tx = session.BeginTransaction(IsolationLevel.ReadCommitted))
             {
                 await session.SaveOrUpdateAsync(new Subscription
-                    {
-                        SubscriberEndpoint = subscriber.TransportAddress,
-                        LogicalEndpoint = subscriber.Endpoint,
-                        MessageType = messageType.TypeName + "," + messageType.Version,
-                        Version = messageType.Version.ToString(),
-                        TypeName = messageType.TypeName
-                    })
+                {
+                    SubscriberEndpoint = subscriber.TransportAddress,
+                    LogicalEndpoint = subscriber.Endpoint,
+                    MessageType = messageType.TypeName + "," + messageType.Version,
+                    Version = messageType.Version.ToString(),
+                    TypeName = messageType.TypeName
+                })
                     .ConfigureAwait(false);
                 await tx.CommitAsync()
                     .ConfigureAwait(false);

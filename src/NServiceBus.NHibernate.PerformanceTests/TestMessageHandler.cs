@@ -7,7 +7,7 @@
 
     using NServiceBus;
 
-    class TestMessageHandler:IHandleMessages<TestMessage>
+    class TestMessageHandler : IHandleMessages<TestMessage>
     {
         static TwoPhaseCommitEnlistment enlistment = new TwoPhaseCommitEnlistment();
 

@@ -91,7 +91,7 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
         public virtual string SomeProperty { get; set; }
     }
 
-    [TableName("MyTestTable", Schema = "MyTestSchema" )]
+    [TableName("MyTestTable", Schema = "MyTestSchema")]
     public class TestSagaWithTableNameAttribute : IContainSagaData
     {
         public virtual Guid Id { get; set; }
@@ -151,21 +151,21 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
 
     public class SagaWithVersionedPropertyAttribute : IContainSagaData
     {
-      public virtual Guid Id { get; set; }
-      public virtual string Originator { get; set; }
-      public virtual string OriginalMessageId { get; set; }
+        public virtual Guid Id { get; set; }
+        public virtual string Originator { get; set; }
+        public virtual string OriginalMessageId { get; set; }
 
-      [RowVersion]
-      public virtual int Version { get; set; }
+        [RowVersion]
+        public virtual int Version { get; set; }
     }
 
     public class SagaWithoutVersionedPropertyAttribute : IContainSagaData
     {
-      public virtual Guid Id { get; set; }
-      public virtual string Originator { get; set; }
-      public virtual string OriginalMessageId { get; set; }
+        public virtual Guid Id { get; set; }
+        public virtual string Originator { get; set; }
+        public virtual string OriginalMessageId { get; set; }
 
-      public virtual int Version { get; set; }
+        public virtual int Version { get; set; }
     }
 
     public class SagaWithVersionedPropertyAttributeActualSaga : Saga<SagaWithVersionedPropertyAttribute>, IAmStartedByMessages<IMessage>

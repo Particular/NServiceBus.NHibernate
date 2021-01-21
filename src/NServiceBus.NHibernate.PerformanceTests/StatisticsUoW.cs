@@ -16,8 +16,10 @@
                 Statistics.First = DateTime.Now;
             }
 
-            if(Transaction.Current != null)
+            if (Transaction.Current != null)
+            {
                 Transaction.Current.TransactionCompleted += OnCompleted;
+            }
 
             //            if (message.TwoPhaseCommit)
             //{
@@ -60,7 +62,7 @@
 
         public void Customize(EndpointConfiguration builder)
         {
-            builder.RegisterComponents(c=> c.ConfigureComponent<StatisticsUoW>(DependencyLifecycle.InstancePerUnitOfWork));
+            builder.RegisterComponents(c => c.ConfigureComponent<StatisticsUoW>(DependencyLifecycle.InstancePerUnitOfWork));
         }
     }
 }

@@ -13,16 +13,36 @@ namespace NServiceBus.Unicast.Subscriptions.NHibernate
 
         public override bool Equals(object obj)
         {
-            if (ReferenceEquals(null, obj)) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != typeof (Subscription)) return false;
-            return Equals((Subscription) obj);
+            if (obj is null)
+            {
+                return false;
+            }
+
+            if (ReferenceEquals(this, obj))
+            {
+                return true;
+            }
+
+            if (obj.GetType() != typeof(Subscription))
+            {
+                return false;
+            }
+
+            return Equals((Subscription)obj);
         }
 
         public virtual bool Equals(Subscription other)
         {
-            if (ReferenceEquals(null, other)) return false;
-            if (ReferenceEquals(this, other)) return true;
+            if (other is null)
+            {
+                return false;
+            }
+
+            if (ReferenceEquals(this, other))
+            {
+                return true;
+            }
+
             return Equals(other.SubscriberEndpoint, SubscriberEndpoint) && Equals(other.MessageType, MessageType) && Equals(other.Version, Version);
         }
 
@@ -30,7 +50,7 @@ namespace NServiceBus.Unicast.Subscriptions.NHibernate
         {
             unchecked
             {
-                return ((SubscriberEndpoint != null ? SubscriberEndpoint.GetHashCode() : 0)*397) ^ (MessageType != null ? MessageType.GetHashCode() : 0);
+                return ((SubscriberEndpoint != null ? SubscriberEndpoint.GetHashCode() : 0) * 397) ^ (MessageType != null ? MessageType.GetHashCode() : 0);
             }
         }
     }

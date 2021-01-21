@@ -51,7 +51,7 @@
                     b.LimitMessageProcessingConcurrencyTo(1); //To ensure saga is properly created before we check it.
                 });
             }
-            
+
             class OutboxTransactionScopeSaga : Saga<OutboxTransactionScopeSagaData>,
                 IAmStartedByMessages<StartSagaMessage>,
                 IAmStartedByMessages<CheckSagaMessage>
@@ -115,5 +115,5 @@
         }
     }
 
-    
+
 }

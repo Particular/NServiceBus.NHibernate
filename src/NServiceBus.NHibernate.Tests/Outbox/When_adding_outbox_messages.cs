@@ -190,7 +190,7 @@ namespace NServiceBus.NHibernate.Tests.Outbox
         {
             var id = Guid.NewGuid().ToString("N");
             var dispatchedBag = new ContextBag();
-            
+
             await persister.Get(id, dispatchedBag);
             using (var transactionA = await persister.BeginTransaction(dispatchedBag))
             {
