@@ -76,7 +76,7 @@
                     b.EnableOutbox();
                 });
             }
-            
+
             class PlaceOrderHandler : IHandleMessages<PlaceOrder>
             {
                 public Task Handle(PlaceOrder message, IMessageHandlerContext context)

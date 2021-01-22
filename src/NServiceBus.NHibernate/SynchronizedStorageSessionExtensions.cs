@@ -15,8 +15,7 @@
         /// </summary>
         public static ISession Session(this SynchronizedStorageSession session)
         {
-            var ambientTransactionSession = session as INHibernateStorageSession;
-            if (ambientTransactionSession != null)
+            if (session is INHibernateStorageSession ambientTransactionSession)
             {
                 return ambientTransactionSession.Session;
             }
@@ -28,8 +27,7 @@
         /// </summary>
         public static void OnSaveChanges(this SynchronizedStorageSession session, Func<SynchronizedStorageSession, Task> callback)
         {
-            var nhibernateSession = session as INHibernateStorageSession;
-            if (nhibernateSession != null)
+            if (session is INHibernateStorageSession nhibernateSession)
             {
                 nhibernateSession.OnSaveChanges(callback);
             }

@@ -19,14 +19,14 @@ namespace NServiceBus.TimeoutPersisters.NHibernate.Tests
             for (var i = 0; i < numberOfTimeoutsToAdd; i++)
             {
                 await persister.Add(new TimeoutData
-                                  {
-                                      Time = DateTime.UtcNow.AddHours(-1),
-                                      Destination = "timeouts",
-                                      SagaId = Guid.NewGuid(),
-                                      State = new byte[] { 0, 0, 133 },
-                                      Headers = new Dictionary<string, string> { { "Bar", "34234" }, { "Foo", "aString1" }, { "Super", "aString2" } },
-                                      OwningTimeoutManager = "MyTestEndpoint",
-                                  }, new ContextBag()).ConfigureAwait(false);
+                {
+                    Time = DateTime.UtcNow.AddHours(-1),
+                    Destination = "timeouts",
+                    SagaId = Guid.NewGuid(),
+                    State = new byte[] { 0, 0, 133 },
+                    Headers = new Dictionary<string, string> { { "Bar", "34234" }, { "Foo", "aString1" }, { "Super", "aString2" } },
+                    OwningTimeoutManager = "MyTestEndpoint",
+                }, new ContextBag()).ConfigureAwait(false);
             }
             var result = await persister.GetNextChunk(DateTime.UtcNow.AddYears(-3)).ConfigureAwait(false);
             Assert.AreEqual(numberOfTimeoutsToAdd, result.DueTimeouts.Count());
@@ -46,7 +46,7 @@ namespace NServiceBus.TimeoutPersisters.NHibernate.Tests
                 Headers = new Dictionary<string, string> { { "Bar", "34234" }, { "Foo", "aString1" }, { "Super", "aString2" } },
                 OwningTimeoutManager = "MyTestEndpoint"
             }, new ContextBag()).ConfigureAwait(false);
-            
+
 
 
             var result = await persister.GetNextChunk(DateTime.UtcNow.AddYears(-3)).ConfigureAwait(false);

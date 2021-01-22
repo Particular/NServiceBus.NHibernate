@@ -1,10 +1,9 @@
-﻿using System.Threading.Tasks;
-using NServiceBus.AcceptanceTesting;
-using NServiceBus.AcceptanceTests.EndpointTemplates;
-using NUnit.Framework;
-
-namespace NServiceBus.AcceptanceTests.Sagas
+﻿namespace NServiceBus.AcceptanceTests.Sagas
 {
+    using System.Threading.Tasks;
+    using NServiceBus.AcceptanceTesting;
+    using NServiceBus.AcceptanceTests.EndpointTemplates;
+    using NUnit.Framework;
     using global::NHibernate;
 
     [TestFixture]
@@ -42,7 +41,7 @@ namespace NServiceBus.AcceptanceTests.Sagas
                 {
                     c.RegisterComponents(cc =>
                     {
-                        cc.ConfigureComponent(b => b.Build<INHibernateStorageSession>().Session, 
+                        cc.ConfigureComponent(b => b.Build<INHibernateStorageSession>().Session,
                             DependencyLifecycle.InstancePerUnitOfWork);
                     });
                 });

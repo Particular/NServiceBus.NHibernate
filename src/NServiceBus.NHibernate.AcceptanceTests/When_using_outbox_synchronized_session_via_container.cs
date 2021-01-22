@@ -1,10 +1,9 @@
-﻿using System.Threading.Tasks;
-using NServiceBus.AcceptanceTesting;
-using NServiceBus.AcceptanceTests.EndpointTemplates;
-using NUnit.Framework;
-
-namespace NServiceBus.AcceptanceTests.Sagas
+﻿namespace NServiceBus.AcceptanceTests.Sagas
 {
+    using System.Threading.Tasks;
+    using NServiceBus.AcceptanceTesting;
+    using NServiceBus.AcceptanceTests.EndpointTemplates;
+    using NUnit.Framework;
     using global::NHibernate;
 
     [TestFixture]

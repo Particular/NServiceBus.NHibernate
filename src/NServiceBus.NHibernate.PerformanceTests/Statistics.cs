@@ -36,16 +36,24 @@
 
 
             if (SendTimeNoTx != TimeSpan.Zero)
+            {
                 PrintStats("Sending", Convert.ToDouble(NumberOfMessages / 2) / SendTimeNoTx.TotalSeconds, "msg/s");
+            }
 
             if (SendTimeWithTx != TimeSpan.Zero)
+            {
                 PrintStats("SendingInsideTX", Convert.ToDouble(NumberOfMessages / 2) / SendTimeWithTx.TotalSeconds, "msg/s");
+            }
 
             if (PublishTimeNoTx != TimeSpan.Zero)
+            {
                 PrintStats("PublishTimeNoTx", Convert.ToDouble(NumberOfMessages / 2) / PublishTimeNoTx.TotalSeconds, "msg/s");
+            }
 
             if (PublishTimeWithTx != TimeSpan.Zero)
+            {
                 PrintStats("PublishTimeWithTx", Convert.ToDouble(NumberOfMessages / 2) / PublishTimeWithTx.TotalSeconds, "msg/s");
+            }
         }
 
         static void PrintStats(string key, double value, string unit)

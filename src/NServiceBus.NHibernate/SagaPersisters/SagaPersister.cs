@@ -45,7 +45,9 @@ namespace NServiceBus.SagaPersisters.NHibernate
             var explicitLockModeAttribute = typeof(T).GetCustomAttributes(typeof(LockModeAttribute), false).SingleOrDefault();
 
             if (explicitLockModeAttribute == null)
+            {
                 return LockMode.Upgrade;//our new default in v4.1.0
+            }
 
             var explicitLockMode = ((LockModeAttribute)explicitLockModeAttribute).RequestedLockMode;
 

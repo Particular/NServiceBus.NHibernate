@@ -39,7 +39,7 @@ namespace NServiceBus.TimeoutPersisters.NHibernate.Tests
             sessionFactory = cfg.BuildSessionFactory();
 
             persister = new TimeoutPersister("MyTestEndpoint", sessionFactory,
-                new NHibernateSynchronizedStorageAdapter(sessionFactory, null), 
+                new NHibernateSynchronizedStorageAdapter(sessionFactory, null),
                 new NHibernateSynchronizedStorage(sessionFactory, null), TimeSpan.FromMinutes(2));
         }
 

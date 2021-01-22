@@ -65,7 +65,7 @@
                     };
                 }
 
-                return new IndexValidationResult {IsValid = true};
+                return new IndexValidationResult { IsValid = true };
             }
             catch (Exception e)
             {
@@ -110,7 +110,7 @@
                     return name;
                 }
 
-                var restrictions = new []
+                var restrictions = new[]
                 {
                     EnsureUnquoted(entity.Table.Catalog),
                     EnsureUnquoted(entity.Table.Schema),
