@@ -15,7 +15,7 @@
     <PackageReference Include="NServiceBus.AcceptanceTests.Sources" Version="8.0.0-alpha.644" />
     <PackageReference Include="NUnit" Version="3.13.0" />
     <PackageReference Include="NUnit3TestAdapter" Version="3.17.0" />
-    <PackageReference Include="Oracle.ManagedDataAccess" Version="19.9.0" />
+    <PackageReference Include="Oracle.ManagedDataAccess" Version="19.10.1" />
   </ItemGroup>
 
   <ItemGroup>
