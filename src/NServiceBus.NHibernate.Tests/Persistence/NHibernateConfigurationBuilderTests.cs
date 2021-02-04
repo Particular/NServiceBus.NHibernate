@@ -7,10 +7,7 @@ namespace NServiceBus.Persistence.NHibernate.Tests
     using System.Dynamic;
     using NUnit.Framework;
     using Settings;
-
-#if NETFRAMEWORK
     using System.Reflection;
-#endif
 
     [TestFixture]
     public class NHibernateConfigurationBuilderTests
