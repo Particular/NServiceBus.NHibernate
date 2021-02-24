@@ -46,7 +46,13 @@
             }
 
             var config = new EndpointConfiguration(endpointName);
-            config.UseTransport<MsmqTransport>().Transactions(suppressDTC ? TransportTransactionMode.SendsAtomicWithReceive : TransportTransactionMode.TransactionScope);
+
+            config.UseTransport(new MsmqTransport
+            {
+                TransportTransactionMode = suppressDTC
+                    ? TransportTransactionMode.SendsAtomicWithReceive
+                    : TransportTransactionMode.TransactionScope
+            });
             config.LimitMessageProcessingConcurrencyTo(numberOfThreads);
             config.EnableInstallers();
             config.SendFailedMessagesTo("error");
@@ -96,6 +102,8 @@
                     Statistics.SendTimeWithTx = await SeedInputQueue(session, numberOfMessages / 2, endpointName, numberOfThreads, !outbox, twoPhaseCommit).ConfigureAwait(false);
                 }
             }));
+            config.Pipeline.Register(new StatisticsBehavior(), "Captures message processing statistics.");
+
             PerformTest(args, config, numberOfMessages).GetAwaiter().GetResult();
         }
 

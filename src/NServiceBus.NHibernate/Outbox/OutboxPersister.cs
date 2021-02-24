@@ -10,7 +10,9 @@
     using Extensibility;
     using Outbox;
     using Outbox.NHibernate;
+    using Transport;
     using IsolationLevel = System.Data.IsolationLevel;
+    using TransportOperation = Outbox.TransportOperation;
 
     class OutboxPersister<TEntity> : INHibernateOutboxStorage
         where TEntity : class, IOutboxRecord, new()
@@ -70,7 +72,7 @@
                     return new OutboxMessage(result.MessageId, new TransportOperation[0]);
                 }
                 var transportOperations = ConvertStringToObject(result.TransportOperations)
-                    .Select(t => new TransportOperation(t.MessageId, t.Options, t.Message, t.Headers))
+                    .Select(t => new TransportOperation(t.MessageId, new DispatchProperties(t.Options), t.Message, t.Headers))
                     .ToArray();
 
                 return new OutboxMessage(result.MessageId, transportOperations);

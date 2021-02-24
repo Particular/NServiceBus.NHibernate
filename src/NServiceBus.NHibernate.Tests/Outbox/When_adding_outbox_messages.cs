@@ -16,6 +16,8 @@ namespace NServiceBus.NHibernate.Tests.Outbox
     using NServiceBus.Outbox;
     using NServiceBus.Outbox.NHibernate;
     using NUnit.Framework;
+    using Transport;
+    using TransportOperation = NServiceBus.Outbox.TransportOperation;
 
     [TestFixture(typeof(OutboxRecord), typeof(OutboxRecordMapping), false, false)]
     [TestFixture(typeof(OutboxRecord), typeof(OutboxRecordMapping), true, false)]
@@ -89,8 +91,8 @@ namespace NServiceBus.NHibernate.Tests.Outbox
             {
                 var transportOperations = new[]
                 {
-                    new TransportOperation("1", new Dictionary<string, string>(), new byte[0], new Dictionary<string, string>()),
-                    new TransportOperation("1", new Dictionary<string, string>(), new byte[0], new Dictionary<string, string>())
+                    new TransportOperation("1", new DispatchProperties(new Dictionary<string, string>()), new byte[0], new Dictionary<string, string>()),
+                    new TransportOperation("1", new DispatchProperties(new Dictionary<string, string>()), new byte[0], new Dictionary<string, string>())
                 };
 
                 await persister.Store(new OutboxMessage(messageId, transportOperations), transaction, contextBag);
@@ -145,7 +147,7 @@ namespace NServiceBus.NHibernate.Tests.Outbox
             {
                 await persister.Store(new OutboxMessage(id, new[]
                 {
-                    new TransportOperation(id, new Dictionary<string, string>(), new byte[1024*5], new Dictionary<string, string>()),
+                    new TransportOperation(id, new DispatchProperties(new Dictionary<string, string>()), new byte[1024*5], new Dictionary<string, string>()),
                 }), transaction, contextBag);
                 await transaction.Commit();
             }
@@ -168,7 +170,7 @@ namespace NServiceBus.NHibernate.Tests.Outbox
             {
                 await persister.Store(new OutboxMessage(id, new[]
                 {
-                    new TransportOperation(id, new Dictionary<string, string>(), new byte[1024*5], new Dictionary<string, string>()),
+                    new TransportOperation(id, new DispatchProperties(new Dictionary<string, string>()), new byte[1024*5], new Dictionary<string, string>()),
                 }), transaction, contextBag);
 
                 await transaction.Commit();
@@ -197,7 +199,7 @@ namespace NServiceBus.NHibernate.Tests.Outbox
             {
                 await persister.Store(new OutboxMessage(id, new[]
                 {
-                    new TransportOperation(id, new Dictionary<string, string>(), new byte[1024*5], new Dictionary<string, string>()),
+                    new TransportOperation(id, new DispatchProperties(new Dictionary<string, string>()), new byte[1024*5], new Dictionary<string, string>()),
                 }), transactionA, dispatchedBag);
                 await transactionA.Commit();
             }

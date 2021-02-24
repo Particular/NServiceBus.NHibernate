@@ -31,7 +31,7 @@
                 EndpointSetup<DefaultServer>((b, r) =>
                 {
                     b.EnableOutbox();
-                    b.UseTransport<SqlServerTransport>().Transactions(TransportTransactionMode.TransactionScope);
+                    b.ConfigureTransport<SqlServerTransport>().TransportTransactionMode = TransportTransactionMode.TransactionScope;
                 });
             }
 
