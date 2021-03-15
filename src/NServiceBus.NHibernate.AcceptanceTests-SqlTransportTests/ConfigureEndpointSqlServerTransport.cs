@@ -26,15 +26,18 @@ public class ConfigureEndpointSqlServerTransport : EndpointConfigurer
 
     public override Task Cleanup()
     {
-        using (var conn = new SqlConnection(ConnectionString))
+        if (transport.ReceiveAddresses != null)
         {
-            conn.Open();
-
-            var queueAddresses = transport.ReceiveAddresses.Select(QueueAddress.Parse).ToList();
-            foreach (var address in queueAddresses)
+            using (var conn = new SqlConnection(ConnectionString))
             {
-                TryDeleteTable(conn, address);
-                TryDeleteTable(conn, new QueueAddress(address.Table + ".Delayed", address.Schema, address.Catalog));
+                conn.Open();
+
+                var queueAddresses = transport.ReceiveAddresses.Select(QueueAddress.Parse).ToList();
+                foreach (var address in queueAddresses)
+                {
+                    TryDeleteTable(conn, address);
+                    TryDeleteTable(conn, new QueueAddress(address.Table + ".Delayed", address.Schema, address.Catalog));
+                }
             }
         }
         return Task.FromResult(0);

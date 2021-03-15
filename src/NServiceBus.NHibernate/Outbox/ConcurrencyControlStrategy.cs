@@ -1,5 +1,6 @@
 ﻿namespace NServiceBus.Outbox.NHibernate
 {
+    using System.Collections.Generic;
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
@@ -22,7 +23,7 @@
                 Message = t.Body,
                 Headers = t.Headers,
                 MessageId = t.MessageId,
-                Options = t.Options,
+                Options = new Dictionary<string, string>(t.Options),
             });
             return ObjectSerializer.Serialize(operations);
         }
