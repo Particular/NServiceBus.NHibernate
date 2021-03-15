@@ -3,13 +3,15 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Threading;
     using System.Threading.Tasks;
     using System.Transactions;
+    using Extensibility;
     using global::NHibernate;
     using global::NHibernate.Criterion;
-    using Extensibility;
     using Outbox;
     using Outbox.NHibernate;
+    using DispatchProperties = NServiceBus.Transport.DispatchProperties;
     using IsolationLevel = System.Data.IsolationLevel;
 
     class OutboxPersister<TEntity> : INHibernateOutboxStorage
@@ -27,7 +29,7 @@
             this.endpointName = endpointName;
         }
 
-        public async Task<OutboxMessage> Get(string messageId, ContextBag context)
+        public async Task<OutboxMessage> Get(string messageId, ContextBag context, CancellationToken cancellationToken = default)
         {
             object[] possibleIds =
             {
@@ -54,10 +56,10 @@
                     //It seems QueryOver uses quite a bit reflection and that takes longer.
                     result = await session.CreateCriteria<TEntity>()
                         .Add(Restrictions.In(nameof(IOutboxRecord.MessageId), possibleIds))
-                        .UniqueResultAsync<TEntity>()
+                        .UniqueResultAsync<TEntity>(cancellationToken)
                         .ConfigureAwait(false);
 
-                    await tx.CommitAsync()
+                    await tx.CommitAsync(cancellationToken)
                         .ConfigureAwait(false);
                 }
 
@@ -70,20 +72,20 @@
                     return new OutboxMessage(result.MessageId, new TransportOperation[0]);
                 }
                 var transportOperations = ConvertStringToObject(result.TransportOperations)
-                    .Select(t => new TransportOperation(t.MessageId, t.Options, t.Message, t.Headers))
+                    .Select(t => new TransportOperation(t.MessageId, new DispatchProperties(t.Options), t.Message, t.Headers))
                     .ToArray();
 
                 return new OutboxMessage(result.MessageId, transportOperations);
             }
         }
 
-        public Task Store(OutboxMessage outboxMessage, OutboxTransaction transaction, ContextBag context)
+        public Task Store(OutboxMessage outboxMessage, OutboxTransaction transaction, ContextBag context, CancellationToken cancellationToken = default)
         {
             var nhibernateTransaction = (INHibernateOutboxTransaction)transaction;
-            return nhibernateTransaction.Complete(EndpointQualifiedMessageId(outboxMessage.MessageId), outboxMessage, context);
+            return nhibernateTransaction.Complete(EndpointQualifiedMessageId(outboxMessage.MessageId), outboxMessage, context, cancellationToken);
         }
 
-        public async Task SetAsDispatched(string messageId, ContextBag context)
+        public async Task SetAsDispatched(string messageId, ContextBag context, CancellationToken cancellationToken = default)
         {
             using (new TransactionScope(TransactionScopeOption.Suppress, TransactionScopeAsyncFlowOption.Enabled))
             using (var session = sessionFactory.OpenStatelessSession())
@@ -94,29 +96,29 @@
                     .SetString("messageid", messageId)
                     .SetString("qualifiedMessageId", EndpointQualifiedMessageId(messageId))
                     .SetDateTime("date", DateTime.UtcNow)
-                    .ExecuteUpdateAsync()
+                    .ExecuteUpdateAsync(cancellationToken)
                     .ConfigureAwait(false);
 
-                await tx.CommitAsync()
+                await tx.CommitAsync(cancellationToken)
                     .ConfigureAwait(false);
             }
         }
 
-        public Task<OutboxTransaction> BeginTransaction(ContextBag context)
+        public Task<OutboxTransaction> BeginTransaction(ContextBag context, CancellationToken cancellationToken = default)
         {
             //Provided by Get
             var endpointQualifiedMessageId = context.Get<string>(EndpointQualifiedMessageIdContextKey);
             var result = outboxTransactionFactory();
             result.Prepare();
             // we always need to avoid using async/await in here so that the transaction scope can float!
-            return BeginTransactionInternal(result, endpointQualifiedMessageId);
+            return BeginTransactionInternal(result, endpointQualifiedMessageId, cancellationToken);
         }
 
-        static async Task<OutboxTransaction> BeginTransactionInternal(INHibernateOutboxTransaction transaction, string endpointQualifiedMessageId)
+        static async Task<OutboxTransaction> BeginTransactionInternal(INHibernateOutboxTransaction transaction, string endpointQualifiedMessageId, CancellationToken cancellationToken = default)
         {
             try
             {
-                await transaction.Begin(endpointQualifiedMessageId).ConfigureAwait(false);
+                await transaction.Begin(endpointQualifiedMessageId, cancellationToken).ConfigureAwait(false);
                 return transaction;
             }
             catch (Exception e)
@@ -130,7 +132,7 @@
             }
         }
 
-        public async Task RemoveEntriesOlderThan(DateTime dateTime)
+        public async Task RemoveEntriesOlderThan(DateTime dateTime, CancellationToken cancellationToken = default)
         {
             using (new TransactionScope(TransactionScopeOption.Suppress, TransactionScopeAsyncFlowOption.Enabled))
             using (var session = sessionFactory.OpenStatelessSession())
@@ -140,9 +142,9 @@
 
                 await session.CreateQuery(queryString)
                     .SetDateTime("date", dateTime)
-                    .ExecuteUpdateAsync().ConfigureAwait(false);
+                    .ExecuteUpdateAsync(cancellationToken).ConfigureAwait(false);
 
-                await tx.CommitAsync().ConfigureAwait(false);
+                await tx.CommitAsync(cancellationToken).ConfigureAwait(false);
             }
         }
 

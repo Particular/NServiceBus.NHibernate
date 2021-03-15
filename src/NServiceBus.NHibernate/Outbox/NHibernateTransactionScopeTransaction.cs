@@ -2,6 +2,7 @@
 {
     using System;
     using System.Data.Common;
+    using System.Threading;
     using System.Threading.Tasks;
     using System.Transactions;
     using Extensibility;
@@ -48,7 +49,7 @@
             };
         }
 
-        public async Task Commit()
+        public async Task Commit(CancellationToken cancellationToken = default)
         {
             await onSaveChangesCallback().ConfigureAwait(false);
             commit = true;
@@ -88,17 +89,17 @@
             ambientTransaction = Transaction.Current;
         }
 
-        public async Task Begin(string endpointQualifiedMessageId)
+        public async Task Begin(string endpointQualifiedMessageId, CancellationToken cancellationToken = default)
         {
             Session = OpenSession();
-            await concurrencyControlStrategy.Begin(endpointQualifiedMessageId, Session).ConfigureAwait(false);
-            await Session.FlushAsync().ConfigureAwait(false);
+            await concurrencyControlStrategy.Begin(endpointQualifiedMessageId, Session, cancellationToken).ConfigureAwait(false);
+            await Session.FlushAsync(cancellationToken).ConfigureAwait(false);
         }
 
-        public async Task Complete(string endpointQualifiedMessageId, OutboxMessage outboxMessage, ContextBag context)
+        public async Task Complete(string endpointQualifiedMessageId, OutboxMessage outboxMessage, ContextBag context, CancellationToken cancellationToken = default)
         {
-            await concurrencyControlStrategy.Complete(endpointQualifiedMessageId, Session, outboxMessage, context).ConfigureAwait(false);
-            await Session.FlushAsync().ConfigureAwait(false);
+            await concurrencyControlStrategy.Complete(endpointQualifiedMessageId, Session, outboxMessage, context, cancellationToken).ConfigureAwait(false);
+            await Session.FlushAsync(cancellationToken).ConfigureAwait(false);
         }
 
         public void BeginSynchronizedSession(ContextBag context)

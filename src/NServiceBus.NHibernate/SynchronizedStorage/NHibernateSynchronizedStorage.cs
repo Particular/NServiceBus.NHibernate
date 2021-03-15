@@ -1,8 +1,9 @@
 ﻿namespace NServiceBus.Persistence.NHibernate
 {
+    using System.Threading;
     using System.Threading.Tasks;
-    using global::NHibernate;
     using Extensibility;
+    using global::NHibernate;
     using Persistence;
 
     class NHibernateSynchronizedStorage : ISynchronizedStorage
@@ -16,7 +17,7 @@
             this.currentSessionHolder = currentSessionHolder;
         }
 
-        public Task<CompletableSynchronizedStorageSession> OpenSession(ContextBag contextBag)
+        public Task<CompletableSynchronizedStorageSession> OpenSession(ContextBag contextBag, CancellationToken cancellationToken = default)
         {
             var session = new NHibernateLazyNativeTransactionSynchronizedStorageSession(() => sessionFactory.OpenSession());
             currentSessionHolder?.SetCurrentSession(session);

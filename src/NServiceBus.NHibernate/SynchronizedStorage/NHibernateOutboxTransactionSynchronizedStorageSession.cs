@@ -1,6 +1,7 @@
 ﻿namespace NServiceBus.Persistence.NHibernate
 {
     using System;
+    using System.Threading;
     using System.Threading.Tasks;
     using global::NHibernate;
     using Janitor;
@@ -23,7 +24,7 @@
             outboxTransaction.OnSaveChanges(() => callback(this));
         }
 
-        public Task CompleteAsync() => Task.CompletedTask;
+        public Task CompleteAsync(CancellationToken cancellationToken = default) => Task.CompletedTask;
 
         public void Dispose()
         {

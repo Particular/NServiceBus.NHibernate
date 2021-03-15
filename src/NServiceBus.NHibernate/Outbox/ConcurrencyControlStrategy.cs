@@ -1,6 +1,7 @@
 ﻿namespace NServiceBus.Outbox.NHibernate
 {
     using System.Linq;
+    using System.Threading;
     using System.Threading.Tasks;
     using Extensibility;
     using global::NHibernate;
@@ -8,8 +9,8 @@
 
     abstract class ConcurrencyControlStrategy
     {
-        public abstract Task Begin(string endpointQualifiedMessageId, ISession session);
-        public abstract Task Complete(string endpointQualifiedMessageId, ISession session, OutboxMessage outboxMessage, ContextBag context);
+        public abstract Task Begin(string endpointQualifiedMessageId, ISession session, CancellationToken cancellationToken = default);
+        public abstract Task Complete(string endpointQualifiedMessageId, ISession session, OutboxMessage outboxMessage, ContextBag context, CancellationToken cancellationToken = default);
         protected static string ConvertOperations(OutboxMessage outboxMessage)
         {
             if (outboxMessage.TransportOperations.Length == 0)

@@ -2,6 +2,7 @@
 {
     using System;
     using System.Data.Common;
+    using System.Threading;
     using System.Threading.Tasks;
     using global::NHibernate;
     using Janitor;
@@ -39,7 +40,7 @@
             }
         }
 
-        public async Task CompleteAsync()
+        public async Task CompleteAsync(CancellationToken cancellationToken = default)
         {
             await onSaveChangesCallback(this).ConfigureAwait(false);
             if (session.IsValueCreated)

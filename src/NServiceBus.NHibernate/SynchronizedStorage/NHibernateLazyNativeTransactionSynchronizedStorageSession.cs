@@ -1,6 +1,7 @@
 ﻿namespace NServiceBus.Persistence.NHibernate
 {
     using System;
+    using System.Threading;
     using System.Threading.Tasks;
     using global::NHibernate;
     using Janitor;
@@ -34,12 +35,12 @@
             };
         }
 
-        public async Task CompleteAsync()
+        public async Task CompleteAsync(CancellationToken cancellationToken = default)
         {
             await onSaveChangesCallback(this).ConfigureAwait(false);
             if (transaction != null)
             {
-                await transaction.CommitAsync().ConfigureAwait(false);
+                await transaction.CommitAsync(cancellationToken).ConfigureAwait(false);
                 transaction.Dispose();
                 transaction = null;
             }

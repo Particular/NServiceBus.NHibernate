@@ -4,9 +4,10 @@ namespace NServiceBus.Unicast.Subscriptions.NHibernate
     using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Threading;
     using System.Threading.Tasks;
-    using global::NHibernate;
     using Extensibility;
+    using global::NHibernate;
     using MessageDrivenSubscriptions;
 
     class CachedSubscriptionPersister : SubscriptionPersister
@@ -17,19 +18,19 @@ namespace NServiceBus.Unicast.Subscriptions.NHibernate
             this.expiration = expiration;
         }
 
-        public override Task Subscribe(Subscriber subscriber, MessageType messageType, ContextBag context)
+        public override Task Subscribe(Subscriber subscriber, MessageType messageType, ContextBag context, CancellationToken cancellationToken = default)
         {
             cache.Clear();
-            return base.Subscribe(subscriber, messageType, context);
+            return base.Subscribe(subscriber, messageType, context, cancellationToken);
         }
 
-        public override Task Unsubscribe(Subscriber address, MessageType messageType, ContextBag context)
+        public override Task Unsubscribe(Subscriber address, MessageType messageType, ContextBag context, CancellationToken cancellationToken = default)
         {
             cache.Clear();
-            return base.Unsubscribe(address, messageType, context);
+            return base.Unsubscribe(address, messageType, context, cancellationToken);
         }
 
-        public override async Task<IEnumerable<Subscriber>> GetSubscriberAddressesForMessage(IEnumerable<MessageType> messageTypes, ContextBag context)
+        public override async Task<IEnumerable<Subscriber>> GetSubscriberAddressesForMessage(IEnumerable<MessageType> messageTypes, ContextBag context, CancellationToken cancellationToken = default)
         {
             var types = messageTypes.ToList();
             var typeNames = types.Select(mt => mt.TypeName).ToArray();
@@ -41,7 +42,7 @@ namespace NServiceBus.Unicast.Subscriptions.NHibernate
                 return cacheItem.Item2;
             }
 
-            var baseSubscribers = await base.GetSubscriberAddressesForMessage(types, context).ConfigureAwait(false);
+            var baseSubscribers = await base.GetSubscriberAddressesForMessage(types, context, cancellationToken).ConfigureAwait(false);
 
             cacheItem = new Tuple<DateTimeOffset, IEnumerable<Subscriber>>(
                 DateTimeOffset.UtcNow,

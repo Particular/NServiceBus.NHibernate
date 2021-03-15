@@ -3,13 +3,14 @@ namespace NServiceBus.Unicast.Subscriptions.NHibernate
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Threading;
     using System.Threading.Tasks;
     using System.Transactions;
+    using Extensibility;
     using global::NHibernate;
     using global::NHibernate.Criterion;
     using Logging;
     using MessageDrivenSubscriptions;
-    using Extensibility;
     using IsolationLevel = System.Data.IsolationLevel;
 
     class SubscriptionPersister : ISubscriptionStorage
@@ -23,12 +24,12 @@ namespace NServiceBus.Unicast.Subscriptions.NHibernate
             this.sessionFactory = sessionFactory;
         }
 
-        public virtual Task Subscribe(Subscriber subscriber, MessageType messageType, ContextBag context)
+        public virtual Task Subscribe(Subscriber subscriber, MessageType messageType, ContextBag context, CancellationToken cancellationToken = default)
         {
-            return Retry(() => SubscribeInternal(subscriber, messageType));
+            return Retry(ct => SubscribeInternal(subscriber, messageType, ct), cancellationToken: cancellationToken);
         }
 
-        async Task SubscribeInternal(Subscriber subscriber, MessageType messageType)
+        async Task SubscribeInternal(Subscriber subscriber, MessageType messageType, CancellationToken cancellationToken = default)
         {
             using (new TransactionScope(TransactionScopeOption.Suppress, TransactionScopeAsyncFlowOption.Enabled))
             using (var session = sessionFactory.OpenSession())
@@ -41,19 +42,19 @@ namespace NServiceBus.Unicast.Subscriptions.NHibernate
                     MessageType = messageType.TypeName + "," + messageType.Version,
                     Version = messageType.Version.ToString(),
                     TypeName = messageType.TypeName
-                })
+                }, cancellationToken)
                     .ConfigureAwait(false);
-                await tx.CommitAsync()
+                await tx.CommitAsync(cancellationToken)
                     .ConfigureAwait(false);
             }
         }
 
-        public virtual Task Unsubscribe(Subscriber address, MessageType messageType, ContextBag context)
+        public virtual Task Unsubscribe(Subscriber address, MessageType messageType, ContextBag context, CancellationToken cancellationToken = default)
         {
-            return Retry(() => UnsubscribeInternal(address, messageType));
+            return Retry(ct => UnsubscribeInternal(address, messageType, ct), cancellationToken: cancellationToken);
         }
 
-        async Task UnsubscribeInternal(Subscriber address, MessageType messageType)
+        async Task UnsubscribeInternal(Subscriber address, MessageType messageType, CancellationToken cancellationToken = default)
         {
             var messageTypes = new List<MessageType>
             {
@@ -68,25 +69,25 @@ namespace NServiceBus.Unicast.Subscriptions.NHibernate
                     .Where(
                         s => s.TypeName.IsIn(messageTypes.Select(mt => mt.TypeName).ToList()) &&
                              s.SubscriberEndpoint == transportAddress)
-                    .ListAsync().ConfigureAwait(false);
+                             .ListAsync(cancellationToken).ConfigureAwait(false);
 
                 foreach (var subscription in subscriptions.Where(s => messageTypes.Contains(new MessageType(s.TypeName, s.Version))))
                 {
-                    await session.DeleteAsync(subscription).ConfigureAwait(false);
+                    await session.DeleteAsync(subscription, cancellationToken).ConfigureAwait(false);
                 }
 
-                await tx.CommitAsync().ConfigureAwait(false);
+                await tx.CommitAsync(cancellationToken).ConfigureAwait(false);
             }
         }
 
-        static async Task Retry(Func<Task> function, int maximumAttempts = 5)
+        static async Task Retry(Func<CancellationToken, Task> function, int maximumAttempts = 5, CancellationToken cancellationToken = default)
         {
             var attempt = 0;
             while (true)
             {
                 try
                 {
-                    await function().ConfigureAwait(false);
+                    await function(cancellationToken).ConfigureAwait(false);
                     return;
                 }
                 catch (Exception)
@@ -96,12 +97,12 @@ namespace NServiceBus.Unicast.Subscriptions.NHibernate
                     {
                         throw;
                     }
-                    await Task.Delay(500).ConfigureAwait(false);
+                    await Task.Delay(500, cancellationToken).ConfigureAwait(false);
                 }
             }
         }
 
-        public virtual async Task<IEnumerable<Subscriber>> GetSubscriberAddressesForMessage(IEnumerable<MessageType> messageTypes, ContextBag context)
+        public virtual async Task<IEnumerable<Subscriber>> GetSubscriberAddressesForMessage(IEnumerable<MessageType> messageTypes, ContextBag context, CancellationToken cancellationToken = default)
         {
             using (new TransactionScope(TransactionScopeOption.Suppress, TransactionScopeAsyncFlowOption.Enabled))
             using (var session = sessionFactory.OpenStatelessSession())
@@ -109,10 +110,10 @@ namespace NServiceBus.Unicast.Subscriptions.NHibernate
             {
                 var tmp = await session.QueryOver<Subscription>()
                     .Where(s => s.TypeName.IsIn(messageTypes.Select(mt => mt.TypeName).ToList()))
-                    .ListAsync()
+                    .ListAsync(cancellationToken)
                     .ConfigureAwait(false);
 
-                await tx.CommitAsync()
+                await tx.CommitAsync(cancellationToken)
                     .ConfigureAwait(false);
 
                 return tmp
@@ -122,7 +123,7 @@ namespace NServiceBus.Unicast.Subscriptions.NHibernate
             }
         }
 
-        internal async Task Init()
+        internal async Task Init(CancellationToken cancellationToken = default)
         {
             using (new TransactionScope(TransactionScopeOption.Suppress, TransactionScopeAsyncFlowOption.Enabled))
             using (var session = sessionFactory.OpenStatelessSession())
@@ -130,7 +131,7 @@ namespace NServiceBus.Unicast.Subscriptions.NHibernate
             {
                 var v2XSubscriptions = await session.QueryOver<Subscription>()
                     .Where(s => s.TypeName == null)
-                    .ListAsync().ConfigureAwait(false);
+                    .ListAsync(cancellationToken).ConfigureAwait(false);
 
                 if (v2XSubscriptions.Count == 0)
                 {
@@ -145,11 +146,11 @@ namespace NServiceBus.Unicast.Subscriptions.NHibernate
                     v2XSubscription.Version = mt.Version.ToString();
                     v2XSubscription.TypeName = mt.TypeName;
 
-                    await session.UpdateAsync(v2XSubscription)
+                    await session.UpdateAsync(v2XSubscription, cancellationToken)
                         .ConfigureAwait(false);
                 }
 
-                await tx.CommitAsync()
+                await tx.CommitAsync(cancellationToken)
                     .ConfigureAwait(false);
                 Logger.InfoFormat("{0} v2X subscriptions upgraded", v2XSubscriptions.Count);
             }

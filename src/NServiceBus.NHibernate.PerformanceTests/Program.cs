@@ -115,12 +115,12 @@
                     this.loader = loader;
                 }
 
-                protected override Task OnStart(IMessageSession session)
+                protected override Task OnStart(IMessageSession session, CancellationToken cancellationToken)
                 {
                     return loader.Load(session);
                 }
 
-                protected override Task OnStop(IMessageSession session)
+                protected override Task OnStop(IMessageSession session, CancellationToken cancellationToken)
                 {
                     return Task.FromResult(0);
                 }

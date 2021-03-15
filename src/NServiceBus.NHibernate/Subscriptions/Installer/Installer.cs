@@ -1,6 +1,7 @@
 namespace NServiceBus.Unicast.Subscriptions.NHibernate.Installer
 {
     using System;
+    using System.Threading;
     using System.Threading.Tasks;
     using Installation;
     using Settings;
@@ -12,7 +13,7 @@ namespace NServiceBus.Unicast.Subscriptions.NHibernate.Installer
             settings.TryGet(out schemaUpdater);
         }
 
-        public Task Install(string identity)
+        public Task Install(string identity, CancellationToken cancellationToken = default)
         {
             if (schemaUpdater == null)
             {
