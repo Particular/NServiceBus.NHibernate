@@ -23,7 +23,7 @@
                 Message = t.Body,
                 Headers = t.Headers,
                 MessageId = t.MessageId,
-                Options = new Dictionary<string, string>(t.Options),
+                Options = t.Options != null ? new Dictionary<string, string>(t.Options) : new Dictionary<string, string>(),
             });
             return ObjectSerializer.Serialize(operations);
         }
