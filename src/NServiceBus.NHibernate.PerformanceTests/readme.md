@@ -1,0 +1,1 @@
+This directory no longer holds performance tests, but TeamCity expects this directory structure to exist for cleanup operations.
