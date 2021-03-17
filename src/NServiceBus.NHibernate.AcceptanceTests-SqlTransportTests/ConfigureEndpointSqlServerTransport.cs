@@ -8,7 +8,7 @@ using NServiceBus.AcceptanceTesting.Support;
 using NServiceBus.Persistence;
 using NServiceBus.Transport;
 
-public class ConfigureEndpointSqlServerTransport : EndpointConfigurer
+public partial class ConfigureEndpointSqlServerTransport : EndpointConfigurer
 {
     public override Task Configure(string endpointName, EndpointConfiguration configuration, RunSettings settings, PublisherMetadata publisherMetadata)
     {
@@ -165,22 +165,5 @@ public class ConfigureEndpointSqlServerTransport : EndpointConfigurer
             return quotedString
                 .Substring(prefix.Length, quotedString.Length - prefix.Length - suffix.Length).Replace(suffix + suffix, suffix);
         }
-    }
-
-    class TestingSqlTransport : SqlServerTransport
-    {
-        public TestingSqlTransport(string connectionString)
-            : base(connectionString)
-        {
-        }
-
-        public string[] ReceiveAddresses { get; set; }
-
-        public override Task<TransportInfrastructure> Initialize(HostSettings hostSettings, ReceiveSettings[] receivers, string[] sendingAddresses, CancellationToken cancellationToken = default)
-        {
-            ReceiveAddresses = receivers.Select(r => r.ReceiveAddress).ToArray();
-            return base.Initialize(hostSettings, receivers, sendingAddresses, cancellationToken);
-        }
-
     }
 }
