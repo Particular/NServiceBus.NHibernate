@@ -3,8 +3,8 @@
     using System;
     using System.Threading.Tasks;
     using Extensibility;
-    using Persistence.NHibernate;
     using NUnit.Framework;
+    using Persistence.NHibernate;
 
     [TestFixture]
     class NHibernateLazyNativeTransactionSynchronizedStorageSession : InMemoryDBFixture
@@ -19,12 +19,12 @@
             using (var storageSession = await storage.OpenSession(new ContextBag()))
             {
                 storageSession.Session(); //Make sure session is initialized
-                storageSession.OnSaveChanges(s =>
+                storageSession.OnSaveChanges((s, _) =>
                 {
                     callbackInvoked++;
                     return Task.FromResult(0);
                 });
-                storageSession.OnSaveChanges(s =>
+                storageSession.OnSaveChanges((s, _) =>
                 {
                     callbackInvoked++;
                     return Task.FromResult(0);
@@ -46,7 +46,7 @@
             using (var storageSession = await storage.OpenSession(new ContextBag()))
             {
                 storageSession.Session().Save(new TestEntity { Id = entityId });
-                storageSession.OnSaveChanges(s =>
+                storageSession.OnSaveChanges((s, _) =>
                 {
                     throw new Exception("Simulated");
                 });

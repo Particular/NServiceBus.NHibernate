@@ -13,7 +13,7 @@
     {
         Lazy<ISession> session;
         Lazy<DbConnection> connection;
-        Func<SynchronizedStorageSession, Task> onSaveChangesCallback = storageSession => Task.CompletedTask;
+        Func<SynchronizedStorageSession, CancellationToken, Task> onSaveChangesCallback = (_, __) => Task.CompletedTask;
 
         public NHibernateLazyAmbientTransactionSynchronizedStorageSession(Func<DbConnection> connectionFactory, Func<DbConnection, ISession> sessionFactory)
         {
@@ -22,14 +22,21 @@
         }
 
         public ISession Session => session.Value;
-        public void OnSaveChanges(Func<SynchronizedStorageSession, Task> callback)
+
+        public void OnSaveChanges(Func<SynchronizedStorageSession, CancellationToken, Task> callback)
         {
             var oldCallback = onSaveChangesCallback;
-            onSaveChangesCallback = async s =>
+            onSaveChangesCallback = async (s, token) =>
             {
-                await oldCallback(s).ConfigureAwait(false);
-                await callback(s).ConfigureAwait(false);
+                await oldCallback(s, token).ConfigureAwait(false);
+                await callback(s, token).ConfigureAwait(false);
             };
+        }
+
+        [ObsoleteEx(Message = "Use the overload that supports cancellation.", RemoveInVersion = "10", TreatAsErrorFromVersion = "9")]
+        public void OnSaveChanges(Func<SynchronizedStorageSession, Task> callback)
+        {
+            throw new NotImplementedException();
         }
 
         public void Dispose()
@@ -42,7 +49,7 @@
 
         public async Task CompleteAsync(CancellationToken cancellationToken = default)
         {
-            await onSaveChangesCallback(this).ConfigureAwait(false);
+            await onSaveChangesCallback(this, cancellationToken).ConfigureAwait(false);
             if (session.IsValueCreated)
             {
                 session.Value.Flush();

@@ -18,7 +18,7 @@
 
         ConcurrencyControlStrategy concurrencyControlStrategy;
         IsolationLevel isolationLevel;
-        Func<Task> onSaveChangesCallback = () => Task.CompletedTask;
+        Func<CancellationToken, Task> onSaveChangesCallback = _ => Task.CompletedTask;
         TransactionScope transactionScope;
         Transaction ambientTransaction;
         SessionFactoryImpl sessionFactoryImpl;
@@ -39,19 +39,19 @@
 
         public ISession Session { get; private set; }
 
-        public void OnSaveChanges(Func<Task> callback)
+        public void OnSaveChanges(Func<CancellationToken, Task> callback)
         {
             var oldCallback = onSaveChangesCallback;
-            onSaveChangesCallback = async () =>
+            onSaveChangesCallback = async token =>
             {
-                await oldCallback().ConfigureAwait(false);
-                await callback().ConfigureAwait(false);
+                await oldCallback(token).ConfigureAwait(false);
+                await callback(token).ConfigureAwait(false);
             };
         }
 
         public async Task Commit(CancellationToken cancellationToken = default)
         {
-            await onSaveChangesCallback().ConfigureAwait(false);
+            await onSaveChangesCallback(cancellationToken).ConfigureAwait(false);
             commit = true;
         }
 

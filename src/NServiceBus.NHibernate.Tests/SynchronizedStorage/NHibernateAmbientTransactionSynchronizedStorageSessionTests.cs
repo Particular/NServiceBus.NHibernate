@@ -4,9 +4,9 @@
     using System.Threading.Tasks;
     using System.Transactions;
     using Extensibility;
+    using NUnit.Framework;
     using Persistence.NHibernate;
     using Transport;
-    using NUnit.Framework;
 
     [TestFixture]
     class NHibernateAmbientTransactionSynchronizedStorageSessionTests : InMemoryDBFixture
@@ -25,12 +25,12 @@
                 using (var storageSession = await adapter.TryAdapt(transportTransaction, new ContextBag()))
                 {
                     storageSession.Session(); //Make sure session is initialized
-                    storageSession.OnSaveChanges(s =>
+                    storageSession.OnSaveChanges((s, _) =>
                     {
                         callbackInvoked++;
                         return Task.FromResult(0);
                     });
-                    storageSession.OnSaveChanges(s =>
+                    storageSession.OnSaveChanges((s, _) =>
                     {
                         callbackInvoked++;
                         return Task.FromResult(0);
@@ -62,7 +62,7 @@
                 using (var storageSession = await adapter.TryAdapt(transportTransaction, new ContextBag()))
                 {
                     storageSession.Session().Save(new TestEntity { Id = entityId });
-                    storageSession.OnSaveChanges(s =>
+                    storageSession.OnSaveChanges((s, _) =>
                     {
                         throw new Exception("Simulated");
                     });

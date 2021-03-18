@@ -19,9 +19,16 @@
         }
 
         public ISession Session => outboxTransaction.Session;
+
+        public void OnSaveChanges(Func<SynchronizedStorageSession, CancellationToken, Task> callback)
+        {
+            outboxTransaction.OnSaveChanges(token => callback(this, token));
+        }
+
+        [ObsoleteEx(Message = "Use the overload that supports cancellation.", RemoveInVersion = "10", TreatAsErrorFromVersion = "9")]
         public void OnSaveChanges(Func<SynchronizedStorageSession, Task> callback)
         {
-            outboxTransaction.OnSaveChanges(() => callback(this));
+            throw new NotImplementedException();
         }
 
         public Task CompleteAsync(CancellationToken cancellationToken = default) => Task.CompletedTask;
