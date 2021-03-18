@@ -41,7 +41,7 @@
         /// <summary>
         /// Registers a callback to be called before completing the session.
         /// </summary>
-        [ObsoleteEx(Message = "Use the overload that supports cancellation.", TreatAsErrorFromVersion = "10", RemoveInVersion = "11")]
+        [ObsoleteEx(Message = "Use the overload that supports cancellation.", RemoveInVersion = "10", TreatAsErrorFromVersion = "9")]
         public static void OnSaveChanges(this SynchronizedStorageSession session, Func<SynchronizedStorageSession, Task> callback)
         {
             OnSaveChanges(session, (s, _) => callback(s));
