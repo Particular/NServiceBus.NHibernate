@@ -1,0 +1,14 @@
+
+    
+    drop table Subscription cascade constraints
+    
+    create table Subscription (
+        SubscriberEndpoint VARCHAR2(450) not null,
+       MessageType VARCHAR2(450) not null,
+       LogicalEndpoint VARCHAR2(450),
+       Version VARCHAR2(450),
+       TypeName VARCHAR2(450),
+       primary key (SubscriberEndpoint, MessageType)
+    )
+    
+    create index Subscription_TypeNameIdx on Subscription (TypeName)

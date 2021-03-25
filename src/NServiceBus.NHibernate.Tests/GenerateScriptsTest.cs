@@ -15,7 +15,7 @@
     {
         [Test]
         [MethodImpl(MethodImplOptions.NoInlining)]
-        public void Outbox()
+        public void Outbox_MsSql2012()
         {
             var script = ScriptGenerator<MsSql2012Dialect>.GenerateOutboxScript();
             Approver.Verify(script);
@@ -23,9 +23,25 @@
 
         [Test]
         [MethodImpl(MethodImplOptions.NoInlining)]
-        public void Subscriptions()
+        public void Outbox_Oracle10g()
+        {
+            var script = ScriptGenerator<Oracle10gDialect>.GenerateOutboxScript();
+            Approver.Verify(script);
+        }
+
+        [Test]
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        public void Subscriptions_MsSql2012()
         {
             var script = ScriptGenerator<MsSql2012Dialect>.GenerateSubscriptionStoreScript();
+            Approver.Verify(script);
+        }
+
+        [Test]
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        public void Subscriptions_Oracle10g()
+        {
+            var script = ScriptGenerator<Oracle10gDialect>.GenerateSubscriptionStoreScript();
             Approver.Verify(script);
         }
 
