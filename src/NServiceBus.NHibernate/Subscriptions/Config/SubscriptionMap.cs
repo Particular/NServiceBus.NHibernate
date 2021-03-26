@@ -12,17 +12,14 @@ namespace NServiceBus.Unicast.Subscriptions.NHibernate.Config
             Action<IColumnMapper> columnMapper = col =>
             {
                 col.Length(450);
-                col.SqlType("VARCHAR(450)");
             };
 
-
             ComposedId(x =>
-                         {
+            {
+                x.Property(p => p.SubscriberEndpoint, map => map.Column(columnMapper));
+                x.Property(p => p.MessageType, map => map.Column(columnMapper));
+            });
 
-                             x.Property(p => p.SubscriberEndpoint, map => map.Column(columnMapper));
-                             x.Property(p => p.MessageType, map => map.Column(columnMapper));
-
-                         });
             Property(p => p.LogicalEndpoint, map =>
             {
                 map.Column(columnMapper);

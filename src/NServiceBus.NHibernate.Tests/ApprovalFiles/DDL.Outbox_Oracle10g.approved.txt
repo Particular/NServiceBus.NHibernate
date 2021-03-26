@@ -1,0 +1,20 @@
+
+    
+    drop table OutboxRecord cascade constraints
+    
+    drop sequence hibernate_sequence
+    
+    create table OutboxRecord (
+        Id NUMBER(20,0) not null,
+       MessageId VARCHAR2(255) not null unique,
+       Dispatched NUMBER(1,0) not null,
+       DispatchedAt TIMESTAMP(7),
+       TransportOperations CLOB,
+       primary key (Id)
+    )
+    
+    create index OutboxRecord_Dispatched_Idx on OutboxRecord (Dispatched)
+    
+    create index OutboxRecord_DispatchedAt_Idx on OutboxRecord (DispatchedAt)
+    
+    create sequence hibernate_sequence
