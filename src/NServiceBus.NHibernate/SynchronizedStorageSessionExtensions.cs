@@ -42,7 +42,9 @@
         /// Registers a callback to be called before completing the session.
         /// </summary>
         [ObsoleteEx(Message = "Use the overload that supports cancellation.", RemoveInVersion = "10", TreatAsErrorFromVersion = "9")]
+#pragma warning disable PS0013 // A Func used as a method parameter with a Task, ValueTask, or ValueTask<T> return type argument should have at least one CancellationToken parameter type argument unless it has a parameter type argument implementing ICancellableContext
         public static void OnSaveChanges(this SynchronizedStorageSession session, Func<SynchronizedStorageSession, Task> callback)
+#pragma warning restore PS0013 // A Func used as a method parameter with a Task, ValueTask, or ValueTask<T> return type argument should have at least one CancellationToken parameter type argument unless it has a parameter type argument implementing ICancellableContext
         {
             OnSaveChanges(session, (s, _) => callback(s));
         }

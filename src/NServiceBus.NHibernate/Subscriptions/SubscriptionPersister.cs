@@ -29,7 +29,7 @@ namespace NServiceBus.Unicast.Subscriptions.NHibernate
             return Retry(ct => SubscribeInternal(subscriber, messageType, ct), cancellationToken: cancellationToken);
         }
 
-        async Task SubscribeInternal(Subscriber subscriber, MessageType messageType, CancellationToken cancellationToken = default)
+        async Task SubscribeInternal(Subscriber subscriber, MessageType messageType, CancellationToken cancellationToken)
         {
             using (new TransactionScope(TransactionScopeOption.Suppress, TransactionScopeAsyncFlowOption.Enabled))
             using (var session = sessionFactory.OpenSession())
@@ -54,7 +54,7 @@ namespace NServiceBus.Unicast.Subscriptions.NHibernate
             return Retry(ct => UnsubscribeInternal(address, messageType, ct), cancellationToken: cancellationToken);
         }
 
-        async Task UnsubscribeInternal(Subscriber address, MessageType messageType, CancellationToken cancellationToken = default)
+        async Task UnsubscribeInternal(Subscriber address, MessageType messageType, CancellationToken cancellationToken)
         {
             var messageTypes = new List<MessageType>
             {
@@ -80,7 +80,7 @@ namespace NServiceBus.Unicast.Subscriptions.NHibernate
             }
         }
 
-        static async Task Retry(Func<CancellationToken, Task> function, int maximumAttempts = 5, CancellationToken cancellationToken = default)
+        static async Task Retry(Func<CancellationToken, Task> function, CancellationToken cancellationToken)
         {
             var attempt = 0;
             while (true)
@@ -93,7 +93,7 @@ namespace NServiceBus.Unicast.Subscriptions.NHibernate
                 catch (Exception)
                 {
                     attempt++;
-                    if (attempt >= maximumAttempts)
+                    if (attempt >= 5)
                     {
                         throw;
                     }

@@ -114,7 +114,7 @@
             return BeginTransactionInternal(result, endpointQualifiedMessageId, cancellationToken);
         }
 
-        static async Task<OutboxTransaction> BeginTransactionInternal(INHibernateOutboxTransaction transaction, string endpointQualifiedMessageId, CancellationToken cancellationToken = default)
+        static async Task<OutboxTransaction> BeginTransactionInternal(INHibernateOutboxTransaction transaction, string endpointQualifiedMessageId, CancellationToken cancellationToken)
         {
             try
             {

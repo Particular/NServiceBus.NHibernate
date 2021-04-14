@@ -43,14 +43,14 @@ namespace NServiceBus.Features
             return cleanup;
         }
 
-        async Task PerformCleanup(CancellationToken ct)
+        async Task PerformCleanup(CancellationToken cancellationToken)
         {
-            while (ct.IsCancellationRequested == false)
+            while (cancellationToken.IsCancellationRequested == false)
             {
                 try
                 {
-                    await Task.Delay(deduplicationDataCleanupPeriod, ct).ConfigureAwait(false);
-                    await outboxPersister.RemoveEntriesOlderThan(DateTime.UtcNow - timeToKeepDeduplicationData, ct).ConfigureAwait(false);
+                    await Task.Delay(deduplicationDataCleanupPeriod, cancellationToken).ConfigureAwait(false);
+                    await outboxPersister.RemoveEntriesOlderThan(DateTime.UtcNow - timeToKeepDeduplicationData, cancellationToken).ConfigureAwait(false);
                 }
                 catch (OperationCanceledException)
                 {
