@@ -24,7 +24,7 @@
             return session.CreateQuery(queryString)
                 .SetString("messageid", endpointQualifiedMessageId)
                 .SetString("ops", ConvertOperations(outboxMessage))
-.ExecuteUpdateAsync(cancellationToken);
+                .ExecuteUpdateAsync(cancellationToken);
         }
     }
 }

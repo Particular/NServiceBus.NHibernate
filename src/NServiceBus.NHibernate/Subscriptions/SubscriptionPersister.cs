@@ -69,7 +69,7 @@ namespace NServiceBus.Unicast.Subscriptions.NHibernate
                     .Where(
                         s => s.TypeName.IsIn(messageTypes.Select(mt => mt.TypeName).ToList()) &&
                              s.SubscriberEndpoint == transportAddress)
-                             .ListAsync(cancellationToken).ConfigureAwait(false);
+                    .ListAsync(cancellationToken).ConfigureAwait(false);
 
                 foreach (var subscription in subscriptions.Where(s => messageTypes.Contains(new MessageType(s.TypeName, s.Version))))
                 {
