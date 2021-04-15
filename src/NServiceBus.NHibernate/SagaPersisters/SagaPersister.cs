@@ -2,42 +2,43 @@ namespace NServiceBus.SagaPersisters.NHibernate
 {
     using System;
     using System.Linq;
+    using System.Threading;
     using System.Threading.Tasks;
+    using Extensibility;
     using global::NHibernate;
     using global::NHibernate.Criterion;
-    using Extensibility;
     using Persistence;
     using Sagas;
 
     class SagaPersister : ISagaPersister
     {
-        public Task Save(IContainSagaData saga, SagaCorrelationProperty correlationProperty, SynchronizedStorageSession session, ContextBag context)
+        public Task Save(IContainSagaData saga, SagaCorrelationProperty correlationProperty, SynchronizedStorageSession session, ContextBag context, CancellationToken cancellationToken = default)
         {
-            return session.Session().SaveAsync(saga);
+            return session.Session().SaveAsync(saga, cancellationToken);
         }
 
-        public Task Update(IContainSagaData saga, SynchronizedStorageSession session, ContextBag context)
+        public Task Update(IContainSagaData saga, SynchronizedStorageSession session, ContextBag context, CancellationToken cancellationToken = default)
         {
-            return session.Session().UpdateAsync(saga);
+            return session.Session().UpdateAsync(saga, cancellationToken);
         }
 
-        public Task<T> Get<T>(Guid sagaId, SynchronizedStorageSession session, ContextBag context)
+        public Task<T> Get<T>(Guid sagaId, SynchronizedStorageSession session, ContextBag context, CancellationToken cancellationToken = default)
             where T : class, IContainSagaData
         {
-            return session.Session().GetAsync<T>(sagaId, GetLockModeForSaga<T>());
+            return session.Session().GetAsync<T>(sagaId, GetLockModeForSaga<T>(), cancellationToken);
         }
 
-        Task<T> ISagaPersister.Get<T>(string property, object value, SynchronizedStorageSession session, ContextBag context)
+        Task<T> ISagaPersister.Get<T>(string property, object value, SynchronizedStorageSession session, ContextBag context, CancellationToken cancellationToken)
         {
             return session.Session().CreateCriteria(typeof(T))
                 .SetLockMode(GetLockModeForSaga<T>())
                 .Add(Restrictions.Eq(property, value))
-                .UniqueResultAsync<T>();
+                .UniqueResultAsync<T>(cancellationToken);
         }
 
-        public Task Complete(IContainSagaData saga, SynchronizedStorageSession session, ContextBag context)
+        public Task Complete(IContainSagaData saga, SynchronizedStorageSession session, ContextBag context, CancellationToken cancellationToken = default)
         {
-            return session.Session().DeleteAsync(saga);
+            return session.Session().DeleteAsync(saga, cancellationToken);
         }
 
         static LockMode GetLockModeForSaga<T>()

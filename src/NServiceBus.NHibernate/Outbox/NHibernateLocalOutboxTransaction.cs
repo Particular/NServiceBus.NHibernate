@@ -1,11 +1,12 @@
 ﻿namespace NServiceBus.Outbox.NHibernate
 {
-    using System.Data;
     using System;
+    using System.Data;
+    using System.Threading;
     using System.Threading.Tasks;
-    using NServiceBus.Extensibility;
     using global::NHibernate;
     using Janitor;
+    using NServiceBus.Extensibility;
     using NServiceBus.Logging;
     using NServiceBus.Outbox;
 
@@ -28,21 +29,21 @@
             this.isolationLevel = isolationLevel;
         }
 
-        public void OnSaveChanges(Func<Task> callback)
+        public void OnSaveChanges(Func<CancellationToken, Task> callback)
         {
             var oldCallback = onSaveChangesCallback;
-            onSaveChangesCallback = async () =>
+            onSaveChangesCallback = async token =>
             {
-                await oldCallback().ConfigureAwait(false);
-                await callback().ConfigureAwait(false);
+                await oldCallback(token).ConfigureAwait(false);
+                await callback(token).ConfigureAwait(false);
             };
         }
 
 
-        public async Task Commit()
+        public async Task Commit(CancellationToken cancellationToken = default)
         {
-            await onSaveChangesCallback().ConfigureAwait(false);
-            await transaction.CommitAsync().ConfigureAwait(false);
+            await onSaveChangesCallback(cancellationToken).ConfigureAwait(false);
+            await transaction.CommitAsync(cancellationToken).ConfigureAwait(false);
             transaction.Dispose();
             transaction = null;
         }
@@ -58,7 +59,7 @@
             Session.Dispose();
         }
 
-        Func<Task> onSaveChangesCallback = () => Task.CompletedTask;
+        Func<CancellationToken, Task> onSaveChangesCallback = _ => Task.CompletedTask;
         ITransaction transaction;
 
         public void Prepare()
@@ -66,17 +67,17 @@
             //NOOP
         }
 
-        public async Task Begin(string endpointQualifiedMessageId)
+        public async Task Begin(string endpointQualifiedMessageId, CancellationToken cancellationToken = default)
         {
             Session = sessionFactory.OpenSession();
             transaction = Session.BeginTransaction(isolationLevel);
 
-            await concurrencyControlStrategy.Begin(endpointQualifiedMessageId, Session).ConfigureAwait(false);
+            await concurrencyControlStrategy.Begin(endpointQualifiedMessageId, Session, cancellationToken).ConfigureAwait(false);
         }
 
-        public Task Complete(string endpointQualifiedMessageId, OutboxMessage outboxMessage, ContextBag context)
+        public Task Complete(string endpointQualifiedMessageId, OutboxMessage outboxMessage, ContextBag context, CancellationToken cancellationToken = default)
         {
-            return concurrencyControlStrategy.Complete(endpointQualifiedMessageId, Session, outboxMessage, context);
+            return concurrencyControlStrategy.Complete(endpointQualifiedMessageId, Session, outboxMessage, context, cancellationToken);
         }
 
         public void BeginSynchronizedSession(ContextBag context)

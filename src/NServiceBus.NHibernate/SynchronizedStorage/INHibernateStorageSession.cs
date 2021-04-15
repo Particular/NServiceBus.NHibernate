@@ -1,6 +1,7 @@
 ﻿namespace NServiceBus
 {
     using System;
+    using System.Threading;
     using System.Threading.Tasks;
     using global::NHibernate;
     using Persistence;
@@ -18,6 +19,14 @@
         /// <summary>
         /// Registers a callback to be executed before the storage session changes are committed.
         /// </summary>
+        void OnSaveChanges(Func<SynchronizedStorageSession, CancellationToken, Task> callback);
+
+        /// <summary>
+        /// Registers a callback to be executed before the storage session changes are committed.
+        /// </summary>
+        [ObsoleteEx(Message = "Use the overload that supports cancellation.", RemoveInVersion = "10", TreatAsErrorFromVersion = "9")]
+#pragma warning disable PS0013 // A Func used as a method parameter with a Task, ValueTask, or ValueTask<T> return type argument should have at least one CancellationToken parameter type argument unless it has a parameter type argument implementing ICancellableContext
         void OnSaveChanges(Func<SynchronizedStorageSession, Task> callback);
+#pragma warning restore PS0013 // A Func used as a method parameter with a Task, ValueTask, or ValueTask<T> return type argument should have at least one CancellationToken parameter type argument unless it has a parameter type argument implementing ICancellableContext
     }
 }

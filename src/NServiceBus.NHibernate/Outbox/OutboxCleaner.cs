@@ -16,7 +16,7 @@ namespace NServiceBus.Features
             this.criticalErrorTriggerTime = criticalErrorTriggerTime;
         }
 
-        protected override Task OnStart(IMessageSession busSession)
+        protected override Task OnStart(IMessageSession busSession, CancellationToken cancellationToken = default)
         {
             circuitBreaker = new RepeatedFailuresOverTimeCircuitBreaker(
                 "OutboxCleanupTaskConnectivity",
@@ -37,20 +37,20 @@ namespace NServiceBus.Features
         }
 
 
-        protected override Task OnStop(IMessageSession busSession)
+        protected override Task OnStop(IMessageSession busSession, CancellationToken cancellationToken = default)
         {
             cancellationTokenSource.Cancel();
             return cleanup;
         }
 
-        async Task PerformCleanup(CancellationToken ct)
+        async Task PerformCleanup(CancellationToken cancellationToken)
         {
-            while (ct.IsCancellationRequested == false)
+            while (cancellationToken.IsCancellationRequested == false)
             {
                 try
                 {
-                    await Task.Delay(deduplicationDataCleanupPeriod, ct).ConfigureAwait(false);
-                    await outboxPersister.RemoveEntriesOlderThan(DateTime.UtcNow - timeToKeepDeduplicationData).ConfigureAwait(false);
+                    await Task.Delay(deduplicationDataCleanupPeriod, cancellationToken).ConfigureAwait(false);
+                    await outboxPersister.RemoveEntriesOlderThan(DateTime.UtcNow - timeToKeepDeduplicationData, cancellationToken).ConfigureAwait(false);
                 }
                 catch (OperationCanceledException)
                 {

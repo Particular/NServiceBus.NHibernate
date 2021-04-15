@@ -2,11 +2,12 @@
 {
     using System;
     using System.Data.Common;
+    using System.Threading;
     using System.Threading.Tasks;
     using System.Transactions;
+    using Extensibility;
     using global::NHibernate;
     using global::NHibernate.Impl;
-    using Extensibility;
     using Outbox;
     using Outbox.NHibernate;
     using Persistence;
@@ -24,7 +25,7 @@
             this.currentSessionHolder = currentSessionHolder;
         }
 
-        public Task<CompletableSynchronizedStorageSession> TryAdapt(OutboxTransaction transaction, ContextBag context)
+        public Task<CompletableSynchronizedStorageSession> TryAdapt(OutboxTransaction transaction, ContextBag context, CancellationToken cancellationToken = default)
         {
             if (transaction is INHibernateOutboxTransaction nhibernateTransaction)
             {
@@ -36,7 +37,7 @@
             return EmptyResult;
         }
 
-        public Task<CompletableSynchronizedStorageSession> TryAdapt(TransportTransaction transportTransaction, ContextBag context)
+        public Task<CompletableSynchronizedStorageSession> TryAdapt(TransportTransaction transportTransaction, ContextBag context, CancellationToken cancellationToken = default)
         {
             if (!transportTransaction.TryGet(out Transaction ambientTransaction))
             {

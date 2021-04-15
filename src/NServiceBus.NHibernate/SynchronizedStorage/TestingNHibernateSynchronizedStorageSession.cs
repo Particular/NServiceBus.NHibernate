@@ -1,6 +1,7 @@
 ﻿namespace NServiceBus.Testing
 {
     using System;
+    using System.Threading;
     using System.Threading.Tasks;
     using global::NHibernate;
     using Janitor;
@@ -26,9 +27,16 @@
         /// </summary>
         public ISession Session { get; }
 
-        void INHibernateStorageSession.OnSaveChanges(Func<SynchronizedStorageSession, Task> callback)
+        void INHibernateStorageSession.OnSaveChanges(Func<SynchronizedStorageSession, CancellationToken, Task> callback)
         {
             //NOOP
+        }
+
+
+        [ObsoleteEx(Message = "Use the overload that supports cancellation.", RemoveInVersion = "10", TreatAsErrorFromVersion = "9")]
+        void INHibernateStorageSession.OnSaveChanges(Func<SynchronizedStorageSession, Task> callback)
+        {
+            throw new NotImplementedException();
         }
     }
 }

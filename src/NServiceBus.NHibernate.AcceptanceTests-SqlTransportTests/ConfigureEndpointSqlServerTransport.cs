@@ -1,26 +1,24 @@
 using System;
 using System.Data.SqlClient;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using NServiceBus;
 using NServiceBus.AcceptanceTesting.Support;
-using NServiceBus.Configuration.AdvancedExtensibility;
 using NServiceBus.Persistence;
 using NServiceBus.Transport;
 
-public class ConfigureEndpointSqlServerTransport : EndpointConfigurer
+public partial class ConfigureEndpointSqlServerTransport : EndpointConfigurer
 {
     public override Task Configure(string endpointName, EndpointConfiguration configuration, RunSettings settings, PublisherMetadata publisherMetadata)
     {
-        queueBindings = configuration.GetSettings().Get<QueueBindings>();
-
         configuration.UsePersistence<NHibernatePersistence>()
             .ConnectionString(ConnectionString);
 
-        var transportConfig = configuration.UseTransport<SqlServerTransport>();
+        transport = new TestingSqlTransport(ConnectionString);
+        transport.Subscriptions.DisableCaching = true;
 
-        transportConfig.SubscriptionSettings().DisableSubscriptionCache();
-        transportConfig.ConnectionString(ConnectionString);
+        configuration.UseTransport(transport);
 
         return Task.FromResult(0);
     }
@@ -28,15 +26,18 @@ public class ConfigureEndpointSqlServerTransport : EndpointConfigurer
 
     public override Task Cleanup()
     {
-        using (var conn = new SqlConnection(ConnectionString))
+        if (transport.ReceiveAddresses != null)
         {
-            conn.Open();
-
-            var queueAddresses = queueBindings.ReceivingAddresses.Select(QueueAddress.Parse).ToList();
-            foreach (var address in queueAddresses)
+            using (var conn = new SqlConnection(ConnectionString))
             {
-                TryDeleteTable(conn, address);
-                TryDeleteTable(conn, new QueueAddress(address.Table + ".Delayed", address.Schema, address.Catalog));
+                conn.Open();
+
+                var queueAddresses = transport.ReceiveAddresses.Select(QueueAddress.Parse).ToList();
+                foreach (var address in queueAddresses)
+                {
+                    TryDeleteTable(conn, address);
+                    TryDeleteTable(conn, new QueueAddress(address.Table + ".Delayed", address.Schema, address.Catalog));
+                }
             }
         }
         return Task.FromResult(0);
@@ -61,7 +62,7 @@ public class ConfigureEndpointSqlServerTransport : EndpointConfigurer
         }
     }
 
-    QueueBindings queueBindings;
+    TestingSqlTransport transport;
 
     class QueueAddress
     {

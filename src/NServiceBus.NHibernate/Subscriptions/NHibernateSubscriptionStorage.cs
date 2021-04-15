@@ -2,13 +2,14 @@ namespace NServiceBus.Features
 {
     using System;
     using System.Dynamic;
+    using System.Threading;
     using System.Threading.Tasks;
+    using global::NHibernate.Tool.hbm2ddl;
     using Microsoft.Extensions.DependencyInjection;
     using Persistence.NHibernate;
     using Unicast.Subscriptions.MessageDrivenSubscriptions;
     using Unicast.Subscriptions.NHibernate;
     using Unicast.Subscriptions.NHibernate.Config;
-    using global::NHibernate.Tool.hbm2ddl;
     using Installer = Unicast.Subscriptions.NHibernate.Installer.Installer;
 
     /// <summary>
@@ -93,12 +94,12 @@ namespace NServiceBus.Features
                 this.persister = persister;
             }
 
-            protected override Task OnStart(IMessageSession session)
+            protected override Task OnStart(IMessageSession session, CancellationToken cancellationToken = default)
             {
-                return persister.Init();
+                return persister.Init(cancellationToken);
             }
 
-            protected override Task OnStop(IMessageSession session) => Task.CompletedTask;
+            protected override Task OnStop(IMessageSession session, CancellationToken cancellationToken = default) => Task.CompletedTask;
         }
     }
 }

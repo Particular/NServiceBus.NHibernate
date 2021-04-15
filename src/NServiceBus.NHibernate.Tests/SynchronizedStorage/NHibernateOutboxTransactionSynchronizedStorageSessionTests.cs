@@ -1,7 +1,7 @@
 ﻿namespace NServiceBus.NHibernate.Tests.SynchronizedStorage
 {
-    using System.Data;
     using System;
+    using System.Data;
     using System.Threading.Tasks;
     using NServiceBus.Extensibility;
     using NServiceBus.NHibernate.Outbox;
@@ -43,7 +43,7 @@
                 using (var storageSession = await adapter.TryAdapt(outboxTransaction, contextBag))
                 {
                     storageSession.Session(); //Make sure session is initialized
-                    storageSession.OnSaveChanges(s =>
+                    storageSession.OnSaveChanges((s, _) =>
                     {
                         callbackInvoked = true;
                         return Task.FromResult(0);
@@ -75,12 +75,12 @@
                 using (var storageSession = await adapter.TryAdapt(outboxTransaction, contextBag))
                 {
                     storageSession.Session(); //Make sure session is initialized
-                    storageSession.OnSaveChanges(s =>
+                    storageSession.OnSaveChanges((s, _) =>
                     {
                         callbackInvoked++;
                         return Task.FromResult(0);
                     });
-                    storageSession.OnSaveChanges(s =>
+                    storageSession.OnSaveChanges((s, _) =>
                     {
                         callbackInvoked++;
                         return Task.FromResult(0);
@@ -118,7 +118,7 @@
                     {
                         Id = entityId
                     });
-                    storageSession.OnSaveChanges(s =>
+                    storageSession.OnSaveChanges((s, _) =>
                     {
                         throw new Exception("Simulated");
                     });
