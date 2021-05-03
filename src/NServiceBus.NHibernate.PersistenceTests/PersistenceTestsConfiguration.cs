@@ -22,6 +22,7 @@
     using NServiceBus.Persistence.NHibernate;
     using NServiceBus.SagaPersisters.NHibernate;
     using NServiceBus.SagaPersisters.NHibernate.AutoPersistence;
+    using System.Threading;
 
     class NHibernateVariant
     {
@@ -132,7 +133,7 @@
             return t.DeclaringType != null && t.DeclaringType.FullName == TestContext.CurrentContext.Test.ClassName;
         }
 
-        public async Task Configure()
+        public async Task Configure(CancellationToken cancellationToken = default)
         {
             var variant = (NHibernateVariant)Variant.Values[0];
 
@@ -168,8 +169,8 @@
             }
 
             var schema = new SchemaExport(cfg);
-            await schema.DropAsync(false, true);
-            await schema.CreateAsync(false, true);
+            await schema.DropAsync(false, true, cancellationToken);
+            await schema.CreateAsync(false, true, cancellationToken);
 
             var sessionFactory = cfg.BuildSessionFactory();
 
@@ -190,7 +191,7 @@
                 .Replace("TestSaga", "TS");
         }
 
-        public Task Cleanup()
+        public Task Cleanup(CancellationToken cancellationToken = default)
         {
             return Task.CompletedTask;
         }
