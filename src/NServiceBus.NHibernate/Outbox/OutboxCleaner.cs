@@ -52,9 +52,16 @@ namespace NServiceBus.Features
                     await Task.Delay(deduplicationDataCleanupPeriod, cancellationToken).ConfigureAwait(false);
                     await outboxPersister.RemoveEntriesOlderThan(DateTime.UtcNow - timeToKeepDeduplicationData, cancellationToken).ConfigureAwait(false);
                 }
-                catch (OperationCanceledException)
+                catch (OperationCanceledException ex)
                 {
-                    // no-op
+                    if (cancellationToken.IsCancellationRequested)
+                    {
+                        Logger.Debug("Outbox cleaning cancelled.", ex);
+                    }
+                    else
+                    {
+                        Logger.Warn("Operation cancelled thrown.", ex);
+                    }
                 }
                 catch (Exception ex)
                 {
