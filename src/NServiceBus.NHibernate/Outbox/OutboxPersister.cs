@@ -9,18 +9,22 @@
     using Extensibility;
     using global::NHibernate;
     using global::NHibernate.Criterion;
+    using NServiceBus.Logging;
     using Outbox;
     using Outbox.NHibernate;
-    using DispatchProperties = NServiceBus.Transport.DispatchProperties;
+    using DispatchProperties = Transport.DispatchProperties;
     using IsolationLevel = System.Data.IsolationLevel;
 
     class OutboxPersister<TEntity> : INHibernateOutboxStorage
         where TEntity : class, IOutboxRecord, new()
     {
         const string EndpointQualifiedMessageIdContextKey = "NServiceBus.Persistence.NHibernate.EndpointQualifiedMessageId";
-        ISessionFactory sessionFactory;
-        Func<INHibernateOutboxTransaction> outboxTransactionFactory;
-        string endpointName;
+
+        static readonly ILog log = LogManager.GetLogger<OutboxPersister<TEntity>>();
+
+        readonly ISessionFactory sessionFactory;
+        readonly Func<INHibernateOutboxTransaction> outboxTransactionFactory;
+        readonly string endpointName;
 
         public OutboxPersister(ISessionFactory sessionFactory, Func<INHibernateOutboxTransaction> outboxTransactionFactory, string endpointName)
         {
@@ -121,14 +125,28 @@
                 await transaction.Begin(endpointQualifiedMessageId, cancellationToken).ConfigureAwait(false);
                 return transaction;
             }
-            catch (Exception e)
+            catch (Exception ex) when (ex.IsCausedBy(cancellationToken))
+            {
+                // copy what's being done in the general catch, but don't let it mask the OCE
+                try
+                {
+                    transaction.Dispose();
+                }
+                catch (Exception disposeEx)
+                {
+                    log.Debug("Failed to dispose transaction.", disposeEx);
+                }
+
+                throw;
+            }
+            catch (Exception ex)
             {
                 // A method that returns something that is disposable should not throw during the creation
                 // of the disposable resource. If it does the compiler generated code will not dispose anything
                 // therefore we need to dispose here to prevent the connection being returned to the pool being
                 // in a zombie state.
                 transaction.Dispose();
-                throw new Exception("Error while opening outbox transaction", e);
+                throw new Exception("Error while opening outbox transaction", ex);
             }
         }
 
