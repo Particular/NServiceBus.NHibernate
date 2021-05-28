@@ -15,9 +15,10 @@ namespace NServiceBus.Unicast.Subscriptions.NHibernate
 
     class SubscriptionPersister : ISubscriptionStorage
     {
-        static ILog Logger = LogManager.GetLogger(typeof(ISubscriptionStorage));
-        static IEqualityComparer<Subscription> SubscriptionComparer = new SubscriptionByTransportAddressComparer();
-        ISessionFactory sessionFactory;
+        static readonly ILog Logger = LogManager.GetLogger(typeof(ISubscriptionStorage));
+        static readonly IEqualityComparer<Subscription> SubscriptionComparer = new SubscriptionByTransportAddressComparer();
+
+        readonly ISessionFactory sessionFactory;
 
         public SubscriptionPersister(ISessionFactory sessionFactory)
         {
@@ -83,14 +84,17 @@ namespace NServiceBus.Unicast.Subscriptions.NHibernate
         static async Task Retry(Func<CancellationToken, Task> function, CancellationToken cancellationToken)
         {
             var attempt = 0;
+
             while (true)
             {
+                cancellationToken.ThrowIfCancellationRequested();
+
                 try
                 {
                     await function(cancellationToken).ConfigureAwait(false);
                     return;
                 }
-                catch (Exception)
+                catch (Exception ex) when (!ex.IsCausedBy(cancellationToken))
                 {
                     attempt++;
                     if (attempt >= 5)

@@ -4,6 +4,7 @@ namespace NServiceBus.Features
     using System.Threading;
     using System.Threading.Tasks;
     using Logging;
+    using NServiceBus;
 
     class OutboxCleaner : FeatureStartupTask
     {
@@ -21,8 +22,7 @@ namespace NServiceBus.Features
             circuitBreaker = new RepeatedFailuresOverTimeCircuitBreaker(
                 "OutboxCleanupTaskConnectivity",
                 criticalErrorTriggerTime,
-                ex => criticalError.Raise("Failed to clean the Outbox.", ex)
-            );
+                ex => criticalError.Raise("Failed to clean the Outbox.", ex));
 
             if (deduplicationDataCleanupPeriod == Timeout.InfiniteTimeSpan)
             {
@@ -31,7 +31,8 @@ namespace NServiceBus.Features
 
             cancellationTokenSource = new CancellationTokenSource();
 
-            cleanup = Task.Run(() => PerformCleanup(cancellationTokenSource.Token), CancellationToken.None);
+            // no Task.Run here because PerformCleanupAndSwallowExceptions yields with an await almost immediately
+            cleanup = PerformCleanupAndSwallowExceptions(cancellationTokenSource.Token);
 
             return Task.CompletedTask;
         }
@@ -43,25 +44,20 @@ namespace NServiceBus.Features
             return cleanup;
         }
 
-        async Task PerformCleanup(CancellationToken cancellationToken)
+        async Task PerformCleanupAndSwallowExceptions(CancellationToken cancellationToken)
         {
-            while (cancellationToken.IsCancellationRequested == false)
+            while (!cancellationToken.IsCancellationRequested)
             {
                 try
                 {
                     await Task.Delay(deduplicationDataCleanupPeriod, cancellationToken).ConfigureAwait(false);
                     await outboxPersister.RemoveEntriesOlderThan(DateTime.UtcNow - timeToKeepDeduplicationData, cancellationToken).ConfigureAwait(false);
                 }
-                catch (OperationCanceledException ex)
+                catch (Exception ex) when (ex.IsCausedBy(cancellationToken))
                 {
-                    if (cancellationToken.IsCancellationRequested)
-                    {
-                        Logger.Debug("Outbox cleaning cancelled.", ex);
-                    }
-                    else
-                    {
-                        Logger.Warn("OperationCanceledException thrown.", ex);
-                    }
+                    // private token, cleaner is being stopped, log the exception in case the stack trace is ever useful for debugging
+                    Logger.Debug("Operation canceled while stopping outbox cleaner.", ex);
+                    break;
                 }
                 catch (Exception ex)
                 {
@@ -71,15 +67,17 @@ namespace NServiceBus.Features
         }
 
         static readonly ILog Logger = LogManager.GetLogger(typeof(OutboxCleaner));
+
+        readonly CriticalError criticalError;
+        readonly INHibernateOutboxStorage outboxPersister;
+
         RepeatedFailuresOverTimeCircuitBreaker circuitBreaker;
 
         Task cleanup;
         CancellationTokenSource cancellationTokenSource;
 
         TimeSpan timeToKeepDeduplicationData;
-        CriticalError criticalError;
         TimeSpan deduplicationDataCleanupPeriod;
-        INHibernateOutboxStorage outboxPersister;
         TimeSpan criticalErrorTriggerTime;
     }
 }

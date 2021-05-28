@@ -1,12 +1,10 @@
 using System;
 using System.Data.SqlClient;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using NServiceBus;
 using NServiceBus.AcceptanceTesting.Support;
 using NServiceBus.Persistence;
-using NServiceBus.Transport;
 
 public partial class ConfigureEndpointSqlServerTransport : EndpointConfigurer
 {
