@@ -1,8 +1,7 @@
-﻿using System.Data;
-
-namespace NServiceBus.NHibernate.Tests.SynchronizedStorage
+﻿namespace NServiceBus.NHibernate.Tests.SynchronizedStorage
 {
     using System;
+    using System.Data;
     using System.Threading.Tasks;
     using Extensibility;
     using NHibernate.Outbox;

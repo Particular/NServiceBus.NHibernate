@@ -1,8 +1,7 @@
-﻿using System;
-using System.Transactions;
-
-namespace NServiceBus
+﻿namespace NServiceBus
 {
+    using System;
+    using System.Transactions;
     using Configuration.AdvancedExtensibility;
     using Features;
     using Outbox;

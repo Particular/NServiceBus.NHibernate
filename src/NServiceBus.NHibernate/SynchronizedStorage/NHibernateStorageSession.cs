@@ -1,5 +1,3 @@
-using System.Transactions;
-
 namespace NServiceBus.Features
 {
     using System;
@@ -7,6 +5,7 @@ namespace NServiceBus.Features
     using System.Dynamic;
     using System.Linq;
     using System.Text;
+    using System.Transactions;
     using System.Threading.Tasks;
     using global::NHibernate.Mapping.ByCode;
     using NHibernate.Outbox;

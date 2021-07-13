@@ -1,8 +1,7 @@
-using System.Data;
-
 namespace NServiceBus.NHibernate.Tests.Outbox
 {
     using System;
+    using System.Data;
     using System.Threading.Tasks;
     using global::NHibernate;
     using global::NHibernate.Cfg;

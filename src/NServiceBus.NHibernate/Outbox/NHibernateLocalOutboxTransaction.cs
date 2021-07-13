@@ -1,8 +1,7 @@
-﻿using System.Data;
-
-namespace NServiceBus.Outbox.NHibernate
+﻿namespace NServiceBus.Outbox.NHibernate
 {
     using System;
+    using System.Data;
     using System.Threading.Tasks;
     using Extensibility;
     using global::NHibernate;
