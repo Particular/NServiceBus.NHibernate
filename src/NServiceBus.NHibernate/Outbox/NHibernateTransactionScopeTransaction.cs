@@ -16,6 +16,7 @@
         static ILog Log = LogManager.GetLogger<NHibernateTransactionScopeTransaction>();
 
         ConcurrencyControlStrategy concurrencyControlStrategy;
+        IsolationLevel isolationLevel;
         Func<Task> onSaveChangesCallback = () => Task.CompletedTask;
         TransactionScope transactionScope;
         Transaction ambientTransaction;
@@ -23,9 +24,11 @@
         bool commit;
         DbConnection connection;
 
-        public NHibernateTransactionScopeTransaction(ConcurrencyControlStrategy concurrencyControlStrategy, ISessionFactory sessionFactory)
+        public NHibernateTransactionScopeTransaction(ConcurrencyControlStrategy concurrencyControlStrategy,
+            ISessionFactory sessionFactory, IsolationLevel isolationLevel)
         {
             this.concurrencyControlStrategy = concurrencyControlStrategy;
+            this.isolationLevel = isolationLevel;
             sessionFactoryImpl = sessionFactory as SessionFactoryImpl;
             if (sessionFactoryImpl == null)
             {
@@ -77,7 +80,11 @@
         // Prepare is deliberately kept sync to allow floating of TxScope where needed
         public void Prepare()
         {
-            transactionScope = new TransactionScope(TransactionScopeOption.RequiresNew, TransactionScopeAsyncFlowOption.Enabled);
+            var transactionOptions = new TransactionOptions
+            {
+                IsolationLevel = isolationLevel
+            };
+            transactionScope = new TransactionScope(TransactionScopeOption.RequiresNew, transactionOptions, TransactionScopeAsyncFlowOption.Enabled);
             ambientTransaction = Transaction.Current;
         }
 

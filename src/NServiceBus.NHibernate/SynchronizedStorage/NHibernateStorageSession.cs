@@ -5,6 +5,7 @@ namespace NServiceBus.Features
     using System.Dynamic;
     using System.Linq;
     using System.Text;
+    using System.Transactions;
     using System.Threading.Tasks;
     using global::NHibernate.Mapping.ByCode;
     using NHibernate.Outbox;
@@ -26,6 +27,8 @@ namespace NServiceBus.Features
         internal const string OutboxSchemaNameSettingsKey = "NServiceBus.NHibernate.OutboxSchemaName";
         internal const string OutboxConcurrencyModeSettingsKey = "NServiceBus.NHibernate.OutboxPessimisticMode";
         internal const string OutboxTransactionModeSettingsKey = "NServiceBus.NHibernate.OutboxTransactionScopeMode";
+        internal const string OutboxTransactionIsolationLevelSettingsKey = "NServiceBus.NHibernate.OutboxTransactionIsolationLevel";
+        internal const string OutboxTransactionScopeModeIsolationLevelSettingsKey = "NServiceBus.NHibernate.OutboxTransactionScopeModeIsolationLevel";
 
         internal NHibernateStorageSession()
         {
@@ -63,6 +66,13 @@ namespace NServiceBus.Features
             {
                 var pessimisticMode = context.Settings.GetOrDefault<bool>(OutboxConcurrencyModeSettingsKey);
                 var transactionScopeMode = context.Settings.GetOrDefault<bool>(OutboxTransactionModeSettingsKey);
+                var transactionScopeIsolationLevel = context.Settings.GetOrDefault<IsolationLevel>(OutboxTransactionScopeModeIsolationLevelSettingsKey);
+                var adoIsolationLevel = context.Settings.GetOrDefault<System.Data.IsolationLevel>(OutboxTransactionIsolationLevelSettingsKey);
+                if (adoIsolationLevel == default)
+                {
+                    //Default to Read Committed
+                    adoIsolationLevel = System.Data.IsolationLevel.ReadCommitted;
+                }
 
                 config.Configuration.Properties[Environment.TransactionStrategy] = typeof(AdoNetTransactionFactory).FullName;
 
@@ -90,7 +100,7 @@ namespace NServiceBus.Features
                 sharedMappings.ApplyTo(config.Configuration);
                 var sessionFactory = config.Configuration.BuildSessionFactory();
                 var persisterFactory = context.Settings.Get<IOutboxPersisterFactory>();
-                var persister = persisterFactory.Create(sessionFactory, context.Settings.EndpointName(), pessimisticMode, transactionScopeMode);
+                var persister = persisterFactory.Create(sessionFactory, context.Settings.EndpointName(), pessimisticMode, transactionScopeMode, adoIsolationLevel, transactionScopeIsolationLevel);
 
                 context.Container.ConfigureComponent(b => persister, DependencyLifecycle.SingleInstance);
                 context.Container.ConfigureComponent(b => new NHibernateSynchronizedStorage(sessionFactory, sessionHolder), DependencyLifecycle.SingleInstance);
