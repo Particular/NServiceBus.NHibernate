@@ -20,11 +20,11 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
             var types = new[]
             {
                 typeof(TestSaga), typeof(TestSagaData), typeof(TestComponent), typeof(PolymorphicPropertyBase),
-                typeof(AlsoDerivedFromTestSagaWithTableNameAttributeActualSaga), typeof(AlsoDerivedFromTestSagaWithTableNameAttribute),
-                typeof(DerivedFromTestSagaWithTableNameAttributeActualSaga), typeof(DerivedFromTestSagaWithTableNameAttribute),
-                typeof(TestSagaWithTableNameAttributeActualSaga), typeof(TestSagaWithTableNameAttribute),
-                typeof(SagaWithVersionedPropertyAttributeActualSaga), typeof(SagaWithVersionedPropertyAttribute),
-                typeof(SagaWithoutVersionedPropertyAttributeActualSaga), typeof(SagaWithoutVersionedPropertyAttribute),
+                typeof(AlsoDerivedFromSagaWithTableName), typeof(AlsoDerivedFromSagaWithTableNameData),
+                typeof(DerivedFromSagaWithTableName), typeof(DerivedFromSagaWithTableNameData),
+                typeof(SagaWithTableName), typeof(SagaWithTableNameData),
+                typeof(SagaWithVersionedProperty), typeof(SagaWithVersionedPropertyData),
+                typeof(SagaWithoutVersionedProperty), typeof(SagaWithoutVersionedPropertyData),
                 typeof(object)
             };
 
@@ -42,7 +42,7 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
         [Test]
         public void Enums_should_be_mapped_as_integers()
         {
-            persisterForTestSaga.ShouldContainMappingsFor<StatusEnum>();
+            persisterForTestSaga.ShouldContainMappingsFor<Status>();
         }
 
         [Test]
@@ -83,7 +83,7 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
         public void Users_can_override_tableNames_by_using_an_attribute()
         {
             var persister =
-                sessionFactory.GetEntityPersister(typeof(TestSagaWithTableNameAttribute).FullName).ClassMetadata as
+                sessionFactory.GetEntityPersister(typeof(SagaWithTableNameData).FullName).ClassMetadata as
                 AbstractEntityPersister;
             Assert.AreEqual(persister.RootTableName, "MyTestSchema.MyTestTable");
         }
@@ -92,16 +92,16 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
         public void Users_can_override_tableNames_by_using_an_attribute_which_does_not_derive()
         {
             var persister =
-                sessionFactory.GetEntityPersister(typeof(DerivedFromTestSagaWithTableNameAttribute).FullName).
+                sessionFactory.GetEntityPersister(typeof(DerivedFromSagaWithTableNameData).FullName).
                     ClassMetadata as AbstractEntityPersister;
-            Assert.AreEqual(persister.TableName, "DerivedFromTestSagaWithTableNameAttribute");
+            Assert.AreEqual(persister.TableName, "DerivedFromSagaWithTableNameData");
         }
 
         [Test]
         public void Users_can_override_derived_tableNames_by_using_an_attribute()
         {
             var persister =
-                sessionFactory.GetEntityPersister(typeof(AlsoDerivedFromTestSagaWithTableNameAttribute).FullName).
+                sessionFactory.GetEntityPersister(typeof(AlsoDerivedFromSagaWithTableNameData).FullName).
                     ClassMetadata as AbstractEntityPersister;
             Assert.AreEqual(persister.TableName, "MyDerivedTestTable");
         }
@@ -136,8 +136,8 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
         [Test]
         public void Versioned_Property_should_override_optimistic_lock()
         {
-            var persister1 = sessionFactory.GetEntityPersisterFor<SagaWithVersionedPropertyAttribute>();
-            var persister2 = sessionFactory.GetEntityPersisterFor<SagaWithoutVersionedPropertyAttribute>();
+            var persister1 = sessionFactory.GetEntityPersisterFor<SagaWithVersionedPropertyData>();
+            var persister2 = sessionFactory.GetEntityPersisterFor<SagaWithoutVersionedPropertyData>();
 
             Assert.True(persister1.IsVersioned);
             Assert.False(persister1.EntityMetamodel.IsDynamicUpdate);

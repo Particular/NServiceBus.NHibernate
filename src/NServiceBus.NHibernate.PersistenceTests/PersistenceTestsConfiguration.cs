@@ -152,7 +152,7 @@
             {
                 return BelongsToCurrentTest(t)
                        && (typeof(Saga).IsAssignableFrom(t)
-                           || typeof(IFindSagas<>).IsAssignableFrom(t)
+                           || typeof(ISagaFinder<,>).IsAssignableFrom(t)
                            || typeof(IFinder).IsAssignableFrom(t));
 
             }).ToArray();

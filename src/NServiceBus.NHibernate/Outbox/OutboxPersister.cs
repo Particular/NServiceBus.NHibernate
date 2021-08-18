@@ -83,7 +83,7 @@
             }
         }
 
-        public Task Store(OutboxMessage outboxMessage, OutboxTransaction transaction, ContextBag context, CancellationToken cancellationToken = default)
+        public Task Store(OutboxMessage outboxMessage, IOutboxTransaction transaction, ContextBag context, CancellationToken cancellationToken = default)
         {
             var nhibernateTransaction = (INHibernateOutboxTransaction)transaction;
             return nhibernateTransaction.Complete(EndpointQualifiedMessageId(outboxMessage.MessageId), outboxMessage, context, cancellationToken);
@@ -108,7 +108,7 @@
             }
         }
 
-        public Task<OutboxTransaction> BeginTransaction(ContextBag context, CancellationToken cancellationToken = default)
+        public Task<IOutboxTransaction> BeginTransaction(ContextBag context, CancellationToken cancellationToken = default)
         {
             //Provided by Get
             var endpointQualifiedMessageId = context.Get<string>(EndpointQualifiedMessageIdContextKey);
@@ -118,7 +118,7 @@
             return BeginTransactionInternal(result, endpointQualifiedMessageId, cancellationToken);
         }
 
-        static async Task<OutboxTransaction> BeginTransactionInternal(INHibernateOutboxTransaction transaction, string endpointQualifiedMessageId, CancellationToken cancellationToken)
+        static async Task<IOutboxTransaction> BeginTransactionInternal(INHibernateOutboxTransaction transaction, string endpointQualifiedMessageId, CancellationToken cancellationToken)
         {
             try
             {

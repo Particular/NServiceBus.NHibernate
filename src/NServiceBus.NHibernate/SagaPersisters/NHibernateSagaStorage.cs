@@ -33,7 +33,7 @@ namespace NServiceBus.Features
             context.Services.AddSingleton<ISagaPersister, SagaPersister>();
         }
 
-        internal void ApplyMappings(ReadOnlySettings settings, Configuration configuration)
+        internal void ApplyMappings(IReadOnlySettings settings, Configuration configuration)
         {
             var tableNamingConvention = settings.GetOrDefault<Func<Type, string>>("NHibernate.Sagas.TableNamingConvention");
 

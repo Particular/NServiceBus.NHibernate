@@ -8,7 +8,7 @@ namespace NServiceBus.Persistence.NHibernate.Installer
 
     class Installer : INeedToInstallSomething
     {
-        public Installer(ReadOnlySettings settings)
+        public Installer(IReadOnlySettings settings)
         {
             settings.TryGet(out schemaUpdater);
         }

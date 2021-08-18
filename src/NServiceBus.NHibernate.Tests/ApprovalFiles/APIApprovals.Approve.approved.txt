@@ -33,8 +33,8 @@ namespace NServiceBus
     {
         NHibernate.ISession Session { get; }
         [System.Obsolete("Use the overload that supports cancellation. Will be removed in version 10.0.0.", true)]
-        void OnSaveChanges(System.Func<NServiceBus.Persistence.SynchronizedStorageSession, System.Threading.Tasks.Task> callback);
-        void OnSaveChanges(System.Func<NServiceBus.Persistence.SynchronizedStorageSession, System.Threading.CancellationToken, System.Threading.Tasks.Task> callback);
+        void OnSaveChanges(System.Func<NServiceBus.Persistence.ISynchronizedStorageSession, System.Threading.Tasks.Task> callback);
+        void OnSaveChanges(System.Func<NServiceBus.Persistence.ISynchronizedStorageSession, System.Threading.CancellationToken, System.Threading.Tasks.Task> callback);
     }
     public class NHibernatePersistence : NServiceBus.Persistence.PersistenceDefinition
     {
@@ -50,9 +50,9 @@ namespace NServiceBus
     public static class SynchronizedStorageSessionExtensions
     {
         [System.Obsolete("Use the overload that supports cancellation. Will be removed in version 10.0.0.", true)]
-        public static void OnSaveChanges(this NServiceBus.Persistence.SynchronizedStorageSession session, System.Func<NServiceBus.Persistence.SynchronizedStorageSession, System.Threading.Tasks.Task> callback) { }
-        public static void OnSaveChanges(this NServiceBus.Persistence.SynchronizedStorageSession session, System.Func<NServiceBus.Persistence.SynchronizedStorageSession, System.Threading.CancellationToken, System.Threading.Tasks.Task> callback) { }
-        public static NHibernate.ISession Session(this NServiceBus.Persistence.SynchronizedStorageSession session) { }
+        public static void OnSaveChanges(this NServiceBus.Persistence.ISynchronizedStorageSession session, System.Func<NServiceBus.Persistence.ISynchronizedStorageSession, System.Threading.Tasks.Task> callback) { }
+        public static void OnSaveChanges(this NServiceBus.Persistence.ISynchronizedStorageSession session, System.Func<NServiceBus.Persistence.ISynchronizedStorageSession, System.Threading.CancellationToken, System.Threading.Tasks.Task> callback) { }
+        public static NHibernate.ISession Session(this NServiceBus.Persistence.ISynchronizedStorageSession session) { }
     }
 }
 namespace NServiceBus.NHibernate.Outbox
@@ -166,7 +166,7 @@ namespace NServiceBus.SagaPersisters.NHibernate
 }
 namespace NServiceBus.Testing
 {
-    public class TestingNHibernateSynchronizedStorageSession : NServiceBus.INHibernateStorageSession, NServiceBus.Persistence.SynchronizedStorageSession
+    public class TestingNHibernateSynchronizedStorageSession : NServiceBus.INHibernateStorageSession, NServiceBus.Persistence.ISynchronizedStorageSession
     {
         public TestingNHibernateSynchronizedStorageSession(NHibernate.ISession session) { }
         public NHibernate.ISession Session { get; }

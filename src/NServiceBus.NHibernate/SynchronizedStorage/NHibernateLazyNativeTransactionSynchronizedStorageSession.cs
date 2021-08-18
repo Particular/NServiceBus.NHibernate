@@ -7,10 +7,10 @@
     using Janitor;
 
     [SkipWeaving]
-    class NHibernateLazyNativeTransactionSynchronizedStorageSession : CompletableSynchronizedStorageSession, INHibernateStorageSession
+    class NHibernateLazyNativeTransactionSynchronizedStorageSession : ICompletableSynchronizedStorageSession, INHibernateStorageSession
     {
         Lazy<ISession> session;
-        Func<SynchronizedStorageSession, CancellationToken, Task> onSaveChangesCallback = (_, __) => Task.CompletedTask;
+        Func<ISynchronizedStorageSession, CancellationToken, Task> onSaveChangesCallback = (_, __) => Task.CompletedTask;
         ITransaction transaction;
 
         public NHibernateLazyNativeTransactionSynchronizedStorageSession(Func<ISession> sessionFactory)
@@ -25,7 +25,7 @@
 
         public ISession Session => session.Value;
 
-        public void OnSaveChanges(Func<SynchronizedStorageSession, CancellationToken, Task> callback)
+        public void OnSaveChanges(Func<ISynchronizedStorageSession, CancellationToken, Task> callback)
         {
             var oldCallback = onSaveChangesCallback;
             onSaveChangesCallback = async (s, token) =>
@@ -37,7 +37,7 @@
 
         [ObsoleteEx(Message = "Use the overload that supports cancellation.", RemoveInVersion = "10", TreatAsErrorFromVersion = "9")]
 #pragma warning disable PS0013 // A Func used as a method parameter with a Task, ValueTask, or ValueTask<T> return type argument should have at least one CancellationToken parameter type argument unless it has a parameter type argument implementing ICancellableContext
-        public void OnSaveChanges(Func<SynchronizedStorageSession, Task> callback)
+        public void OnSaveChanges(Func<ISynchronizedStorageSession, Task> callback)
 #pragma warning restore PS0013 // A Func used as a method parameter with a Task, ValueTask, or ValueTask<T> return type argument should have at least one CancellationToken parameter type argument unless it has a parameter type argument implementing ICancellableContext
         {
             throw new NotImplementedException();

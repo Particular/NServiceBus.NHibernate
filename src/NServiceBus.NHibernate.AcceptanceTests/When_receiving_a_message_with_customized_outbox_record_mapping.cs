@@ -96,9 +96,9 @@
             class SendOrderAcknowledgementHandler : IHandleMessages<SendOrderAcknowledgement>
             {
                 Context testContext;
-                ReadOnlySettings settings;
+                IReadOnlySettings settings;
 
-                public SendOrderAcknowledgementHandler(Context testContext, ReadOnlySettings settings)
+                public SendOrderAcknowledgementHandler(Context testContext, IReadOnlySettings settings)
                 {
                     this.testContext = testContext;
                     this.settings = settings;
