@@ -11,7 +11,7 @@
     /// Allows writing automated tests against handlers which use NServiceBus-managed NHibernate session.
     /// </summary>
     [SkipWeaving]
-    public class TestingNHibernateSynchronizedStorageSession : SynchronizedStorageSession, INHibernateStorageSession
+    public class TestingNHibernateSynchronizedStorageSession : ISynchronizedStorageSession, INHibernateStorageSession
     {
         /// <summary>
         /// Creates new instance of the session.
@@ -27,14 +27,14 @@
         /// </summary>
         public ISession Session { get; }
 
-        void INHibernateStorageSession.OnSaveChanges(Func<SynchronizedStorageSession, CancellationToken, Task> callback)
+        void INHibernateStorageSession.OnSaveChanges(Func<ISynchronizedStorageSession, CancellationToken, Task> callback)
         {
             //NOOP
         }
 
 
         [ObsoleteEx(Message = "Use the overload that supports cancellation.", RemoveInVersion = "10", TreatAsErrorFromVersion = "9")]
-        void INHibernateStorageSession.OnSaveChanges(Func<SynchronizedStorageSession, Task> callback)
+        void INHibernateStorageSession.OnSaveChanges(Func<ISynchronizedStorageSession, Task> callback)
         {
             throw new NotImplementedException();
         }

@@ -6,7 +6,7 @@
     using Extensibility;
     using global::NHibernate;
 
-    interface INHibernateOutboxTransaction : OutboxTransaction
+    interface INHibernateOutboxTransaction : IOutboxTransaction
     {
         ISession Session { get; }
         void OnSaveChanges(Func<CancellationToken, Task> callback);

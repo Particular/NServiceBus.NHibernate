@@ -12,23 +12,23 @@ namespace NServiceBus.SagaPersisters.NHibernate
 
     class SagaPersister : ISagaPersister
     {
-        public Task Save(IContainSagaData saga, SagaCorrelationProperty correlationProperty, SynchronizedStorageSession session, ContextBag context, CancellationToken cancellationToken = default)
+        public Task Save(IContainSagaData saga, SagaCorrelationProperty correlationProperty, ISynchronizedStorageSession session, ContextBag context, CancellationToken cancellationToken = default)
         {
             return session.Session().SaveAsync(saga, cancellationToken);
         }
 
-        public Task Update(IContainSagaData saga, SynchronizedStorageSession session, ContextBag context, CancellationToken cancellationToken = default)
+        public Task Update(IContainSagaData saga, ISynchronizedStorageSession session, ContextBag context, CancellationToken cancellationToken = default)
         {
             return session.Session().UpdateAsync(saga, cancellationToken);
         }
 
-        public Task<T> Get<T>(Guid sagaId, SynchronizedStorageSession session, ContextBag context, CancellationToken cancellationToken = default)
+        public Task<T> Get<T>(Guid sagaId, ISynchronizedStorageSession session, ContextBag context, CancellationToken cancellationToken = default)
             where T : class, IContainSagaData
         {
             return session.Session().GetAsync<T>(sagaId, GetLockModeForSaga<T>(), cancellationToken);
         }
 
-        Task<T> ISagaPersister.Get<T>(string property, object value, SynchronizedStorageSession session, ContextBag context, CancellationToken cancellationToken)
+        Task<T> ISagaPersister.Get<T>(string property, object value, ISynchronizedStorageSession session, ContextBag context, CancellationToken cancellationToken)
         {
             return session.Session().CreateCriteria(typeof(T))
                 .SetLockMode(GetLockModeForSaga<T>())
@@ -36,7 +36,7 @@ namespace NServiceBus.SagaPersisters.NHibernate
                 .UniqueResultAsync<T>(cancellationToken);
         }
 
-        public Task Complete(IContainSagaData saga, SynchronizedStorageSession session, ContextBag context, CancellationToken cancellationToken = default)
+        public Task Complete(IContainSagaData saga, ISynchronizedStorageSession session, ContextBag context, CancellationToken cancellationToken = default)
         {
             return session.Session().DeleteAsync(saga, cancellationToken);
         }

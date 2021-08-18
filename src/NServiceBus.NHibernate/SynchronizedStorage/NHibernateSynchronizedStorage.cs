@@ -17,11 +17,11 @@
             this.currentSessionHolder = currentSessionHolder;
         }
 
-        public Task<CompletableSynchronizedStorageSession> OpenSession(ContextBag contextBag, CancellationToken cancellationToken = default)
+        public Task<ICompletableSynchronizedStorageSession> OpenSession(ContextBag contextBag, CancellationToken cancellationToken = default)
         {
             var session = new NHibernateLazyNativeTransactionSynchronizedStorageSession(() => sessionFactory.OpenSession());
             currentSessionHolder?.SetCurrentSession(session);
-            return Task.FromResult<CompletableSynchronizedStorageSession>(session);
+            return Task.FromResult<ICompletableSynchronizedStorageSession>(session);
         }
     }
 }

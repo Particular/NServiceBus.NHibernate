@@ -23,7 +23,7 @@ namespace NServiceBus.Persistence.NHibernate
 
         readonly Configuration configuration;
 
-        public NHibernateConfigurationBuilder(ReadOnlySettings settings, dynamic diagnosticsObject, string connectionStringKeySuffix, string specificConfigSetting)
+        public NHibernateConfigurationBuilder(IReadOnlySettings settings, dynamic diagnosticsObject, string connectionStringKeySuffix, string specificConfigSetting)
         {
             if (settings.TryGet(specificConfigSetting, out configuration))
             {
@@ -74,7 +74,7 @@ namespace NServiceBus.Persistence.NHibernate
             return new NHibernateConfiguration(configuration, connString);
         }
 
-        static IDictionary<string, string> InitFromConfiguration(ReadOnlySettings settings)
+        static IDictionary<string, string> InitFromConfiguration(IReadOnlySettings settings)
         {
             connectionStringSettingsCollection = NHibernateSettingRetriever.ConnectionStrings() ??
                                                  new ConnectionStringSettingsCollection();

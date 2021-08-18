@@ -29,7 +29,7 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
 
         public virtual IList<OrderLine> OrderLines { get; set; }
 
-        public virtual StatusEnum Status { get; set; }
+        public virtual Status Status { get; set; }
 
         public virtual DateTime DateTimeProperty { get; set; }
 
@@ -52,7 +52,7 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
         public virtual Guid Id { get; set; }
     }
 
-    public enum StatusEnum
+    public enum Status
     {
         SomeStatus,
         AnotherStatus
@@ -93,7 +93,7 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
     }
 
     [TableName("MyTestTable", Schema = "MyTestSchema")]
-    public class TestSagaWithTableNameAttribute : IContainSagaData
+    public class SagaWithTableNameData : IContainSagaData
     {
         public virtual Guid Id { get; set; }
 
@@ -104,9 +104,9 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
         public virtual string SomeProperty { get; set; }
     }
 
-    public class TestSagaWithTableNameAttributeActualSaga : Saga<TestSagaWithTableNameAttribute>, IAmStartedByMessages<IMessage>
+    public class SagaWithTableName : Saga<SagaWithTableNameData>, IAmStartedByMessages<IMessage>
     {
-        protected override void ConfigureHowToFindSaga(SagaPropertyMapper<TestSagaWithTableNameAttribute> mapper)
+        protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaWithTableNameData> mapper)
         {
             mapper.ConfigureMapping<IMessage>(m => m.GetHashCode()).ToSaga(s => s.Id);
         }
@@ -117,12 +117,12 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
         }
     }
 
-    public class DerivedFromTestSagaWithTableNameAttribute : TestSagaWithTableNameAttribute
+    public class DerivedFromSagaWithTableNameData : SagaWithTableNameData
     { }
 
-    public class DerivedFromTestSagaWithTableNameAttributeActualSaga : Saga<DerivedFromTestSagaWithTableNameAttribute>, IAmStartedByMessages<IMessage>
+    public class DerivedFromSagaWithTableName : Saga<DerivedFromSagaWithTableNameData>, IAmStartedByMessages<IMessage>
     {
-        protected override void ConfigureHowToFindSaga(SagaPropertyMapper<DerivedFromTestSagaWithTableNameAttribute> mapper)
+        protected override void ConfigureHowToFindSaga(SagaPropertyMapper<DerivedFromSagaWithTableNameData> mapper)
         {
             mapper.ConfigureMapping<IMessage>(m => m.GetHashCode()).ToSaga(s => s.Id);
         }
@@ -134,12 +134,12 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
     }
 
     [TableName("MyDerivedTestTable")]
-    public class AlsoDerivedFromTestSagaWithTableNameAttribute : TestSagaWithTableNameAttribute
+    public class AlsoDerivedFromSagaWithTableNameData : SagaWithTableNameData
     { }
 
-    public class AlsoDerivedFromTestSagaWithTableNameAttributeActualSaga : Saga<AlsoDerivedFromTestSagaWithTableNameAttribute>, IAmStartedByMessages<IMessage>
+    public class AlsoDerivedFromSagaWithTableName : Saga<AlsoDerivedFromSagaWithTableNameData>, IAmStartedByMessages<IMessage>
     {
-        protected override void ConfigureHowToFindSaga(SagaPropertyMapper<AlsoDerivedFromTestSagaWithTableNameAttribute> mapper)
+        protected override void ConfigureHowToFindSaga(SagaPropertyMapper<AlsoDerivedFromSagaWithTableNameData> mapper)
         {
             mapper.ConfigureMapping<IMessage>(m => m.GetHashCode()).ToSaga(s => s.Id);
         }
@@ -150,7 +150,7 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
         }
     }
 
-    public class SagaWithVersionedPropertyAttribute : IContainSagaData
+    public class SagaWithVersionedPropertyData : IContainSagaData
     {
         public virtual Guid Id { get; set; }
         public virtual string Originator { get; set; }
@@ -160,7 +160,7 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
         public virtual int Version { get; set; }
     }
 
-    public class SagaWithoutVersionedPropertyAttribute : IContainSagaData
+    public class SagaWithoutVersionedPropertyData : IContainSagaData
     {
         public virtual Guid Id { get; set; }
         public virtual string Originator { get; set; }
@@ -169,9 +169,9 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
         public virtual int Version { get; set; }
     }
 
-    public class SagaWithVersionedPropertyAttributeActualSaga : Saga<SagaWithVersionedPropertyAttribute>, IAmStartedByMessages<IMessage>
+    public class SagaWithVersionedProperty : Saga<SagaWithVersionedPropertyData>, IAmStartedByMessages<IMessage>
     {
-        protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaWithVersionedPropertyAttribute> mapper)
+        protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaWithVersionedPropertyData> mapper)
         {
             mapper.ConfigureMapping<IMessage>(m => m.GetHashCode()).ToSaga(s => s.Id);
         }
@@ -182,9 +182,9 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
         }
     }
 
-    public class SagaWithoutVersionedPropertyAttributeActualSaga : Saga<SagaWithoutVersionedPropertyAttribute>, IAmStartedByMessages<IMessage>
+    public class SagaWithoutVersionedProperty : Saga<SagaWithoutVersionedPropertyData>, IAmStartedByMessages<IMessage>
     {
-        protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaWithoutVersionedPropertyAttribute> mapper)
+        protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaWithoutVersionedPropertyData> mapper)
         {
             mapper.ConfigureMapping<IMessage>(m => m.GetHashCode()).ToSaga(s => s.Id);
         }
