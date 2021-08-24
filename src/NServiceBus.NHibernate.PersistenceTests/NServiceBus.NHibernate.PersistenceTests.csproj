@@ -27,6 +27,8 @@
     <!--Because NHibernate does not support lists of primitive types-->
     <Compile Remove="\**\When_persisting_a_saga_with_complex_types.cs" />
     <Compile Remove="\**\When_worker_tries_to_complete_saga_update_by_another_pessimistic.cs" />
+    <!--Because NHibernate does not support record types-->
+    <Compile Remove="\**\When_persisting_a_saga_with_record_type.cs" />
   </ItemGroup>
 
 </Project>
