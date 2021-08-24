@@ -152,7 +152,7 @@
             {
                 return BelongsToCurrentTest(t)
                        && (typeof(Saga).IsAssignableFrom(t)
-                           || typeof(ISagaFinder<,>).IsAssignableFrom(t)
+                           || t.GetInterfaces().Any(type => type.IsGenericType && type.GetGenericTypeDefinition() == typeof(ISagaFinder<,>))
                            || typeof(IFinder).IsAssignableFrom(t));
 
             }).ToArray();
