@@ -20,7 +20,7 @@
             }
             var operations = outboxMessage.TransportOperations.Select(t => new OutboxOperation
             {
-                Message = t.Body,
+                Message = t.Body.ToArray(),
                 Headers = t.Headers,
                 MessageId = t.MessageId,
                 Options = t.Options != null ? new Dictionary<string, string>(t.Options) : new Dictionary<string, string>(),
