@@ -8,10 +8,11 @@ namespace NServiceBus.SagaPersisters.NHibernate.AutoPersistence
     using global::NHibernate;
     using global::NHibernate.Cfg;
     using global::NHibernate.Cfg.MappingSchema;
-    using global::NHibernate.Mapping;
     using global::NHibernate.Mapping.ByCode;
     using global::NHibernate.Type;
     using Sagas;
+
+    using Index = global::NHibernate.Mapping.Index;
 
     class SagaModelMapper
     {
