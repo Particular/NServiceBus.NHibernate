@@ -52,24 +52,16 @@ namespace NServiceBus.SagaPersisters.NHibernate
 
             var explicitLockMode = ((LockModeAttribute)explicitLockModeAttribute).RequestedLockMode;
 
-            switch (explicitLockMode)
+            return explicitLockMode switch
             {
-                case LockModes.Force:
-                    return LockMode.Force;
-                case LockModes.None:
-                    return LockMode.None;
-                case LockModes.Read:
-                    return LockMode.Read;
-                case LockModes.Upgrade:
-                    return LockMode.Upgrade;
-                case LockModes.UpgradeNoWait:
-                    return LockMode.UpgradeNoWait;
-                case LockModes.Write:
-                    return LockMode.Write;
-
-                default:
-                    throw new InvalidOperationException("Unknown lock mode requested: " + explicitLockMode);
-            }
+                LockModes.Force => LockMode.Force,
+                LockModes.None => LockMode.None,
+                LockModes.Read => LockMode.Read,
+                LockModes.Upgrade => LockMode.Upgrade,
+                LockModes.UpgradeNoWait => LockMode.UpgradeNoWait,
+                LockModes.Write => LockMode.Write,
+                _ => throw new InvalidOperationException("Unknown lock mode requested: " + explicitLockMode)
+            };
         }
     }
 }
