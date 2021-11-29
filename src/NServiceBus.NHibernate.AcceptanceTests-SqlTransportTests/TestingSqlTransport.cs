@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using NServiceBus;
@@ -15,11 +16,20 @@ public partial class ConfigureEndpointSqlServerTransport
 
         public string[] ReceiveAddresses { get; set; }
 
-        public override Task<TransportInfrastructure> Initialize(HostSettings hostSettings, ReceiveSettings[] receivers, string[] sendingAddresses, CancellationToken cancellationToken = default)
+        public override async Task<TransportInfrastructure> Initialize(HostSettings hostSettings, ReceiveSettings[] receivers, string[] sendingAddresses, CancellationToken cancellationToken = default)
         {
-            ReceiveAddresses = receivers.Select(r => r.ReceiveAddress).ToArray();
-            return base.Initialize(hostSettings, receivers, sendingAddresses, cancellationToken);
-        }
+            var infra = await base.Initialize(hostSettings, receivers, sendingAddresses, cancellationToken);
 
+            if (infra.Receivers == null)
+            {
+                ReceiveAddresses = Array.Empty<string>();
+            }
+            else
+            {
+                ReceiveAddresses = infra.Receivers.Select(r => r.Value.ReceiveAddress).ToArray();
+            }
+
+            return infra;
+        }
     }
 }
