@@ -73,13 +73,16 @@
 
         static PersistenceTestsConfiguration()
         {
-            var sagaVariants = new List<object>
+            var sagaVariants = new List<object>();
+            var sqlConnectionString = Consts.ConnectionString;
+
+            if (sqlConnectionString != null)
             {
-                CreateVariant("SQL Server", x =>
+                sagaVariants.Add(CreateVariant("SQL Server", x =>
                 {
                     x.Dialect<MsSql2012Dialect>();
-                    x.ConnectionString = Consts.ConnectionString;
-                })
+                    x.ConnectionString = sqlConnectionString;
+                }));
             };
 
             if (!string.IsNullOrWhiteSpace(System.Environment.GetEnvironmentVariable("OracleConnectionString")))
@@ -92,29 +95,32 @@
                 }));
             }
             SagaVariants = sagaVariants.ToArray();
-            OutboxVariants = new[]
+
+            var outboxVariants = new List<object>();
+            if (sqlConnectionString != null)
             {
-                CreateVariant("SQL Server Optimistic Native default OutboxRecord", x =>
-                {
-                    x.Dialect<MsSql2012Dialect>();
-                    x.ConnectionString = Consts.ConnectionString;
-                }),
-                CreateVariant("SQL Server Pessimistic Native default OutboxRecord", x =>
-                {
-                    x.Dialect<MsSql2012Dialect>();
-                    x.ConnectionString = Consts.ConnectionString;
-                }, true, false),
-                CreateVariant("SQL Server Pessimistic TransactionScope default OutboxRecord", x =>
-                {
-                    x.Dialect<MsSql2012Dialect>();
-                    x.ConnectionString = Consts.ConnectionString;
-                }, true, true),
-                CreateVariant("SQL Server Optimistic TransactionScope default OutboxRecord", x =>
-                {
-                    x.Dialect<MsSql2012Dialect>();
-                    x.ConnectionString = Consts.ConnectionString;
-                }, false, true),
-            };
+                outboxVariants.Add(CreateVariant("SQL Server Optimistic Native default OutboxRecord", x =>
+                    {
+                        x.Dialect<MsSql2012Dialect>();
+                        x.ConnectionString = sqlConnectionString;
+                    }));
+                outboxVariants.Add(CreateVariant("SQL Server Pessimistic Native default OutboxRecord", x =>
+                    {
+                        x.Dialect<MsSql2012Dialect>();
+                        x.ConnectionString = sqlConnectionString;
+                    }, true, false));
+                outboxVariants.Add(CreateVariant("SQL Server Pessimistic TransactionScope default OutboxRecord", x =>
+                    {
+                        x.Dialect<MsSql2012Dialect>();
+                        x.ConnectionString = sqlConnectionString;
+                    }, true, true));
+                outboxVariants.Add(CreateVariant("SQL Server Optimistic TransactionScope default OutboxRecord", x =>
+                    {
+                        x.Dialect<MsSql2012Dialect>();
+                        x.ConnectionString = sqlConnectionString;
+                    }, false, true));
+            }
+            OutboxVariants = outboxVariants.ToArray();
         }
 
         static TestFixtureData CreateVariant<T>(string description, Action<DbIntegrationConfigurationProperties> configureDb, bool pessimistic = false, bool transactionScope = false)

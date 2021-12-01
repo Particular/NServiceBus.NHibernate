@@ -19,8 +19,10 @@ public class ConfigureEndpointNHibernatePersistence : IConfigureEndpointTestExec
             {"NServiceBus/Persistence/NHibernate/show_sql", "true"}
         };
 
+        var connectionString = Environment.GetEnvironmentVariable("OracleConnectionString");
+
         config.UsePersistence<NHibernatePersistence>()
-            .ConnectionString("Data Source=(DESCRIPTION=(ADDRESS_LIST = (ADDRESS = (PROTOCOL = TCP)(HOST = 127.0.0.1)(PORT = 1521)))(CONNECT_DATA = (SERVER = DEDICATED)(SERVICE_NAME = XE)));User Id=particular; Password=Welcome1; Enlist=dynamic")
+            .ConnectionString(connectionString)
             .SagaTableNamingConvention(type =>
             {
                 var tablename = DefaultTableNameConvention(type);
