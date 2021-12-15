@@ -8,18 +8,11 @@ on:
   pull_request:
       branches-ignore:
         - release-[0-7].*
-  pull_request_target:
-      branches-ignore:
-        - release-[0-7].*
   workflow_dispatch:
 env:
   DOTNET_NOLOGO: true
 jobs:
   build:
-    if:
-      (github.event_name == 'pull_request_target' && github.event.pull_request.user.login == 'dependabot[bot]') ||
-      (github.event_name == 'pull_request' && github.event.pull_request.user.login != 'dependabot[bot]') ||
-      github.event_name == 'push' || github.event_name == 'workflow_dispatch'
     name: ${{ matrix.name }}
     runs-on: ${{ matrix.os }}
     strategy:
@@ -33,22 +26,10 @@ jobs:
             name: Windows-Oracle
       fail-fast: false
     steps:
-      - name: Check for secrets
-        env:
-          SECRETS_AVAILABLE: ${{ secrets.SECRETS_AVAILABLE }}
-        shell: pwsh
-        run: exit $(If ($env:SECRETS_AVAILABLE -eq 'true') { 0 } Else { 1 })
       - name: Checkout
-        if: github.event_name != 'pull_request_target'
         uses: actions/checkout@v2.4.0
         with:
           fetch-depth: 0
-      - name: Checkout for Dependabot
-        if: github.event_name == 'pull_request_target'
-        uses: actions/checkout@v2.4.0
-        with:
-          ref: "refs/pull/${{ github.event.number }}/merge"
-          fetch-depth: 0   
       - name: Setup .NET SDK
         uses: actions/setup-dotnet@v1.9.0
         with:
