@@ -4,7 +4,7 @@
 
     static class Consts
     {
-        const string defaultConnStr = @"Data Source=localhost;Initial Catalog=nservicebus;Integrated Security=True;";
+        const string defaultConnStr = @"Data Source=.\SQLEXPRESS;Initial Catalog=nservicebus;Integrated Security=True;";
 
         public static string ConnectionString
         {
