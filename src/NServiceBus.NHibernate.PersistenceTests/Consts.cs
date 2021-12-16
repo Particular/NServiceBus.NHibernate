@@ -4,25 +4,19 @@
 
     static class Consts
     {
-        const string @default = @"Data Source=.\SQLEXPRESS;Initial Catalog=nservicebus;Integrated Security=True;";
+        const string defaultConnStr = @"Data Source=localhost;Initial Catalog=nservicebus;Integrated Security=True;";
 
         public static string ConnectionString
         {
             get
             {
-                var env = Environment.GetEnvironmentVariable("NH_ACC_TEST_CONNSTR");
+                var env = Environment.GetEnvironmentVariable("SQLServerConnectionString");
+                var ci = Environment.GetEnvironmentVariable("CI");
                 if (!string.IsNullOrEmpty(env))
                 {
                     return env;
                 }
-
-                env = Environment.GetEnvironmentVariable("SQLServerConnectionString");
-                if (!string.IsNullOrEmpty(env))
-                {
-                    return env;
-                }
-
-                return @default;
+                return ci == "true" ? null : defaultConnStr;
             }
         }
     }

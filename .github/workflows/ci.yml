@@ -1,0 +1,76 @@
+name: CI
+on:
+  push:
+    branches:
+      - master
+      - release-[8-9].*
+      - release-1[0-9].*
+  pull_request:
+      branches-ignore:
+        - release-[0-7].*
+  workflow_dispatch:
+env:
+  DOTNET_NOLOGO: true
+jobs:
+  build:
+    name: ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+          - os: windows-2019
+            name: Windows-Sql
+          - os: ubuntu-20.04
+            name: Linux
+          - os: [self-hosted, windows, oracle]
+            name: Windows-Oracle
+      fail-fast: false
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2.4.0
+        with:
+          fetch-depth: 0
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v1.9.0
+        with:
+          dotnet-version: |
+            5.0.x
+            3.1.x
+      - name: Build
+        run: dotnet build src --configuration Release
+      - name: Upload packages
+        if: matrix.name == 'Windows-Sql'
+        uses: actions/upload-artifact@v2.2.4
+        with:
+          name: NuGet packages
+          path: nugets/
+          retention-days: 7
+      - name: Install SQL Server
+        if: matrix.name == 'Linux' || matrix.name == 'Windows-Sql'
+        uses: Particular/install-sql-server-action@v1.0.0
+        with:
+          connection-string-env-var: SQLServerConnectionString
+          catalog: nservicebus      
+      - name: Setup Oracle for Linux
+        if: matrix.name == 'Linux'
+        shell: pwsh
+        run: |
+          docker run -d -p 1521:1521 -e ORACLE_PASSWORD=Welcome1 gvenzl/oracle-xe
+          for ($i = 0; $i -lt 24; $i++) { ## 2 minute timeout
+              echo "Checking for Oracle connectivity $($i+1)/24..."
+              docker exec oracle ./healthcheck.sh
+              if ($?) {
+                echo "Connection successful"
+                break;
+              }
+              sleep 5
+            }
+          echo "OracleConnectionString=Data Source=(DESCRIPTION=(ADDRESS_LIST = (ADDRESS = (PROTOCOL = TCP)(HOST = 127.0.0.1)(PORT = 1521)))(CONNECT_DATA = (SERVER = DEDICATED)(SERVICE_NAME = XE)));User Id=SYSTEM; Password=Welcome1; Enlist=dynamic" >> $GITHUB_ENV
+      - name: Setup Oracle for Windows   
+        if: matrix.name == 'Windows-Oracle' 
+        shell: pwsh
+        run: |
+            echo "Adding environment variables for Oracle connection strings"
+            echo "OracleConnectionString=User Id=particular;Password=Welcome1;Data Source=127.0.0.1:1521/nservicebus;Enlist=dynamic" | Out-File -FilePath $Env:GITHUB_ENV -Encoding utf-8 -Append
+      - name: Run tests
+        uses: Particular/run-tests-action@v1.0.0
