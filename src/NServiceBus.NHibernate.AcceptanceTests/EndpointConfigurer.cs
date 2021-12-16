@@ -11,19 +11,8 @@ public abstract class EndpointConfigurer : IConfigureEndpointTestExecution
     {
         get
         {
-            var env = Environment.GetEnvironmentVariable("NH_ACC_TEST_CONNSTR");
-            if (!string.IsNullOrEmpty(env))
-            {
-                return env;
-            }
-
-            env = Environment.GetEnvironmentVariable("SQLServerConnectionString");
-            if (!string.IsNullOrEmpty(env))
-            {
-                return env;
-            }
-
-            return defaultConnStr;
+            var env = Environment.GetEnvironmentVariable("SQLServerConnectionString");
+            return string.IsNullOrEmpty(env) ? defaultConnStr : env;
         }
     }
 
