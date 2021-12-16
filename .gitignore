@@ -95,6 +95,3 @@ src/scaffolding.config
 # JetBrains Rider
 .idea/
 *.sln.iml
-
-# Visual Studio Code
-.vscode
