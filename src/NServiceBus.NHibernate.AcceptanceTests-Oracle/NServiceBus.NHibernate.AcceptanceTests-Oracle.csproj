@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net461</TargetFramework>
+    <TargetFrameworks>net461;netcoreapp3.1;net5.0</TargetFrameworks>
     <RootNamespace>NServiceBus.NHibernate.AcceptanceTests.Oracle</RootNamespace>
   </PropertyGroup>
 
@@ -12,10 +12,11 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.6.1" />
     <PackageReference Include="NHibernate" Version="5.2.7" />
-    <PackageReference Include="NServiceBus.AcceptanceTests.Sources" Version="7.5.0" />
+    <PackageReference Include="NServiceBus.AcceptanceTests.Sources" Version="7.5.0" GeneratePathProperty="true" />
     <PackageReference Include="NUnit" Version="3.12.0" />
     <PackageReference Include="NUnit3TestAdapter" Version="3.16.1" />
-    <PackageReference Include="Oracle.ManagedDataAccess" Version="19.7.0" />
+    <PackageReference Include="Oracle.ManagedDataAccess.Core" Version="2.19.110" />
+    <PackageReference Include="GitHubActionsTestLogger" Version="1.2.0" />
   </ItemGroup>
 
   <ItemGroup>
