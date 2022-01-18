@@ -57,5 +57,14 @@ namespace NServiceBus.NHibernate
         {
             throw new NotImplementedException();
         }
+
+        [ObsoleteEx(
+            Message = "NHibernate gateway persistence is deprecated. Use the new NServiceBus.Gateway.Sql dedicated package.",
+            RemoveInVersion = "10",
+            TreatAsErrorFromVersion = "9")]
+        public static string GenerateGatewayDeduplicationStoreScript()
+        {
+            throw new NotImplementedException();
+        }
     }
 }
