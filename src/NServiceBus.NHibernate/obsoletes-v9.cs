@@ -68,3 +68,5 @@ namespace NServiceBus.NHibernate
         }
     }
 }
+
+#pragma warning restore 1591
