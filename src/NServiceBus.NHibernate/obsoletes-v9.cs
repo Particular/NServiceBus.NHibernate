@@ -14,9 +14,7 @@ namespace NServiceBus.Features
     public class NHibernateTimeoutStorage : Feature
     {
         protected override void Setup(FeatureConfigurationContext context)
-        {
-            throw new NotImplementedException();
-        }
+            => throw new NotImplementedException();
     }
 }
 
@@ -32,15 +30,11 @@ namespace NServiceBus.Persistence.NHibernate
     {
         public static PersistenceExtensions<NHibernatePersistence> DisableTimeoutStorageSchemaUpdate(
             this PersistenceExtensions<NHibernatePersistence> persistenceConfiguration)
-        {
-            throw new NotImplementedException();
-        }
+            => throw new NotImplementedException();
 
         public static PersistenceExtensions<NHibernatePersistence> UseTimeoutStorageConfiguration(
             this PersistenceExtensions<NHibernatePersistence> persistenceConfiguration, Configuration configuration)
-        {
-            throw new NotImplementedException();
-        }
+            => throw new NotImplementedException();
     }
 }
 
@@ -54,18 +48,15 @@ namespace NServiceBus.NHibernate
             TreatAsErrorFromVersion = "9",
             RemoveInVersion = "10")]
         public static string GenerateTimeoutStoreScript()
-        {
-            throw new NotImplementedException();
-        }
+            => throw new NotImplementedException();
 
         [ObsoleteEx(
-            Message = "NHibernate gateway persistence is deprecated. Use the new NServiceBus.Gateway.Sql dedicated package.",
+            Message =
+                "NHibernate gateway persistence is deprecated. Use the new NServiceBus.Gateway.Sql dedicated package.",
             RemoveInVersion = "10",
             TreatAsErrorFromVersion = "9")]
         public static string GenerateGatewayDeduplicationStoreScript()
-        {
-            throw new NotImplementedException();
-        }
+            => throw new NotImplementedException();
     }
 }
 
