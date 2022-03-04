@@ -83,16 +83,14 @@
 
                 protected override void ConfigureHowToFindSaga(SagaPropertyMapper<Saga13Data> mapper)
                 {
-                    mapper.ConfigureMapping<Message1>(m => m.SomeId).ToSaga(s => s.SomeId);
-                    mapper.ConfigureMapping<Message2>(m => m.SomeId).ToSaga(s => s.SomeId);
+                    mapper.MapSaga(s => s.SomeId)
+                        .ToMessage<Message1>(m => m.SomeId)
+                        .ToMessage<Message2>(m => m.SomeId);
                 }
             }
 
-            public class Saga13Data : IContainSagaData
+            public class Saga13Data : ContainSagaData
             {
-                public virtual Guid Id { get; set; }
-                public virtual string Originator { get; set; }
-                public virtual string OriginalMessageId { get; set; }
                 public virtual Guid SomeId { get; set; }
             }
         }

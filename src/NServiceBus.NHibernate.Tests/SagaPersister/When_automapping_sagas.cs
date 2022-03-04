@@ -25,7 +25,7 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
                 typeof(SagaWithTableName), typeof(SagaWithTableNameData),
                 typeof(SagaWithVersionedProperty), typeof(SagaWithVersionedPropertyData),
                 typeof(SagaWithoutVersionedProperty), typeof(SagaWithoutVersionedPropertyData),
-                typeof(object)
+                typeof(ContainSagaData), typeof(object)
             };
 
             sessionFactory = SessionFactoryHelper.Build(types);

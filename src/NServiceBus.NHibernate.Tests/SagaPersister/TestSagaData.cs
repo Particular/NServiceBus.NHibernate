@@ -4,27 +4,22 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
     using System.Collections.Generic;
     using System.Threading.Tasks;
 
-    public class TestSaga : Saga<TestSagaData>, IAmStartedByMessages<IMessage>
+    public class TestSaga : Saga<TestSagaData>, IAmStartedByMessages<SagaStartMessage>
     {
         protected override void ConfigureHowToFindSaga(SagaPropertyMapper<TestSagaData> mapper)
         {
-            mapper.ConfigureMapping<IMessage>(m => m.GetHashCode()).ToSaga(s => s.Id);
+            mapper.ConfigureMapping<SagaStartMessage>(m => m.SagaId).ToSaga(s => s.SagaId);
         }
 
-        public Task Handle(IMessage message, IMessageHandlerContext context)
+        public Task Handle(SagaStartMessage message, IMessageHandlerContext context)
         {
             throw new NotImplementedException();
         }
     }
 
-    public class TestSagaData : IContainSagaData
+    public class TestSagaData : ContainSagaData
     {
-        public virtual Guid Id { get; set; }
-
-        public virtual string Originator { get; set; }
-
-        public virtual string OriginalMessageId { get; set; }
-
+        public virtual Guid SagaId { get; set; }
         public virtual RelatedClass RelatedClass { get; set; }
 
         public virtual IList<OrderLine> OrderLines { get; set; }
@@ -81,37 +76,31 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
         public virtual TestSagaData ParentSaga { get; set; }
     }
 
-    public class TestSagaWithHbmlXmlOverride : IContainSagaData
+    public class TestSagaWithHbmlXmlOverride : ContainSagaData
     {
-        public virtual Guid Id { get; set; }
-
-        public virtual string Originator { get; set; }
-
-        public virtual string OriginalMessageId { get; set; }
-
         public virtual string SomeProperty { get; set; }
     }
 
     [TableName("MyTestTable", Schema = "MyTestSchema")]
-    public class SagaWithTableNameData : IContainSagaData
+    public class SagaWithTableNameData : ContainSagaData
     {
-        public virtual Guid Id { get; set; }
-
-        public virtual string Originator { get; set; }
-
-        public virtual string OriginalMessageId { get; set; }
-
+        public virtual Guid SagaId { get; set; }
         public virtual string SomeProperty { get; set; }
     }
 
-    public class SagaWithTableName : Saga<SagaWithTableNameData>, IAmStartedByMessages<IMessage>
+    public class SagaStartMessage : IMessage
+    {
+        public virtual Guid SagaId { get; set; }
+    }
+
+    public class SagaWithTableName : Saga<SagaWithTableNameData>, IAmStartedByMessages<SagaStartMessage>
     {
         protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaWithTableNameData> mapper)
         {
-            mapper.ConfigureMapping<IMessage>(m => m.GetHashCode()).ToSaga(s => s.Id);
+            mapper.ConfigureMapping<SagaStartMessage>(m => m.SagaId).ToSaga(s => s.SagaId);
         }
 
-        public Task Handle(IMessage message, IMessageHandlerContext context)
+        public Task Handle(SagaStartMessage message, IMessageHandlerContext context)
         {
             throw new NotImplementedException();
         }
@@ -120,14 +109,14 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
     public class DerivedFromSagaWithTableNameData : SagaWithTableNameData
     { }
 
-    public class DerivedFromSagaWithTableName : Saga<DerivedFromSagaWithTableNameData>, IAmStartedByMessages<IMessage>
+    public class DerivedFromSagaWithTableName : Saga<DerivedFromSagaWithTableNameData>, IAmStartedByMessages<SagaStartMessage>
     {
         protected override void ConfigureHowToFindSaga(SagaPropertyMapper<DerivedFromSagaWithTableNameData> mapper)
         {
-            mapper.ConfigureMapping<IMessage>(m => m.GetHashCode()).ToSaga(s => s.Id);
+            mapper.ConfigureMapping<SagaStartMessage>(m => m.SagaId).ToSaga(s => s.SagaId);
         }
 
-        public Task Handle(IMessage message, IMessageHandlerContext context)
+        public Task Handle(SagaStartMessage message, IMessageHandlerContext context)
         {
             throw new NotImplementedException();
         }
@@ -137,59 +126,58 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
     public class AlsoDerivedFromSagaWithTableNameData : SagaWithTableNameData
     { }
 
-    public class AlsoDerivedFromSagaWithTableName : Saga<AlsoDerivedFromSagaWithTableNameData>, IAmStartedByMessages<IMessage>
+    public class AlsoDerivedFromSagaWithTableName : Saga<AlsoDerivedFromSagaWithTableNameData>, IAmStartedByMessages<SagaStartMessage>
     {
         protected override void ConfigureHowToFindSaga(SagaPropertyMapper<AlsoDerivedFromSagaWithTableNameData> mapper)
         {
-            mapper.ConfigureMapping<IMessage>(m => m.GetHashCode()).ToSaga(s => s.Id);
+            mapper.ConfigureMapping<SagaStartMessage>(m => m.SagaId).ToSaga(s => s.SagaId);
         }
 
-        public Task Handle(IMessage message, IMessageHandlerContext context)
+        public Task Handle(SagaStartMessage message, IMessageHandlerContext context)
         {
             throw new NotImplementedException();
         }
     }
 
+#pragma warning disable NSB0012
     public class SagaWithVersionedPropertyData : IContainSagaData
     {
-        public virtual Guid Id { get; set; }
-        public virtual string Originator { get; set; }
-        public virtual string OriginalMessageId { get; set; }
-
         [RowVersion]
         public virtual int Version { get; set; }
-    }
-
-    public class SagaWithoutVersionedPropertyData : IContainSagaData
-    {
+        public virtual Guid SagaId { get; set; }
         public virtual Guid Id { get; set; }
         public virtual string Originator { get; set; }
         public virtual string OriginalMessageId { get; set; }
+    }
+#pragma warning restore
 
+    public class SagaWithoutVersionedPropertyData : ContainSagaData
+    {
+        public virtual Guid SagaId { get; set; }
         public virtual int Version { get; set; }
     }
 
-    public class SagaWithVersionedProperty : Saga<SagaWithVersionedPropertyData>, IAmStartedByMessages<IMessage>
+    public class SagaWithVersionedProperty : Saga<SagaWithVersionedPropertyData>, IAmStartedByMessages<SagaStartMessage>
     {
         protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaWithVersionedPropertyData> mapper)
         {
-            mapper.ConfigureMapping<IMessage>(m => m.GetHashCode()).ToSaga(s => s.Id);
+            mapper.ConfigureMapping<SagaStartMessage>(m => m.SagaId).ToSaga(s => s.SagaId);
         }
 
-        public Task Handle(IMessage message, IMessageHandlerContext context)
+        public Task Handle(SagaStartMessage message, IMessageHandlerContext context)
         {
             throw new NotImplementedException();
         }
     }
 
-    public class SagaWithoutVersionedProperty : Saga<SagaWithoutVersionedPropertyData>, IAmStartedByMessages<IMessage>
+    public class SagaWithoutVersionedProperty : Saga<SagaWithoutVersionedPropertyData>, IAmStartedByMessages<SagaStartMessage>
     {
         protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaWithoutVersionedPropertyData> mapper)
         {
-            mapper.ConfigureMapping<IMessage>(m => m.GetHashCode()).ToSaga(s => s.Id);
+            mapper.ConfigureMapping<SagaStartMessage>(m => m.SagaId).ToSaga(s => s.SagaId);
         }
 
-        public Task Handle(IMessage message, IMessageHandlerContext context)
+        public Task Handle(SagaStartMessage message, IMessageHandlerContext context)
         {
             throw new NotImplementedException();
         }

@@ -1,5 +1,6 @@
 namespace NServiceBus.SagaPersisters.NHibernate.Tests
 {
+    using System;
     using System.Threading.Tasks;
     using global::NHibernate;
     using NUnit.Framework;
@@ -23,18 +24,19 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
 
     public class MyDerivedClassWithRowVersion : ContainSagaData
     {
+        public Guid SagaId { get; set; }
         [RowVersion]
         public virtual byte[] MyVersion { get; set; }
     }
 
-    public class MyDerivedClassWithRowVersionSaga : Saga<MyDerivedClassWithRowVersion>, IAmStartedByMessages<IMessage>
+    public class MyDerivedClassWithRowVersionSaga : Saga<MyDerivedClassWithRowVersion>, IAmStartedByMessages<SagaStartMessage>
     {
         protected override void ConfigureHowToFindSaga(SagaPropertyMapper<MyDerivedClassWithRowVersion> mapper)
         {
-            mapper.ConfigureMapping<IMessage>(m => m.GetHashCode()).ToSaga(s => s.Id);
+            mapper.ConfigureMapping<SagaStartMessage>(m => m.SagaId).ToSaga(s => s.SagaId);
         }
 
-        public Task Handle(IMessage message, IMessageHandlerContext context)
+        public Task Handle(SagaStartMessage message, IMessageHandlerContext context)
         {
             throw new System.NotImplementedException();
         }
