@@ -42,7 +42,7 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
     {
         protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaWithAbstractBaseClass> mapper)
         {
-            mapper.ConfigureMapping<SagaStartMessage>(m => m.SagaId).ToSaga(s => s.SagaId);
+            mapper.ConfigureMapping<SagaStartMessage>(m => m.CorrelationId).ToSaga(s => s.CorrelationId);
         }
 
         public Task Handle(SagaStartMessage message, IMessageHandlerContext context)
@@ -58,7 +58,7 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
 
     public abstract class MyOwnAbstractBase : ContainSagaData
     {
-        public virtual Guid SagaId { get; set; }
+        public virtual Guid CorrelationId { get; set; }
         public virtual string AbstractBaseProp { get; set; }
     }
 }

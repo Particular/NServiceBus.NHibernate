@@ -8,7 +8,7 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
     {
         protected override void ConfigureHowToFindSaga(SagaPropertyMapper<TestSagaData> mapper)
         {
-            mapper.ConfigureMapping<SagaStartMessage>(m => m.SagaId).ToSaga(s => s.SagaId);
+            mapper.ConfigureMapping<SagaStartMessage>(m => m.CorrelationId).ToSaga(s => s.SagaCorrelationId);
         }
 
         public Task Handle(SagaStartMessage message, IMessageHandlerContext context)
@@ -19,7 +19,7 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
 
     public class TestSagaData : ContainSagaData
     {
-        public virtual Guid SagaId { get; set; }
+        public virtual Guid SagaCorrelationId { get; set; }
         public virtual RelatedClass RelatedClass { get; set; }
 
         public virtual IList<OrderLine> OrderLines { get; set; }
@@ -84,20 +84,20 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
     [TableName("MyTestTable", Schema = "MyTestSchema")]
     public class SagaWithTableNameData : ContainSagaData
     {
-        public virtual Guid SagaId { get; set; }
+        public virtual Guid CorrelationId { get; set; }
         public virtual string SomeProperty { get; set; }
     }
 
     public class SagaStartMessage : IMessage
     {
-        public virtual Guid SagaId { get; set; }
+        public virtual Guid CorrelationId { get; set; }
     }
 
     public class SagaWithTableName : Saga<SagaWithTableNameData>, IAmStartedByMessages<SagaStartMessage>
     {
         protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaWithTableNameData> mapper)
         {
-            mapper.ConfigureMapping<SagaStartMessage>(m => m.SagaId).ToSaga(s => s.SagaId);
+            mapper.ConfigureMapping<SagaStartMessage>(m => m.CorrelationId).ToSaga(s => s.CorrelationId);
         }
 
         public Task Handle(SagaStartMessage message, IMessageHandlerContext context)
@@ -113,7 +113,7 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
     {
         protected override void ConfigureHowToFindSaga(SagaPropertyMapper<DerivedFromSagaWithTableNameData> mapper)
         {
-            mapper.ConfigureMapping<SagaStartMessage>(m => m.SagaId).ToSaga(s => s.SagaId);
+            mapper.ConfigureMapping<SagaStartMessage>(m => m.CorrelationId).ToSaga(s => s.CorrelationId);
         }
 
         public Task Handle(SagaStartMessage message, IMessageHandlerContext context)
@@ -130,7 +130,7 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
     {
         protected override void ConfigureHowToFindSaga(SagaPropertyMapper<AlsoDerivedFromSagaWithTableNameData> mapper)
         {
-            mapper.ConfigureMapping<SagaStartMessage>(m => m.SagaId).ToSaga(s => s.SagaId);
+            mapper.ConfigureMapping<SagaStartMessage>(m => m.CorrelationId).ToSaga(s => s.CorrelationId);
         }
 
         public Task Handle(SagaStartMessage message, IMessageHandlerContext context)
@@ -144,7 +144,7 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
     {
         [RowVersion]
         public virtual int Version { get; set; }
-        public virtual Guid SagaId { get; set; }
+        public virtual Guid CorrelationId { get; set; }
         public virtual Guid Id { get; set; }
         public virtual string Originator { get; set; }
         public virtual string OriginalMessageId { get; set; }
@@ -153,7 +153,7 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
 
     public class SagaWithoutVersionedPropertyData : ContainSagaData
     {
-        public virtual Guid SagaId { get; set; }
+        public virtual Guid CorrelationId { get; set; }
         public virtual int Version { get; set; }
     }
 
@@ -161,7 +161,7 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
     {
         protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaWithVersionedPropertyData> mapper)
         {
-            mapper.ConfigureMapping<SagaStartMessage>(m => m.SagaId).ToSaga(s => s.SagaId);
+            mapper.ConfigureMapping<SagaStartMessage>(m => m.CorrelationId).ToSaga(s => s.CorrelationId);
         }
 
         public Task Handle(SagaStartMessage message, IMessageHandlerContext context)
@@ -174,7 +174,7 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
     {
         protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaWithoutVersionedPropertyData> mapper)
         {
-            mapper.ConfigureMapping<SagaStartMessage>(m => m.SagaId).ToSaga(s => s.SagaId);
+            mapper.ConfigureMapping<SagaStartMessage>(m => m.CorrelationId).ToSaga(s => s.CorrelationId);
         }
 
         public Task Handle(SagaStartMessage message, IMessageHandlerContext context)

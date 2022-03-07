@@ -57,7 +57,7 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
 
         public class TestSaga2 : ContainSagaData
         {
-            public virtual Guid SagaId { get; set; }
+            public virtual Guid CorrelationId { get; set; }
         }
 
         public class TestSaga2ActualSaga : Saga<TestSaga2>, IAmStartedByMessages<SagaStartMessage>
@@ -65,7 +65,7 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
 
             protected override void ConfigureHowToFindSaga(SagaPropertyMapper<TestSaga2> mapper)
             {
-                mapper.ConfigureMapping<SagaStartMessage>(m => m.SagaId).ToSaga(s => s.SagaId);
+                mapper.ConfigureMapping<SagaStartMessage>(m => m.CorrelationId).ToSaga(s => s.CorrelationId);
             }
 
             public Task Handle(SagaStartMessage message, IMessageHandlerContext context)
@@ -77,7 +77,7 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
 
     public class SagaWithNestedType : ContainSagaData
     {
-        public virtual Guid SagaId { get; set; }
+        public virtual Guid CorrelationId { get; set; }
         public virtual IList<Customer> Customers { get; set; }
 
         public class Customer
@@ -91,7 +91,7 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
     {
         protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaWithNestedType> mapper)
         {
-            mapper.ConfigureMapping<SagaStartMessage>(m => m.SagaId).ToSaga(s => s.SagaId);
+            mapper.ConfigureMapping<SagaStartMessage>(m => m.CorrelationId).ToSaga(s => s.CorrelationId);
         }
 
         public Task Handle(SagaStartMessage message, IMessageHandlerContext context)
@@ -104,12 +104,12 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
     {
         public class NestedSagaData : ContainSagaData
         {
-            public virtual Guid SagaId { get; set; }
+            public virtual Guid CorrelationId { get; set; }
         }
 
         protected override void ConfigureHowToFindSaga(SagaPropertyMapper<NestedSagaData> mapper)
         {
-            mapper.ConfigureMapping<SagaStartMessage>(m => m.SagaId).ToSaga(s => s.SagaId);
+            mapper.ConfigureMapping<SagaStartMessage>(m => m.CorrelationId).ToSaga(s => s.CorrelationId);
         }
 
         public Task Handle(SagaStartMessage message, IMessageHandlerContext context)
