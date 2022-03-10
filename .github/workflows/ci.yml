@@ -65,7 +65,7 @@ jobs:
               }
               sleep 5
             }
-          echo "OracleConnectionString=Data Source=(DESCRIPTION=(ADDRESS_LIST = (ADDRESS = (PROTOCOL = TCP)(HOST = 127.0.0.1)(PORT = 1521)))(CONNECT_DATA = (SERVER = DEDICATED)(SERVICE_NAME = XE)));User Id=SYSTEM; Password=Welcome1; Enlist=dynamic" >> $GITHUB_ENV
+          echo "OracleConnectionString=Data Source=(DESCRIPTION=(ADDRESS_LIST = (ADDRESS = (PROTOCOL = TCP)(HOST = 127.0.0.1)(PORT = 1521)))(CONNECT_DATA = (SERVER = DEDICATED)(SERVICE_NAME = XE)));User Id=SYSTEM; Password=Welcome1; Enlist=dynamic" | Out-File -FilePath $Env:GITHUB_ENV -Encoding utf-8 -Append
       - name: Setup Oracle for Windows   
         if: matrix.name == 'Windows-Oracle' 
         shell: pwsh
