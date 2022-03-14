@@ -34,18 +34,18 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
         public void Concrete_class_persister_includes_all_properties_from_abstract_base_classes()
         {
             var persister = sessionFactory.GetEntityPersister(typeof(SagaWithAbstractBaseClass).FullName);
-            CollectionAssert.AreEquivalent(new[] { "AbstractBaseProp", "OrderId", "Originator", "OriginalMessageId" }, persister.PropertyNames);
+            CollectionAssert.AreEquivalent(new[] { "AbstractBaseProp", "CorrelationId", "OrderId", "Originator", "OriginalMessageId" }, persister.PropertyNames);
         }
     }
 
-    public class SagaWithAbstractBaseClassActualSaga : Saga<SagaWithAbstractBaseClass>, IAmStartedByMessages<IMessage>
+    public class SagaWithAbstractBaseClassActualSaga : Saga<SagaWithAbstractBaseClass>, IAmStartedByMessages<SagaStartMessage>
     {
         protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaWithAbstractBaseClass> mapper)
         {
-            mapper.ConfigureMapping<IMessage>(m => m.GetHashCode()).ToSaga(s => s.Id);
+            mapper.ConfigureMapping<SagaStartMessage>(m => m.CorrelationId).ToSaga(s => s.CorrelationId);
         }
 
-        public Task Handle(IMessage message, IMessageHandlerContext context)
+        public Task Handle(SagaStartMessage message, IMessageHandlerContext context)
         {
             throw new NotImplementedException();
         }
@@ -58,6 +58,7 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
 
     public abstract class MyOwnAbstractBase : ContainSagaData
     {
+        public virtual Guid CorrelationId { get; set; }
         public virtual string AbstractBaseProp { get; set; }
     }
 }

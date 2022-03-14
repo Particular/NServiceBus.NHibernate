@@ -52,9 +52,10 @@
             {
                 protected override void ConfigureHowToFindSaga(SagaPropertyMapper<NHNestedColRowVerSagaData> mapper)
                 {
-                    mapper.ConfigureMapping<Message2>(m => m.SomeId).ToSaga(s => s.SomeId);
-                    mapper.ConfigureMapping<Message3>(m => m.SomeId).ToSaga(s => s.SomeId);
-                    mapper.ConfigureMapping<Message1>(m => m.SomeId).ToSaga(s => s.SomeId);
+                    mapper.MapSaga(s => s.SomeId)
+                        .ToMessage<Message2>(m => m.SomeId)
+                        .ToMessage<Message3>(m => m.SomeId)
+                        .ToMessage<Message1>(m => m.SomeId);
                 }
 
                 Task PerformSagaCompletionCheck(IMessageHandlerContext context)
@@ -116,6 +117,7 @@
             }
         }
 
+#pragma warning disable NSB0012
         public class NHNestedColRowVerSagaData : IContainSagaData
         {
             [RowVersion]
@@ -129,6 +131,7 @@
             public virtual bool MessageThreeReceived { get; set; }
             public virtual IList<ChildData> RelatedData { get; set; }
         }
+#pragma warning restore
 
         [Serializable]
         public class Message2 : IMessage
