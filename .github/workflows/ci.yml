@@ -73,4 +73,4 @@ jobs:
             echo "SKIPPING adding environment variables for Oracle connection strings"
             #echo "OracleConnectionString=User Id=particular;Password=Welcome1;Data Source=127.0.0.1:1521/nservicebus;Enlist=dynamic" | Out-File -FilePath $Env:GITHUB_ENV -Encoding utf-8 -Append
       - name: Run tests
-        uses: Particular/run-tests-action@v1.2.0
+        uses: Particular/run-tests-action@v1.3.0
