@@ -67,14 +67,8 @@
     }
 
     [LockMode(LockModes.None)]
-    public class SagaWithUniqueProperty : IContainSagaData
+    public class SagaWithUniqueProperty : ContainSagaData
     {
-        public virtual Guid Id { get; set; }
-
-        public virtual string Originator { get; set; }
-
-        public virtual string OriginalMessageId { get; set; }
-
         public virtual string UniqueString { get; set; }
     }
 

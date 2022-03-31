@@ -12,7 +12,8 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
             {
                 typeof(RelatedClass),
                 typeof(TestSagaData),
-                typeof(TestSaga)
+                typeof(TestSaga),
+                typeof(ContainSagaData)
             });
             Assert.NotNull(sessionFactory.GetEntityPersister(typeof(RelatedClass).FullName));
         }

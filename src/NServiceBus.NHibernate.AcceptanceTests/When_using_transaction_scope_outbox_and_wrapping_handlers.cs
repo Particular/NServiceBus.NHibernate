@@ -79,8 +79,9 @@
 
                 protected override void ConfigureHowToFindSaga(SagaPropertyMapper<OutboxTransactionScopeSagaData> mapper)
                 {
-                    mapper.ConfigureMapping<StartSagaMessage>(m => m.UniqueId).ToSaga(s => s.UniqueId);
-                    mapper.ConfigureMapping<CheckSagaMessage>(m => m.UniqueId).ToSaga(s => s.UniqueId);
+                    mapper.MapSaga(s => s.UniqueId)
+                        .ToMessage<StartSagaMessage>(m => m.UniqueId)
+                        .ToMessage<CheckSagaMessage>(m => m.UniqueId);
                 }
 
                 public Task Handle(StartSagaMessage message, IMessageHandlerContext context)
