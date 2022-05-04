@@ -7,14 +7,16 @@
     using Janitor;
 
     [SkipWeaving]
-    class NHibernateLazyNativeTransactionSynchronizedStorageSession : ICompletableSynchronizedStorageSession, INHibernateStorageSession
+    class NHibernateLazyNativeTransactionSynchronizedStorageSession : INHibernateStorageSessionInternal
     {
+        readonly ISynchronizedStorageSession synchronizedStorageSession;
         Lazy<ISession> session;
         Func<ISynchronizedStorageSession, CancellationToken, Task> onSaveChangesCallback = (_, __) => Task.CompletedTask;
         ITransaction transaction;
 
-        public NHibernateLazyNativeTransactionSynchronizedStorageSession(Func<ISession> sessionFactory)
+        public NHibernateLazyNativeTransactionSynchronizedStorageSession(Func<ISession> sessionFactory, ISynchronizedStorageSession synchronizedStorageSession)
         {
+            this.synchronizedStorageSession = synchronizedStorageSession;
             session = new Lazy<ISession>(() =>
             {
                 var s = sessionFactory();
@@ -45,7 +47,7 @@
 
         public async Task CompleteAsync(CancellationToken cancellationToken = default)
         {
-            await onSaveChangesCallback(this, cancellationToken).ConfigureAwait(false);
+            await onSaveChangesCallback(synchronizedStorageSession, cancellationToken).ConfigureAwait(false);
             if (transaction != null)
             {
                 await transaction.CommitAsync(cancellationToken).ConfigureAwait(false);

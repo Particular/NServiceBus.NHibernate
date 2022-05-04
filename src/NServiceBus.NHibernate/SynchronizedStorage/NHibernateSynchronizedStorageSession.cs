@@ -8,45 +8,46 @@
     using Extensibility;
     using global::NHibernate;
     using global::NHibernate.Impl;
+    using Janitor;
+    using NServiceBus.NHibernate.SynchronizedStorage;
     using Outbox;
     using Outbox.NHibernate;
-    using Persistence;
     using Transport;
 
-    class NHibernateSynchronizedStorageAdapter : ISynchronizedStorageAdapter
+    [SkipWeaving]
+    class NHibernateSynchronizedStorageSession : ICompletableSynchronizedStorageSession
     {
-        ISessionFactory sessionFactory;
-        CurrentSessionHolder currentSessionHolder;
-        static readonly Task<ICompletableSynchronizedStorageSession> EmptyResult = Task.FromResult((ICompletableSynchronizedStorageSession)null);
+        public INHibernateStorageSessionInternal Session { get; private set; }
+        readonly ISessionFactory sessionFactory;
 
-        public NHibernateSynchronizedStorageAdapter(ISessionFactory sessionFactory, CurrentSessionHolder currentSessionHolder)
+        public NHibernateSynchronizedStorageSession(SessionFactoryHolder sessionFactoryHolder)
         {
-            this.sessionFactory = sessionFactory;
-            this.currentSessionHolder = currentSessionHolder;
+            sessionFactory = sessionFactoryHolder.SessionFactory;
         }
 
-        public Task<ICompletableSynchronizedStorageSession> TryAdapt(IOutboxTransaction transaction, ContextBag context, CancellationToken cancellationToken = default)
+        public ValueTask<bool> TryOpen(IOutboxTransaction transaction, ContextBag context, CancellationToken cancellationToken = new CancellationToken())
         {
             if (transaction is INHibernateOutboxTransaction nhibernateTransaction)
             {
                 nhibernateTransaction.BeginSynchronizedSession(context);
-                var session = new NHibernateOutboxTransactionSynchronizedStorageSession(nhibernateTransaction);
-                currentSessionHolder?.SetCurrentSession(session);
-                return Task.FromResult<ICompletableSynchronizedStorageSession>(session);
+                Session = new NHibernateOutboxTransactionSynchronizedStorageSession(nhibernateTransaction, this);
+                return new ValueTask<bool>(true);
             }
-            return EmptyResult;
+
+            return new ValueTask<bool>(false);
         }
 
-        public Task<ICompletableSynchronizedStorageSession> TryAdapt(TransportTransaction transportTransaction, ContextBag context, CancellationToken cancellationToken = default)
+        public ValueTask<bool> TryOpen(TransportTransaction transportTransaction, ContextBag context, CancellationToken cancellationToken = new CancellationToken())
         {
             if (!transportTransaction.TryGet(out Transaction ambientTransaction))
             {
-                return EmptyResult;
+                return new ValueTask<bool>(false);
             }
             if (!(sessionFactory is SessionFactoryImpl sessionFactoryImpl))
             {
                 throw new NotSupportedException("Overriding default implementation of ISessionFactory is not supported.");
             }
+
             var session = new NHibernateLazyAmbientTransactionSynchronizedStorageSession(
                 connectionFactory: () => OpenConnection(sessionFactoryImpl, ambientTransaction),
                 sessionFactory: conn =>
@@ -54,10 +55,10 @@
                     var sessionBuilder = sessionFactory.WithOptions();
                     sessionBuilder.Connection(conn);
                     return sessionBuilder.OpenSession();
-                });
+                }, this);
+            Session = session;
 
-            currentSessionHolder?.SetCurrentSession(session);
-            return Task.FromResult<ICompletableSynchronizedStorageSession>(session);
+            return new ValueTask<bool>(true);
         }
 
         static DbConnection OpenConnection(SessionFactoryImpl sessionFactoryImpl, Transaction ambientTransaction)
@@ -65,6 +66,19 @@
             var connection = sessionFactoryImpl.ConnectionProvider.GetConnection();
             connection.EnlistTransaction(ambientTransaction);
             return connection;
+        }
+
+        public Task Open(ContextBag contextBag, CancellationToken cancellationToken = new CancellationToken())
+        {
+            Session = new NHibernateLazyNativeTransactionSynchronizedStorageSession(() => sessionFactory.OpenSession(), this);
+            return Task.CompletedTask;
+        }
+
+        public Task CompleteAsync(CancellationToken cancellationToken = new CancellationToken()) => Session.CompleteAsync(cancellationToken);
+
+        public void Dispose()
+        {
+            Session.Dispose();
         }
     }
 }
