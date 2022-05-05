@@ -10,6 +10,11 @@ namespace NServiceBus.Features
         public NHibernateGatewayDeduplication() { }
         protected override void Setup(NServiceBus.Features.FeatureConfigurationContext context) { }
     }
+    public class NHibernateOutbox : NServiceBus.Features.Feature
+    {
+        public NHibernateOutbox() { }
+        protected override void Setup(NServiceBus.Features.FeatureConfigurationContext context) { }
+    }
     public class NHibernateSagaStorage : NServiceBus.Features.Feature
     {
         public NHibernateSagaStorage() { }
