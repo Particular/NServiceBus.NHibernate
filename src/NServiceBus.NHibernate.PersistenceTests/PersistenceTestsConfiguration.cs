@@ -13,29 +13,36 @@
     using global::NHibernate.Mapping.ByCode;
     using global::NHibernate.Tool.hbm2ddl;
     using NServiceBus.NHibernate.Outbox;
-    using NServiceBus.NHibernate.PersistenceTests;
+    using NHibernate.PersistenceTests;
     using NServiceBus.Outbox;
     using NServiceBus.Outbox.NHibernate;
     using NServiceBus.Sagas;
     using NUnit.Framework;
-    using NServiceBus.Persistence;
-    using NServiceBus.Persistence.NHibernate;
     using NServiceBus.SagaPersisters.NHibernate;
     using NServiceBus.SagaPersisters.NHibernate.AutoPersistence;
     using System.Threading;
+    using NHibernate.SynchronizedStorage;
+    using Persistence;
+    using Persistence.NHibernate;
+
+    public enum DatabaseVariant
+    {
+        SqlServer,
+        Oracle
+    }
 
     class NHibernateVariant
     {
-        public NHibernateVariant(string description, Action<DbIntegrationConfigurationProperties> configureDb, IOutboxPersisterFactory outboxPersisterFactory, bool pessimistic = false, bool transactionScope = false)
+        public NHibernateVariant(string description, DatabaseVariant databaseVariant, IOutboxPersisterFactory outboxPersisterFactory, bool pessimistic = false, bool transactionScope = false)
         {
-            ConfigureDb = configureDb;
             OutboxPersisterFactory = outboxPersisterFactory;
             Description = description;
+            DatabaseVariant = databaseVariant;
             Pessimistic = pessimistic;
             TransactionScope = transactionScope;
         }
 
-        public Action<DbIntegrationConfigurationProperties> ConfigureDb { get; }
+        public DatabaseVariant DatabaseVariant { get; }
 
         public IOutboxPersisterFactory OutboxPersisterFactory { get; }
 
@@ -65,11 +72,9 @@
 
         public ISagaPersister SagaStorage { get; private set; }
 
-        public ISynchronizedStorage SynchronizedStorage { get; private set; }
-
-        public ISynchronizedStorageAdapter SynchronizedStorageAdapter { get; private set; }
-
         public IOutboxStorage OutboxStorage { get; private set; }
+
+        public Func<ICompletableSynchronizedStorageSession> CreateStorageSession { get; private set; }
 
         static PersistenceTestsConfiguration()
         {
@@ -78,60 +83,54 @@
 
             if (sqlConnectionString != null)
             {
-                sagaVariants.Add(CreateVariant("SQL Server", x =>
-                {
-                    x.Dialect<MsSql2012Dialect>();
-                    x.ConnectionString = sqlConnectionString;
-                }));
+                sagaVariants.Add(CreateVariant("SQL Server", DatabaseVariant.SqlServer));
             };
 
             if (!string.IsNullOrWhiteSpace(System.Environment.GetEnvironmentVariable("OracleConnectionString")))
             {
-                sagaVariants.Add(CreateVariant("Oracle", x =>
-                {
-                    x.Dialect<Oracle10gDialect>();
-                    x.Driver<OracleManagedDataClientDriver>();
-                    x.ConnectionString = System.Environment.GetEnvironmentVariable("OracleConnectionString");
-                }));
+                sagaVariants.Add(CreateVariant("Oracle", DatabaseVariant.Oracle));
             }
             SagaVariants = sagaVariants.ToArray();
 
             var outboxVariants = new List<object>();
             if (sqlConnectionString != null)
             {
-                outboxVariants.Add(CreateVariant("SQL Server Optimistic Native default OutboxRecord", x =>
-                    {
-                        x.Dialect<MsSql2012Dialect>();
-                        x.ConnectionString = sqlConnectionString;
-                    }));
-                outboxVariants.Add(CreateVariant("SQL Server Pessimistic Native default OutboxRecord", x =>
-                    {
-                        x.Dialect<MsSql2012Dialect>();
-                        x.ConnectionString = sqlConnectionString;
-                    }, true, false));
-                outboxVariants.Add(CreateVariant("SQL Server Pessimistic TransactionScope default OutboxRecord", x =>
-                    {
-                        x.Dialect<MsSql2012Dialect>();
-                        x.ConnectionString = sqlConnectionString;
-                    }, true, true));
-                outboxVariants.Add(CreateVariant("SQL Server Optimistic TransactionScope default OutboxRecord", x =>
-                    {
-                        x.Dialect<MsSql2012Dialect>();
-                        x.ConnectionString = sqlConnectionString;
-                    }, false, true));
+                outboxVariants.Add(CreateVariant("SQL Server Optimistic Native default OutboxRecord", DatabaseVariant.SqlServer));
+                outboxVariants.Add(CreateVariant("SQL Server Pessimistic Native default OutboxRecord", DatabaseVariant.SqlServer, true, false));
+                outboxVariants.Add(CreateVariant("SQL Server Pessimistic TransactionScope default OutboxRecord", DatabaseVariant.SqlServer, true, true));
+                outboxVariants.Add(CreateVariant("SQL Server Optimistic TransactionScope default OutboxRecord", DatabaseVariant.SqlServer, false, true));
             }
             OutboxVariants = outboxVariants.ToArray();
         }
 
-        static TestFixtureData CreateVariant<T>(string description, Action<DbIntegrationConfigurationProperties> configureDb, bool pessimistic = false, bool transactionScope = false)
-            where T : class, IOutboxRecord, new()
+        public static void ConfigureDb(DatabaseVariant databaseVariant, DbIntegrationConfigurationProperties props)
         {
-            return new TestFixtureData(new TestVariant(new NHibernateVariant(description, configureDb, new OutboxPersisterFactory<T>(), pessimistic, transactionScope)));
+            if (databaseVariant == DatabaseVariant.Oracle)
+            {
+                props.Dialect<Oracle10gDialect>();
+                props.Driver<OracleManagedDataClientDriver>();
+                props.ConnectionString = System.Environment.GetEnvironmentVariable("OracleConnectionString");
+            }
+            else if (databaseVariant == DatabaseVariant.SqlServer)
+            {
+                props.Dialect<MsSql2012Dialect>();
+                props.ConnectionString = Consts.ConnectionString;
+            }
+            else
+            {
+                throw new NotSupportedException("Not supported database variant.");
+            }
         }
 
-        static TestFixtureData CreateVariant(string description, Action<DbIntegrationConfigurationProperties> configureDb, bool pessimistic = false, bool transactionScope = false)
+        static TestFixtureData CreateVariant<T>(string description, DatabaseVariant databaseVariant, bool pessimistic = false, bool transactionScope = false)
+            where T : class, IOutboxRecord, new()
         {
-            return CreateVariant<OutboxRecord>(description, configureDb, pessimistic, transactionScope);
+            return new TestFixtureData(new TestVariant(new NHibernateVariant(description, databaseVariant, new OutboxPersisterFactory<T>(), pessimistic, transactionScope)));
+        }
+
+        static TestFixtureData CreateVariant(string description, DatabaseVariant databaseVariant, bool pessimistic = false, bool transactionScope = false)
+        {
+            return CreateVariant<OutboxRecord>(description, databaseVariant, pessimistic, transactionScope);
         }
 
         static bool BelongsToCurrentTest(Type t)
@@ -144,7 +143,10 @@
             var variant = (NHibernateVariant)Variant.Values[0];
 
             var cfg = new Configuration()
-                .DataBaseIntegration(variant.ConfigureDb);
+                .DataBaseIntegration(x =>
+                {
+                    ConfigureDb(variant.DatabaseVariant, x);
+                });
 
             //Add mapping for the outbox record
             var mapper = new ModelMapper();
@@ -182,8 +184,7 @@
 
             SagaIdGenerator = new DefaultSagaIdGenerator();
             SagaStorage = new SagaPersister();
-            SynchronizedStorage = new NHibernateSynchronizedStorage(sessionFactory, null);
-            SynchronizedStorageAdapter = new NHibernateSynchronizedStorageAdapter(sessionFactory, null);
+            CreateStorageSession = () => new NHibernateSynchronizedStorageSession(new SessionFactoryHolder(sessionFactory));
             OutboxStorage = variant.OutboxPersisterFactory.Create(sessionFactory, "TestEndpoint", variant.Pessimistic, variant.TransactionScope, IsolationLevel.ReadCommitted, System.Transactions.IsolationLevel.ReadCommitted);
         }
 

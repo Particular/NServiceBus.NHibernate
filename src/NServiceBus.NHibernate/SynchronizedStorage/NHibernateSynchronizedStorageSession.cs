@@ -15,10 +15,12 @@
     using Transport;
 
     [SkipWeaving]
-    class NHibernateSynchronizedStorageSession : ICompletableSynchronizedStorageSession
+    class NHibernateSynchronizedStorageSession : ICompletableSynchronizedStorageSession, INHibernateStorageSessionProvider
     {
-        public INHibernateStorageSessionInternal Session { get; private set; }
+        public INHibernateStorageSession InternalSession => internalSession;
+
         readonly ISessionFactory sessionFactory;
+        INHibernateStorageSessionInternal internalSession;
 
         public NHibernateSynchronizedStorageSession(SessionFactoryHolder sessionFactoryHolder)
         {
@@ -30,7 +32,7 @@
             if (transaction is INHibernateOutboxTransaction nhibernateTransaction)
             {
                 nhibernateTransaction.BeginSynchronizedSession(context);
-                Session = new NHibernateOutboxTransactionSynchronizedStorageSession(nhibernateTransaction, this);
+                internalSession = new NHibernateOutboxTransactionSynchronizedStorageSession(nhibernateTransaction, this);
                 return new ValueTask<bool>(true);
             }
 
@@ -56,7 +58,7 @@
                     sessionBuilder.Connection(conn);
                     return sessionBuilder.OpenSession();
                 }, this);
-            Session = session;
+            internalSession = session;
 
             return new ValueTask<bool>(true);
         }
@@ -70,15 +72,15 @@
 
         public Task Open(ContextBag contextBag, CancellationToken cancellationToken = new CancellationToken())
         {
-            Session = new NHibernateLazyNativeTransactionSynchronizedStorageSession(() => sessionFactory.OpenSession(), this);
+            internalSession = new NHibernateLazyNativeTransactionSynchronizedStorageSession(() => sessionFactory.OpenSession(), this);
             return Task.CompletedTask;
         }
 
-        public Task CompleteAsync(CancellationToken cancellationToken = new CancellationToken()) => Session.CompleteAsync(cancellationToken);
+        public Task CompleteAsync(CancellationToken cancellationToken = new CancellationToken()) => internalSession.CompleteAsync(cancellationToken);
 
         public void Dispose()
         {
-            Session.Dispose();
+            internalSession.Dispose();
         }
     }
 }
