@@ -21,7 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Remove="\**\When_handling_concurrent_messages.cs" />
+    <Compile Remove="$(PkgNServiceBus_AcceptanceTests_Sources)/**/When_handling_concurrent_messages.cs" />
   </ItemGroup>
 
 </Project>

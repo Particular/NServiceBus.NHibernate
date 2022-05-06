@@ -25,8 +25,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Remove="\**\When_handling_concurrent_messages.cs" />
-    <Compile Remove="\**\NSB.AcceptanceTests\DelayedDelivery\When_deferring_a_message.cs" />
+    <Compile Remove="$(PkgNServiceBus_AcceptanceTests_Sources)/**/When_handling_concurrent_messages.cs" />
+    <Compile Remove="$(PkgNServiceBus_AcceptanceTests_Sources)/**/When_deferring_a_message.cs" />
   </ItemGroup>
 
 </Project>
