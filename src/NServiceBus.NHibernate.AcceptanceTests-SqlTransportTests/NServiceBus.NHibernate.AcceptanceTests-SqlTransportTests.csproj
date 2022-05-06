@@ -21,7 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Remove="\**\When_handling_concurrent_messages.cs" />
-    <Compile Remove="\**\When_nested_send_with_outer_replyTo_routing.cs" />
+    <Compile Remove="/**/When_handling_concurrent_messages.cs" />
+    <Compile Remove="/**/When_nested_send_with_outer_replyTo_routing.cs" />
   </ItemGroup>
 </Project>
