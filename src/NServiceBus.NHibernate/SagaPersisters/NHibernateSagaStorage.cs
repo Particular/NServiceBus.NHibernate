@@ -20,9 +20,10 @@ namespace NServiceBus.Features
         /// </summary>
         public NHibernateSagaStorage()
         {
+            Defaults(x => x.EnableFeatureByDefault<NHibernateStorageSession>());
+
             DependsOn<Sagas>();
             DependsOn<NHibernateStorageSession>();
-            Defaults(x => x.EnableFeatureByDefault<NHibernateStorageSession>());
         }
 
         /// <summary>

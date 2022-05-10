@@ -55,7 +55,7 @@ namespace NServiceBus.Features
             });
 
             context.Services.AddScoped<ICompletableSynchronizedStorageSession, NHibernateSynchronizedStorageSession>();
-            context.Services.AddTransient(sb => sb.GetRequiredService<ICompletableSynchronizedStorageSession>().StorageSession());
+            context.Services.AddScoped(sb => sb.GetRequiredService<ICompletableSynchronizedStorageSession>().StorageSession());
 
             var runInstaller = context.Settings.Get<bool>("NHibernate.Common.AutoUpdateSchema");
 
