@@ -23,7 +23,6 @@ namespace NServiceBus.Features
 
         internal NHibernateStorageSession()
         {
-
             Defaults(s =>
             {
                 var diagnosticsObject = new ExpandoObject();
@@ -33,11 +32,13 @@ namespace NServiceBus.Features
                 s.SetDefault("NServiceBus.NHibernate.NHibernateStorageSessionDiagnostics", diagnosticsObject);
 
                 s.SetDefault<IOutboxPersisterFactory>(new OutboxPersisterFactory<OutboxRecord>());
+
+                // since the installers are registered even if the feature isn't enabled we need to make
+                // this a no-op of there is no "schema updater" available
+                s.Set(new Installer.SchemaUpdater());
             });
 
-            // since the installers are registered even if the feature isn't enabled we need to make
-            // this a no-op of there is no "schema updater" available
-            Defaults(c => c.Set(new Installer.SchemaUpdater()));
+            DependsOn<SynchronizedStorage>();
         }
 
         /// <summary>
@@ -45,7 +46,7 @@ namespace NServiceBus.Features
         /// </summary>
         protected override void Setup(FeatureConfigurationContext context)
         {
-            var config = context.Settings.Get<NHibernateConfiguration>(); //TODO: Should we register it under a Seaga key?
+            var config = context.Settings.Get<NHibernateConfiguration>();
 
             context.Services.AddSingleton(sb =>
             {

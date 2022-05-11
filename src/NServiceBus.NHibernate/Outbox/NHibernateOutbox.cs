@@ -42,7 +42,7 @@ namespace NServiceBus.Features
         /// <inheritdoc />
         protected override void Setup(FeatureConfigurationContext context)
         {
-            var config = context.Settings.Get<NHibernateConfiguration>(); //TODO: Should we register it under a Seaga key?
+            var config = context.Settings.Get<NHibernateConfiguration>();
 
             var pessimisticMode = context.Settings.GetOrDefault<bool>(OutboxConcurrencyModeSettingsKey);
             var transactionScopeMode = context.Settings.GetOrDefault<bool>(OutboxTransactionModeSettingsKey);

@@ -31,7 +31,7 @@ namespace NServiceBus.Features
         /// </summary>
         protected override void Setup(FeatureConfigurationContext context)
         {
-            var config = context.Settings.Get<NHibernateConfiguration>(); //TODO: Should we register it under a Seaga key?
+            var config = context.Settings.Get<NHibernateConfiguration>();
 
             ApplyMappings(context.Settings, config.Configuration);
 
