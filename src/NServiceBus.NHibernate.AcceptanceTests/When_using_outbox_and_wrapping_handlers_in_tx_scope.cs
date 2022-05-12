@@ -46,6 +46,7 @@
             {
                 EndpointSetup<DefaultServer>(b =>
                 {
+                    b.ConfigureTransport().TransportTransactionMode = TransportTransactionMode.ReceiveOnly;
                     b.EnableOutbox();
                     b.UnitOfWork().WrapHandlersInATransactionScope();
                     b.LimitMessageProcessingConcurrencyTo(1); //To ensure saga is properly created before we check it.

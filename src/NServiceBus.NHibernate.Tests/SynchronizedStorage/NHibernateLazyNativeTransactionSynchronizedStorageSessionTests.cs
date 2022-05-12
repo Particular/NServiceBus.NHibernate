@@ -24,12 +24,12 @@
             storageSession.OnSaveChanges((s, _) =>
             {
                 callbackInvoked++;
-                return Task.FromResult(0);
+                return Task.CompletedTask;
             });
             storageSession.OnSaveChanges((s, _) =>
             {
                 callbackInvoked++;
-                return Task.FromResult(0);
+                return Task.CompletedTask;
             });
 
             await syncSession.CompleteAsync();

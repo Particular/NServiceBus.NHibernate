@@ -123,7 +123,6 @@ namespace NServiceBus.Features
                 return typedValue;
             }
             throw new Exception("Invalid value in \"NServiceBus/Outbox/NHibernate/TimeToWaitBeforeTriggeringCriticalErrorWhenCleanupTaskFails\" AppSetting. Please ensure it is a TimeSpan.");
-
         }
 
         static TimeSpan GetDeduplicationDataCleanupPeriod()
@@ -138,7 +137,6 @@ namespace NServiceBus.Features
                 return typedValue;
             }
             throw new Exception("Invalid value in \"NServiceBus/Outbox/NHibernate/FrequencyToRunDeduplicationDataCleanup\" AppSetting. Please ensure it is a TimeSpan.");
-
         }
 
         static TimeSpan GetTimeToKeepDeduplicationData()

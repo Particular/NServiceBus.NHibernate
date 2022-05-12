@@ -27,7 +27,7 @@
             sessionFactory = sessionFactoryHolder.SessionFactory;
         }
 
-        public ValueTask<bool> TryOpen(IOutboxTransaction transaction, ContextBag context, CancellationToken cancellationToken = new CancellationToken())
+        public ValueTask<bool> TryOpen(IOutboxTransaction transaction, ContextBag context, CancellationToken cancellationToken = default)
         {
             if (transaction is INHibernateOutboxTransaction nhibernateTransaction)
             {
@@ -39,7 +39,7 @@
             return new ValueTask<bool>(false);
         }
 
-        public ValueTask<bool> TryOpen(TransportTransaction transportTransaction, ContextBag context, CancellationToken cancellationToken = new CancellationToken())
+        public ValueTask<bool> TryOpen(TransportTransaction transportTransaction, ContextBag context, CancellationToken cancellationToken = default)
         {
             if (!transportTransaction.TryGet(out Transaction ambientTransaction))
             {
@@ -70,7 +70,7 @@
             return connection;
         }
 
-        public Task Open(ContextBag contextBag, CancellationToken cancellationToken = new CancellationToken())
+        public Task Open(ContextBag contextBag, CancellationToken cancellationToken = default)
         {
             internalSession = new NHibernateLazyNativeTransactionSynchronizedStorageSession(() => sessionFactory.OpenSession(), this);
             return Task.CompletedTask;

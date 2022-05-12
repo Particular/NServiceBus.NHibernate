@@ -44,7 +44,7 @@
                 storageSession.OnSaveChanges((s, _) =>
                 {
                     callbackInvoked = true;
-                    return Task.FromResult(0);
+                    return Task.CompletedTask;
                 });
 
                 await storageSession.CompleteAsync();
@@ -72,12 +72,12 @@
                 storageSession.OnSaveChanges((s, _) =>
                     {
                         callbackInvoked++;
-                        return Task.FromResult(0);
+                        return Task.CompletedTask;
                     });
                 storageSession.OnSaveChanges((s, _) =>
                 {
                     callbackInvoked++;
-                    return Task.FromResult(0);
+                    return Task.CompletedTask;
                 });
 
                 await storageSession.CompleteAsync();
@@ -135,7 +135,6 @@
             }
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Code", "PS0018:A task-returning method should have a CancellationToken parameter unless it has a parameter implementing ICancellableContext", Justification = "<Pending>")]
         async Task<NHibernateSynchronizedStorageSession> OpenStorageSession(IOutboxTransaction outboxTransaction)
         {
             //The open method creates the NHibernateLazyNativeTransactionSynchronizedStorageSession

@@ -84,7 +84,7 @@
             if (sqlConnectionString != null)
             {
                 sagaVariants.Add(CreateVariant("SQL Server", DatabaseVariant.SqlServer));
-            };
+            }
 
             if (!string.IsNullOrWhiteSpace(System.Environment.GetEnvironmentVariable("OracleConnectionString")))
             {

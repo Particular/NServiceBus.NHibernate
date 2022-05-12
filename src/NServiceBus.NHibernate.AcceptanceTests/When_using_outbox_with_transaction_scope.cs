@@ -31,7 +31,11 @@
         {
             public Endpoint()
             {
-                EndpointSetup<DefaultServer>(c => { c.EnableOutbox().UseTransactionScope(); });
+                EndpointSetup<DefaultServer>(c =>
+                {
+                    c.ConfigureTransport().TransportTransactionMode = TransportTransactionMode.ReceiveOnly;
+                    c.EnableOutbox().UseTransactionScope();
+                });
             }
 
             public class MyMessageHandler : IHandleMessages<MyMessage>

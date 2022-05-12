@@ -22,6 +22,7 @@
 
   <ItemGroup>
     <Compile Remove="$(PkgNServiceBus_AcceptanceTests_Sources)/**/When_handling_concurrent_messages.cs" />
+    <!--Excluded because depends on the AcceptanceTestTransport-->
     <Compile Remove="$(PkgNServiceBus_AcceptanceTests_Sources)/**/When_nested_send_with_outer_replyTo_routing.cs" />
   </ItemGroup>
 </Project>

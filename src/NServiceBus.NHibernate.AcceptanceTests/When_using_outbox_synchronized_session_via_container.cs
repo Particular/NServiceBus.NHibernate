@@ -34,6 +34,7 @@
             {
                 EndpointSetup<DefaultServer>(c =>
                 {
+                    c.ConfigureTransport().TransportTransactionMode = TransportTransactionMode.ReceiveOnly;
                     c.EnableOutbox();
                     c.RegisterComponents(cc =>
                     {

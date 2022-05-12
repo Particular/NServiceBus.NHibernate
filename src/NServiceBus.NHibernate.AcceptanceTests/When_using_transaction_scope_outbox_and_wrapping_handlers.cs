@@ -50,6 +50,7 @@
                 {
                     b.Pipeline.Register(new BehaviorThatCreatesACustomScope(), "Creates a custom transaction scope");
 
+                    b.ConfigureTransport().TransportTransactionMode = TransportTransactionMode.ReceiveOnly;
                     var outbox = b.EnableOutbox();
                     outbox.UseTransactionScope();
                 });
