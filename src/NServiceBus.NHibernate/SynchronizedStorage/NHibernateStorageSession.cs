@@ -1,51 +1,44 @@
 namespace NServiceBus.Features
 {
-    using System.Transactions;
     using System;
-    using System.Configuration;
     using System.Dynamic;
     using System.Linq;
     using System.Text;
     using System.Threading.Tasks;
-    using global::NHibernate.Mapping.ByCode;
     using NServiceBus.NHibernate.Outbox;
-    using global::NHibernate.Transaction;
     using Microsoft.Extensions.DependencyInjection;
-    using NServiceBus.Outbox;
     using NServiceBus.Outbox.NHibernate;
     using NServiceBus.Persistence;
     using NServiceBus.Persistence.NHibernate;
     using global::NHibernate.Tool.hbm2ddl;
-    using Configuration = global::NHibernate.Cfg.Configuration;
-    using Environment = global::NHibernate.Cfg.Environment;
+    using NHibernate.SynchronizedStorage;
     using Installer = Persistence.NHibernate.Installer.Installer;
+
 
     /// <summary>
     /// NHibernate Storage Session.
     /// </summary>
     public class NHibernateStorageSession : Feature
     {
-        internal const string OutboxMappingSettingsKey = "NServiceBus.NHibernate.OutboxMapping";
-        internal const string OutboxTableNameSettingsKey = "NServiceBus.NHibernate.OutboxTableName";
-        internal const string OutboxSchemaNameSettingsKey = "NServiceBus.NHibernate.OutboxSchemaName";
-        internal const string OutboxConcurrencyModeSettingsKey = "NServiceBus.NHibernate.OutboxPessimisticMode";
-        internal const string OutboxTransactionModeSettingsKey = "NServiceBus.NHibernate.OutboxTransactionScopeMode";
-        internal const string OutboxTransactionIsolationLevelSettingsKey = "NServiceBus.NHibernate.OutboxTransactionIsolationLevel";
-        internal const string OutboxTransactionScopeModeIsolationLevelSettingsKey = "NServiceBus.NHibernate.OutboxTransactionScopeModeIsolationLevel";
 
         internal NHibernateStorageSession()
         {
-            DependsOnOptionally<Outbox>();
-
             Defaults(s =>
             {
-                s.SetDefault(new SharedMappings());
+                var diagnosticsObject = new ExpandoObject();
+                var builder = new NHibernateConfigurationBuilder(s, diagnosticsObject, "Saga", "StorageConfiguration");
+                var config = builder.Build();
+                s.SetDefault(config);
+                s.SetDefault("NServiceBus.NHibernate.NHibernateStorageSessionDiagnostics", diagnosticsObject);
+
                 s.SetDefault<IOutboxPersisterFactory>(new OutboxPersisterFactory<OutboxRecord>());
+
+                // since the installers are registered even if the feature isn't enabled we need to make
+                // this a no-op of there is no "schema updater" available
+                s.Set(new Installer.SchemaUpdater());
             });
 
-            // since the installers are registered even if the feature isn't enabled we need to make
-            // this a no-op of there is no "schema updater" available
-            Defaults(c => c.Set(new Installer.SchemaUpdater()));
+            DependsOn<SynchronizedStorage>();
         }
 
         /// <summary>
@@ -53,81 +46,18 @@ namespace NServiceBus.Features
         /// </summary>
         protected override void Setup(FeatureConfigurationContext context)
         {
-            dynamic diagnostics = new ExpandoObject();
+            var config = context.Settings.Get<NHibernateConfiguration>();
 
-            var builder = new NHibernateConfigurationBuilder(context.Settings, diagnostics, "Saga", "StorageConfiguration");
-            var config = builder.Build();
-
-            var outboxEnabled = context.Settings.IsFeatureActive(typeof(Outbox));
-
-            var sessionHolder = new CurrentSessionHolder();
-
-            context.Services.AddTransient(_ => sessionHolder.Current);
-            context.Pipeline.Register(new CurrentSessionBehavior(sessionHolder), "Manages the lifecycle of the current session holder.");
-
-            if (outboxEnabled)
+            context.Services.AddSingleton(sb =>
             {
-                var pessimisticMode = context.Settings.GetOrDefault<bool>(OutboxConcurrencyModeSettingsKey);
-                var transactionScopeMode = context.Settings.GetOrDefault<bool>(OutboxTransactionModeSettingsKey);
-                var transactionScopeIsolationLevel = context.Settings.GetOrDefault<IsolationLevel>(OutboxTransactionScopeModeIsolationLevelSettingsKey);
-                var adoIsolationLevel = context.Settings.GetOrDefault<System.Data.IsolationLevel>(OutboxTransactionIsolationLevelSettingsKey);
-                if (adoIsolationLevel == default)
-                {
-                    //Default to Read Committed
-                    adoIsolationLevel = System.Data.IsolationLevel.ReadCommitted;
-                }
-
-                config.Configuration.Properties[Environment.TransactionStrategy] = typeof(AdoNetTransactionFactory).FullName;
-
-                var sharedMappings = context.Settings.Get<SharedMappings>();
-
-                var configuredOutboxRecordType = context.Settings.GetOrDefault<Type>(OutboxMappingSettingsKey);
-                var actualOutboxRecordType = configuredOutboxRecordType ?? typeof(OutboxRecordMapping);
-                var outboxTableName = context.Settings.GetOrDefault<string>(OutboxTableNameSettingsKey);
-                var outboxSchemaName = context.Settings.GetOrDefault<string>(OutboxSchemaNameSettingsKey);
-
-                var timeToKeepDeduplicationData = GetTimeToKeepDeduplicationData();
-                var deduplicationDataCleanupPeriod = GetDeduplicationDataCleanupPeriod();
-                var outboxCleanupCriticalErrorTriggerTime = GetOutboxCleanupCriticalErrorTriggerTime();
-
-                if (outboxTableName != null && configuredOutboxRecordType != null)
-                {
-                    throw new Exception("Custom outbox table name and custom outbox record type cannot be specified at the same time.");
-                }
-
-                sharedMappings.AddMapping(configuration =>
-                {
-                    ApplyMappings(configuration, actualOutboxRecordType, outboxTableName, outboxSchemaName);
-                });
-
-                sharedMappings.ApplyTo(config.Configuration);
+                //This is lazy lazy initialized when first resolving because other features modify configuration in their Setup phases adding their mappings
                 var sessionFactory = config.Configuration.BuildSessionFactory();
-                var persisterFactory = context.Settings.Get<IOutboxPersisterFactory>();
-                var persister = persisterFactory.Create(sessionFactory, context.Settings.EndpointName(), pessimisticMode, transactionScopeMode, adoIsolationLevel, transactionScopeIsolationLevel);
+                return new SessionFactoryHolder(sessionFactory);
+            });
 
-                context.Services.AddSingleton<IOutboxStorage>(persister);
-                context.Services.AddSingleton<ISynchronizedStorage>(new NHibernateSynchronizedStorage(sessionFactory, sessionHolder));
-                context.Services.AddSingleton<ISynchronizedStorageAdapter>(new NHibernateSynchronizedStorageAdapter(sessionFactory, sessionHolder));
-                context.RegisterStartupTask(b => new OutboxCleaner(persister, b.GetRequiredService<CriticalError>(), timeToKeepDeduplicationData, deduplicationDataCleanupPeriod, outboxCleanupCriticalErrorTriggerTime));
+            context.Services.AddScoped<ICompletableSynchronizedStorageSession, NHibernateSynchronizedStorageSession>();
+            context.Services.AddScoped(sb => sb.GetRequiredService<ICompletableSynchronizedStorageSession>().StorageSession());
 
-                context.Settings.AddStartupDiagnosticsSection("NServiceBus.Persistence.NHibernate.Outbox", new
-                {
-                    TimeToKeepDeduplicationData = timeToKeepDeduplicationData,
-                    DeduplicationDataCleanupPeriod = deduplicationDataCleanupPeriod,
-                    OutboxCleanupCriticalErrorTriggerTime = outboxCleanupCriticalErrorTriggerTime,
-                    RecordType = actualOutboxRecordType.FullName,
-                    CustomOutboxTableName = outboxTableName,
-                    CustomOutboxSchemaName = outboxSchemaName
-                });
-            }
-            else
-            {
-                var sharedMappings = context.Settings.Get<SharedMappings>();
-                sharedMappings.ApplyTo(config.Configuration);
-                var sessionFactory = config.Configuration.BuildSessionFactory();
-                context.Services.AddSingleton<ISynchronizedStorage>(new NHibernateSynchronizedStorage(sessionFactory, sessionHolder));
-                context.Services.AddSingleton<ISynchronizedStorageAdapter>(new NHibernateSynchronizedStorageAdapter(sessionFactory, sessionHolder));
-            }
             var runInstaller = context.Settings.Get<bool>("NHibernate.Common.AutoUpdateSchema");
 
             if (runInstaller)
@@ -155,69 +85,9 @@ TSql Script:
             }
 
 
-            context.Settings.AddStartupDiagnosticsSection("NServiceBus.Persistence.NHibernate.SynchronizedSession", (object)diagnostics);
+            context.Settings.AddStartupDiagnosticsSection("NServiceBus.Persistence.NHibernate.SynchronizedSession", context.Settings.Get("NServiceBus.NHibernate.NHibernateStorageSessionDiagnostics"));
         }
 
-        static void ApplyMappings(Configuration config, Type outboxRecordType, string customOutboxTableName, string customOutboxSchemaName)
-        {
-            var mapper = new ModelMapper();
-            mapper.BeforeMapClass += (inspector, type, customizer) =>
-            {
-                if (customOutboxTableName != null)
-                {
-                    customizer.Table(customOutboxTableName);
-                }
-                if (customOutboxSchemaName != null)
-                {
-                    customizer.Schema(customOutboxSchemaName);
-                }
-            };
-            mapper.AddMapping(outboxRecordType);
-            config.AddMapping(mapper.CompileMappingForAllExplicitlyAddedEntities());
-        }
 
-        static TimeSpan GetOutboxCleanupCriticalErrorTriggerTime()
-        {
-            var configValue = ConfigurationManager.AppSettings.Get("NServiceBus/Outbox/NHibernate/TimeToWaitBeforeTriggeringCriticalErrorWhenCleanupTaskFails");
-            if (configValue == null)
-            {
-                return TimeSpan.FromMinutes(2);
-            }
-            if (TimeSpan.TryParse(configValue, out var typedValue))
-            {
-                return typedValue;
-            }
-            throw new Exception("Invalid value in \"NServiceBus/Outbox/NHibernate/TimeToWaitBeforeTriggeringCriticalErrorWhenCleanupTaskFails\" AppSetting. Please ensure it is a TimeSpan.");
-
-        }
-
-        static TimeSpan GetDeduplicationDataCleanupPeriod()
-        {
-            var configValue = ConfigurationManager.AppSettings.Get("NServiceBus/Outbox/NHibernate/FrequencyToRunDeduplicationDataCleanup");
-            if (configValue == null)
-            {
-                return TimeSpan.FromMinutes(1);
-            }
-            if (TimeSpan.TryParse(configValue, out var typedValue))
-            {
-                return typedValue;
-            }
-            throw new Exception("Invalid value in \"NServiceBus/Outbox/NHibernate/FrequencyToRunDeduplicationDataCleanup\" AppSetting. Please ensure it is a TimeSpan.");
-
-        }
-
-        static TimeSpan GetTimeToKeepDeduplicationData()
-        {
-            var configValue = ConfigurationManager.AppSettings.Get("NServiceBus/Outbox/NHibernate/TimeToKeepDeduplicationData");
-            if (configValue == null)
-            {
-                return TimeSpan.FromDays(7);
-            }
-            if (TimeSpan.TryParse(configValue, out var typedValue))
-            {
-                return typedValue;
-            }
-            throw new Exception("Invalid value in \"NServiceBus/Outbox/NHibernate/TimeToKeepDeduplicationData\" AppSetting. Please ensure it is a TimeSpan.");
-        }
     }
 }

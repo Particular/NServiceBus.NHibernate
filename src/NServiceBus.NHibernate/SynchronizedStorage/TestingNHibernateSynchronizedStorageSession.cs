@@ -6,12 +6,13 @@
     using global::NHibernate;
     using Janitor;
     using Persistence;
+    using Persistence.NHibernate;
 
     /// <summary>
     /// Allows writing automated tests against handlers which use NServiceBus-managed NHibernate session.
     /// </summary>
     [SkipWeaving]
-    public class TestingNHibernateSynchronizedStorageSession : ISynchronizedStorageSession, INHibernateStorageSession
+    public class TestingNHibernateSynchronizedStorageSession : ISynchronizedStorageSession, INHibernateStorageSessionProvider, INHibernateStorageSession
     {
         /// <summary>
         /// Creates new instance of the session.
@@ -32,6 +33,7 @@
             //NOOP
         }
 
+        INHibernateStorageSession INHibernateStorageSessionProvider.InternalSession => this;
 
         [ObsoleteEx(Message = "Use the overload that supports cancellation.", RemoveInVersion = "10", TreatAsErrorFromVersion = "9")]
         void INHibernateStorageSession.OnSaveChanges(Func<ISynchronizedStorageSession, Task> callback)

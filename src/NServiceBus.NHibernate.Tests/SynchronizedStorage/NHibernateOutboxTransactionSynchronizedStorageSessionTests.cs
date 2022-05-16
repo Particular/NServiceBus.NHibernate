@@ -3,8 +3,10 @@
     using System;
     using System.Data;
     using System.Threading.Tasks;
+    using NHibernate.SynchronizedStorage;
     using NServiceBus.Extensibility;
     using NServiceBus.NHibernate.Outbox;
+    using NServiceBus.Outbox;
     using NServiceBus.Outbox.NHibernate;
     using NServiceBus.Persistence.NHibernate;
     using NUnit.Framework;
@@ -38,19 +40,14 @@
 
             using (var outboxTransaction = await persister.BeginTransaction(contextBag))
             {
-                var adapter = new NHibernateSynchronizedStorageAdapter(SessionFactory, null);
-
-                using (var storageSession = await adapter.TryAdapt(outboxTransaction, contextBag))
+                var storageSession = await OpenStorageSession(outboxTransaction);
+                storageSession.OnSaveChanges((s, _) =>
                 {
-                    storageSession.Session(); //Make sure session is initialized
-                    storageSession.OnSaveChanges((s, _) =>
-                    {
-                        callbackInvoked = true;
-                        return Task.FromResult(0);
-                    });
+                    callbackInvoked = true;
+                    return Task.CompletedTask;
+                });
 
-                    await storageSession.CompleteAsync();
-                }
+                await storageSession.CompleteAsync();
 
                 Assert.IsFalse(callbackInvoked);
             }
@@ -70,24 +67,21 @@
 
             using (var outboxTransaction = await persister.BeginTransaction(contextBag))
             {
-                var adapter = new NHibernateSynchronizedStorageAdapter(SessionFactory, null);
+                var storageSession = await OpenStorageSession(outboxTransaction);
 
-                using (var storageSession = await adapter.TryAdapt(outboxTransaction, contextBag))
+                storageSession.OnSaveChanges((s, _) =>
+                    {
+                        callbackInvoked++;
+                        return Task.CompletedTask;
+                    });
+                storageSession.OnSaveChanges((s, _) =>
                 {
-                    storageSession.Session(); //Make sure session is initialized
-                    storageSession.OnSaveChanges((s, _) =>
-                    {
-                        callbackInvoked++;
-                        return Task.FromResult(0);
-                    });
-                    storageSession.OnSaveChanges((s, _) =>
-                    {
-                        callbackInvoked++;
-                        return Task.FromResult(0);
-                    });
+                    callbackInvoked++;
+                    return Task.CompletedTask;
+                });
 
-                    await storageSession.CompleteAsync();
-                }
+                await storageSession.CompleteAsync();
+
 
                 await outboxTransaction.Commit();
             }
@@ -110,29 +104,27 @@
 
             using (var outboxTransaction = await persister.BeginTransaction(contextBag))
             {
-                var adapter = new NHibernateSynchronizedStorageAdapter(SessionFactory, null);
+                var storageSession = await OpenStorageSession(outboxTransaction);
 
-                using (var storageSession = await adapter.TryAdapt(outboxTransaction, contextBag))
+                storageSession.InternalSession.Session.Save(new TestEntity
                 {
-                    storageSession.Session().Save(new TestEntity
-                    {
-                        Id = entityId
-                    });
-                    storageSession.OnSaveChanges((s, _) =>
-                    {
-                        throw new Exception("Simulated");
-                    });
+                    Id = entityId
+                });
+                storageSession.OnSaveChanges((s, _) =>
+                {
+                    throw new Exception("Simulated");
+                });
 
-                    try
-                    {
-                        await storageSession.CompleteAsync();
-                        await outboxTransaction.Commit();
-                    }
-                    catch (Exception)
-                    {
-                        exceptionThrown = true;
-                    }
+                try
+                {
+                    await storageSession.CompleteAsync();
+                    await outboxTransaction.Commit();
                 }
+                catch (Exception)
+                {
+                    exceptionThrown = true;
+                }
+
             }
             Assert.IsTrue(exceptionThrown);
 
@@ -141,6 +133,18 @@
                 var savedEntity = session.Get<TestEntity>(entityId);
                 Assert.IsNull(savedEntity);
             }
+        }
+
+        async Task<NHibernateSynchronizedStorageSession> OpenStorageSession(IOutboxTransaction outboxTransaction)
+        {
+            //The open method creates the NHibernateLazyNativeTransactionSynchronizedStorageSession
+            var syncSession = new NHibernateSynchronizedStorageSession(new SessionFactoryHolder(SessionFactory));
+            var success = await syncSession.TryOpen(outboxTransaction, new ContextBag());
+            Assert.IsTrue(success);
+            var storageSession = syncSession.InternalSession;
+
+            var _ = storageSession.Session; //Make sure session is initialized
+            return syncSession;
         }
     }
 }

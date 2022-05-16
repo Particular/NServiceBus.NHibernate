@@ -4,6 +4,7 @@
     using System.Threading.Tasks;
     using System.Transactions;
     using Extensibility;
+    using NHibernate.SynchronizedStorage;
     using NUnit.Framework;
     using Persistence.NHibernate;
     using Transport;
@@ -20,26 +21,28 @@
                 transportTransaction.Set(Transaction.Current);
 
                 var callbackInvoked = 0;
-                var adapter = new NHibernateSynchronizedStorageAdapter(SessionFactory, null);
 
-                using (var storageSession = await adapter.TryAdapt(transportTransaction, new ContextBag()))
+                //The open method creates the NHibernateLazyNativeTransactionSynchronizedStorageSession
+                var syncSession = new NHibernateSynchronizedStorageSession(new SessionFactoryHolder(SessionFactory));
+                var success = await syncSession.TryOpen(transportTransaction, new ContextBag());
+                Assert.IsTrue(success);
+                var storageSession = syncSession.InternalSession;
+
+                var __ = storageSession.Session; //Make sure session is initialized
+                storageSession.OnSaveChanges((s, _) =>
                 {
-                    storageSession.Session(); //Make sure session is initialized
-                    storageSession.OnSaveChanges((s, _) =>
-                    {
-                        callbackInvoked++;
-                        return Task.FromResult(0);
-                    });
-                    storageSession.OnSaveChanges((s, _) =>
-                    {
-                        callbackInvoked++;
-                        return Task.FromResult(0);
-                    });
+                    callbackInvoked++;
+                    return Task.CompletedTask;
+                });
+                storageSession.OnSaveChanges((s, _) =>
+                {
+                    callbackInvoked++;
+                    return Task.CompletedTask;
+                });
 
-                    await storageSession.CompleteAsync();
+                await syncSession.CompleteAsync();
 
-                    Assert.AreEqual(2, callbackInvoked);
-                }
+                Assert.AreEqual(2, callbackInvoked);
 
                 scope.Complete();
             }
@@ -57,25 +60,26 @@
                 var transportTransaction = new TransportTransaction();
                 transportTransaction.Set(Transaction.Current);
 
-                var adapter = new NHibernateSynchronizedStorageAdapter(SessionFactory, null);
+                //The open method creates the NHibernateLazyNativeTransactionSynchronizedStorageSession
+                var syncSession = new NHibernateSynchronizedStorageSession(new SessionFactoryHolder(SessionFactory));
+                var success = await syncSession.TryOpen(transportTransaction, new ContextBag());
+                Assert.IsTrue(success);
+                var storageSession = syncSession.InternalSession;
 
-                using (var storageSession = await adapter.TryAdapt(transportTransaction, new ContextBag()))
+                storageSession.Session.Save(new TestEntity { Id = entityId });
+                storageSession.OnSaveChanges((s, _) =>
                 {
-                    storageSession.Session().Save(new TestEntity { Id = entityId });
-                    storageSession.OnSaveChanges((s, _) =>
-                    {
-                        throw new Exception("Simulated");
-                    });
+                    throw new Exception("Simulated");
+                });
 
-                    try
-                    {
-                        await storageSession.CompleteAsync();
-                        scope.Complete();
-                    }
-                    catch (Exception)
-                    {
-                        //NOOP
-                    }
+                try
+                {
+                    await syncSession.CompleteAsync();
+                    scope.Complete();
+                }
+                catch (Exception)
+                {
+                    //NOOP
                 }
 
             }

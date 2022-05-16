@@ -21,7 +21,7 @@
         /// </summary>
         public static void UsePessimisticConcurrencyControl(this OutboxSettings outboxSettings)
         {
-            outboxSettings.GetSettings().Set(NHibernateStorageSession.OutboxConcurrencyModeSettingsKey, true);
+            outboxSettings.GetSettings().Set(NHibernateOutbox.OutboxConcurrencyModeSettingsKey, true);
         }
 
         /// <summary>
@@ -37,7 +37,7 @@
             {
                 throw new Exception($"Isolation level {isolationLevel} is not supported.");
             }
-            outboxSettings.GetSettings().Set(NHibernateStorageSession.OutboxTransactionIsolationLevelSettingsKey, isolationLevel);
+            outboxSettings.GetSettings().Set(NHibernateOutbox.OutboxTransactionIsolationLevelSettingsKey, isolationLevel);
         }
 
         /// <summary>
@@ -68,8 +68,8 @@
             {
                 throw new Exception($"Isolation level {isolationLevel} is not supported.");
             }
-            outboxSettings.GetSettings().Set(NHibernateStorageSession.OutboxTransactionModeSettingsKey, true);
-            outboxSettings.GetSettings().Set(NHibernateStorageSession.OutboxTransactionScopeModeIsolationLevelSettingsKey, isolationLevel);
+            outboxSettings.GetSettings().Set(NHibernateOutbox.OutboxTransactionModeSettingsKey, true);
+            outboxSettings.GetSettings().Set(NHibernateOutbox.OutboxTransactionScopeModeIsolationLevelSettingsKey, isolationLevel);
         }
     }
 }

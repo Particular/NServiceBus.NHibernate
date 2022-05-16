@@ -1,8 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net472;netcoreapp3.1;net6.0</TargetFrameworks>
-    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+    <TargetFrameworks>net472;net6.0</TargetFrameworks>
   </PropertyGroup>
 
   <ItemGroup>
@@ -12,7 +11,7 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.2.0" />
     <PackageReference Include="NHibernate" Version="5.3.12" />
-    <PackageReference Include="NServiceBus.AcceptanceTests.Sources" Version="8.0.0-beta.1" GeneratePathProperty="true" />
+    <PackageReference Include="NServiceBus.AcceptanceTests.Sources" Version="8.0.0-beta.2" GeneratePathProperty="true" />
     <PackageReference Include="NUnit" Version="3.13.3" />
     <PackageReference Include="NUnit3TestAdapter" Version="4.2.1" />
     <PackageReference Include="System.Data.SqlClient" Version="4.8.3" />
@@ -25,8 +24,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Remove="\**\When_handling_concurrent_messages.cs" />
-    <Compile Remove="\**\NSB.AcceptanceTests\DelayedDelivery\When_deferring_a_message.cs" />
+    <Compile Remove="$(PkgNServiceBus_AcceptanceTests_Sources)/**/When_handling_concurrent_messages.cs" />
+    <Compile Remove="$(PkgNServiceBus_AcceptanceTests_Sources)/**/When_deferring_a_message.cs" />
   </ItemGroup>
 
 </Project>

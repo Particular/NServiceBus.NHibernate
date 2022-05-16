@@ -45,8 +45,6 @@
             Approver.Verify(script);
         }
 
-#if !NETCOREAPP
-        // This test is ignored for .NETCore because of the unstable foreign key name generation in NHibernate https://github.com/nhibernate/nhibernate-core/issues/1769
         [Test]
         [MethodImpl(MethodImplOptions.NoInlining)]
         public void Sagas_MsSql2012()
@@ -62,7 +60,6 @@
             var script = ScriptGenerator<Oracle10gDialect>.GenerateSagaScript<MySaga>();
             Approver.Verify(script);
         }
-#endif
     }
 
     class MySaga : Saga<MySaga.SagaData>, IAmStartedByMessages<MyMessage>

@@ -9,20 +9,22 @@
     using Persistence;
 
     [SkipWeaving]
-    class NHibernateOutboxTransactionSynchronizedStorageSession : ICompletableSynchronizedStorageSession, INHibernateStorageSession
+    class NHibernateOutboxTransactionSynchronizedStorageSession : INHibernateStorageSessionInternal
     {
-        INHibernateOutboxTransaction outboxTransaction;
+        readonly INHibernateOutboxTransaction outboxTransaction;
+        readonly ISynchronizedStorageSession synchronizedStorageSession;
 
-        public NHibernateOutboxTransactionSynchronizedStorageSession(INHibernateOutboxTransaction outboxTransaction)
+        public NHibernateOutboxTransactionSynchronizedStorageSession(INHibernateOutboxTransaction outboxTransaction, ISynchronizedStorageSession synchronizedStorageSession)
         {
             this.outboxTransaction = outboxTransaction;
+            this.synchronizedStorageSession = synchronizedStorageSession;
         }
 
         public ISession Session => outboxTransaction.Session;
 
         public void OnSaveChanges(Func<ISynchronizedStorageSession, CancellationToken, Task> callback)
         {
-            outboxTransaction.OnSaveChanges(token => callback(this, token));
+            outboxTransaction.OnSaveChanges(token => callback(synchronizedStorageSession, token));
         }
 
         [ObsoleteEx(Message = "Use the overload that supports cancellation.", RemoveInVersion = "10", TreatAsErrorFromVersion = "9")]

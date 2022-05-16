@@ -9,14 +9,16 @@
     using Persistence;
 
     [SkipWeaving]
-    class NHibernateLazyAmbientTransactionSynchronizedStorageSession : ICompletableSynchronizedStorageSession, INHibernateStorageSession
+    class NHibernateLazyAmbientTransactionSynchronizedStorageSession : INHibernateStorageSessionInternal
     {
+        readonly ISynchronizedStorageSession synchronizedStorageSession;
         Lazy<ISession> session;
         Lazy<DbConnection> connection;
         Func<ISynchronizedStorageSession, CancellationToken, Task> onSaveChangesCallback = (_, __) => Task.CompletedTask;
 
-        public NHibernateLazyAmbientTransactionSynchronizedStorageSession(Func<DbConnection> connectionFactory, Func<DbConnection, ISession> sessionFactory)
+        public NHibernateLazyAmbientTransactionSynchronizedStorageSession(Func<DbConnection> connectionFactory, Func<DbConnection, ISession> sessionFactory, ISynchronizedStorageSession synchronizedStorageSession)
         {
+            this.synchronizedStorageSession = synchronizedStorageSession;
             connection = new Lazy<DbConnection>(connectionFactory);
             session = new Lazy<ISession>(() => sessionFactory(connection.Value));
         }
@@ -51,7 +53,7 @@
 
         public async Task CompleteAsync(CancellationToken cancellationToken = default)
         {
-            await onSaveChangesCallback(this, cancellationToken).ConfigureAwait(false);
+            await onSaveChangesCallback(synchronizedStorageSession, cancellationToken).ConfigureAwait(false);
             if (session.IsValueCreated)
             {
                 session.Value.Flush();

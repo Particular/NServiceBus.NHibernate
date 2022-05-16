@@ -5,6 +5,7 @@
     using System.Threading.Tasks;
     using global::NHibernate;
     using Persistence;
+    using Persistence.NHibernate;
 
     /// <summary>
     /// Shared session extensions for NHibernate persistence.
@@ -16,9 +17,18 @@
         /// </summary>
         public static ISession Session(this ISynchronizedStorageSession session)
         {
-            if (session is INHibernateStorageSession ambientTransactionSession)
+            if (session is INHibernateStorageSessionProvider sessionProvider)
             {
-                return ambientTransactionSession.Session;
+                return sessionProvider.InternalSession.Session;
+            }
+            throw new InvalidOperationException("Shared session has not been configured for NHibernate.");
+        }
+
+        internal static INHibernateStorageSession StorageSession(this ISynchronizedStorageSession session)
+        {
+            if (session is INHibernateStorageSessionProvider sessionProvider)
+            {
+                return sessionProvider.InternalSession;
             }
             throw new InvalidOperationException("Shared session has not been configured for NHibernate.");
         }
@@ -28,9 +38,9 @@
         /// </summary>
         public static void OnSaveChanges(this ISynchronizedStorageSession session, Func<ISynchronizedStorageSession, CancellationToken, Task> callback)
         {
-            if (session is INHibernateStorageSession nhibernateSession)
+            if (session is INHibernateStorageSessionProvider sessionProvider)
             {
-                nhibernateSession.OnSaveChanges(callback);
+                sessionProvider.InternalSession.OnSaveChanges(callback);
             }
             else
             {

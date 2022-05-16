@@ -22,7 +22,7 @@
             where TMapping : ClassMapping<TEntity>
         {
             persistenceConfiguration.GetSettings().Set<IOutboxPersisterFactory>(new OutboxPersisterFactory<TEntity>());
-            persistenceConfiguration.GetSettings().Set(NHibernateStorageSession.OutboxMappingSettingsKey, typeof(TMapping));
+            persistenceConfiguration.GetSettings().Set(NHibernateOutbox.OutboxMappingSettingsKey, typeof(TMapping));
             return persistenceConfiguration;
         }
 
@@ -35,8 +35,8 @@
         /// <returns>The NHibernate configuration.</returns>
         public static PersistenceExtensions<NHibernatePersistence> CustomizeOutboxTableName(this PersistenceExtensions<NHibernatePersistence> persistenceConfiguration, string outboxTableName, string outboxSchemaName = null)
         {
-            persistenceConfiguration.GetSettings().Set(NHibernateStorageSession.OutboxTableNameSettingsKey, outboxTableName);
-            persistenceConfiguration.GetSettings().Set(NHibernateStorageSession.OutboxSchemaNameSettingsKey, outboxSchemaName);
+            persistenceConfiguration.GetSettings().Set(NHibernateOutbox.OutboxTableNameSettingsKey, outboxTableName);
+            persistenceConfiguration.GetSettings().Set(NHibernateOutbox.OutboxSchemaNameSettingsKey, outboxSchemaName);
             return persistenceConfiguration;
         }
     }

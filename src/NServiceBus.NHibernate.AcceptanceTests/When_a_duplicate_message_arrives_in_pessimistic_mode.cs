@@ -32,6 +32,7 @@
                     await Send(duplicateMessageId, session);
                 }).CustomConfig(c =>
                 {
+                    c.ConfigureTransport().TransportTransactionMode = TransportTransactionMode.ReceiveOnly;
                     var outboxSettings = c.EnableOutbox();
                     outboxSettings.UsePessimisticConcurrencyControl();
                     if (transactionScope)

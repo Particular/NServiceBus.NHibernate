@@ -5,6 +5,7 @@ namespace NServiceBus.Features
     using global::NHibernate.Cfg;
     using Microsoft.Extensions.DependencyInjection;
     using NServiceBus.Sagas;
+    using Persistence.NHibernate;
     using SagaPersisters.NHibernate;
     using SagaPersisters.NHibernate.AutoPersistence;
     using Settings;
@@ -19,7 +20,10 @@ namespace NServiceBus.Features
         /// </summary>
         public NHibernateSagaStorage()
         {
+            Defaults(x => x.EnableFeatureByDefault<NHibernateStorageSession>());
+
             DependsOn<Sagas>();
+            DependsOn<NHibernateStorageSession>();
         }
 
         /// <summary>
@@ -27,8 +31,9 @@ namespace NServiceBus.Features
         /// </summary>
         protected override void Setup(FeatureConfigurationContext context)
         {
-            context.Settings.Get<SharedMappings>()
-                .AddMapping(configuration => ApplyMappings(context.Settings, configuration));
+            var config = context.Settings.Get<NHibernateConfiguration>();
+
+            ApplyMappings(context.Settings, config.Configuration);
 
             context.Services.AddSingleton<ISagaPersister, SagaPersister>();
         }
