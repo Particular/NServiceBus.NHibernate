@@ -14,10 +14,7 @@ namespace NServiceBus.Features
     using Configuration = global::NHibernate.Cfg.Configuration;
     using Environment = global::NHibernate.Cfg.Environment;
 
-    /// <summary>
-    /// NHibernate Outbox feature
-    /// </summary>
-    public class NHibernateOutbox : Feature
+    class NHibernateOutbox : Feature
     {
 
         internal const string OutboxMappingSettingsKey = "NServiceBus.NHibernate.OutboxMapping";
