@@ -45,7 +45,7 @@ public class ConfigureEndpointNHibernatePersistence : IConfigureEndpointTestExec
 
     static string Create(params object[] data)
     {
-        using (var provider = new MD5CryptoServiceProvider())
+        using (var provider = MD5.Create())
         {
             var inputBytes = Encoding.Default.GetBytes(string.Concat(data));
             var hashBytes = provider.ComputeHash(inputBytes);

@@ -2,7 +2,6 @@
 
   <PropertyGroup>
     <TargetFrameworks>net472;net6.0</TargetFrameworks>
-    <NoWarn>$(NoWarn);SYSLIB0021</NoWarn>
     <RootNamespace>NServiceBus.NHibernate.AcceptanceTests.Oracle</RootNamespace>
   </PropertyGroup>
 
