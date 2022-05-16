@@ -45,7 +45,7 @@
             {
                 return new ValueTask<bool>(false);
             }
-            if (!(sessionFactory is SessionFactoryImpl sessionFactoryImpl))
+            if (sessionFactory is not SessionFactoryImpl sessionFactoryImpl)
             {
                 throw new NotSupportedException("Overriding default implementation of ISessionFactory is not supported.");
             }

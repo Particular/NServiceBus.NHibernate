@@ -30,10 +30,10 @@
         /// </summary>
         public static void TransactionIsolationLevel(this OutboxSettings outboxSettings, System.Data.IsolationLevel isolationLevel)
         {
-            if (isolationLevel == System.Data.IsolationLevel.Chaos
-                || isolationLevel == System.Data.IsolationLevel.ReadUncommitted
-                || isolationLevel == System.Data.IsolationLevel.Snapshot
-                || isolationLevel == System.Data.IsolationLevel.Unspecified)
+            if (isolationLevel is System.Data.IsolationLevel.Chaos
+                or System.Data.IsolationLevel.ReadUncommitted
+                or System.Data.IsolationLevel.Snapshot
+                or System.Data.IsolationLevel.Unspecified)
             {
                 throw new Exception($"Isolation level {isolationLevel} is not supported.");
             }
@@ -61,10 +61,10 @@
         /// <param name="isolationLevel">Isolation level to use. Only levels Read Committed, Repeatable Read and Serializable are supported.</param>
         public static void UseTransactionScope(this OutboxSettings outboxSettings, IsolationLevel isolationLevel)
         {
-            if (isolationLevel == IsolationLevel.Chaos
-                || isolationLevel == IsolationLevel.ReadUncommitted
-                || isolationLevel == IsolationLevel.Snapshot
-                || isolationLevel == IsolationLevel.Unspecified)
+            if (isolationLevel is IsolationLevel.Chaos
+                or IsolationLevel.ReadUncommitted
+                or IsolationLevel.Snapshot
+                or IsolationLevel.Unspecified)
             {
                 throw new Exception($"Isolation level {isolationLevel} is not supported.");
             }

@@ -31,7 +31,7 @@
             INHibernateOutboxTransaction transactionFactory()
             {
                 return transactionScope
-                    ? (INHibernateOutboxTransaction)new NHibernateTransactionScopeTransaction(concurrencyControlStrategy, sessionFactory, transactionScopeIsolationLevel)
+                    ? new NHibernateTransactionScopeTransaction(concurrencyControlStrategy, sessionFactory, transactionScopeIsolationLevel)
                     : new NHibernateLocalOutboxTransaction(concurrencyControlStrategy, sessionFactory, adoIsolationLevel);
             }
 
