@@ -41,6 +41,10 @@ jobs:
           name: NuGet packages
           path: nugets/
           retention-days: 7
+      - name: Azure login
+        uses: azure/login@v1.4.3
+        with:
+          creds: ${{ secrets.AZURE_ACI_CREDENTIALS }}          
       - name: Install SQL Server
         uses: Particular/install-sql-server-action@v1.0.0
         with:
