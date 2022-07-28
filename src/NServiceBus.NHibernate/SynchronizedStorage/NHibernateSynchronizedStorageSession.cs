@@ -22,10 +22,7 @@
         readonly ISessionFactory sessionFactory;
         INHibernateStorageSessionInternal internalSession;
 
-        public NHibernateSynchronizedStorageSession(SessionFactoryHolder sessionFactoryHolder)
-        {
-            sessionFactory = sessionFactoryHolder.SessionFactory;
-        }
+        public NHibernateSynchronizedStorageSession(SessionFactoryHolder sessionFactoryHolder) => sessionFactory = sessionFactoryHolder.SessionFactory;
 
         public ValueTask<bool> TryOpen(IOutboxTransaction transaction, ContextBag context, CancellationToken cancellationToken = default)
         {
@@ -78,9 +75,6 @@
 
         public Task CompleteAsync(CancellationToken cancellationToken = new CancellationToken()) => internalSession.CompleteAsync(cancellationToken);
 
-        public void Dispose()
-        {
-            internalSession.Dispose();
-        }
+        public void Dispose() => internalSession?.Dispose();
     }
 }
