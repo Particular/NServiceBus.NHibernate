@@ -24,6 +24,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NServiceBus.NHibernate.Tran
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NServiceBus.NHibernate.TransactionalSession.AcceptanceTests", "NServiceBus.NHibernate.TransactionalSession.AcceptanceTests\NServiceBus.NHibernate.TransactionalSession.AcceptanceTests.csproj", "{281CA35B-D5D5-4F20-AA13-2BEE160F49C6}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NServiceBus.NHibernate.TransactionalSession.Tests", "NServiceBus.NHibernate.TransactionalSession.Tests\NServiceBus.NHibernate.TransactionalSession.Tests.csproj", "{2FC6EBDA-4A5D-474E-8BBC-562C938B225B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -62,6 +64,10 @@ Global
 		{281CA35B-D5D5-4F20-AA13-2BEE160F49C6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{281CA35B-D5D5-4F20-AA13-2BEE160F49C6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{281CA35B-D5D5-4F20-AA13-2BEE160F49C6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2FC6EBDA-4A5D-474E-8BBC-562C938B225B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2FC6EBDA-4A5D-474E-8BBC-562C938B225B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2FC6EBDA-4A5D-474E-8BBC-562C938B225B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2FC6EBDA-4A5D-474E-8BBC-562C938B225B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

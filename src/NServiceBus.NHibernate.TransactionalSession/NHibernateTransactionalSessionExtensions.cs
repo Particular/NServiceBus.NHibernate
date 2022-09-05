@@ -3,8 +3,14 @@
     using Configuration.AdvancedExtensibility;
     using Features;
 
-    static class NHibernateTransactionalSessionExtensions
+    /// <summary>
+    /// Enables the transactional session feature.
+    /// </summary>
+    public static class NHibernateTransactionalSessionExtensions
     {
+        /// <summary>
+        /// Enables transactional session for this endpoint.
+        /// </summary>
         public static PersistenceExtensions<NHibernatePersistence> EnableTransactionalSession(
             this PersistenceExtensions<NHibernatePersistence> persistenceExtensions)
         {
