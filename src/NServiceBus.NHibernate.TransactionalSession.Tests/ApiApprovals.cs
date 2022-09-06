@@ -1,9 +1,9 @@
-﻿namespace NServiceBus.Persistence.CosmosDB.Tests
+﻿namespace NServiceBus.TransactionalSession.Tests
 {
+    using NServiceBus.TransactionalSession;
     using NUnit.Framework;
     using Particular.Approvals;
     using PublicApiGenerator;
-    using TransactionalSession;
 
     [TestFixture]
     public class APIApprovals
