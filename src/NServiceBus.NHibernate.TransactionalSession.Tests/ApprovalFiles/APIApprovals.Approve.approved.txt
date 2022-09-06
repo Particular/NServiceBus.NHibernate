@@ -8,5 +8,6 @@ namespace NServiceBus.TransactionalSession
     public static class NHibernateTransactionalSessionExtensions
     {
         public static NServiceBus.PersistenceExtensions<NServiceBus.NHibernatePersistence> EnableTransactionalSession(this NServiceBus.PersistenceExtensions<NServiceBus.NHibernatePersistence> persistenceExtensions) { }
+        public static System.Threading.Tasks.Task Open(this NServiceBus.TransactionalSession.ITransactionalSession transactionalSession, System.Threading.CancellationToken cancellationToken = default) { }
     }
 }

@@ -22,7 +22,7 @@ namespace NServiceBus.TransactionalSession.AcceptanceTests
                 {
                     using var scope = ctx.ServiceProvider.CreateScope();
                     using var transactionalSession = scope.ServiceProvider.GetRequiredService<ITransactionalSession>();
-                    await transactionalSession.Open(new NHibernateOpenSessionOptions());
+                    await transactionalSession.Open();
 
                     await transactionalSession.SendLocal(new SampleMessage(), CancellationToken.None);
 
@@ -60,7 +60,7 @@ namespace NServiceBus.TransactionalSession.AcceptanceTests
                     using (var scope = ctx.ServiceProvider.CreateScope())
                     using (var transactionalSession = scope.ServiceProvider.GetRequiredService<ITransactionalSession>())
                     {
-                        await transactionalSession.Open(new NHibernateOpenSessionOptions());
+                        await transactionalSession.Open();
 
                         await transactionalSession.SendLocal(new SampleMessage());
                     }
@@ -85,7 +85,7 @@ namespace NServiceBus.TransactionalSession.AcceptanceTests
                     using var scope = ctx.ServiceProvider.CreateScope();
                     using var transactionalSession = scope.ServiceProvider.GetRequiredService<ITransactionalSession>();
 
-                    await transactionalSession.Open(new NHibernateOpenSessionOptions());
+                    await transactionalSession.Open();
 
                     var sendOptions = new SendOptions();
                     sendOptions.RequireImmediateDispatch();

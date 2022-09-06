@@ -1,5 +1,7 @@
 ﻿namespace NServiceBus.TransactionalSession
 {
+    using System.Threading;
+    using System.Threading.Tasks;
     using Configuration.AdvancedExtensibility;
     using Features;
 
@@ -18,5 +20,11 @@
 
             return persistenceExtensions;
         }
+
+        /// <summary>
+        /// Opens the transactional session
+        /// </summary>
+        public static Task Open(this ITransactionalSession transactionalSession, CancellationToken cancellationToken = default)
+            => transactionalSession.Open(new NHibernateOpenSessionOptions(), cancellationToken);
     }
 }
