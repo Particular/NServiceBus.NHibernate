@@ -1,16 +1,17 @@
-﻿namespace NServiceBus.TransactionalSession;
-
-/// <summary>
-/// The options allowing to control the behavior of the transactional session.
-/// </summary>
-public class NHibernateOpenSessionOptions : OpenSessionOptions
+﻿namespace NServiceBus.TransactionalSession
 {
-    internal void SetEndpointQualifiedMessageIdValue(string endpointName)
+    /// <summary>
+    /// The options allowing to control the behavior of the transactional session.
+    /// </summary>
+    public class NHibernateOpenSessionOptions : OpenSessionOptions
     {
-        var endpointQualifiedMessageId = $"{endpointName}/{SessionId}";
-        var endpointQualifiedMessageIdKeyName = "NServiceBus.Persistence.NHibernate.EndpointQualifiedMessageId";
+        internal void SetEndpointQualifiedMessageIdValue(string endpointName)
+        {
+            var endpointQualifiedMessageId = $"{endpointName}/{SessionId}";
+            var endpointQualifiedMessageIdKeyName = "NServiceBus.Persistence.NHibernate.EndpointQualifiedMessageId";
 
-        Extensions.Set(endpointQualifiedMessageIdKeyName, endpointQualifiedMessageId);
-        Metadata.Add(endpointQualifiedMessageIdKeyName, endpointQualifiedMessageId);
+            Extensions.Set(endpointQualifiedMessageIdKeyName, endpointQualifiedMessageId);
+            Metadata.Add(endpointQualifiedMessageIdKeyName, endpointQualifiedMessageId);
+        }
     }
 }

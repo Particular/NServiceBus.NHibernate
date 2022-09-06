@@ -1,25 +1,26 @@
-﻿namespace NServiceBus.TransactionalSession;
-
-using Features;
-using Microsoft.Extensions.DependencyInjection;
-
-sealed class NHibernateTransactionalSession : Feature
+﻿namespace NServiceBus.TransactionalSession
 {
-    public NHibernateTransactionalSession()
+    using Features;
+    using Microsoft.Extensions.DependencyInjection;
+
+    sealed class NHibernateTransactionalSession : Feature
     {
-        Defaults(s =>
+        public NHibernateTransactionalSession()
         {
-            s.EnableFeatureByDefault<TransactionalSession>();
-        });
+            Defaults(s =>
+            {
+                s.EnableFeatureByDefault<TransactionalSession>();
+            });
 
-        DependsOn<SynchronizedStorage>();
-        DependsOn<TransactionalSession>();
-    }
+            DependsOn<SynchronizedStorage>();
+            DependsOn<TransactionalSession>();
+        }
 
-    protected override void Setup(FeatureConfigurationContext context)
-    {
-        var endpointName = context.Settings.EndpointName();
+        protected override void Setup(FeatureConfigurationContext context)
+        {
+            var endpointName = context.Settings.EndpointName();
 
-        context.Services.AddSingleton(typeof(IOpenSessionOptionsCustomization), new NHibernateTransactionalSessionOptionsCustomization(endpointName));
+            context.Services.AddSingleton(typeof(IOpenSessionOptionsCustomization), new NHibernateTransactionalSessionOptionsCustomization(endpointName));
+        }
     }
 }

@@ -1,16 +1,17 @@
-﻿namespace NServiceBus.TransactionalSession;
-
-class NHibernateTransactionalSessionOptionsCustomization : IOpenSessionOptionsCustomization
+﻿namespace NServiceBus.TransactionalSession
 {
-    readonly string endpointName;
-
-    public NHibernateTransactionalSessionOptionsCustomization(string endpointName) => this.endpointName = endpointName;
-
-    public void Apply(OpenSessionOptions options)
+    class NHibernateTransactionalSessionOptionsCustomization : IOpenSessionOptionsCustomization
     {
-        if (options is NHibernateOpenSessionOptions nhOptions)
+        readonly string endpointName;
+
+        public NHibernateTransactionalSessionOptionsCustomization(string endpointName) => this.endpointName = endpointName;
+
+        public void Apply(OpenSessionOptions options)
         {
-            nhOptions.SetEndpointQualifiedMessageIdValue(endpointName);
+            if (options is NHibernateOpenSessionOptions nhOptions)
+            {
+                nhOptions.SetEndpointQualifiedMessageIdValue(endpointName);
+            }
         }
     }
 }
