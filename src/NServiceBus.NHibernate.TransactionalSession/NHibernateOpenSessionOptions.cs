@@ -8,10 +8,11 @@
         internal void SetEndpointQualifiedMessageIdValue(string endpointName)
         {
             var endpointQualifiedMessageId = $"{endpointName}/{SessionId}";
-            var endpointQualifiedMessageIdKeyName = "NServiceBus.Persistence.NHibernate.EndpointQualifiedMessageId";
 
-            Extensions.Set(endpointQualifiedMessageIdKeyName, endpointQualifiedMessageId);
-            Metadata.Add(endpointQualifiedMessageIdKeyName, endpointQualifiedMessageId);
+            Extensions.Set(EndpointQualifiedMessageIdKeyName, endpointQualifiedMessageId);
+            Metadata.Add(EndpointQualifiedMessageIdKeyName, endpointQualifiedMessageId);
         }
+
+        const string EndpointQualifiedMessageIdKeyName = "NServiceBus.Persistence.NHibernate.EndpointQualifiedMessageId";
     }
 }
