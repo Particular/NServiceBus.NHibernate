@@ -6,7 +6,6 @@ namespace NServiceBus.TransactionalSession.AcceptanceTests
     using System.Threading.Tasks;
     using Microsoft.Extensions.DependencyInjection;
     using AcceptanceTesting;
-    using NServiceBus.AcceptanceTests;
     using NUnit.Framework;
 
     public class When_using_transactional_session : NServiceBusAcceptanceTest
@@ -41,7 +40,7 @@ namespace NServiceBus.TransactionalSession.AcceptanceTests
                 .Done(c => c.MessageReceived)
                 .Run();
 
-            using var connection = new SqlConnection(EndpointConfigurer.ConnectionString);
+            using var connection = new SqlConnection(TransactionSessionDefaultServer.ConnectionString);
             await connection.OpenAsync();
 
             using var queryCommand = new SqlCommand($"SELECT TOP 1 [Id] FROM [dbo].[SomeTable] WHERE [Id]='{rowId}'", connection);

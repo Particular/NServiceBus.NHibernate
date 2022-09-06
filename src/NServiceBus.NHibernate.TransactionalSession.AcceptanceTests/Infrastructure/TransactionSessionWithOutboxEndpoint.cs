@@ -3,7 +3,6 @@ namespace NServiceBus.TransactionalSession.AcceptanceTests
     using System;
     using System.Threading.Tasks;
     using AcceptanceTesting.Support;
-    using NServiceBus.AcceptanceTests.EndpointTemplates;
 
     public class TransactionSessionWithOutboxEndpoint : TransactionSessionDefaultServer
     {

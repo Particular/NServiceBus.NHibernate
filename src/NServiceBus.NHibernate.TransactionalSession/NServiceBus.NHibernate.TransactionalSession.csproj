@@ -19,7 +19,4 @@
     <ProjectReference Include="..\NServiceBus.NHibernate\NServiceBus.NHibernate.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <InternalsVisibleTo Include="NServiceBus.NHibernate.TransactionalSession.AcceptanceTests" Key="$(NServiceBusTestsKey)" />
-  </ItemGroup>
 </Project>
