@@ -56,7 +56,7 @@ namespace NServiceBus.Features
             var builder = new NHibernateConfigurationBuilder(context.Settings, diagnostics, "Saga", "StorageConfiguration");
             var config = builder.Build();
 
-            context.Container.ConfigureComponent(b => (INHibernateStorageSession)b.Build<CompletableSynchronizedStorageSessionAdapter>().AdaptedSession, DependencyLifecycle.InstancePerUnitOfWork);
+            context.Container.ConfigureComponent(b => b.Build<CompletableSynchronizedStorageSessionAdapter>().AdaptedSession.NHibernatePersistenceSession(), DependencyLifecycle.InstancePerUnitOfWork);
 
             var outboxEnabled = context.Settings.IsFeatureActive(typeof(Outbox));
             if (outboxEnabled)

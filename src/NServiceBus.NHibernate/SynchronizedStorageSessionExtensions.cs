@@ -13,11 +13,17 @@
         /// <summary>
         /// Gets the current context NHibernate <see cref="ISession"/>.
         /// </summary>
-        public static ISession Session(this SynchronizedStorageSession session)
+        public static ISession Session(this SynchronizedStorageSession session) =>
+            session.NHibernatePersistenceSession().Session;
+
+        /// <summary>
+        /// Retrieves the shared <see cref="INHibernateStorageSession"/> from the <see cref="SynchronizedStorageSession"/>.
+        /// </summary>
+        public static INHibernateStorageSession NHibernatePersistenceSession(this SynchronizedStorageSession session)
         {
-            if (session is INHibernateStorageSession ambientTransactionSession)
+            if (session is INHibernateStorageSession storageSession)
             {
-                return ambientTransactionSession.Session;
+                return storageSession;
             }
             throw new InvalidOperationException("Shared session has not been configured for NHibernate.");
         }
