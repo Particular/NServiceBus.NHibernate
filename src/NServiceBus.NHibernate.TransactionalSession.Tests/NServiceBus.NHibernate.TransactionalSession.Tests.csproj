@@ -1,0 +1,29 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net472;net6.0</TargetFrameworks>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>..\NServiceBusTests.snk</AssemblyOriginatorKeyFile>
+    <LangVersion>10.0</LangVersion>
+    <!-- We want the root namespace to match the transactional session one -->
+    <RootNamespace>NServiceBus.TransactionalSession.Tests</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="GitHubActionsTestLogger" Version="2.0.1" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.3.1" />
+    <PackageReference Include="NUnit3TestAdapter" Version="4.2.1" />
+    <PackageReference Include="Nunit" Version="3.13.3" />
+    <PackageReference Include="NServiceBus.TransactionalSession" Version="2.0.0-beta.6" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Particular.Approvals" Version="0.3.0" />
+    <PackageReference Include="PublicApiGenerator" Version="10.3.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\NServiceBus.NHibernate.TransactionalSession\NServiceBus.NHibernate.TransactionalSession.csproj" />
+  </ItemGroup>
+
+</Project>
