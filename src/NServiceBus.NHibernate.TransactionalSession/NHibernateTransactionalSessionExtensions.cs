@@ -16,7 +16,6 @@
         public static PersistenceExtensions<NHibernatePersistence> EnableTransactionalSession(
             this PersistenceExtensions<NHibernatePersistence> persistenceExtensions)
         {
-            persistenceExtensions.GetSettings().EnableFeatureByDefault(typeof(TransactionalSession));
             persistenceExtensions.GetSettings().EnableFeatureByDefault(typeof(NHibernateTransactionalSession));
 
             return persistenceExtensions;
