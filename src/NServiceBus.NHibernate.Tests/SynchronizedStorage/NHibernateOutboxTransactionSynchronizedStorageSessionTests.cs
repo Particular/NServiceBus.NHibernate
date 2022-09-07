@@ -39,7 +39,7 @@
 
             using (var outboxTransaction = await persister.BeginTransaction(contextBag))
             {
-                var adapter = new NHibernateSynchronizedStorageAdapter(SessionFactory, null);
+                var adapter = new NHibernateSynchronizedStorageAdapter(SessionFactory);
 
                 using (var storageSession = await adapter.TryAdapt(outboxTransaction, contextBag))
                 {
@@ -71,7 +71,7 @@
 
             using (var outboxTransaction = await persister.BeginTransaction(contextBag))
             {
-                var adapter = new NHibernateSynchronizedStorageAdapter(SessionFactory, null);
+                var adapter = new NHibernateSynchronizedStorageAdapter(SessionFactory);
 
                 using (var storageSession = await adapter.TryAdapt(outboxTransaction, contextBag))
                 {
@@ -111,7 +111,7 @@
 
             using (var outboxTransaction = await persister.BeginTransaction(contextBag))
             {
-                var adapter = new NHibernateSynchronizedStorageAdapter(SessionFactory, null);
+                var adapter = new NHibernateSynchronizedStorageAdapter(SessionFactory);
 
                 using (var storageSession = await adapter.TryAdapt(outboxTransaction, contextBag))
                 {

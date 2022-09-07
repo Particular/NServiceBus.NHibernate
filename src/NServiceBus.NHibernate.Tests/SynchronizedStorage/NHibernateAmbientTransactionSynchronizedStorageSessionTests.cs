@@ -20,7 +20,7 @@
                 transportTransaction.Set(Transaction.Current);
 
                 var callbackInvoked = 0;
-                var adapter = new NHibernateSynchronizedStorageAdapter(SessionFactory, null);
+                var adapter = new NHibernateSynchronizedStorageAdapter(SessionFactory);
 
                 using (var storageSession = await adapter.TryAdapt(transportTransaction, new ContextBag()))
                 {
@@ -57,7 +57,7 @@
                 var transportTransaction = new TransportTransaction();
                 transportTransaction.Set(Transaction.Current);
 
-                var adapter = new NHibernateSynchronizedStorageAdapter(SessionFactory, null);
+                var adapter = new NHibernateSynchronizedStorageAdapter(SessionFactory);
 
                 using (var storageSession = await adapter.TryAdapt(transportTransaction, new ContextBag()))
                 {

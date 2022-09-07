@@ -14,15 +14,10 @@
 
     class NHibernateSynchronizedStorageAdapter : ISynchronizedStorageAdapter
     {
-        ISessionFactory sessionFactory;
-        CurrentSessionHolder currentSessionHolder;
+        readonly ISessionFactory sessionFactory;
         static readonly Task<CompletableSynchronizedStorageSession> EmptyResult = Task.FromResult((CompletableSynchronizedStorageSession)null);
 
-        public NHibernateSynchronizedStorageAdapter(ISessionFactory sessionFactory, CurrentSessionHolder currentSessionHolder)
-        {
-            this.sessionFactory = sessionFactory;
-            this.currentSessionHolder = currentSessionHolder;
-        }
+        public NHibernateSynchronizedStorageAdapter(ISessionFactory sessionFactory) => this.sessionFactory = sessionFactory;
 
         public Task<CompletableSynchronizedStorageSession> TryAdapt(OutboxTransaction transaction, ContextBag context)
         {
@@ -30,7 +25,6 @@
             {
                 nhibernateTransaction.BeginSynchronizedSession(context);
                 var session = new NHibernateOutboxTransactionSynchronizedStorageSession(nhibernateTransaction);
-                currentSessionHolder?.SetCurrentSession(session);
                 return Task.FromResult<CompletableSynchronizedStorageSession>(session);
             }
             return EmptyResult;
@@ -55,7 +49,6 @@
                     return sessionBuilder.OpenSession();
                 });
 
-            currentSessionHolder?.SetCurrentSession(session);
             return Task.FromResult<CompletableSynchronizedStorageSession>(session);
         }
 
