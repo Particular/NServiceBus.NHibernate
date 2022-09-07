@@ -10,6 +10,8 @@
             var endpointName = context.Settings.EndpointName();
 
             context.Services.AddSingleton(typeof(IOpenSessionOptionsCustomization), new NHibernateTransactionalSessionOptionsCustomization(endpointName));
+
+            base.Setup(context);
         }
     }
 }
