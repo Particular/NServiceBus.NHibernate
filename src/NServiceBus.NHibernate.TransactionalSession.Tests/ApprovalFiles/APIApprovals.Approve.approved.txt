@@ -1,0 +1,12 @@
+namespace NServiceBus.TransactionalSession
+{
+    public class NHibernateOpenSessionOptions : NServiceBus.TransactionalSession.OpenSessionOptions
+    {
+        public NHibernateOpenSessionOptions() { }
+    }
+    public static class NHibernateTransactionalSessionExtensions
+    {
+        public static NServiceBus.PersistenceExtensions<NServiceBus.NHibernatePersistence> EnableTransactionalSession(this NServiceBus.PersistenceExtensions<NServiceBus.NHibernatePersistence> persistenceExtensions) { }
+        public static System.Threading.Tasks.Task Open(this NServiceBus.TransactionalSession.ITransactionalSession transactionalSession, System.Threading.CancellationToken cancellationToken = default) { }
+    }
+}
