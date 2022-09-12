@@ -1,0 +1,8 @@
+[*.cs]
+
+# Justification: Test project
+dotnet_diagnostic.CA2007.severity = none
+
+# Persistence library doesn't need saga analyzers
+dotnet_diagnostic.NSB0004.severity = none
+dotnet_diagnostic.NSB0012.severity = none
