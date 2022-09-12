@@ -6,7 +6,6 @@ namespace NServiceBus.TransactionalSession.AcceptanceTests
     using System.Threading.Tasks;
     using AcceptanceTesting.Support;
     using Infrastructure;
-    using NUnit.Framework;
     using Persistence;
     using Persistence.NHibernate;
 
@@ -21,20 +20,7 @@ namespace NServiceBus.TransactionalSession.AcceptanceTests
                 {"NServiceBus/Persistence/NHibernate/show_sql", "true"}
             };
 
-            var builder = new EndpointConfiguration(endpointConfiguration.EndpointName);
-            builder.EnableInstallers();
-
-            builder.Recoverability()
-                .Delayed(delayed => delayed.NumberOfRetries(0))
-                .Immediate(immediate => immediate.NumberOfRetries(0));
-            builder.SendFailedMessagesTo("error");
-
-            var storageDir = Path.Combine(Path.GetTempPath(), "learn", TestContext.CurrentContext.Test.ID);
-
-            var transport = builder.UseTransport<AcceptanceTestingTransport>();
-            transport.StorageDirectory(storageDir);
-
-            var persistence = builder.UsePersistence<NHibernatePersistence>();
+            var persistence = configuration.UsePersistence<NHibernatePersistence>();
             persistence.ConnectionString(ConnectionString);
             persistence.EnableTransactionalSession();
 
