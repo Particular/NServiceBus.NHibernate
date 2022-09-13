@@ -56,7 +56,7 @@ namespace NServiceBus.Features
                 return new TimeoutPersister(
                     context.Settings.EndpointName(),
                     sessionFactory,
-                    new NHibernateSynchronizedStorageAdapter(sessionFactory, null), new NHibernateSynchronizedStorage(sessionFactory, null),
+                    new NHibernateSynchronizedStorageAdapter(sessionFactory), new NHibernateSynchronizedStorage(sessionFactory),
                     timeoutsCleanupExecutionInterval);
             }, DependencyLifecycle.SingleInstance);
 

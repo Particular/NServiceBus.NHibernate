@@ -1,4 +1,5 @@
 ﻿using System;
+using NServiceBus;
 using NUnit.Framework;
 
 [SetUpFixture]
@@ -13,5 +14,8 @@ public class SetUpFixture
         {
             Assert.Ignore("Ignoring Oracle test");
         }
+
+        // ensure the NHibernate persistence assembly is loaded into the AppDomain because it needs its features to be scanned to work properly.
+        typeof(NHibernatePersistence).ToString();
     }
 }

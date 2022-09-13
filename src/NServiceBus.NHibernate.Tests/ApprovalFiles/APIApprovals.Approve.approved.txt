@@ -45,6 +45,7 @@ namespace NServiceBus
     }
     public class static SynchronizedStorageSessionExtensions
     {
+        public static NServiceBus.INHibernateStorageSession NHibernatePersistenceSession(this NServiceBus.Persistence.SynchronizedStorageSession session) { }
         public static void OnSaveChanges(this NServiceBus.Persistence.SynchronizedStorageSession session, System.Func<NServiceBus.Persistence.SynchronizedStorageSession, System.Threading.Tasks.Task> callback) { }
         public static NHibernate.ISession Session(this NServiceBus.Persistence.SynchronizedStorageSession session) { }
     }

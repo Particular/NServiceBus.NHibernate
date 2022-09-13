@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net461;netstandard2.0</TargetFrameworks>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>..\NServiceBus.snk</AssemblyOriginatorKeyFile>
+    <RootNamespace>NServiceBus.TransactionalSession</RootNamespace>
+    <Description>NServiceBus Transactional Session for the NHibernate persistence.</Description>
+    <LangVersion>7.1</LangVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Particular.Packaging" Version="2.0.0" PrivateAssets="All" />
+    <PackageReference Include="NServiceBus.TransactionalSession" Version="[1.0.0-beta.1, 3.0.0)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\NServiceBus.NHibernate\NServiceBus.NHibernate.csproj" />
+  </ItemGroup>
+
+</Project>

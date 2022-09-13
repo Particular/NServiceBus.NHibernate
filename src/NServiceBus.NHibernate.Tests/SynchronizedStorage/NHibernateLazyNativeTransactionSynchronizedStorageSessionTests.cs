@@ -12,7 +12,7 @@
         [Test]
         public async Task It_invokes_callbacks_when_session_is_completed()
         {
-            var storage = new NHibernateSynchronizedStorage(SessionFactory, null);
+            var storage = new NHibernateSynchronizedStorage(SessionFactory);
 
             var callbackInvoked = 0;
 
@@ -41,7 +41,7 @@
         {
             var entityId = Guid.NewGuid().ToString();
             var exceptionThrown = false;
-            var storage = new NHibernateSynchronizedStorage(SessionFactory, null);
+            var storage = new NHibernateSynchronizedStorage(SessionFactory);
 
             using (var storageSession = await storage.OpenSession(new ContextBag()))
             {
