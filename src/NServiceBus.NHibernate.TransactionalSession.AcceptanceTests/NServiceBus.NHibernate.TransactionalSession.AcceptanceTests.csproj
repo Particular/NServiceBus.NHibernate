@@ -23,6 +23,7 @@
     <PackageReference Include="System.Data.SqlClient" Version="4.8.1" />
     <PackageReference Include="GitHubActionsTestLogger" Version="1.2.0" />
     <PackageReference Include="NServiceBus.AcceptanceTesting" Version="7.8.0" />
+    <PackageReference Include="NServiceBus.TransactionalSession" Version="1.0.0" />
   </ItemGroup>
 
 </Project>
