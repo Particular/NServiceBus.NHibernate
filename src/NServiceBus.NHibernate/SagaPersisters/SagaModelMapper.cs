@@ -67,7 +67,15 @@ namespace NServiceBus.SagaPersisters.NHibernate.AutoPersistence
                     idx.AddColumns(foreignKey.ColumnIterator);
                     idx.Name = "IDX" + foreignKey.Name.Substring(2);
                     idx.Table = table;
-                    table.AddIndex(idx);
+
+                    try
+                    {
+                        table.AddIndex(idx);
+                    }
+                    catch (MappingException e)
+                    {
+                        throw new Exception("Failed to add index! Are your sagas sharing types?", e);
+                    }
                 }
             }
 
