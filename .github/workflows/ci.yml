@@ -51,9 +51,9 @@ jobs:
           connection-string-env-var: SQLServerConnectionString
           catalog: nservicebus
       - name: Setup Oracle
-        uses: Particular/setup-oracle-action@v1.1.0
+        uses: Particular/setup-oracle-action@v1.3.0
         with:
           connection-string-name: OracleConnectionString
           tag: NHibernatePersistence
       - name: Run tests
-        uses: Particular/run-tests-action@v1.3.0
+        uses: Particular/run-tests-action@v1.4.0
