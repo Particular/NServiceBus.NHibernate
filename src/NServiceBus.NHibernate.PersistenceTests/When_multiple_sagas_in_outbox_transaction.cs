@@ -62,9 +62,9 @@ namespace NServiceBus.PersistenceTesting.Sagas
             var saga1 = new Saga1.Saga1Data { CorrelationId = Guid.NewGuid().ToString() };
             var saga2 = new Saga2.Saga2Data { CorrelationId = Guid.NewGuid().ToString() };
 
+            var context = configuration.GetContextBagForOutbox();
             var outboxRecords = configuration.OutboxStorage.Get(Guid.NewGuid().ToString(), context);
             Assert.IsNull(outboxRecords);
-            var context = configuration.GetContextBagForOutbox();
             using (var outboxTransaction = await configuration.OutboxStorage.BeginTransaction(context))
             {
                 using (var saga1Session = configuration.CreateStorageSession())
