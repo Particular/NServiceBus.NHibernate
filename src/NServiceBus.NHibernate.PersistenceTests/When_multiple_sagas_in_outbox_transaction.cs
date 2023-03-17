@@ -15,6 +15,8 @@ namespace NServiceBus.PersistenceTesting.Sagas
             var saga2 = new Saga2.Saga2Data { CorrelationId = Guid.NewGuid().ToString() };
 
             var context = configuration.GetContextBagForOutbox();
+            var outboxRecords = configuration.OutboxStorage.Get(Guid.NewGuid().ToString(), context);
+            Assert.IsNull(outboxRecords);
             using (var outboxTransaction = await configuration.OutboxStorage.BeginTransaction(context))
             {
                 using (var saga1Session = configuration.CreateStorageSession())
@@ -60,6 +62,8 @@ namespace NServiceBus.PersistenceTesting.Sagas
             var saga1 = new Saga1.Saga1Data { CorrelationId = Guid.NewGuid().ToString() };
             var saga2 = new Saga2.Saga2Data { CorrelationId = Guid.NewGuid().ToString() };
 
+            var outboxRecords = configuration.OutboxStorage.Get(Guid.NewGuid().ToString(), context);
+            Assert.IsNull(outboxRecords);
             var context = configuration.GetContextBagForOutbox();
             using (var outboxTransaction = await configuration.OutboxStorage.BeginTransaction(context))
             {
@@ -107,6 +111,8 @@ namespace NServiceBus.PersistenceTesting.Sagas
             await SaveSaga(saga2);
 
             var context = configuration.GetContextBagForOutbox();
+            var outboxRecords = configuration.OutboxStorage.Get(Guid.NewGuid().ToString(), context);
+            Assert.IsNull(outboxRecords);
             using (var outboxTransaction = await configuration.OutboxStorage.BeginTransaction(context))
             {
                 using (var saga1Session = configuration.CreateStorageSession())
@@ -155,6 +161,8 @@ namespace NServiceBus.PersistenceTesting.Sagas
             await SaveSaga(saga2);
 
             var context = configuration.GetContextBagForOutbox();
+            var outboxRecords = configuration.OutboxStorage.Get(Guid.NewGuid().ToString(), context);
+            Assert.IsNull(outboxRecords);
             using (var outboxTransaction = await configuration.OutboxStorage.BeginTransaction(context))
             {
                 using (var saga1Session = configuration.CreateStorageSession())
@@ -217,7 +225,6 @@ namespace NServiceBus.PersistenceTesting.Sagas
                 public string SomeSaga2Data { get; set; }
             }
         }
-
 
         public class StartTestSagaMessage : IMessage
         {
