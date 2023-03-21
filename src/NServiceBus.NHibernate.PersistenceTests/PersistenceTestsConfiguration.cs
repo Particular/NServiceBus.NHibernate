@@ -133,10 +133,7 @@
             return CreateVariant<OutboxRecord>(description, databaseVariant, pessimistic, transactionScope);
         }
 
-        static bool BelongsToCurrentTest(Type t)
-        {
-            return t.DeclaringType != null && t.DeclaringType.FullName == TestContext.CurrentContext.Test.ClassName;
-        }
+        static bool BelongsToCurrentTest(Type t) => t.DeclaringType != null && (t.DeclaringType.FullName == TestContext.CurrentContext.Test.ClassName || BelongsToCurrentTest(t.DeclaringType));
 
         public async Task Configure(CancellationToken cancellationToken = default)
         {
