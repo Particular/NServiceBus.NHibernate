@@ -1,16 +1,11 @@
 namespace NServiceBus.Persistence.NHibernate.Tests
 {
-    using System;
     using System.Collections.Generic;
     using System.Collections.Specialized;
     using System.Configuration;
     using System.Dynamic;
     using NUnit.Framework;
     using Settings;
-
-#if NETFRAMEWORK
-    using System.Reflection;
-#endif
 
     [TestFixture]
     public class NHibernateConfigurationBuilderTests
@@ -129,121 +124,6 @@ namespace NServiceBus.Persistence.NHibernate.Tests
                 };
 
             CollectionAssert.IsSubsetOf(expected, builder.Build().Configuration.Properties);
-        }
-
-#if NETFRAMEWORK
-
-        [Test]
-        public void Should_read_settings_from_hibernate_configuration_config_section_if_available()
-        {
-            var appDomain = AppDomain.CreateDomain("Testing", AppDomain.CurrentDomain.Evidence,
-                                                   new AppDomainSetup
-                                                   {
-                                                       ApplicationBase = AppDomain.CurrentDomain.SetupInformation.ApplicationBase,
-                                                       ConfigurationFile = "Testing.config"
-                                                   });
-
-            var worker = (Worker)appDomain.CreateInstanceAndUnwrap(Assembly.GetExecutingAssembly().FullName, typeof(Worker).FullName);
-            var result = worker.Execute();
-            AppDomain.Unload(appDomain);
-
-            var expected = new Dictionary<string, string>
-                {
-                    {"connection.connection_string", "Data Source=:memory:;New=True;"},
-                };
-
-            CollectionAssert.IsSubsetOf(expected, result);
-        }
-
-        [Test]
-        public void Should_read_settings_from_hibernate_cfg_xml_if_available()
-        {
-            var appDomain = AppDomain.CreateDomain("Testing", AppDomain.CurrentDomain.Evidence,
-                                                   new AppDomainSetup
-                                                   {
-                                                       ApplicationBase =
-                                                           AppDomain.CurrentDomain.SetupInformation.ApplicationBase,
-                                                   });
-
-            var worker = (Worker)appDomain.CreateInstanceAndUnwrap(Assembly.GetExecutingAssembly().FullName, typeof(Worker).FullName);
-            var result = worker.Execute();
-            AppDomain.Unload(appDomain);
-
-            var expected = new Dictionary<string, string>
-                {
-                    {"connection.connection_string", @"Server=localhost\sqlexpress;Database=nservicebus;Trusted_Connection=True;"},
-                };
-
-            CollectionAssert.IsSubsetOf(expected, result);
-        }
-
-        [Test]
-        public void Our_settings_should_take_precedence_over_settings_from_hibernate_cfg_xml_if_available()
-        {
-            var appDomain = AppDomain.CreateDomain("Testing", AppDomain.CurrentDomain.Evidence,
-                                                   new AppDomainSetup
-                                                   {
-                                                       ApplicationBase =
-                                                           AppDomain.CurrentDomain.SetupInformation.ApplicationBase,
-                                                   });
-
-            var worker = (Worker2)appDomain.CreateInstanceAndUnwrap(Assembly.GetExecutingAssembly().FullName, typeof(Worker2).FullName);
-            var result = worker.Execute();
-            AppDomain.Unload(appDomain);
-
-            var expected = new Dictionary<string, string>
-                {
-                    {"connection.connection_string", "specified"},
-                };
-
-            CollectionAssert.IsSubsetOf(expected, result);
-        }
-
-        [Test]
-        public void Our_settings_should_take_precedence_over_settings_from_hibernate_configuration_config_section_if_available()
-        {
-            var appDomain = AppDomain.CreateDomain("Testing", AppDomain.CurrentDomain.Evidence,
-                                                   new AppDomainSetup
-                                                   {
-                                                       ConfigurationFile = "Testing.config",
-                                                       ApplicationBase =
-                                                           AppDomain.CurrentDomain.SetupInformation.ApplicationBase,
-                                                   });
-
-            var worker = (Worker2)appDomain.CreateInstanceAndUnwrap(Assembly.GetExecutingAssembly().FullName, typeof(Worker2).FullName);
-            var result = worker.Execute();
-            AppDomain.Unload(appDomain);
-
-            var expected = new Dictionary<string, string>
-                {
-                    {"connection.connection_string", "specified"},
-                };
-
-            CollectionAssert.IsSubsetOf(expected, result);
-        }
-#endif
-
-        public class Worker2 : MarshalByRefObject
-        {
-            public IDictionary<string, string> Execute()
-            {
-                NHibernateSettingRetriever.ConnectionStrings = () => new ConnectionStringSettingsCollection
-                {
-                    new ConnectionStringSettings("NServiceBus/Persistence", "specified")
-                };
-
-                var builder = new NHibernateConfigurationBuilder(new SettingsHolder(), new ExpandoObject(), "NotUsed", "NotUsed");
-                return builder.Build().Configuration.Properties;
-            }
-        }
-
-        public class Worker : MarshalByRefObject
-        {
-            public IDictionary<string, string> Execute()
-            {
-                var builder = new NHibernateConfigurationBuilder(new SettingsHolder(), new ExpandoObject(), "NotUsed", "NotUsed");
-                return builder.Build().Configuration.Properties;
-            }
         }
     }
 }

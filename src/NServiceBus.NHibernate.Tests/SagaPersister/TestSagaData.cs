@@ -139,7 +139,6 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
         }
     }
 
-#pragma warning disable NSB0012
     public class SagaWithVersionedPropertyData : IContainSagaData
     {
         [RowVersion]
@@ -149,7 +148,6 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
         public virtual string Originator { get; set; }
         public virtual string OriginalMessageId { get; set; }
     }
-#pragma warning restore
 
     public class SagaWithoutVersionedPropertyData : ContainSagaData
     {

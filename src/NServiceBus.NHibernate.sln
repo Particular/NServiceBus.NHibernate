@@ -15,16 +15,18 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NServiceBus.NHibernate.Acce
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{5B3819C2-CEAD-4184-A4F1-6EAE76DBAABC}"
 	ProjectSection(SolutionItems) = preProject
+		..\.github\workflows\ci.yml = ..\.github\workflows\ci.yml
 		Custom.Build.props = Custom.Build.props
+		..\.github\workflows\release.yml = ..\.github\workflows\release.yml
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NServiceBus.NHibernate.PersistenceTests", "NServiceBus.NHibernate.PersistenceTests\NServiceBus.NHibernate.PersistenceTests.csproj", "{DE0B3DF2-8BDE-46A0-B28D-E34337E8BC6E}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NServiceBus.NHibernate.TransactionalSession", "NServiceBus.NHibernate.TransactionalSession\NServiceBus.NHibernate.TransactionalSession.csproj", "{ABF5BD3A-E821-4255-896A-6C807919568D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NServiceBus.NHibernate.TransactionalSession.AcceptanceTests", "NServiceBus.NHibernate.TransactionalSession.AcceptanceTests\NServiceBus.NHibernate.TransactionalSession.AcceptanceTests.csproj", "{281CA35B-D5D5-4F20-AA13-2BEE160F49C6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NServiceBus.NHibernate.TransactionalSession.AcceptanceTests", "NServiceBus.NHibernate.TransactionalSession.AcceptanceTests\NServiceBus.NHibernate.TransactionalSession.AcceptanceTests.csproj", "{281CA35B-D5D5-4F20-AA13-2BEE160F49C6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NServiceBus.NHibernate.TransactionalSession.Tests", "NServiceBus.NHibernate.TransactionalSession.Tests\NServiceBus.NHibernate.TransactionalSession.Tests.csproj", "{2FC6EBDA-4A5D-474E-8BBC-562C938B225B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NServiceBus.NHibernate.TransactionalSession.Tests", "NServiceBus.NHibernate.TransactionalSession.Tests\NServiceBus.NHibernate.TransactionalSession.Tests.csproj", "{2FC6EBDA-4A5D-474E-8BBC-562C938B225B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
