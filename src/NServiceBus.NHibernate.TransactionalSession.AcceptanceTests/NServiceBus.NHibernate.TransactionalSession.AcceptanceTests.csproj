@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
@@ -14,7 +14,7 @@
     <PackageReference Include="System.Data.SqlClient" Version="4.8.5" />
     <PackageReference Include="NUnit3TestAdapter" Version="4.5.0" />
     <PackageReference Include="Nunit" Version="3.13.3" />
-    <PackageReference Include="NServiceBus.AcceptanceTesting" Version="9.0.0-alpha.2" />
+    <PackageReference Include="NServiceBus.AcceptanceTesting" Version="9.0.0-alpha.6" />
     <PackageReference Include="NServiceBus.TransactionalSession" Version="3.0.0-alpha.1" />
   </ItemGroup>
   
