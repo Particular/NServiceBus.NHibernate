@@ -9,17 +9,17 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="GitHubActionsTestLogger" Version="2.3.2" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0-preview-23424-02" />
     <PackageReference Include="NHibernate" Version="5.4.6" />
-    <PackageReference Include="NServiceBus.SqlServer" Version="8.0.0-alpha.1" />
     <PackageReference Include="NServiceBus.AcceptanceTests.Sources" Version="9.0.0-alpha.6" GeneratePathProperty="true" />
+    <PackageReference Include="NServiceBus.SqlServer" Version="8.0.0-alpha.1" />
     <PackageReference Include="NUnit" Version="3.13.3" />
     <PackageReference Include="NUnit3TestAdapter" Version="4.5.0" />
     <PackageReference Include="System.Data.SqlClient" Version="4.8.5" />
-    <PackageReference Include="GitHubActionsTestLogger" Version="2.3.2" />
   </ItemGroup>
 
-  <ItemGroup>
+  <ItemGroup Condition="'$(PkgNServiceBus_AcceptanceTests_Sources)' != ''">
     <Compile Remove="$(PkgNServiceBus_AcceptanceTests_Sources)/**/When_handling_concurrent_messages.cs" />
     <!--Excluded because depends on the AcceptanceTestTransport-->
     <Compile Remove="$(PkgNServiceBus_AcceptanceTests_Sources)/**/When_nested_send_with_outer_replyTo_routing.cs" />
