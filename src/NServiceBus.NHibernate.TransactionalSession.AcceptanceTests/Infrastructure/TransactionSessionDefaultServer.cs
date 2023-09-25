@@ -7,6 +7,7 @@ namespace NServiceBus.TransactionalSession.AcceptanceTests
     using AcceptanceTesting;
     using AcceptanceTesting.Customization;
     using AcceptanceTesting.Support;
+    using global::NHibernate.Driver;
     using NUnit.Framework;
     using Persistence;
     using Persistence.NHibernate;
@@ -19,7 +20,8 @@ namespace NServiceBus.TransactionalSession.AcceptanceTests
         {
             NHibernateSettingRetriever.AppSettings = () => new NameValueCollection
             {
-                {"NServiceBus/Persistence/NHibernate/show_sql", "true"}
+                {"NServiceBus/Persistence/NHibernate/show_sql", "true"},
+                {"NServiceBus/Persistence/NHibernate/connection.driver_class", typeof(MicrosoftDataSqlClientDriver).FullName}
             };
 
             var builder = new EndpointConfiguration(endpointConfiguration.EndpointName);

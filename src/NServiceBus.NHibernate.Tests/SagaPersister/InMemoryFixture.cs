@@ -6,11 +6,12 @@
     using global::NHibernate;
     using global::NHibernate.Cfg;
     using global::NHibernate.Dialect;
+    using global::NHibernate.Driver;
     using global::NHibernate.Tool.hbm2ddl;
+    using NUnit.Framework;
     using SagaPersisters.NHibernate;
     using SagaPersisters.NHibernate.AutoPersistence;
     using Sagas;
-    using NUnit.Framework;
 
     abstract class InMemoryFixture
     {
@@ -23,6 +24,7 @@
                 .DataBaseIntegration(x =>
                 {
                     x.Dialect<MsSql2012Dialect>();
+                    x.Driver<MicrosoftDataSqlClientDriver>();
                     x.ConnectionString = Consts.SqlConnectionString;
                 });
 

@@ -2,11 +2,12 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
 {
     using System;
     using System.Linq;
+    using AutoPersistence;
     using global::NHibernate.Cfg;
     using global::NHibernate.Dialect;
+    using global::NHibernate.Driver;
     using global::NHibernate.Impl;
     using NServiceBus.NHibernate.Tests;
-    using AutoPersistence;
     using Sagas;
 
     public static class SessionFactoryHelper
@@ -17,6 +18,7 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
                 .DataBaseIntegration(x =>
                 {
                     x.Dialect<MsSql2012Dialect>();
+                    x.Driver<MicrosoftDataSqlClientDriver>();
                     x.ConnectionString = Consts.SqlConnectionString;
                 });
 

@@ -2,13 +2,13 @@
 {
     using System;
     using System.Threading.Tasks;
-    using EndpointTemplates;
     using AcceptanceTesting;
+    using EndpointTemplates;
     using global::NHibernate.Cfg;
     using global::NHibernate.Dialect;
     using global::NHibernate.Driver;
-    using Persistence;
     using NUnit.Framework;
+    using Persistence;
     using Environment = global::NHibernate.Cfg.Environment;
 
     public class When_user_supplies_NH_Configuration : NServiceBusAcceptanceTest
@@ -41,7 +41,7 @@
                 {
                     var cfg = new Configuration();
                     cfg.SetProperty(Environment.Dialect, typeof(MsSql2012Dialect).FullName);
-                    cfg.SetProperty(Environment.ConnectionDriver, typeof(Sql2008ClientDriver).FullName);
+                    cfg.SetProperty(Environment.ConnectionDriver, typeof(MicrosoftDataSqlClientDriver).FullName);
                     cfg.SetProperty(Environment.ConnectionString, ConfigureEndpointNHibernatePersistence.ConnectionString);
 
                     c.UsePersistence<NHibernatePersistence>().UseConfiguration(cfg);

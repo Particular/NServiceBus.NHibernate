@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using NHibernate.Cfg;
 using NHibernate.Cfg.MappingSchema;
 using NHibernate.Dialect;
+using NHibernate.Driver;
 using NServiceBus;
 using NServiceBus.AcceptanceTesting.Support;
 using NServiceBus.Persistence;
@@ -17,6 +18,7 @@ public class ConfigureEndpointNHibernatePersistence : EndpointConfigurer
             {
                 {Environment.ConnectionString, ConnectionString},
                 {Environment.Dialect, typeof(MsSql2008Dialect).FullName},
+                {Environment.ConnectionDriver, typeof(MicrosoftDataSqlClientDriver).FullName}
             },
         };
 

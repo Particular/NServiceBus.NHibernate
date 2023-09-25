@@ -26,7 +26,7 @@
                     {
                         var cfg = new Configuration();
                         cfg.SetProperty(Environment.Dialect, typeof(MsSql2012Dialect).FullName);
-                        cfg.SetProperty(Environment.ConnectionDriver, typeof(Sql2008ClientDriver).FullName);
+                        cfg.SetProperty(Environment.ConnectionDriver, typeof(MicrosoftDataSqlClientDriver).FullName);
                         cfg.SetProperty(Environment.ConnectionString, EndpointConfigurer.ConnectionString);
                         cfg.SetInterceptor(new LoggingInterceptor(context));
 

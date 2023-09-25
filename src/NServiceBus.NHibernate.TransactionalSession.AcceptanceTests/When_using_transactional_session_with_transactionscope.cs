@@ -1,19 +1,14 @@
 ﻿namespace NServiceBus.TransactionalSession.AcceptanceTests
 {
     using System;
-    using System.Data.SqlClient;
     using System.Threading;
     using System.Threading.Tasks;
     using System.Transactions;
     using AcceptanceTesting;
-    using AcceptanceTesting.Customization;
-    using Configuration.AdvancedExtensibility;
+    using Microsoft.Data.SqlClient;
     using Microsoft.Extensions.DependencyInjection;
-    using NServiceBus.Outbox;
-    using NServiceBus.Transport;
     using NUnit.Framework;
     using Persistence;
-    using IsolationLevel = System.Data.IsolationLevel;
 
     public class When_using_transactional_session_with_transactionscope : NServiceBusAcceptanceTest
     {
@@ -36,7 +31,7 @@
                     string insertText =
                         $@"IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='SomeTable' and xtype='U')
                                         BEGIN
-	                                        CREATE TABLE [dbo].[SomeTable]([Id] [nvarchar](50) NOT NULL)
+                                            CREATE TABLE [dbo].[SomeTable]([Id] [nvarchar](50) NOT NULL)
                                         END;
                                         INSERT INTO [dbo].[SomeTable] VALUES ('{rowId}')";
 

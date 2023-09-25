@@ -1,10 +1,11 @@
 ﻿namespace NServiceBus.PersistenceTesting
 {
-    using System.Data;
     using System;
     using System.Collections.Generic;
+    using System.Data;
     using System.Linq;
     using System.Reflection;
+    using System.Threading;
     using System.Threading.Tasks;
     using global::NHibernate.Cfg;
     using global::NHibernate.Cfg.Loquacious;
@@ -12,16 +13,15 @@
     using global::NHibernate.Driver;
     using global::NHibernate.Mapping.ByCode;
     using global::NHibernate.Tool.hbm2ddl;
-    using NServiceBus.NHibernate.Outbox;
     using NHibernate.PersistenceTests;
+    using NHibernate.SynchronizedStorage;
+    using NServiceBus.NHibernate.Outbox;
     using NServiceBus.Outbox;
     using NServiceBus.Outbox.NHibernate;
-    using NServiceBus.Sagas;
-    using NUnit.Framework;
     using NServiceBus.SagaPersisters.NHibernate;
     using NServiceBus.SagaPersisters.NHibernate.AutoPersistence;
-    using System.Threading;
-    using NHibernate.SynchronizedStorage;
+    using NServiceBus.Sagas;
+    using NUnit.Framework;
     using Persistence;
     using Persistence.NHibernate;
 
@@ -114,6 +114,7 @@
             else if (databaseVariant == DatabaseVariant.SqlServer)
             {
                 props.Dialect<MsSql2012Dialect>();
+                props.Driver<MicrosoftDataSqlClientDriver>();
                 props.ConnectionString = Consts.ConnectionString;
             }
             else

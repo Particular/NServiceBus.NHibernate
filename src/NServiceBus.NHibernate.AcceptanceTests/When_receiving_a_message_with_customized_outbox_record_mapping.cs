@@ -13,9 +13,9 @@
     using global::NHibernate.SqlCommand;
     using NHibernate.Outbox;
     using NServiceBus.Outbox.NHibernate;
-    using Settings;
     using NUnit.Framework;
     using Persistence;
+    using Settings;
     using Environment = global::NHibernate.Cfg.Environment;
 
     public class When_receiving_a_message_with_customized_outbox_record_mapping : NServiceBusAcceptanceTest
@@ -31,7 +31,7 @@
                     {
                         var cfg = new Configuration();
                         cfg.SetProperty(Environment.Dialect, typeof(MsSql2012Dialect).FullName);
-                        cfg.SetProperty(Environment.ConnectionDriver, typeof(Sql2008ClientDriver).FullName);
+                        cfg.SetProperty(Environment.ConnectionDriver, typeof(MicrosoftDataSqlClientDriver).FullName);
                         cfg.SetProperty(Environment.ConnectionString, EndpointConfigurer.ConnectionString);
                         cfg.SetInterceptor(new LoggingInterceptor(context));
 
