@@ -9,9 +9,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NServiceBus.NHibernate.Test
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NServiceBus.NHibernate.AcceptanceTests", "NServiceBus.NHibernate.AcceptanceTests\NServiceBus.NHibernate.AcceptanceTests.csproj", "{8BF5E2C0-8F97-4746-9A8B-10CB38CF8B97}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NServiceBus.NHibernate.AcceptanceTests-Oracle", "NServiceBus.NHibernate.AcceptanceTests-Oracle\NServiceBus.NHibernate.AcceptanceTests-Oracle.csproj", "{0412098A-6622-44AF-8932-C4C77E525B1F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NServiceBus.NHibernate.AcceptanceTests.Oracle", "NServiceBus.NHibernate.AcceptanceTests.Oracle\NServiceBus.NHibernate.AcceptanceTests.Oracle.csproj", "{0412098A-6622-44AF-8932-C4C77E525B1F}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NServiceBus.NHibernate.AcceptanceTests-SqlTransportTests", "NServiceBus.NHibernate.AcceptanceTests-SqlTransportTests\NServiceBus.NHibernate.AcceptanceTests-SqlTransportTests.csproj", "{40F6304C-CFA4-426F-949B-AB7E0E370C27}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NServiceBus.NHibernate.AcceptanceTests.SqlTransport", "NServiceBus.NHibernate.AcceptanceTests.SqlTransport\NServiceBus.NHibernate.AcceptanceTests.SqlTransport.csproj", "{40F6304C-CFA4-426F-949B-AB7E0E370C27}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{5B3819C2-CEAD-4184-A4F1-6EAE76DBAABC}"
 	ProjectSection(SolutionItems) = preProject
