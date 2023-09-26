@@ -60,7 +60,7 @@
 
     public partial class PersistenceTestsConfiguration
     {
-        public bool SupportsDtc => false; // DTC tests are currently disabled due to CurrentSessionBehavior logic that is required to make this work
+        public bool SupportsDtc => true;
 
         public bool SupportsOutbox => true;
 
