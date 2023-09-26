@@ -60,7 +60,7 @@
 
     public partial class PersistenceTestsConfiguration
     {
-        public bool SupportsDtc => true;
+        public bool SupportsDtc => OperatingSystem.IsWindows();
 
         public bool SupportsOutbox => true;
 
