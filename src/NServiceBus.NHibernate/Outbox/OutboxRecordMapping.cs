@@ -3,6 +3,7 @@ namespace NServiceBus.Outbox.NHibernate
     using global::NHibernate;
     using global::NHibernate.Mapping.ByCode;
     using global::NHibernate.Mapping.ByCode.Conformist;
+    using NServiceBus.Deduplication.NHibernate.Config;
 
     class OutboxRecordMapping : ClassMapping<OutboxRecord>
     {

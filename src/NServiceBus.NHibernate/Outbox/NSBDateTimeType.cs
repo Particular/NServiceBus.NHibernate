@@ -1,4 +1,4 @@
-﻿namespace NServiceBus.Outbox.NHibernate
+﻿namespace NServiceBus.Deduplication.NHibernate.Config
 {
     using System;
     using System.Data;
