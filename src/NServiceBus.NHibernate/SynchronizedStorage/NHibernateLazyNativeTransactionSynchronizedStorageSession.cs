@@ -3,7 +3,6 @@
     using System;
     using System.Threading;
     using System.Threading.Tasks;
-    using System.Transactions;
     using global::NHibernate;
     using Janitor;
 
@@ -20,12 +19,9 @@
             this.synchronizedStorageSession = synchronizedStorageSession;
             session = new Lazy<ISession>(() =>
             {
-                using (var scope = new TransactionScope(TransactionScopeOption.Suppress, TransactionScopeAsyncFlowOption.Enabled))
-                {
-                    var s = sessionFactory();
-                    transaction = s.BeginTransaction();
-                    return s;
-                }
+                var s = sessionFactory();
+                transaction = s.BeginTransaction();
+                return s;
             });
         }
 
