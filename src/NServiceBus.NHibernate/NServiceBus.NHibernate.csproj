@@ -9,7 +9,7 @@
 
   <ItemGroup Label="Public dependencies">
     <PackageReference Include="NHibernate" Version="[5.4.6, 6.0.0)" />
-    <PackageReference Include="NServiceBus" Version="9.0.0-alpha.6" />
+    <PackageReference Include="NServiceBus" Version="9.0.0-alpha.8" />
   </ItemGroup>
 
   <ItemGroup Label="Private dependencies">
