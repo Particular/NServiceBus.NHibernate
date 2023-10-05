@@ -33,13 +33,19 @@
 
     class NHibernateVariant
     {
-        public NHibernateVariant(string description, DatabaseVariant databaseVariant, IOutboxPersisterFactory outboxPersisterFactory, bool pessimistic = false, bool transactionScope = false)
+        public NHibernateVariant(string description,
+            DatabaseVariant databaseVariant,
+            IOutboxPersisterFactory outboxPersisterFactory,
+            bool pessimistic,
+            bool transactionScopeOutboxMode,
+            bool supportsDtc)
         {
             OutboxPersisterFactory = outboxPersisterFactory;
             Description = description;
             DatabaseVariant = databaseVariant;
             Pessimistic = pessimistic;
-            TransactionScope = transactionScope;
+            TransactionScopeOutboxMode = transactionScopeOutboxMode;
+            SupportsDtc = supportsDtc;
         }
 
         public DatabaseVariant DatabaseVariant { get; }
@@ -48,7 +54,9 @@
 
         public bool Pessimistic { get; }
 
-        public bool TransactionScope { get; }
+        public bool TransactionScopeOutboxMode { get; }
+
+        public bool SupportsDtc { get; }
 
         public string Description { get; }
 
@@ -60,7 +68,7 @@
 
     public partial class PersistenceTestsConfiguration
     {
-        public bool SupportsDtc => OperatingSystem.IsWindows();
+        public bool SupportsDtc => OperatingSystem.IsWindows() && ((NHibernateVariant)Variant.Values[0]).SupportsDtc;
 
         public bool SupportsOutbox => true;
 
@@ -83,7 +91,7 @@
 
             if (sqlConnectionString != null)
             {
-                sagaVariants.Add(CreateVariant("SQL Server", DatabaseVariant.SqlServer));
+                sagaVariants.Add(CreateVariant("SQL Server", DatabaseVariant.SqlServer, supportsDtc: true));
             }
 
             if (!string.IsNullOrWhiteSpace(System.Environment.GetEnvironmentVariable("OracleConnectionString")))
@@ -95,10 +103,10 @@
             var outboxVariants = new List<object>();
             if (sqlConnectionString != null)
             {
-                outboxVariants.Add(CreateVariant("SQL Server Optimistic Native default OutboxRecord", DatabaseVariant.SqlServer));
-                outboxVariants.Add(CreateVariant("SQL Server Pessimistic Native default OutboxRecord", DatabaseVariant.SqlServer, true, false));
-                outboxVariants.Add(CreateVariant("SQL Server Pessimistic TransactionScope default OutboxRecord", DatabaseVariant.SqlServer, true, true));
-                outboxVariants.Add(CreateVariant("SQL Server Optimistic TransactionScope default OutboxRecord", DatabaseVariant.SqlServer, false, true));
+                outboxVariants.Add(CreateVariant("SQL Server Optimistic Native default OutboxRecord", DatabaseVariant.SqlServer, false, false, true));
+                outboxVariants.Add(CreateVariant("SQL Server Pessimistic Native default OutboxRecord", DatabaseVariant.SqlServer, true, false, true));
+                outboxVariants.Add(CreateVariant("SQL Server Pessimistic TransactionScope default OutboxRecord", DatabaseVariant.SqlServer, true, true, true));
+                outboxVariants.Add(CreateVariant("SQL Server Optimistic TransactionScope default OutboxRecord", DatabaseVariant.SqlServer, false, true, true));
             }
             OutboxVariants = outboxVariants.ToArray();
         }
@@ -123,15 +131,15 @@
             }
         }
 
-        static TestFixtureData CreateVariant<T>(string description, DatabaseVariant databaseVariant, bool pessimistic = false, bool transactionScope = false)
+        static TestFixtureData CreateVariant<T>(string description, DatabaseVariant databaseVariant, bool pessimistic = false, bool transactionScopeOutboxMode = false, bool supportsDtc = false)
             where T : class, IOutboxRecord, new()
         {
-            return new TestFixtureData(new TestVariant(new NHibernateVariant(description, databaseVariant, new OutboxPersisterFactory<T>(), pessimistic, transactionScope)));
+            return new TestFixtureData(new TestVariant(new NHibernateVariant(description, databaseVariant, new OutboxPersisterFactory<T>(), pessimistic, transactionScopeOutboxMode, supportsDtc)));
         }
 
-        static TestFixtureData CreateVariant(string description, DatabaseVariant databaseVariant, bool pessimistic = false, bool transactionScope = false)
+        static TestFixtureData CreateVariant(string description, DatabaseVariant databaseVariant, bool pessimistic = false, bool transactionScopeOutboxMode = false, bool supportsDtc = false)
         {
-            return CreateVariant<OutboxRecord>(description, databaseVariant, pessimistic, transactionScope);
+            return CreateVariant<OutboxRecord>(description, databaseVariant, pessimistic, transactionScopeOutboxMode, supportsDtc);
         }
 
         static bool BelongsToCurrentTest(Type t)
@@ -186,7 +194,7 @@
             SagaIdGenerator = new DefaultSagaIdGenerator();
             SagaStorage = new SagaPersister();
             CreateStorageSession = () => new NHibernateSynchronizedStorageSession(new SessionFactoryHolder(sessionFactory));
-            OutboxStorage = variant.OutboxPersisterFactory.Create(sessionFactory, "TestEndpoint", variant.Pessimistic, variant.TransactionScope, IsolationLevel.ReadCommitted, System.Transactions.IsolationLevel.ReadCommitted);
+            OutboxStorage = variant.OutboxPersisterFactory.Create(sessionFactory, "TestEndpoint", variant.Pessimistic, variant.TransactionScopeOutboxMode, IsolationLevel.ReadCommitted, System.Transactions.IsolationLevel.ReadCommitted);
         }
 
         static string ShortenSagaName(string sagaName)
