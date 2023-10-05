@@ -28,9 +28,4 @@
     <EmbeddedResource Include="SagaPersister\TestSagaWithHbmlXmlOverride.hbm.xml" />
   </ItemGroup>
 
-  <ItemGroup>
-    <None Update="hibernate.cfg.xml" CopyToOutputDirectory="PreserveNewest" />
-    <None Update="Testing.config" CopyToOutputDirectory="PreserveNewest" />
-  </ItemGroup>
-
 </Project>
