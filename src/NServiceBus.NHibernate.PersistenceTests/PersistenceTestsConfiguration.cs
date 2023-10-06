@@ -96,7 +96,8 @@
 
             if (!string.IsNullOrWhiteSpace(System.Environment.GetEnvironmentVariable("OracleConnectionString")))
             {
-                sagaVariants.Add(CreateVariant("Oracle", DatabaseVariant.Oracle));
+                // we can only test optimistic locking mode since oracle is using snapshot isolation mode which can provide pessimistic locking the way we need it
+                sagaVariants.Add(CreateVariant("Oracle", DatabaseVariant.Oracle, pessimistic: false));
             }
             SagaVariants = sagaVariants.ToArray();
 
