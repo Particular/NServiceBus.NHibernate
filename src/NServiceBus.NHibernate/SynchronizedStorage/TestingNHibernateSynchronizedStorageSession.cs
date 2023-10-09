@@ -34,11 +34,5 @@
         }
 
         INHibernateStorageSession INHibernateStorageSessionProvider.InternalSession => this;
-
-        [ObsoleteEx(Message = "Use the overload that supports cancellation.", RemoveInVersion = "10", TreatAsErrorFromVersion = "9")]
-        void INHibernateStorageSession.OnSaveChanges(Func<ISynchronizedStorageSession, Task> callback)
-        {
-            throw new NotImplementedException();
-        }
     }
 }

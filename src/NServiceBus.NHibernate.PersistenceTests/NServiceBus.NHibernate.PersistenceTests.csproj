@@ -1,10 +1,9 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net472;net6.0;net7.0</TargetFrameworks>
+    <TargetFramework>net8.0</TargetFramework>
     <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>..\Test.snk</AssemblyOriginatorKeyFile>
-    <LangVersion>8.0</LangVersion>
+    <AssemblyOriginatorKeyFile>..\NServiceBusTests.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
 
   <ItemGroup>
@@ -12,17 +11,17 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.7.2" />
-    <PackageReference Include="NHibernate" Version="5.4.4" />
-    <PackageReference Include="NServiceBus.PersistenceTests.Sources" Version="8.1.1" GeneratePathProperty="true" />
+    <PackageReference Include="GitHubActionsTestLogger" Version="2.3.2" />
+    <PackageReference Include="Microsoft.Data.SqlClient" Version="5.2.0-preview3.23201.1" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0-preview-23424-02" />
+    <PackageReference Include="NHibernate" Version="5.4.6" />
+    <PackageReference Include="NServiceBus.PersistenceTests.Sources" Version="9.0.0-alpha.8" GeneratePathProperty="true" />
     <PackageReference Include="NUnit" Version="3.13.3" />
     <PackageReference Include="NUnit3TestAdapter" Version="4.5.0" />
-    <PackageReference Include="System.Data.SqlClient" Version="4.8.5" />
-    <PackageReference Include="Oracle.ManagedDataAccess.Core" Version="2.19.180" />
-    <PackageReference Include="GitHubActionsTestLogger" Version="2.3.2" />
+    <PackageReference Include="Oracle.ManagedDataAccess.Core" Version="3.21.110" />
   </ItemGroup>
 
-  <ItemGroup>
+  <ItemGroup Condition="'$(PkgNServiceBus_PersistenceTests_Sources)' != ''">
     <!--Because it causes undeterministic test hangs-->
     <Compile Remove="$(PkgNServiceBus_PersistenceTests_Sources)\**\When_concurrent_update_exceed_lock_request_timeout_pessimistic.cs" />
     <!--Because NHibernate does not support lists of primitive types-->

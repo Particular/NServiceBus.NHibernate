@@ -8,6 +8,7 @@ namespace NServiceBus.NHibernate.Tests.Outbox
     using global::NHibernate;
     using global::NHibernate.Cfg;
     using global::NHibernate.Dialect;
+    using global::NHibernate.Driver;
     using global::NHibernate.Mapping.ByCode;
     using global::NHibernate.Mapping.ByCode.Conformist;
     using global::NHibernate.Tool.hbm2ddl;
@@ -56,6 +57,7 @@ namespace NServiceBus.NHibernate.Tests.Outbox
                 .DataBaseIntegration(x =>
                 {
                     x.Dialect<MsSql2012Dialect>();
+                    x.Driver<MicrosoftDataSqlClientDriver>();
                     x.ConnectionString = Consts.SqlConnectionString;
                 });
 

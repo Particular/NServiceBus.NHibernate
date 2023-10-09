@@ -25,9 +25,7 @@ namespace NServiceBus.Features
         /// </summary>
         public NHibernateSubscriptionStorage()
         {
-#pragma warning disable CS0618 // Type or member is obsolete
-            DependsOn<MessageDrivenSubscriptions>();
-#pragma warning restore CS0618 // Type or member is obsolete
+            DependsOn("NServiceBus.Features.MessageDrivenSubscriptions");
 
             // since the installers are registered even if the feature isn't enabled we need to make
             // this a no-op of there is no "schema updater" available

@@ -4,6 +4,7 @@ namespace NServiceBus.NHibernate.Tests.SynchronizedStorage
     using global::NHibernate;
     using global::NHibernate.Cfg;
     using global::NHibernate.Dialect;
+    using global::NHibernate.Driver;
     using global::NHibernate.Mapping.ByCode;
     using global::NHibernate.Tool.hbm2ddl;
     using NServiceBus.Outbox.NHibernate;
@@ -21,6 +22,7 @@ namespace NServiceBus.NHibernate.Tests.SynchronizedStorage
                 .DataBaseIntegration(x =>
                 {
                     x.Dialect<MsSql2012Dialect>();
+                    x.Driver<MicrosoftDataSqlClientDriver>();
                     x.ConnectionString = Consts.SqlConnectionString;
                 });
 

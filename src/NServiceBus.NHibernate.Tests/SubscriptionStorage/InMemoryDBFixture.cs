@@ -4,6 +4,7 @@ namespace NServiceBus.Unicast.Subscriptions.NHibernate.Tests
     using global::NHibernate;
     using global::NHibernate.Cfg;
     using global::NHibernate.Dialect;
+    using global::NHibernate.Driver;
     using global::NHibernate.Mapping.ByCode;
     using global::NHibernate.Tool.hbm2ddl;
     using NServiceBus.NHibernate.Tests;
@@ -22,6 +23,7 @@ namespace NServiceBus.Unicast.Subscriptions.NHibernate.Tests
                 .DataBaseIntegration(x =>
                 {
                     x.Dialect<MsSql2012Dialect>();
+                    x.Driver<MicrosoftDataSqlClientDriver>();
                     x.ConnectionString = Consts.SqlConnectionString;
                 });
 

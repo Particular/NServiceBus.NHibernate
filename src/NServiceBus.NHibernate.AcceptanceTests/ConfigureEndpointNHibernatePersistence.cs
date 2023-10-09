@@ -1,5 +1,6 @@
 ﻿using System.Collections.Specialized;
 using System.Threading.Tasks;
+using NHibernate.Driver;
 using NServiceBus;
 using NServiceBus.AcceptanceTesting.Support;
 using NServiceBus.Persistence;
@@ -11,7 +12,8 @@ public class ConfigureEndpointNHibernatePersistence : EndpointConfigurer
     {
         NHibernateSettingRetriever.AppSettings = () => new NameValueCollection
         {
-            {"NServiceBus/Persistence/NHibernate/show_sql", "true"}
+            {"NServiceBus/Persistence/NHibernate/show_sql", "true"},
+            {"NServiceBus/Persistence/NHibernate/connection.driver_class", typeof(MicrosoftDataSqlClientDriver).FullName}
         };
 
         configuration.UsePersistence<NHibernatePersistence>()
