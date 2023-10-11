@@ -2,7 +2,6 @@ namespace NServiceBus.Persistence.NHibernate
 {
     using System;
     using System.Collections.Generic;
-    using System.Collections.Specialized;
     using System.Configuration;
     using System.IO;
     using System.Linq;
@@ -77,14 +76,14 @@ namespace NServiceBus.Persistence.NHibernate
         static IDictionary<string, string> InitFromConfiguration(IReadOnlySettings settings)
         {
             connectionStringSettingsCollection = NHibernateSettingRetriever.ConnectionStrings() ??
-                                                 new ConnectionStringSettingsCollection();
+                                                 [];
 
             var configuration = CreateNHibernateConfiguration();
 
             var defaultConnectionString = settings.GetOrDefault<string>("NHibernate.Common.ConnectionString") ?? GetConnectionStringOrNull("NServiceBus/Persistence");
             var configurationProperties = configuration.Properties;
 
-            var appSettingsSection = NHibernateSettingRetriever.AppSettings() ?? new NameValueCollection();
+            var appSettingsSection = NHibernateSettingRetriever.AppSettings() ?? [];
             foreach (string appSetting in appSettingsSection)
             {
                 var match = PropertyRetrievalRegex.Match(appSetting);

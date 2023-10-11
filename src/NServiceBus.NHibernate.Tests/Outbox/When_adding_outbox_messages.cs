@@ -91,8 +91,8 @@ namespace NServiceBus.NHibernate.Tests.Outbox
             {
                 var transportOperations = new[]
                 {
-                    new TransportOperation("1", new Transport.DispatchProperties(), new byte[0], new Dictionary<string, string>()),
-                    new TransportOperation("1", new Transport.DispatchProperties(), new byte[0], new Dictionary<string, string>())
+                    new TransportOperation("1", [], new byte[0], []),
+                    new TransportOperation("1", [], new byte[0], [])
                 };
 
                 await persister.Store(new OutboxMessage(messageId, transportOperations), transaction, contextBag);
@@ -147,7 +147,7 @@ namespace NServiceBus.NHibernate.Tests.Outbox
             {
                 await persister.Store(new OutboxMessage(id, new[]
                 {
-                    new TransportOperation(id, new Transport.DispatchProperties(), new byte[1024*5], new Dictionary<string, string>()),
+                    new TransportOperation(id, [], new byte[1024*5], []),
                 }), transaction, contextBag);
                 await transaction.Commit();
             }
@@ -170,7 +170,7 @@ namespace NServiceBus.NHibernate.Tests.Outbox
             {
                 await persister.Store(new OutboxMessage(id, new[]
                 {
-                    new TransportOperation(id, new Transport.DispatchProperties(), new byte[1024*5], new Dictionary<string, string>()),
+                    new TransportOperation(id, [], new byte[1024*5], []),
                 }), transaction, contextBag);
 
                 await transaction.Commit();
@@ -199,7 +199,7 @@ namespace NServiceBus.NHibernate.Tests.Outbox
             {
                 await persister.Store(new OutboxMessage(id, new[]
                 {
-                    new TransportOperation(id, new Transport.DispatchProperties(), new byte[1024*5], new Dictionary<string, string>()),
+                    new TransportOperation(id, [], new byte[1024*5], []),
                 }), transactionA, dispatchedBag);
                 await transactionA.Commit();
             }
