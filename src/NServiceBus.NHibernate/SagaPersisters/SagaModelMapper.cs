@@ -356,8 +356,8 @@ namespace NServiceBus.SagaPersisters.NHibernate.AutoPersistence
         SagaMetadataCollection sagaMetaModel;
         Func<Type, string> tableNamingConvention;
         List<Type> typesToScan;
-        List<Type> childTables = new List<Type>();
-        List<Type> entityTypes = new List<Type>();
+        List<Type> childTables = [];
+        List<Type> entityTypes = [];
         ConventionModelMapper mapper;
     }
 }
