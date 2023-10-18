@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
@@ -9,7 +9,7 @@
 
   <ItemGroup Label="Public dependencies">
     <PackageReference Include="NHibernate" Version="[5.4.6, 6.0.0)" />
-    <PackageReference Include="NServiceBus" Version="9.0.0-alpha.8" />
+    <PackageReference Include="NServiceBus" Version="9.0.0-alpha.9" />
   </ItemGroup>
 
   <ItemGroup Label="Private dependencies">
