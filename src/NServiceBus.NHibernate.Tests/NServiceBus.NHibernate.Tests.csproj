@@ -13,7 +13,7 @@
   <ItemGroup>
     <PackageReference Include="GitHubActionsTestLogger" Version="2.3.3" />
     <PackageReference Include="Microsoft.Data.SqlClient" Version="5.2.0-preview3.23201.1" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0-release-23468-02" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="NHibernate" Version="5.4.6" />
     <PackageReference Include="NServiceBus" Version="9.0.0-alpha.9" />
