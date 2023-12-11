@@ -15,7 +15,7 @@
   <ItemGroup>
     <PackageReference Include="GitHubActionsTestLogger" Version="2.3.3" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
-    <PackageReference Include="NHibernate" Version="5.4.6" />
+    <PackageReference Include="NHibernate" Version="5.4.7" />
     <PackageReference Include="NServiceBus" Version="9.0.0-alpha.9" />
     <PackageReference Include="NServiceBus.TransactionalSession" Version="3.0.0-alpha.1" />
     <PackageReference Include="Nunit" Version="3.14.0" />
