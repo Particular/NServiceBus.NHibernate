@@ -4,7 +4,7 @@ NServiceBus.NHibernate is the official NServiceBus persistence implementation fo
 
 It is part of the [Particular Service Platform](https://particular.net/service-platform), which includes [NServiceBus](https://particular.net/nservicebus) and tools to build, monitor, and debug distributed systems.
 
-See the [NHibernate documentation](https://docs.particular.net/persistence/nhibernate/) to learn more.
+See the [NHibernate Persistence documentation](https://docs.particular.net/persistence/nhibernate/) to learn more.
 
 ## Running tests locally
 
