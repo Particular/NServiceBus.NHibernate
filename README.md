@@ -1,10 +1,12 @@
 # NServiceBus.NHibernate
 
-Persistence support for [NServiceBus](https://github.com/Particular/NServiceBus) using the [NHibernate](http://nhibernate.info/) ORM.
+NServiceBus.NHibernate is the official NServiceBus persistence implementation for the [NHibernate](http://nhibernate.info/) ORM.
 
-Learn more about NServiceBus.NHibernate through our [documentation](https://docs.particular.net/nservicebus/nhibernate/).
+It is part of the [Particular Service Platform](https://particular.net/service-platform), which includes [NServiceBus](https://particular.net/nservicebus) and tools to build, monitor, and debug distributed systems.
 
-## Running the tests
+See the [NHibernate Persistence documentation](https://docs.particular.net/persistence/nhibernate/) to learn more.
+
+## Running tests locally
 
 The solution consists of a number of test projects with different requirements. In general, you can run all the tests safely if you have both: a SQL Server instance named `SQLExpress` with a database named `nservicebus`, and an Oracle database with an environment variable named `OracleConnectionString` pointing to it. If you don't have an Oracle instance available, you can skip the `NServiceBus.NHibernate.AcceptanceTests-Oracle` project. Further details are below.
 
