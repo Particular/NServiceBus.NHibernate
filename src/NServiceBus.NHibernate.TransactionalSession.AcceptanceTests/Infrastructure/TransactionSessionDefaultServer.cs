@@ -25,6 +25,7 @@ namespace NServiceBus.TransactionalSession.AcceptanceTests
             };
 
             var builder = new EndpointConfiguration(endpointConfiguration.EndpointName);
+            builder.UseSerialization<SystemJsonSerializer>();
             builder.EnableInstallers();
 
             builder.Recoverability()
