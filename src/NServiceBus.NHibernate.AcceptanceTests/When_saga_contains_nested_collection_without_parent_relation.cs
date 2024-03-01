@@ -39,8 +39,8 @@
                 public Task Handle(Message1 message, IMessageHandlerContext context)
                 {
                     Data.SomeId = message.SomeId;
-                    Data.RelatedData = new List<ChildData>
-                    {
+                    Data.RelatedData =
+                    [
                         new ChildData
                         {
                             Name = "Foo1"
@@ -57,7 +57,7 @@
                         {
                             Name = "Foo4"
                         },
-                    };
+                    ];
 
                     return context.SendLocal(new Message2
                     {
