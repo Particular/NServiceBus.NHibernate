@@ -1,20 +1,18 @@
 ﻿namespace NServiceBus.NHibernate.Tests
 {
-    using global::NHibernate.Dialect;
     using System;
     using System.Collections.Generic;
-    using System.Runtime.CompilerServices;
     using System.Threading.Tasks;
+    using global::NHibernate.Dialect;
     using NServiceBus;
     using NServiceBus.NHibernate;
     using NUnit.Framework;
     using Particular.Approvals;
 
     [TestFixture]
-    public class DDL
+    public class GenerateScriptsTests
     {
         [Test]
-        [MethodImpl(MethodImplOptions.NoInlining)]
         public void Outbox_MsSql2012()
         {
             var script = ScriptGenerator<MsSql2012Dialect>.GenerateOutboxScript();
@@ -22,7 +20,6 @@
         }
 
         [Test]
-        [MethodImpl(MethodImplOptions.NoInlining)]
         public void Outbox_Oracle10g()
         {
             var script = ScriptGenerator<Oracle10gDialect>.GenerateOutboxScript();
@@ -30,7 +27,6 @@
         }
 
         [Test]
-        [MethodImpl(MethodImplOptions.NoInlining)]
         public void Subscriptions_MsSql2012()
         {
             var script = ScriptGenerator<MsSql2012Dialect>.GenerateSubscriptionStoreScript();
@@ -38,7 +34,6 @@
         }
 
         [Test]
-        [MethodImpl(MethodImplOptions.NoInlining)]
         public void Subscriptions_Oracle10g()
         {
             var script = ScriptGenerator<Oracle10gDialect>.GenerateSubscriptionStoreScript();
@@ -46,7 +41,6 @@
         }
 
         [Test]
-        [MethodImpl(MethodImplOptions.NoInlining)]
         public void Sagas_MsSql2012()
         {
             var script = ScriptGenerator<MsSql2012Dialect>.GenerateSagaScript<MySaga>();
@@ -54,7 +48,6 @@
         }
 
         [Test]
-        [MethodImpl(MethodImplOptions.NoInlining)]
         public void Sagas_Oracle10g()
         {
             var script = ScriptGenerator<Oracle10gDialect>.GenerateSagaScript<MySaga>();

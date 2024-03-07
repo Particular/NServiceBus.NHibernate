@@ -39,11 +39,12 @@ namespace NServiceBus.Persistence.NHibernate.Tests
         [Test]
         public void Should_assign_default_properties()
         {
-            NHibernateSettingRetriever.AppSettings = () => new NameValueCollection();
-            NHibernateSettingRetriever.ConnectionStrings = () => new ConnectionStringSettingsCollection
-                {
+            NHibernateSettingRetriever.AppSettings = () => [];
+
+            NHibernateSettingRetriever.ConnectionStrings = () =>
+            [
                     new ConnectionStringSettings("NServiceBus/Persistence", connectionString)
-                };
+            ];
 
             var builder = new NHibernateConfigurationBuilder(new SettingsHolder(), new ExpandoObject(), "NotUsed", "NotUsed");
 
@@ -59,13 +60,14 @@ namespace NServiceBus.Persistence.NHibernate.Tests
         [Test]
         public void Should_assign_overridden_connectionString_if_specified()
         {
-            NHibernateSettingRetriever.AppSettings = () => new NameValueCollection();
-            NHibernateSettingRetriever.ConnectionStrings = () => new ConnectionStringSettingsCollection
-                {
+            NHibernateSettingRetriever.AppSettings = () => [];
+
+            NHibernateSettingRetriever.ConnectionStrings = () =>
+                [
                     new ConnectionStringSettings("NServiceBus/Persistence", connectionString),
                     new ConnectionStringSettings("NServiceBus/Persistence/NHibernate/Timeout",
                                                  "timeout_connection_string")
-                };
+                ];
 
             var builder = new NHibernateConfigurationBuilder(new SettingsHolder(), new ExpandoObject(), "Timeout", "NotUsed");
 
@@ -86,10 +88,10 @@ namespace NServiceBus.Persistence.NHibernate.Tests
                     {"NServiceBus/Persistence/NHibernate/connection.driver_class", "driver_class"},
                 };
 
-            NHibernateSettingRetriever.ConnectionStrings = () => new ConnectionStringSettingsCollection
-                {
+            NHibernateSettingRetriever.ConnectionStrings = () =>
+                [
                     new ConnectionStringSettings("NServiceBus/Persistence", connectionString)
-                };
+                ];
 
             var builder = new NHibernateConfigurationBuilder(new SettingsHolder(), new ExpandoObject(), "NotUsed", "NotUsed");
 
@@ -112,10 +114,11 @@ namespace NServiceBus.Persistence.NHibernate.Tests
                     {"myOtherSetting2", "driver_class"},
                 };
 
-            NHibernateSettingRetriever.ConnectionStrings = () => new ConnectionStringSettingsCollection
-                {
+            NHibernateSettingRetriever.ConnectionStrings = () =>
+                [
                     new ConnectionStringSettings("NServiceBus/Persistence", connectionString)
-                };
+                ];
+
             var builder = new NHibernateConfigurationBuilder(new SettingsHolder(), new ExpandoObject(), "NotUsed", "NotUsed");
 
             var expected = new Dictionary<string, string>
