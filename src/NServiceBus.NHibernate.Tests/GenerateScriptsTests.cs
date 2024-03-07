@@ -10,7 +10,7 @@
     using Particular.Approvals;
 
     [TestFixture]
-    public class DDL
+    public class GenerateScriptsTests
     {
         [Test]
         public void Outbox_MsSql2012()
