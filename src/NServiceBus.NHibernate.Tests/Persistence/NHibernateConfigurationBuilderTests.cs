@@ -41,12 +41,10 @@ namespace NServiceBus.Persistence.NHibernate.Tests
         {
             NHibernateSettingRetriever.AppSettings = () => [];
 
-#pragma warning disable IDE0028 // Simplify collection initialization
-            NHibernateSettingRetriever.ConnectionStrings = () => new ConnectionStringSettingsCollection
-            {
+            NHibernateSettingRetriever.ConnectionStrings = () =>
+            [
                     new ConnectionStringSettings("NServiceBus/Persistence", connectionString)
-            };
-#pragma warning restore IDE0028 // Simplify collection initialization
+            ];
 
             var builder = new NHibernateConfigurationBuilder(new SettingsHolder(), new ExpandoObject(), "NotUsed", "NotUsed");
 
@@ -64,14 +62,12 @@ namespace NServiceBus.Persistence.NHibernate.Tests
         {
             NHibernateSettingRetriever.AppSettings = () => [];
 
-#pragma warning disable IDE0028 // Simplify collection initialization
-            NHibernateSettingRetriever.ConnectionStrings = () => new ConnectionStringSettingsCollection
-                {
+            NHibernateSettingRetriever.ConnectionStrings = () =>
+                [
                     new ConnectionStringSettings("NServiceBus/Persistence", connectionString),
                     new ConnectionStringSettings("NServiceBus/Persistence/NHibernate/Timeout",
                                                  "timeout_connection_string")
-                };
-#pragma warning restore IDE0028 // Simplify collection initialization
+                ];
 
             var builder = new NHibernateConfigurationBuilder(new SettingsHolder(), new ExpandoObject(), "Timeout", "NotUsed");
 
@@ -92,12 +88,10 @@ namespace NServiceBus.Persistence.NHibernate.Tests
                     {"NServiceBus/Persistence/NHibernate/connection.driver_class", "driver_class"},
                 };
 
-#pragma warning disable IDE0028 // Simplify collection initialization
-            NHibernateSettingRetriever.ConnectionStrings = () => new ConnectionStringSettingsCollection
-                {
+            NHibernateSettingRetriever.ConnectionStrings = () =>
+                [
                     new ConnectionStringSettings("NServiceBus/Persistence", connectionString)
-                };
-#pragma warning restore IDE0028 // Simplify collection initialization
+                ];
 
             var builder = new NHibernateConfigurationBuilder(new SettingsHolder(), new ExpandoObject(), "NotUsed", "NotUsed");
 
@@ -120,12 +114,10 @@ namespace NServiceBus.Persistence.NHibernate.Tests
                     {"myOtherSetting2", "driver_class"},
                 };
 
-#pragma warning disable IDE0028 // Simplify collection initialization
-            NHibernateSettingRetriever.ConnectionStrings = () => new ConnectionStringSettingsCollection
-                {
+            NHibernateSettingRetriever.ConnectionStrings = () =>
+                [
                     new ConnectionStringSettings("NServiceBus/Persistence", connectionString)
-                };
-#pragma warning restore IDE0028 // Simplify collection initialization
+                ];
 
             var builder = new NHibernateConfigurationBuilder(new SettingsHolder(), new ExpandoObject(), "NotUsed", "NotUsed");
 

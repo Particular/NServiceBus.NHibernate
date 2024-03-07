@@ -6,7 +6,7 @@ namespace NServiceBus.SagaPersisters.NHibernate
     public enum LockModes
     {
         /// <summary>
-        /// No lock required. 
+        /// No lock required.
         /// </summary>
         /// <remarks>
         /// If an object is requested with this lock mode, a <c>Read</c> lock
@@ -15,7 +15,7 @@ namespace NServiceBus.SagaPersisters.NHibernate
         None = 1,
 
         /// <summary>
-        /// A shared lock. 
+        /// A shared lock.
         /// </summary>
         /// <remarks>
         /// Objects are loaded in <c>Read</c> mode by default
@@ -23,7 +23,7 @@ namespace NServiceBus.SagaPersisters.NHibernate
         Read = 2,
 
         /// <summary>
-        /// An upgrade lock. 
+        /// An upgrade lock.
         /// </summary>
         /// <remarks>
         /// Objects loaded in this lock mode are materialized using an
@@ -33,7 +33,7 @@ namespace NServiceBus.SagaPersisters.NHibernate
 
         /// <summary>
         /// Attempt to obtain an upgrade lock, using an Oracle-style
-        /// <c>SELECT ... FOR UPGRADE NOWAIT</c>. 
+        /// <c>SELECT ... FOR UPGRADE NOWAIT</c>.
         /// </summary>
         /// <remarks>
         /// The semantics of this lock mode, once obtained, are the same as <c>Upgrade</c>
@@ -48,7 +48,7 @@ namespace NServiceBus.SagaPersisters.NHibernate
         /// </remarks>
         Write = 5,
 
-        /// <summary> 
+        /// <summary>
         /// Similar to <see cref="Upgrade"/> except that, for versioned entities,
         /// it results in a forced version increment.
         /// </summary>
