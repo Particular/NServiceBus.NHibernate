@@ -57,4 +57,4 @@ jobs:
           connection-string-name: OracleConnectionString
           tag: NHibernatePersistence
       - name: Run tests
-        uses: Particular/run-tests-action@v1.6.0
+        uses: Particular/run-tests-action@v1.7.0
