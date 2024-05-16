@@ -19,7 +19,7 @@
     <PackageReference Include="GitHubActionsTestLogger" Version="2.3.3" />
   </ItemGroup>
 
-  <ItemGroup>
+  <ItemGroup Condition="'$(PkgNServiceBus_AcceptanceTests_Sources)' != ''">
     <Compile Remove="$(PkgNServiceBus_AcceptanceTests_Sources)/**/When_handling_concurrent_messages.cs" />
   </ItemGroup>
 
