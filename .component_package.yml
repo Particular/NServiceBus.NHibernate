@@ -1,0 +1,4 @@
+component_type: Persistence
+component_packages:
+  - name: NServiceBus.NHibernate    
+  - name: NServiceBus.NHibernate.TransactionalSession
