@@ -56,7 +56,6 @@ jobs:
         with:
           connection-string-name: OracleConnectionString
           tag: NHibernatePersistence
-          registry-login-server: index.docker.io
           registry-username: ${{ secrets.DOCKERHUB_USERNAME }}
           registry-password: ${{ secrets.DOCKERHUB_TOKEN }}}}
       - name: Run tests
