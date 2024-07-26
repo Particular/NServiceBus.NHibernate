@@ -12,7 +12,7 @@
 
   <ItemGroup>
     <PackageReference Include="GitHubActionsTestLogger" Version="2.4.1" />
-    <PackageReference Include="Microsoft.Data.SqlClient" Version="5.2.0" />
+    <PackageReference Include="Microsoft.Data.SqlClient" Version="5.2.1" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.10.0" />
     <PackageReference Include="NHibernate" Version="5.5.2" />
     <PackageReference Include="NServiceBus.PersistenceTests.Sources" Version="9.0.0" GeneratePathProperty="true" />
