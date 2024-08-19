@@ -46,7 +46,7 @@ namespace NServiceBus.TransactionalSession.AcceptanceTests
             using var queryCommand = new SqlCommand($"SELECT TOP 1 [Id] FROM [dbo].[SomeTable] WHERE [Id]='{rowId}'", connection);
             var result = await queryCommand.ExecuteScalarAsync();
 
-            Assert.AreEqual(rowId, result);
+            Assert.That(result, Is.EqualTo(rowId));
         }
 
         [TestCase(true)]
@@ -70,8 +70,11 @@ namespace NServiceBus.TransactionalSession.AcceptanceTests
                 .Done(c => c.CompleteMessageReceived)
                 .Run();
 
-            Assert.True(result.CompleteMessageReceived);
-            Assert.False(result.MessageReceived);
+            Assert.Multiple(() =>
+            {
+                Assert.That(result.CompleteMessageReceived);
+                Assert.That(result.MessageReceived, Is.False);
+            });
         }
 
         [TestCase(true)]
@@ -95,7 +98,7 @@ namespace NServiceBus.TransactionalSession.AcceptanceTests
                 .Run()
                 ;
 
-            Assert.True(result.MessageReceived);
+            Assert.That(result.MessageReceived, Is.True);
         }
 
         class Context : ScenarioContext, IInjectServiceProvider

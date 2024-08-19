@@ -33,6 +33,9 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
             persisterForTestSaga = sessionFactory.GetEntityPersisterFor<TestSagaData>();
         }
 
+        [OneTimeTearDown]
+        public void TearDown() => sessionFactory.Dispose();
+
         [Test]
         public void Id_generator_should_be_set_to_assigned()
         {

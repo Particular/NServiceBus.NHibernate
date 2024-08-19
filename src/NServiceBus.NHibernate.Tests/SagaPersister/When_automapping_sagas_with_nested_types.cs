@@ -12,12 +12,10 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
         SessionFactoryImpl sessionFactory;
 
         [SetUp]
-        public void SetUp()
-        {
+        public void SetUp() =>
             sessionFactory = SessionFactoryHelper.Build(
-                new[]
-                {
-                    typeof(TestSaga2),
+            [
+                typeof(TestSaga2),
                     typeof(TestSaga2ActualSaga),
                     typeof(ContainSagaData),
                     typeof(SagaWithNestedTypeActualSaga),
@@ -25,8 +23,10 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
                     typeof(SagaWithNestedType.Customer),
                     typeof(SagaWithNestedSagaData),
                     typeof(SagaWithNestedSagaData.NestedSagaData)
-                });
-        }
+            ]);
+
+        [TearDown]
+        public void TearDown() => sessionFactory.Dispose();
 
         [Test]
         public void Table_name_for_nested_entity_should_be_generated_correctly()

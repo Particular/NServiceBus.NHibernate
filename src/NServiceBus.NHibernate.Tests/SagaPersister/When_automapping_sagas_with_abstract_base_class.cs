@@ -12,16 +12,16 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
         SessionFactoryImpl sessionFactory;
 
         [SetUp]
-        public void SetUp()
-        {
-            sessionFactory = SessionFactoryHelper.Build(new[]
-            {
+        public void SetUp() =>
+            sessionFactory = SessionFactoryHelper.Build([
                 typeof(SagaWithAbstractBaseClassActualSaga),
                 typeof(SagaWithAbstractBaseClass),
                 typeof(ContainSagaData),
                 typeof(MyOwnAbstractBase)
-            });
-        }
+            ]);
+
+        [TearDown]
+        public void TearDown() => sessionFactory.Dispose();
 
         [Test]
         public void Should_not_generate_join_table_for_base_class()
