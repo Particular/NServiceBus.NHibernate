@@ -39,7 +39,7 @@
                 .Run();
 
             Assert.That(result.Done, Is.True);
-            StringAssert.StartsWith("INSERT INTO dbo.MyOutbox", result.OutboxTableInsert);
+            Assert.That(result.OutboxTableInsert, Does.StartWith("INSERT INTO dbo.MyOutbox"));
         }
 
         class LoggingInterceptor : EmptyInterceptor
