@@ -23,7 +23,7 @@
             Assert.That(context.SessionInjectedToSecondHandler, Is.Not.Null);
             Assert.That(context.SessionInjectedToThirdHandler, Is.Not.Null);
             Assert.That(context.SessionInjectedToSecondHandler, Is.SameAs(context.SessionInjectedToFirstHandler));
-            Assert.AreNotSame(context.SessionInjectedToFirstHandler, context.SessionInjectedToThirdHandler);
+            Assert.That(context.SessionInjectedToThirdHandler, Is.Not.SameAs(context.SessionInjectedToFirstHandler));
         }
 
         public class Context : ScenarioContext
