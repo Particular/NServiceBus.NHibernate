@@ -15,7 +15,7 @@ namespace NServiceBus.Persistence.NHibernate.Tests
         [Test]
         public void Should_fail_validation_if_no_connection_string_is_defined()
         {
-            Assert.IsFalse(NHibernateConfigurationBuilder.ContainsRequiredProperties(new Dictionary<string, string>()));
+            Assert.That(NHibernateConfigurationBuilder.ContainsRequiredProperties(new Dictionary<string, string>()), Is.False);
         }
 
         [Test]

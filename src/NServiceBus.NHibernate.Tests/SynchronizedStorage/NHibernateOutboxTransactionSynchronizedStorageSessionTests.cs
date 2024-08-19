@@ -49,7 +49,7 @@
 
                 await storageSession.CompleteAsync();
 
-                Assert.IsFalse(callbackInvoked);
+                Assert.That(callbackInvoked, Is.False);
             }
         }
 
