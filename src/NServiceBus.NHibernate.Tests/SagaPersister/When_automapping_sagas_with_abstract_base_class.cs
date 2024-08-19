@@ -34,7 +34,7 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
         public void Concrete_class_persister_includes_all_properties_from_abstract_base_classes()
         {
             var persister = sessionFactory.GetEntityPersister(typeof(SagaWithAbstractBaseClass).FullName);
-            CollectionAssert.AreEquivalent(new[] { "AbstractBaseProp", "CorrelationId", "OrderId", "Originator", "OriginalMessageId" }, persister.PropertyNames);
+            Assert.That(persister.PropertyNames, Is.EquivalentTo(new[] { "AbstractBaseProp", "CorrelationId", "OrderId", "Originator", "OriginalMessageId" }));
         }
     }
 

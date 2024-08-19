@@ -54,7 +54,7 @@ namespace NServiceBus.Persistence.NHibernate.Tests
                      {"connection.connection_string", connectionString}
                 };
 
-            CollectionAssert.IsSubsetOf(expected, builder.Build().Configuration.Properties);
+            Assert.That(expected, Is.SubsetOf(builder.Build().Configuration.Properties));
         }
 
         [Test]
@@ -76,7 +76,7 @@ namespace NServiceBus.Persistence.NHibernate.Tests
                    {"connection.connection_string", "timeout_connection_string"}
                 };
 
-            CollectionAssert.IsSubsetOf(expected, builder.Build().Configuration.Properties);
+            Assert.That(expected, Is.SubsetOf(builder.Build().Configuration.Properties));
         }
 
         [Test]
@@ -102,7 +102,7 @@ namespace NServiceBus.Persistence.NHibernate.Tests
                     {"connection.driver_class", "driver_class"},
                 };
 
-            CollectionAssert.IsSubsetOf(expected, builder.Build().Configuration.Properties);
+            Assert.That(expected, Is.SubsetOf(builder.Build().Configuration.Properties));
         }
 
         [Test]
@@ -126,7 +126,7 @@ namespace NServiceBus.Persistence.NHibernate.Tests
                     {"connection.connection_string", connectionString},
                 };
 
-            CollectionAssert.IsSubsetOf(expected, builder.Build().Configuration.Properties);
+            Assert.That(expected, Is.SubsetOf(builder.Build().Configuration.Properties));
         }
     }
 }
