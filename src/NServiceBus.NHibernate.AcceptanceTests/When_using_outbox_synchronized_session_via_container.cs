@@ -19,7 +19,7 @@
                 .Run()
                 .ConfigureAwait(false);
 
-            Assert.True(context.RepositoryHasSession);
+            Assert.That(context.RepositoryHasSession, Is.True);
         }
 
         public class Context : ScenarioContext

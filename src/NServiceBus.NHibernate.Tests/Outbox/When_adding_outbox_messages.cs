@@ -182,7 +182,7 @@ namespace NServiceBus.NHibernate.Tests.Outbox
                 var result = session.QueryOver<IOutboxRecord>().Where(o => o.MessageId == "TestEndpoint/" + id)
                     .SingleOrDefault();
 
-                Assert.True(result.Dispatched);
+                Assert.That(result.Dispatched, Is.True);
                 Assert.IsNull(result.TransportOperations);
             }
         }
