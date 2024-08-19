@@ -73,7 +73,7 @@ namespace NServiceBus.NHibernate.Tests.Outbox
             {
                 var ambientTransaction = System.Transactions.Transaction.Current;
 
-                Assert.IsNotNull(ambientTransaction);
+                Assert.That(ambientTransaction, Is.Not.Null);
 
                 await transaction.Commit();
             }

@@ -110,7 +110,7 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
         public void Array_of_ints_should_be_mapped_as_serializable()
         {
             var p = persisterForTestSaga.EntityMetamodel.Properties.SingleOrDefault(x => x.Name == "ArrayOfInts");
-            Assert.IsNotNull(p);
+            Assert.That(p, Is.Not.Null);
 
             Assert.That(p.Type.GetType(), Is.EqualTo(global::NHibernate.NHibernateUtil.Serializable.GetType()));
         }
@@ -119,7 +119,7 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
         public void Array_of_string_should_be_mapped_as_serializable()
         {
             var p = persisterForTestSaga.EntityMetamodel.Properties.SingleOrDefault(x => x.Name == "ArrayOfStrings");
-            Assert.IsNotNull(p);
+            Assert.That(p, Is.Not.Null);
 
             Assert.That(p.Type.GetType(), Is.EqualTo(global::NHibernate.NHibernateUtil.Serializable.GetType()));
         }
@@ -128,7 +128,7 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
         public void Array_of_dates_should_be_mapped_as_serializable()
         {
             var p = persisterForTestSaga.EntityMetamodel.Properties.SingleOrDefault(x => x.Name == "ArrayOfDates");
-            Assert.IsNotNull(p);
+            Assert.That(p, Is.Not.Null);
 
             Assert.That(p.Type.GetType(), Is.EqualTo(global::NHibernate.NHibernateUtil.Serializable.GetType()));
         }
