@@ -22,7 +22,7 @@
             Assert.IsNotNull(context.SessionInjectedToFirstHandler);
             Assert.IsNotNull(context.SessionInjectedToSecondHandler);
             Assert.IsNotNull(context.SessionInjectedToThirdHandler);
-            Assert.AreSame(context.SessionInjectedToFirstHandler, context.SessionInjectedToSecondHandler);
+            Assert.That(context.SessionInjectedToSecondHandler, Is.SameAs(context.SessionInjectedToFirstHandler));
             Assert.AreNotSame(context.SessionInjectedToFirstHandler, context.SessionInjectedToThirdHandler);
         }
 
