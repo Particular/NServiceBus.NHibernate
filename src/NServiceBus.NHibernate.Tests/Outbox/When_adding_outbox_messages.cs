@@ -222,7 +222,7 @@ namespace NServiceBus.NHibernate.Tests.Outbox
             {
                 var result = await session.QueryOver<IOutboxRecord>().ListAsync();
 
-                Assert.That(result.Count, Is.EqualTo(1));
+                Assert.That(result, Has.Count.EqualTo(1));
                 Assert.That(result[0].MessageId, Is.EqualTo("TestEndpoint/NotDispatched"));
             }
         }

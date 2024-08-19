@@ -16,7 +16,7 @@
             using (var session = SessionFactory.OpenSession())
             {
                 var subscriptions = session.CreateCriteria(typeof(Subscription)).List<Subscription>();
-                Assert.That(subscriptions.Count, Is.EqualTo(2));
+                Assert.That(subscriptions, Has.Count.EqualTo(2));
             }
         }
 
@@ -29,7 +29,7 @@
             using (var session = SessionFactory.OpenSession())
             {
                 var subscriptions = session.CreateCriteria(typeof(Subscription)).List<Subscription>();
-                Assert.That(subscriptions.Count, Is.EqualTo(1));
+                Assert.That(subscriptions, Has.Count.EqualTo(1));
             }
         }
     }
