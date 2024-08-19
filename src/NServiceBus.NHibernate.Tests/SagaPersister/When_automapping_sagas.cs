@@ -158,7 +158,7 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
 
         public static void ShouldContainPersisterFor<T>(this SessionFactoryImpl sessionFactory)
         {
-            Assert.NotNull(sessionFactory.GetEntityPersisterFor<T>());
+            Assert.That(sessionFactory.GetEntityPersisterFor<T>(), Is.Not.Null);
         }
     }
 
