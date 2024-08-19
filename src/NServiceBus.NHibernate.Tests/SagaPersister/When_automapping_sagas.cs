@@ -139,13 +139,16 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
             var persister1 = sessionFactory.GetEntityPersisterFor<SagaWithVersionedPropertyData>();
             var persister2 = sessionFactory.GetEntityPersisterFor<SagaWithoutVersionedPropertyData>();
 
-            Assert.That(persister1.IsVersioned, Is.True);
-            Assert.That(persister1.EntityMetamodel.IsDynamicUpdate, Is.False);
-            Assert.That(persister1.EntityMetamodel.OptimisticLockMode, Is.EqualTo(Versioning.OptimisticLock.Version));
+            Assert.Multiple(() =>
+            {
+                Assert.That(persister1.IsVersioned, Is.True);
+                Assert.That(persister1.EntityMetamodel.IsDynamicUpdate, Is.False);
+                Assert.That(persister1.EntityMetamodel.OptimisticLockMode, Is.EqualTo(Versioning.OptimisticLock.Version));
 
-            Assert.That(persister2.EntityMetamodel.IsDynamicUpdate, Is.True);
-            Assert.That(persister2.EntityMetamodel.OptimisticLockMode, Is.EqualTo(Versioning.OptimisticLock.All));
-            Assert.That(persister2.IsVersioned, Is.False);
+                Assert.That(persister2.EntityMetamodel.IsDynamicUpdate, Is.True);
+                Assert.That(persister2.EntityMetamodel.OptimisticLockMode, Is.EqualTo(Versioning.OptimisticLock.All));
+                Assert.That(persister2.IsVersioned, Is.False);
+            });
         }
     }
 

@@ -31,9 +31,12 @@
                 .Done(c => c.Done)
                 .Run(TimeSpan.FromSeconds(20));
 
-            Assert.That(ctx.Done, Is.True);
-            Assert.That(ctx.SagaStarted, Is.True);
-            Assert.That(ctx.Logs.Any(x => x.Level == LogLevel.Warn && x.Message.StartsWith("The endpoint is configured to use Outbox with TransactionScope but a different TransactionScope")), Is.True);
+            Assert.Multiple(() =>
+            {
+                Assert.That(ctx.Done, Is.True);
+                Assert.That(ctx.SagaStarted, Is.True);
+                Assert.That(ctx.Logs.Any(x => x.Level == LogLevel.Warn && x.Message.StartsWith("The endpoint is configured to use Outbox with TransactionScope but a different TransactionScope")), Is.True);
+            });
         }
 
         class Context : ScenarioContext

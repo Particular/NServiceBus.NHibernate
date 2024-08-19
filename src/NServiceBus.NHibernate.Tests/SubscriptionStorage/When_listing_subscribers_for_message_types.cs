@@ -24,8 +24,11 @@ namespace NServiceBus.Unicast.Subscriptions.NHibernate.Tests
             var subscribers = (await storage.GetSubscriberAddressesForMessage(messageTypes, new ContextBag()).ConfigureAwait(false)).ToArray();
 
             Assert.That(subscribers.Length, Is.EqualTo(2));
-            Assert.That(subscribers.First().Endpoint, Is.EqualTo(TestClients.ClientA.Endpoint));
-            Assert.That(subscribers.First().TransportAddress, Is.EqualTo(TestClients.ClientA.TransportAddress));
+            Assert.Multiple(() =>
+            {
+                Assert.That(subscribers.First().Endpoint, Is.EqualTo(TestClients.ClientA.Endpoint));
+                Assert.That(subscribers.First().TransportAddress, Is.EqualTo(TestClients.ClientA.TransportAddress));
+            });
         }
 
         [Test]

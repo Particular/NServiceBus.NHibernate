@@ -19,9 +19,12 @@
                 .Run()
                 .ConfigureAwait(false);
 
-            Assert.That(context.SessionInjectedToFirstHandler, Is.Not.Null);
-            Assert.That(context.SessionInjectedToSecondHandler, Is.Not.Null);
-            Assert.That(context.SessionInjectedToThirdHandler, Is.Not.Null);
+            Assert.Multiple(() =>
+            {
+                Assert.That(context.SessionInjectedToFirstHandler, Is.Not.Null);
+                Assert.That(context.SessionInjectedToSecondHandler, Is.Not.Null);
+                Assert.That(context.SessionInjectedToThirdHandler, Is.Not.Null);
+            });
             Assert.That(context.SessionInjectedToSecondHandler, Is.SameAs(context.SessionInjectedToFirstHandler));
             Assert.That(context.SessionInjectedToThirdHandler, Is.Not.SameAs(context.SessionInjectedToFirstHandler));
         }
