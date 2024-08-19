@@ -27,7 +27,7 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
         public void Should_not_generate_join_table_for_base_class()
         {
             var persister = sessionFactory.GetEntityPersister(typeof(SagaWithAbstractBaseClass).FullName);
-            Assert.IsInstanceOf<UnionSubclassEntityPersister>(persister);
+            Assert.That(persister, Is.InstanceOf<UnionSubclassEntityPersister>());
         }
 
         [Test]
