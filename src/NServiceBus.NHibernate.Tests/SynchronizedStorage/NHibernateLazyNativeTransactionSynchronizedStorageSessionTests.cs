@@ -68,7 +68,7 @@
             using (var session = SessionFactory.OpenSession())
             {
                 var savedEntity = session.Get<TestEntity>(entityId);
-                Assert.IsNull(savedEntity);
+                Assert.That(savedEntity, Is.Null);
             }
         }
     }

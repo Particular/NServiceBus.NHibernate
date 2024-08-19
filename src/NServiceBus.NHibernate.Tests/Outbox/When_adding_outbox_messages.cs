@@ -183,7 +183,7 @@ namespace NServiceBus.NHibernate.Tests.Outbox
                     .SingleOrDefault();
 
                 Assert.That(result.Dispatched, Is.True);
-                Assert.IsNull(result.TransportOperations);
+                Assert.That(result.TransportOperations, Is.Null);
             }
         }
 
