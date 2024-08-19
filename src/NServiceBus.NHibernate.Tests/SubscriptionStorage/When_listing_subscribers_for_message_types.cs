@@ -23,9 +23,9 @@ namespace NServiceBus.Unicast.Subscriptions.NHibernate.Tests
             };
             var subscribers = (await storage.GetSubscriberAddressesForMessage(messageTypes, new ContextBag()).ConfigureAwait(false)).ToArray();
 
-            Assert.AreEqual(2, subscribers.Length);
-            Assert.AreEqual(TestClients.ClientA.Endpoint, subscribers.First().Endpoint);
-            Assert.AreEqual(TestClients.ClientA.TransportAddress, subscribers.First().TransportAddress);
+            Assert.That(subscribers.Length, Is.EqualTo(2));
+            Assert.That(subscribers.First().Endpoint, Is.EqualTo(TestClients.ClientA.Endpoint));
+            Assert.That(subscribers.First().TransportAddress, Is.EqualTo(TestClients.ClientA.TransportAddress));
         }
 
         [Test]
@@ -43,7 +43,7 @@ namespace NServiceBus.Unicast.Subscriptions.NHibernate.Tests
             };
             var subscribers = await storage.GetSubscriberAddressesForMessage(messageTypes, new ContextBag()).ConfigureAwait(false);
 
-            Assert.AreEqual(1, subscribers.Count());
+            Assert.That(subscribers.Count(), Is.EqualTo(1));
         }
     }
 }

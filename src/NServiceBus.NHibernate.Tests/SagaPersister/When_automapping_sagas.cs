@@ -36,7 +36,7 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
         [Test]
         public void Id_generator_should_be_set_to_assigned()
         {
-            Assert.AreEqual(persisterForTestSaga.IdentifierGenerator.GetType(), typeof(Assigned));
+            Assert.That(typeof(Assigned), Is.EqualTo(persisterForTestSaga.IdentifierGenerator.GetType()));
         }
 
         [Test]
@@ -48,8 +48,8 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
         [Test]
         public void Related_entities_should_also_be_mapped()
         {
-            Assert.AreEqual(sessionFactory.GetEntityPersisterFor<OrderLine>()
-                                .IdentifierGenerator.GetType(), typeof(GuidCombGenerator));
+            Assert.That(typeof(GuidCombGenerator), Is.EqualTo(sessionFactory.GetEntityPersisterFor<OrderLine>()
+                                .IdentifierGenerator.GetType()));
         }
 
         [Test]
@@ -67,8 +67,8 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
         [Test]
         public void Users_can_override_autoMappings_by_embedding_hbm_files()
         {
-            Assert.AreEqual(sessionFactory.GetEntityPersisterFor<TestSagaWithHbmlXmlOverride>()
-                                .IdentifierGenerator.GetType(), typeof(IdentityGenerator));
+            Assert.That(typeof(IdentityGenerator), Is.EqualTo(sessionFactory.GetEntityPersisterFor<TestSagaWithHbmlXmlOverride>()
+                                .IdentifierGenerator.GetType()));
         }
 
         [Test]
@@ -85,7 +85,7 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
             var persister =
                 sessionFactory.GetEntityPersister(typeof(SagaWithTableNameData).FullName).ClassMetadata as
                 AbstractEntityPersister;
-            Assert.AreEqual(persister.RootTableName, "MyTestSchema.MyTestTable");
+            Assert.That("MyTestSchema.MyTestTable", Is.EqualTo(persister.RootTableName));
         }
 
         [Test]
@@ -94,7 +94,7 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
             var persister =
                 sessionFactory.GetEntityPersister(typeof(DerivedFromSagaWithTableNameData).FullName).
                     ClassMetadata as AbstractEntityPersister;
-            Assert.AreEqual(persister.TableName, "DerivedFromSagaWithTableNameData");
+            Assert.That("DerivedFromSagaWithTableNameData", Is.EqualTo(persister.TableName));
         }
 
         [Test]
@@ -103,7 +103,7 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
             var persister =
                 sessionFactory.GetEntityPersister(typeof(AlsoDerivedFromSagaWithTableNameData).FullName).
                     ClassMetadata as AbstractEntityPersister;
-            Assert.AreEqual(persister.TableName, "MyDerivedTestTable");
+            Assert.That("MyDerivedTestTable", Is.EqualTo(persister.TableName));
         }
 
         [Test]
@@ -112,7 +112,7 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
             var p = persisterForTestSaga.EntityMetamodel.Properties.SingleOrDefault(x => x.Name == "ArrayOfInts");
             Assert.IsNotNull(p);
 
-            Assert.AreEqual(global::NHibernate.NHibernateUtil.Serializable.GetType(), p.Type.GetType());
+            Assert.That(p.Type.GetType(), Is.EqualTo(global::NHibernate.NHibernateUtil.Serializable.GetType()));
         }
 
         [Test]
@@ -121,7 +121,7 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
             var p = persisterForTestSaga.EntityMetamodel.Properties.SingleOrDefault(x => x.Name == "ArrayOfStrings");
             Assert.IsNotNull(p);
 
-            Assert.AreEqual(global::NHibernate.NHibernateUtil.Serializable.GetType(), p.Type.GetType());
+            Assert.That(p.Type.GetType(), Is.EqualTo(global::NHibernate.NHibernateUtil.Serializable.GetType()));
         }
 
         [Test]
@@ -130,7 +130,7 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
             var p = persisterForTestSaga.EntityMetamodel.Properties.SingleOrDefault(x => x.Name == "ArrayOfDates");
             Assert.IsNotNull(p);
 
-            Assert.AreEqual(global::NHibernate.NHibernateUtil.Serializable.GetType(), p.Type.GetType());
+            Assert.That(p.Type.GetType(), Is.EqualTo(global::NHibernate.NHibernateUtil.Serializable.GetType()));
         }
 
         [Test]
@@ -141,10 +141,10 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
 
             Assert.That(persister1.IsVersioned, Is.True);
             Assert.That(persister1.EntityMetamodel.IsDynamicUpdate, Is.False);
-            Assert.AreEqual(Versioning.OptimisticLock.Version, persister1.EntityMetamodel.OptimisticLockMode);
+            Assert.That(persister1.EntityMetamodel.OptimisticLockMode, Is.EqualTo(Versioning.OptimisticLock.Version));
 
             Assert.That(persister2.EntityMetamodel.IsDynamicUpdate, Is.True);
-            Assert.AreEqual(Versioning.OptimisticLock.All, persister2.EntityMetamodel.OptimisticLockMode);
+            Assert.That(persister2.EntityMetamodel.OptimisticLockMode, Is.EqualTo(Versioning.OptimisticLock.All));
             Assert.That(persister2.IsVersioned, Is.False);
         }
     }

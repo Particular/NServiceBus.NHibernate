@@ -43,7 +43,7 @@
                 .Done(c => c.MessagesReceived >= 2)
                 .Run();
 
-            Assert.AreEqual(1, context.HandlerExecutions);
+            Assert.That(context.HandlerExecutions, Is.EqualTo(1));
         }
 
         static Task Send(string duplicateMessageId, IMessageSession session)

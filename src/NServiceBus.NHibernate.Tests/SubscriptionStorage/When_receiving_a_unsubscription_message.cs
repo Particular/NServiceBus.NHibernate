@@ -19,7 +19,7 @@ namespace NServiceBus.Unicast.Subscriptions.NHibernate.Tests
             using (var session = SessionFactory.OpenSession())
             {
                 var subscriptions = session.CreateCriteria(typeof(Subscription)).List<Subscription>();
-                Assert.AreEqual(subscriptions.Count, 0);
+                Assert.That(0, Is.EqualTo(subscriptions.Count));
             }
         }
     }

@@ -102,7 +102,7 @@ namespace NServiceBus.NHibernate.Tests.Outbox
 
             var outboxMessage = await persister.Get(messageId, contextBag);
 
-            Assert.AreEqual(0, outboxMessage.TransportOperations.Length);
+            Assert.That(outboxMessage.TransportOperations.Length, Is.EqualTo(0));
         }
 
         [Test]
@@ -154,7 +154,7 @@ namespace NServiceBus.NHibernate.Tests.Outbox
             var result = await persister.Get(id, contextBag);
             var operation = result.TransportOperations.Single();
 
-            Assert.AreEqual(id, operation.MessageId);
+            Assert.That(operation.MessageId, Is.EqualTo(id));
         }
 
         [Test]
@@ -219,8 +219,8 @@ namespace NServiceBus.NHibernate.Tests.Outbox
             {
                 var result = await session.QueryOver<IOutboxRecord>().ListAsync();
 
-                Assert.AreEqual(1, result.Count);
-                Assert.AreEqual("TestEndpoint/NotDispatched", result[0].MessageId);
+                Assert.That(result.Count, Is.EqualTo(1));
+                Assert.That(result[0].MessageId, Is.EqualTo("TestEndpoint/NotDispatched"));
             }
         }
     }

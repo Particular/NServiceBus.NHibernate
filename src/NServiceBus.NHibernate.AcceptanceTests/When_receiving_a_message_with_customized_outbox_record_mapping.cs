@@ -43,7 +43,7 @@
                 .Done(c => c.OrderAckReceived == 1)
                 .Run();
 
-            Assert.AreEqual(1, result.OrderAckReceived);
+            Assert.That(result.OrderAckReceived, Is.EqualTo(1));
             Assert.That(result.CorrectTableNameDetected, Is.True);
         }
 

@@ -42,7 +42,7 @@
 
                 await syncSession.CompleteAsync();
 
-                Assert.AreEqual(2, callbackInvoked);
+                Assert.That(callbackInvoked, Is.EqualTo(2));
 
                 scope.Complete();
             }
