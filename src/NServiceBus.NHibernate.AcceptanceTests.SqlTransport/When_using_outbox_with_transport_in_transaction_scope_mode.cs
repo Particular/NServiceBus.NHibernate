@@ -20,7 +20,7 @@
                     .Run(TimeSpan.FromSeconds(20));
             });
 
-            Assert.IsTrue(exception.Message.Contains("ReceiveOnly") && exception.Message.Contains("TransportTransactionMode"));
+            Assert.That(exception.Message.Contains("ReceiveOnly") && exception.Message.Contains("TransportTransactionMode"), Is.True);
         }
 
         class Context : ScenarioContext

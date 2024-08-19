@@ -32,7 +32,7 @@
                 .Done(c => c.SagaCompleted)
                 .Run();
 
-            Assert.IsTrue(result.SagaCompleted);
+            Assert.That(result.SagaCompleted, Is.True);
         }
 
         public class Context : ScenarioContext

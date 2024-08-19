@@ -44,7 +44,7 @@
                 .Run();
 
             Assert.AreEqual(1, result.OrderAckReceived);
-            Assert.IsTrue(result.CorrectTableNameDetected);
+            Assert.That(result.CorrectTableNameDetected, Is.True);
         }
 
         class LoggingInterceptor : EmptyInterceptor

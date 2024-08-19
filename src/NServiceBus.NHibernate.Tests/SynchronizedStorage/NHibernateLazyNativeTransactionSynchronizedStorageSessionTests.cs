@@ -63,7 +63,7 @@
                 exceptionThrown = true;
             }
 
-            Assert.IsTrue(exceptionThrown);
+            Assert.That(exceptionThrown, Is.True);
 
             using (var session = SessionFactory.OpenSession())
             {

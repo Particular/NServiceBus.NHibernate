@@ -131,7 +131,7 @@ namespace NServiceBus.NHibernate.Tests.Outbox
             {
                 failed = true;
             }
-            Assert.IsTrue(failed);
+            Assert.That(failed, Is.True);
         }
 
         [Test]

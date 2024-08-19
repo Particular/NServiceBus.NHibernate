@@ -21,19 +21,19 @@ namespace NServiceBus.Persistence.NHibernate.Tests
         [Test]
         public void Should_pass_validation_if_connection_string_is_defined_literally()
         {
-            Assert.IsTrue(NHibernateConfigurationBuilder.ContainsRequiredProperties(new Dictionary<string, string>
+            Assert.That(NHibernateConfigurationBuilder.ContainsRequiredProperties(new Dictionary<string, string>
                                                                                                   {
                                                                                                       {"connection.connection_string", "aString"}
-                                                                                                  }));
+                                                                                                  }), Is.True);
         }
 
         [Test]
         public void Should_pass_validation_if_connection_string_is_defined_by_name()
         {
-            Assert.IsTrue(NHibernateConfigurationBuilder.ContainsRequiredProperties(new Dictionary<string, string>
+            Assert.That(NHibernateConfigurationBuilder.ContainsRequiredProperties(new Dictionary<string, string>
                                                                                                   {
                                                                                                       {"connection.connection_string_name", "aString"}
-                                                                                                  }));
+                                                                                                  }), Is.True);
         }
 
         [Test]

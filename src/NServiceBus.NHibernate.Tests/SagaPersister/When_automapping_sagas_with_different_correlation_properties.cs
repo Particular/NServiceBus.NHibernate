@@ -79,8 +79,8 @@
                 }
             }
 
-            Assert.IsTrue(firstFailed);
-            Assert.IsTrue(secondFailed);
+            Assert.That(firstFailed, Is.True);
+            Assert.That(secondFailed, Is.True);
         }
     }
 

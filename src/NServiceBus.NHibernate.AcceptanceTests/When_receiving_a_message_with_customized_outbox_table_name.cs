@@ -38,7 +38,7 @@
                 .Done(c => c.Done)
                 .Run();
 
-            Assert.IsTrue(result.Done);
+            Assert.That(result.Done, Is.True);
             StringAssert.StartsWith("INSERT INTO dbo.MyOutbox", result.OutboxTableInsert);
         }
 
