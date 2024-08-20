@@ -25,7 +25,7 @@
                 //The open method creates the NHibernateLazyNativeTransactionSynchronizedStorageSession
                 var syncSession = new NHibernateSynchronizedStorageSession(new SessionFactoryHolder(SessionFactory));
                 var success = await syncSession.TryOpen(transportTransaction, new ContextBag());
-                Assert.IsTrue(success);
+                Assert.That(success, Is.True);
                 var storageSession = syncSession.InternalSession;
 
                 var __ = storageSession.Session; //Make sure session is initialized
@@ -42,7 +42,7 @@
 
                 await syncSession.CompleteAsync();
 
-                Assert.AreEqual(2, callbackInvoked);
+                Assert.That(callbackInvoked, Is.EqualTo(2));
 
                 scope.Complete();
             }
@@ -63,7 +63,7 @@
                 //The open method creates the NHibernateLazyNativeTransactionSynchronizedStorageSession
                 var syncSession = new NHibernateSynchronizedStorageSession(new SessionFactoryHolder(SessionFactory));
                 var success = await syncSession.TryOpen(transportTransaction, new ContextBag());
-                Assert.IsTrue(success);
+                Assert.That(success, Is.True);
                 var storageSession = syncSession.InternalSession;
 
                 storageSession.Session.Save(new TestEntity { Id = entityId });
@@ -87,7 +87,7 @@
             using (var session = SessionFactory.OpenSession())
             {
                 var savedEntity = session.Get<TestEntity>(entityId);
-                Assert.IsNull(savedEntity);
+                Assert.That(savedEntity, Is.Null);
             }
         }
     }

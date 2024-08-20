@@ -15,25 +15,25 @@ namespace NServiceBus.Persistence.NHibernate.Tests
         [Test]
         public void Should_fail_validation_if_no_connection_string_is_defined()
         {
-            Assert.IsFalse(NHibernateConfigurationBuilder.ContainsRequiredProperties(new Dictionary<string, string>()));
+            Assert.That(NHibernateConfigurationBuilder.ContainsRequiredProperties(new Dictionary<string, string>()), Is.False);
         }
 
         [Test]
         public void Should_pass_validation_if_connection_string_is_defined_literally()
         {
-            Assert.IsTrue(NHibernateConfigurationBuilder.ContainsRequiredProperties(new Dictionary<string, string>
+            Assert.That(NHibernateConfigurationBuilder.ContainsRequiredProperties(new Dictionary<string, string>
                                                                                                   {
                                                                                                       {"connection.connection_string", "aString"}
-                                                                                                  }));
+                                                                                                  }), Is.True);
         }
 
         [Test]
         public void Should_pass_validation_if_connection_string_is_defined_by_name()
         {
-            Assert.IsTrue(NHibernateConfigurationBuilder.ContainsRequiredProperties(new Dictionary<string, string>
+            Assert.That(NHibernateConfigurationBuilder.ContainsRequiredProperties(new Dictionary<string, string>
                                                                                                   {
                                                                                                       {"connection.connection_string_name", "aString"}
-                                                                                                  }));
+                                                                                                  }), Is.True);
         }
 
         [Test]
@@ -54,7 +54,7 @@ namespace NServiceBus.Persistence.NHibernate.Tests
                      {"connection.connection_string", connectionString}
                 };
 
-            CollectionAssert.IsSubsetOf(expected, builder.Build().Configuration.Properties);
+            Assert.That(expected, Is.SubsetOf(builder.Build().Configuration.Properties));
         }
 
         [Test]
@@ -76,7 +76,7 @@ namespace NServiceBus.Persistence.NHibernate.Tests
                    {"connection.connection_string", "timeout_connection_string"}
                 };
 
-            CollectionAssert.IsSubsetOf(expected, builder.Build().Configuration.Properties);
+            Assert.That(expected, Is.SubsetOf(builder.Build().Configuration.Properties));
         }
 
         [Test]
@@ -102,7 +102,7 @@ namespace NServiceBus.Persistence.NHibernate.Tests
                     {"connection.driver_class", "driver_class"},
                 };
 
-            CollectionAssert.IsSubsetOf(expected, builder.Build().Configuration.Properties);
+            Assert.That(expected, Is.SubsetOf(builder.Build().Configuration.Properties));
         }
 
         [Test]
@@ -126,7 +126,7 @@ namespace NServiceBus.Persistence.NHibernate.Tests
                     {"connection.connection_string", connectionString},
                 };
 
-            CollectionAssert.IsSubsetOf(expected, builder.Build().Configuration.Properties);
+            Assert.That(expected, Is.SubsetOf(builder.Build().Configuration.Properties));
         }
     }
 }

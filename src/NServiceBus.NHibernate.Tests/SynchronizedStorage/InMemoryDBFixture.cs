@@ -37,6 +37,10 @@ namespace NServiceBus.NHibernate.Tests.SynchronizedStorage
         }
 
         [TearDown]
-        public Task TearDown() => schema.DropAsync(false, true);
+        public async Task TearDown()
+        {
+            await schema.DropAsync(false, true);
+            SessionFactory.Dispose();
+        }
     }
 }

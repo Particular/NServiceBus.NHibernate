@@ -18,7 +18,7 @@
                 .Run()
                 .ConfigureAwait(false);
 
-            Assert.NotNull(context.Transaction);
+            Assert.That(context.Transaction, Is.Not.Null);
         }
 
         public class Context : ScenarioContext

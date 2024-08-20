@@ -12,29 +12,29 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
         SessionFactoryImpl sessionFactory;
 
         [SetUp]
-        public void SetUp()
-        {
-            sessionFactory = SessionFactoryHelper.Build(new[]
-            {
+        public void SetUp() =>
+            sessionFactory = SessionFactoryHelper.Build([
                 typeof(SagaWithAbstractBaseClassActualSaga),
                 typeof(SagaWithAbstractBaseClass),
                 typeof(ContainSagaData),
                 typeof(MyOwnAbstractBase)
-            });
-        }
+            ]);
+
+        [TearDown]
+        public void TearDown() => sessionFactory.Dispose();
 
         [Test]
         public void Should_not_generate_join_table_for_base_class()
         {
             var persister = sessionFactory.GetEntityPersister(typeof(SagaWithAbstractBaseClass).FullName);
-            Assert.IsInstanceOf<UnionSubclassEntityPersister>(persister);
+            Assert.That(persister, Is.InstanceOf<UnionSubclassEntityPersister>());
         }
 
         [Test]
         public void Concrete_class_persister_includes_all_properties_from_abstract_base_classes()
         {
             var persister = sessionFactory.GetEntityPersister(typeof(SagaWithAbstractBaseClass).FullName);
-            CollectionAssert.AreEquivalent(new[] { "AbstractBaseProp", "CorrelationId", "OrderId", "Originator", "OriginalMessageId" }, persister.PropertyNames);
+            Assert.That(persister.PropertyNames, Is.EquivalentTo(new[] { "AbstractBaseProp", "CorrelationId", "OrderId", "Originator", "OriginalMessageId" }));
         }
     }
 

@@ -50,7 +50,7 @@
                                 connection);
                         object result = await queryCommand.ExecuteScalarAsync();
 
-                        Assert.AreEqual(null, result);
+                        Assert.That(result, Is.EqualTo(null));
                     }
 
                     await transactionalSession.Commit().ConfigureAwait(false);
@@ -66,7 +66,7 @@
                 new SqlCommand($"SELECT TOP 1 [Id] FROM [dbo].[SomeTable] WHERE [Id]='{rowId}'", connection);
             object result = await queryCommand.ExecuteScalarAsync();
 
-            Assert.AreEqual(rowId, result);
+            Assert.That(result, Is.EqualTo(rowId));
         }
 
         class Context : ScenarioContext, IInjectServiceProvider

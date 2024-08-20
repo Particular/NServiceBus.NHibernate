@@ -23,7 +23,7 @@
         {
             var headersDeserialized = ObjectSerializer.DeSerialize<Dictionary<string, string>>(ObjectSerializer.Serialize(Expected));
 
-            CollectionAssert.AreEquivalent(Expected, headersDeserialized);
+            Assert.That(headersDeserialized, Is.EquivalentTo(Expected));
         }
 
         [Test]
@@ -43,7 +43,7 @@
             };
 
             var headersDeserialized = ObjectSerializer.DeSerialize<Dictionary<string, string>>(JsonConvert.SerializeObject(Expected, Formatting.None, serializerSettings));
-            CollectionAssert.AreEquivalent(Expected, headersDeserialized);
+            Assert.That(headersDeserialized, Is.EquivalentTo(Expected));
         }
     }
 }

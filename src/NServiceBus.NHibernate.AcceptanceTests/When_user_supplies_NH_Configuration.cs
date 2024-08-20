@@ -25,7 +25,7 @@
                 .Run()
                 .ConfigureAwait(false);
 
-            Assert.IsTrue(context.Completed);
+            Assert.That(context.Completed, Is.True);
         }
 
         public class Context : ScenarioContext

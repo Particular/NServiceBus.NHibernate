@@ -12,12 +12,10 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
         SessionFactoryImpl sessionFactory;
 
         [SetUp]
-        public void SetUp()
-        {
+        public void SetUp() =>
             sessionFactory = SessionFactoryHelper.Build(
-                new[]
-                {
-                    typeof(TestSaga2),
+            [
+                typeof(TestSaga2),
                     typeof(TestSaga2ActualSaga),
                     typeof(ContainSagaData),
                     typeof(SagaWithNestedTypeActualSaga),
@@ -25,8 +23,10 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
                     typeof(SagaWithNestedType.Customer),
                     typeof(SagaWithNestedSagaData),
                     typeof(SagaWithNestedSagaData.NestedSagaData)
-                });
-        }
+            ]);
+
+        [TearDown]
+        public void TearDown() => sessionFactory.Dispose();
 
         [Test]
         public void Table_name_for_nested_entity_should_be_generated_correctly()
@@ -34,7 +34,7 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
             var persister = sessionFactory.GetEntityPersister(typeof(SagaWithNestedType.Customer).FullName).
                    ClassMetadata as global::NHibernate.Persister.Entity.AbstractEntityPersister;
 
-            Assert.AreEqual("SagaWithNestedType_Customer", persister.TableName);
+            Assert.That(persister.TableName, Is.EqualTo("SagaWithNestedType_Customer"));
         }
 
         [Test]
@@ -43,7 +43,7 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
             var persister = sessionFactory.GetEntityPersister(typeof(SagaWithNestedSagaData.NestedSagaData).FullName).
                    ClassMetadata as global::NHibernate.Persister.Entity.AbstractEntityPersister;
 
-            Assert.AreEqual("SagaWithNestedSagaData", persister.TableName);
+            Assert.That(persister.TableName, Is.EqualTo("SagaWithNestedSagaData"));
         }
 
         [Test]
@@ -52,7 +52,7 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
             var persister = sessionFactory.GetEntityPersister(typeof(TestSaga2).FullName).
                    ClassMetadata as global::NHibernate.Persister.Entity.AbstractEntityPersister;
 
-            Assert.AreEqual("When_autoMapping_sagas_with_nested_types", persister.TableName);
+            Assert.That(persister.TableName, Is.EqualTo("When_autoMapping_sagas_with_nested_types"));
         }
 
         public class TestSaga2 : ContainSagaData

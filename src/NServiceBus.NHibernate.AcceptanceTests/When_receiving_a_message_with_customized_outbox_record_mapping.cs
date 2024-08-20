@@ -43,8 +43,11 @@
                 .Done(c => c.OrderAckReceived == 1)
                 .Run();
 
-            Assert.AreEqual(1, result.OrderAckReceived);
-            Assert.IsTrue(result.CorrectTableNameDetected);
+            Assert.Multiple(() =>
+            {
+                Assert.That(result.OrderAckReceived, Is.EqualTo(1));
+                Assert.That(result.CorrectTableNameDetected, Is.True);
+            });
         }
 
         class LoggingInterceptor : EmptyInterceptor

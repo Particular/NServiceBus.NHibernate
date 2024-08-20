@@ -34,7 +34,7 @@
 
             await syncSession.CompleteAsync();
 
-            Assert.AreEqual(2, callbackInvoked);
+            Assert.That(callbackInvoked, Is.EqualTo(2));
         }
 
         [Test]
@@ -63,12 +63,12 @@
                 exceptionThrown = true;
             }
 
-            Assert.IsTrue(exceptionThrown);
+            Assert.That(exceptionThrown, Is.True);
 
             using (var session = SessionFactory.OpenSession())
             {
                 var savedEntity = session.Get<TestEntity>(entityId);
-                Assert.IsNull(savedEntity);
+                Assert.That(savedEntity, Is.Null);
             }
         }
     }

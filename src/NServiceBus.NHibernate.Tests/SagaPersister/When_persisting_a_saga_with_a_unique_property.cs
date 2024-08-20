@@ -44,7 +44,7 @@
                     failed = true;
                 }
             }
-            Assert.IsTrue(failed);
+            Assert.That(failed, Is.True);
         }
     }
 

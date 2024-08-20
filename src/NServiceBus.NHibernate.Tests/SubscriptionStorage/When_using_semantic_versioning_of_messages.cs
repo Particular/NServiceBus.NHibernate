@@ -15,9 +15,12 @@ namespace NServiceBus.Unicast.Subscriptions.NHibernate.Tests
             await storage.Subscribe(TestClients.ClientB, MessageTypes.MessageAv11, new ContextBag());
             await storage.Subscribe(TestClients.ClientC, MessageTypes.MessageAv2, new ContextBag());
 
-            Assert.AreEqual(3, (await storage.GetSubscriberAddressesForMessage([MessageTypes.MessageA], new ContextBag())).Count());
-            Assert.AreEqual(3, (await storage.GetSubscriberAddressesForMessage([MessageTypes.MessageAv11], new ContextBag())).Count());
-            Assert.AreEqual(3, (await storage.GetSubscriberAddressesForMessage([MessageTypes.MessageAv2], new ContextBag())).Count());
+            Assert.Multiple(async () =>
+            {
+                Assert.That((await storage.GetSubscriberAddressesForMessage([MessageTypes.MessageA], new ContextBag())).Count(), Is.EqualTo(3));
+                Assert.That((await storage.GetSubscriberAddressesForMessage([MessageTypes.MessageAv11], new ContextBag())).Count(), Is.EqualTo(3));
+                Assert.That((await storage.GetSubscriberAddressesForMessage([MessageTypes.MessageAv2], new ContextBag())).Count(), Is.EqualTo(3));
+            });
         }
 
         [Test]
@@ -25,11 +28,11 @@ namespace NServiceBus.Unicast.Subscriptions.NHibernate.Tests
         {
             await storage.Subscribe(TestClients.ClientA, MessageTypes.MessageA, new ContextBag());
 
-            Assert.AreEqual(1, (await storage.GetSubscriberAddressesForMessage([MessageTypes.MessageA], new ContextBag())).Count());
+            Assert.That((await storage.GetSubscriberAddressesForMessage([MessageTypes.MessageA], new ContextBag())).Count(), Is.EqualTo(1));
 
             await storage.Unsubscribe(TestClients.ClientA, MessageTypes.MessageAv2, new ContextBag());
 
-            Assert.AreEqual(0, (await storage.GetSubscriberAddressesForMessage([MessageTypes.MessageA], new ContextBag())).Count());
+            Assert.That((await storage.GetSubscriberAddressesForMessage([MessageTypes.MessageA], new ContextBag())).Count(), Is.EqualTo(0));
         }
 
         [Test]
@@ -37,11 +40,11 @@ namespace NServiceBus.Unicast.Subscriptions.NHibernate.Tests
         {
             await storage.Subscribe(TestClients.ClientA, MessageTypes.MessageA, new ContextBag());
 
-            Assert.AreEqual(1, (await storage.GetSubscriberAddressesForMessage([MessageTypes.MessageA], new ContextBag())).Count());
+            Assert.That((await storage.GetSubscriberAddressesForMessage([MessageTypes.MessageA], new ContextBag())).Count(), Is.EqualTo(1));
 
             await storage.Subscribe(TestClients.ClientA, MessageTypes.MessageAv2, new ContextBag());
 
-            Assert.AreEqual(1, (await storage.GetSubscriberAddressesForMessage([MessageTypes.MessageA], new ContextBag())).Count());
+            Assert.That((await storage.GetSubscriberAddressesForMessage([MessageTypes.MessageA], new ContextBag())).Count(), Is.EqualTo(1));
         }
     }
 }
