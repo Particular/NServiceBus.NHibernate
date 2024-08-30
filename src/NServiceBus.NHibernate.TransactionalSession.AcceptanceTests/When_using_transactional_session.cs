@@ -1,7 +1,6 @@
 namespace NServiceBus.TransactionalSession.AcceptanceTests
 {
     using System;
-    using System.Threading;
     using System.Threading.Tasks;
     using AcceptanceTesting;
     using Microsoft.Data.SqlClient;
@@ -23,7 +22,7 @@ namespace NServiceBus.TransactionalSession.AcceptanceTests
                     using var transactionalSession = scope.ServiceProvider.GetRequiredService<ITransactionalSession>();
                     await transactionalSession.Open();
 
-                    await transactionalSession.SendLocal(new SampleMessage(), CancellationToken.None);
+                    await transactionalSession.SendLocal(new SampleMessage());
 
                     var storageSession = transactionalSession.SynchronizedStorageSession.Session();
 
@@ -33,9 +32,9 @@ namespace NServiceBus.TransactionalSession.AcceptanceTests
                                         END;
                                         INSERT INTO [dbo].[SomeTable] VALUES ('{rowId}')";
 
-                    await storageSession.CreateSQLQuery(insertText).ExecuteUpdateAsync(CancellationToken.None);
+                    await storageSession.CreateSQLQuery(insertText).ExecuteUpdateAsync();
 
-                    await transactionalSession.Commit(CancellationToken.None).ConfigureAwait(false);
+                    await transactionalSession.Commit().ConfigureAwait(false);
                 }))
                 .Done(c => c.MessageReceived)
                 .Run();
@@ -92,13 +91,57 @@ namespace NServiceBus.TransactionalSession.AcceptanceTests
                     var sendOptions = new SendOptions();
                     sendOptions.RequireImmediateDispatch();
                     sendOptions.RouteToThisEndpoint();
-                    await transactionalSession.Send(new SampleMessage(), sendOptions, CancellationToken.None);
+                    await transactionalSession.Send(new SampleMessage(), sendOptions);
                 }))
                 .Done(c => c.MessageReceived)
                 .Run()
                 ;
 
             Assert.That(result.MessageReceived, Is.True);
+        }
+
+        [TestCase(true)]
+        [TestCase(false)]
+        public async Task Should_allow_using_synchronized_storage_even_when_there_are_no_outgoing_operations(bool outboxEnabled)
+        {
+            var rowId = Guid.NewGuid().ToString();
+
+            await Scenario.Define<Context>()
+                .WithEndpoint<AnEndpoint>(s => s.When(async (statelessSession, ctx) =>
+                {
+                    using (var scope = ctx.ServiceProvider.CreateScope())
+                    using (var transactionalSession = scope.ServiceProvider.GetRequiredService<ITransactionalSession>())
+                    {
+                        await transactionalSession.Open();
+
+                        var storageSession = transactionalSession.SynchronizedStorageSession.Session();
+
+                        var insertText =
+                            $@"IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='SomeTable' and xtype='U')
+                                        BEGIN
+                                            CREATE TABLE [dbo].[SomeTable]([Id] [nvarchar](50) NOT NULL)
+                                        END;
+                                        INSERT INTO [dbo].[SomeTable] VALUES ('{rowId}')";
+
+                        await storageSession.CreateSQLQuery(insertText).ExecuteUpdateAsync();
+
+                        // Deliberately not sending any messages via the transactional session before committing
+                        await transactionalSession.Commit();
+                    }
+
+                    //Send immediately dispatched message to finish the test
+                    await statelessSession.SendLocal(new CompleteTestMessage());
+                }))
+                .Done(c => c.CompleteMessageReceived)
+                .Run();
+
+            using var connection = new SqlConnection(TransactionSessionDefaultServer.ConnectionString);
+            await connection.OpenAsync();
+
+            using var queryCommand = new SqlCommand($"SELECT TOP 1 [Id] FROM [dbo].[SomeTable] WHERE [Id]='{rowId}'", connection);
+            var result = await queryCommand.ExecuteScalarAsync();
+
+            Assert.That(result, Is.EqualTo(rowId));
         }
 
         class Context : ScenarioContext, IInjectServiceProvider
