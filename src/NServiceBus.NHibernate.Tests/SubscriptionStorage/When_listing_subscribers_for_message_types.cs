@@ -26,8 +26,9 @@ namespace NServiceBus.Unicast.Subscriptions.NHibernate.Tests
             Assert.That(subscribers.Length, Is.EqualTo(2));
             Assert.Multiple(() =>
             {
-                Assert.That(subscribers.First().Endpoint, Is.EqualTo(TestClients.ClientA.Endpoint));
-                Assert.That(subscribers.First().TransportAddress, Is.EqualTo(TestClients.ClientA.TransportAddress));
+                var firstSubscriber = subscribers.First();
+                Assert.That(firstSubscriber.Endpoint, Is.EqualTo(TestClients.ClientA.Endpoint));
+                Assert.That(firstSubscriber.TransportAddress, Is.EqualTo(TestClients.ClientA.TransportAddress));
             });
         }
 
