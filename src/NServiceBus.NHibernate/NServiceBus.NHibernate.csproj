@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup Label="Public dependencies">
-    <PackageReference Include="NHibernate" Version="[5.5.2, 6.0.0)" />
+    <PackageReference Include="NHibernate" Version="5.5.2" />
     <PackageReference Include="NServiceBus" Version="[9.0.0, 10.0.0)" />
   </ItemGroup>
 
