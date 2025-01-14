@@ -4,6 +4,7 @@
     <TargetFrameworks>net481;net8.0</TargetFrameworks>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\Test.snk</AssemblyOriginatorKeyFile>
+    <LangVersion>12.0</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>
@@ -13,7 +14,7 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.9.0" />
     <PackageReference Include="NHibernate" Version="5.5.2" />
-    <PackageReference Include="NServiceBus.PersistenceTests.Sources" Version="8.0.0" GeneratePathProperty="true" />
+    <PackageReference Include="NServiceBus.PersistenceTests.Sources" Version="8.2.4" GeneratePathProperty="true" />
     <PackageReference Include="NUnit" Version="3.14.0" />
     <PackageReference Include="NUnit3TestAdapter" Version="4.5.0" />
     <PackageReference Include="System.Data.SqlClient" Version="4.8.6" />
