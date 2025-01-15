@@ -17,7 +17,7 @@
 
   <ItemGroup>
     <PackageReference Include="NServiceBus.AcceptanceTests.Sources" Version="8.2.4" GeneratePathProperty="true" />
-    <PackageReference Include="NServiceBus.SqlServer" Version="7.0.0" />
+    <PackageReference Include="NServiceBus.SqlServer" Version="7.0.8" />
     <PackageReference Include="System.Data.SqlClient" Version="4.8.6" />
   </ItemGroup>
 
