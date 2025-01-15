@@ -11,10 +11,13 @@
   <ItemGroup>
     <PackageReference Include="GitHubActionsTestLogger" Version="2.4.1" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.12.0" />
-    <PackageReference Include="NServiceBus.AcceptanceTests.Sources" Version="9.1.2" GeneratePathProperty="true" />
-    <PackageReference Include="NServiceBus.Transport.SqlServer" Version="8.0.0" />
     <PackageReference Include="NUnit" Version="3.14.0" />
     <PackageReference Include="NUnit3TestAdapter" Version="4.6.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="NServiceBus.AcceptanceTests.Sources" Version="9.1.2" GeneratePathProperty="true" />
+    <PackageReference Include="NServiceBus.Transport.SqlServer" Version="8.0.0" />
   </ItemGroup>
 
   <ItemGroup Label="Direct references to transitive dependencies to avoid versions with CVE">
@@ -26,4 +29,5 @@
     <!--Excluded because depends on the AcceptanceTestTransport-->
     <Compile Remove="$(PkgNServiceBus_AcceptanceTests_Sources)/**/When_nested_send_with_outer_replyTo_routing.cs" />
   </ItemGroup>
+
 </Project>
