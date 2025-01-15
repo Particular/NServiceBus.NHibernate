@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
@@ -17,7 +17,7 @@
 
   <ItemGroup>
     <PackageReference Include="NServiceBus.AcceptanceTests.Sources" Version="9.1.2" GeneratePathProperty="true" />
-    <PackageReference Include="NServiceBus.Transport.SqlServer" Version="8.0.0" />
+    <PackageReference Include="NServiceBus.Transport.SqlServer" Version="8.1.6" />
   </ItemGroup>
 
   <ItemGroup Label="Direct references to transitive dependencies to avoid versions with CVE">
