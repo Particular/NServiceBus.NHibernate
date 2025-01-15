@@ -11,12 +11,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="NServiceBus.TransactionalSession" Version="2.0.2" />
-    <PackageReference Include="Particular.Packaging" Version="4.2.0" PrivateAssets="All" />
+    <ProjectReference Include="..\NServiceBus.NHibernate\NServiceBus.NHibernate.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\NServiceBus.NHibernate\NServiceBus.NHibernate.csproj" />
+    <PackageReference Include="NServiceBus.TransactionalSession" Version="2.0.2" />
+    <PackageReference Include="Particular.Packaging" Version="4.2.0" PrivateAssets="All" />
   </ItemGroup>
 
 </Project>
