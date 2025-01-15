@@ -22,7 +22,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Data.SqlClient" Version="5.2.2" />
-    <PackageReference Include="NServiceBus.AcceptanceTesting" Version="9.2.3" />
+    <PackageReference Include="NServiceBus.AcceptanceTesting" Version="9.2.4" />
   </ItemGroup>
 
 </Project>
