@@ -140,7 +140,7 @@ namespace NServiceBus.Persistence
 }
 namespace NServiceBus.SagaPersisters.NHibernate
 {
-    [System.AttributeUsage(System.AttributeTargets.Class | System.AttributeTargets.All)]
+    [System.AttributeUsage(System.AttributeTargets.Class)]
     public sealed class LockModeAttribute : System.Attribute
     {
         public LockModeAttribute(NServiceBus.SagaPersisters.NHibernate.LockModes lockModeToUse) { }
@@ -155,12 +155,12 @@ namespace NServiceBus.SagaPersisters.NHibernate
         Write = 5,
         Force = 6,
     }
-    [System.AttributeUsage(System.AttributeTargets.Property | System.AttributeTargets.All)]
+    [System.AttributeUsage(System.AttributeTargets.Property)]
     public class RowVersionAttribute : System.Attribute
     {
         public RowVersionAttribute() { }
     }
-    [System.AttributeUsage(System.AttributeTargets.Class | System.AttributeTargets.All)]
+    [System.AttributeUsage(System.AttributeTargets.Class)]
     public class TableNameAttribute : System.Attribute
     {
         public TableNameAttribute(string tableName) { }

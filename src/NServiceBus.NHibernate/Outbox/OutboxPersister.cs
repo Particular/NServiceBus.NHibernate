@@ -73,13 +73,13 @@
                 }
                 if (result.Dispatched)
                 {
-                    return new OutboxMessage(result.MessageId, new TransportOperation[0]);
+                    return new OutboxMessage(messageId, Array.Empty<TransportOperation>());
                 }
                 var transportOperations = ConvertStringToObject(result.TransportOperations)
                     .Select(t => new TransportOperation(t.MessageId, new DispatchProperties(t.Options), t.Message, t.Headers))
                     .ToArray();
 
-                return new OutboxMessage(result.MessageId, transportOperations);
+                return new OutboxMessage(messageId, transportOperations);
             }
         }
 

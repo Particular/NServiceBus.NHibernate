@@ -9,14 +9,16 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.9.0" />
-    <PackageReference Include="NHibernate" Version="5.5.2" />
-    <PackageReference Include="NServiceBus.SqlServer" Version="7.0.0" />
-    <PackageReference Include="NServiceBus.AcceptanceTests.Sources" Version="8.0.0" GeneratePathProperty="true" />
+    <PackageReference Include="GitHubActionsTestLogger" Version="2.4.1" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.12.0" />
     <PackageReference Include="NUnit" Version="3.14.0" />
-    <PackageReference Include="NUnit3TestAdapter" Version="4.5.0" />
+    <PackageReference Include="NUnit3TestAdapter" Version="4.6.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="NServiceBus.AcceptanceTests.Sources" Version="8.2.4" GeneratePathProperty="true" />
+    <PackageReference Include="NServiceBus.SqlServer" Version="7.0.8" />
     <PackageReference Include="System.Data.SqlClient" Version="4.8.6" />
-    <PackageReference Include="GitHubActionsTestLogger" Version="2.3.3" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(PkgNServiceBus_AcceptanceTests_Sources)' != ''">
@@ -24,4 +26,5 @@
     <!--Excluded because depends on the AcceptanceTestTransport-->
     <Compile Remove="$(PkgNServiceBus_AcceptanceTests_Sources)/**/When_nested_send_with_outer_replyTo_routing.cs" />
   </ItemGroup>
+
 </Project>
