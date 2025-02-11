@@ -25,4 +25,9 @@
     <PackageReference Include="System.Net.Http" Version="4.3.4" />
   </ItemGroup>
 
+  <ItemGroup>
+    <InternalsVisibleTo Include="NServiceBus.NHibernate.PersistenceTests" Key="$(NServiceBusTestsKey)" />
+    <InternalsVisibleTo Include="NServiceBus.NHibernate.Tests" Key="$(NServiceBusTestsKey)" />
+  </ItemGroup>
+
 </Project>
