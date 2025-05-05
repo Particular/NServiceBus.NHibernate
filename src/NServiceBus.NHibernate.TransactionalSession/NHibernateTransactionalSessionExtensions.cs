@@ -1,5 +1,6 @@
 ﻿namespace NServiceBus.TransactionalSession
 {
+    using System;
     using System.Threading;
     using System.Threading.Tasks;
     using Configuration.AdvancedExtensibility;
@@ -14,9 +15,22 @@
         /// Enables transactional session for this endpoint.
         /// </summary>
         public static PersistenceExtensions<NHibernatePersistence> EnableTransactionalSession(
-            this PersistenceExtensions<NHibernatePersistence> persistenceExtensions)
+            this PersistenceExtensions<NHibernatePersistence> persistenceExtensions) =>
+            EnableTransactionalSession(persistenceExtensions, new TransactionalSessionOptions());
+
+        /// <summary>
+        /// Enables the transactional session for this endpoint using the specified TransactionalSessionOptions.
+        /// </summary>
+        public static PersistenceExtensions<NHibernatePersistence> EnableTransactionalSession(this PersistenceExtensions<NHibernatePersistence> persistenceExtensions,
+            TransactionalSessionOptions transactionalSessionOptions)
         {
-            persistenceExtensions.GetSettings().EnableFeatureByDefault(typeof(NHibernateTransactionalSession));
+            ArgumentNullException.ThrowIfNull(persistenceExtensions);
+            ArgumentNullException.ThrowIfNull(transactionalSessionOptions);
+
+            var settings = persistenceExtensions.GetSettings();
+
+            settings.Set(transactionalSessionOptions);
+            settings.EnableFeatureByDefault<NHibernateTransactionalSession>();
 
             return persistenceExtensions;
         }
