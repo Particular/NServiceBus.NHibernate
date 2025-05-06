@@ -6,9 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using AcceptanceTesting;
 using AcceptanceTesting.Customization;
-using Configuration.AdvancedExtensibility;
 using NUnit.Framework;
-using Pipeline;
 
 public class When_using_outbox_send_only : NServiceBusAcceptanceTest
 {
@@ -35,26 +33,35 @@ public class When_using_outbox_send_only : NServiceBusAcceptanceTest
             .Done(c => c.MessageReceived)
             .Run();
 
-        Assert.That(context.ControlMessageReceived, Is.True);
         Assert.That(context.MessageReceived, Is.True);
     }
 
-    class Context : ScenarioContext, IInjectServiceProvider
+    [Test]
+    public void Should_throw_when_processor_address_not_specified()
+    {
+        var exception = Assert.ThrowsAsync<InvalidOperationException>(async () =>
+        {
+            await Scenario.Define<Context>()
+                .WithEndpoint<SendOnlyEndpointWithoutProcessor>()
+                .Done(c => c.MessageReceived)
+                .Run();
+        });
+
+        Assert.That(exception?.Message, Is.EqualTo("A configured ProcessorAddress is required when using the transactional session and the outbox with send-only endpoints"));
+    }
+
+    class Context : TransactionalSessionTestContext
     {
         public bool MessageReceived { get; set; }
-
-        public IServiceProvider ServiceProvider { get; set; }
-
-        public bool ControlMessageReceived { get; set; }
     }
 
     class SendOnlyEndpoint : EndpointConfigurationBuilder
     {
-        public SendOnlyEndpoint() => EndpointSetup<TransactionSessionDefaultServer>(c =>
+        public SendOnlyEndpoint() => EndpointSetup<TransactionSessionWithOutboxEndpoint>((c, runDescriptor) =>
         {
-            var persistence = c.GetSettings().Get<PersistenceExtensions<NHibernatePersistence>>();
-
             var options = new TransactionalSessionOptions { ProcessorAddress = Conventions.EndpointNamingConvention.Invoke(typeof(ProcessorEndpoint)) };
+
+            var persistence = c.UsePersistence<NHibernatePersistence>();
 
             persistence.EnableTransactionalSession(options);
 
@@ -63,7 +70,21 @@ public class When_using_outbox_send_only : NServiceBusAcceptanceTest
         });
     }
 
-    class AnotherEndpoint : EndpointConfigurationBuilder, IDoNotCaptureServiceProvider
+    class SendOnlyEndpointWithoutProcessor : EndpointConfigurationBuilder
+    {
+        public SendOnlyEndpointWithoutProcessor() => EndpointSetup<TransactionSessionWithOutboxEndpoint>(c =>
+        {
+            var persistence = c.UsePersistence<NHibernatePersistence>();
+
+            // Deliberately not passing a ProcessorAddress via TransactionalSessionOptions
+            persistence.EnableTransactionalSession();
+
+            c.EnableOutbox();
+            c.SendOnly();
+        });
+    }
+
+    class AnotherEndpoint : EndpointConfigurationBuilder
     {
         public AnotherEndpoint() => EndpointSetup<DefaultServer>();
 
@@ -78,28 +99,20 @@ public class When_using_outbox_send_only : NServiceBusAcceptanceTest
         }
     }
 
-    class ProcessorEndpoint : EndpointConfigurationBuilder, IDoNotCaptureServiceProvider
+    class ProcessorEndpoint : EndpointConfigurationBuilder
     {
-        public ProcessorEndpoint() => EndpointSetup<TransactionSessionDefaultServer>(c =>
-            {
-                c.Pipeline.Register(typeof(DiscoverControlMessagesBehavior), "Discovers control messages");
-                c.EnableOutbox();
-                c.ConfigureTransport().TransportTransactionMode = TransportTransactionMode.ReceiveOnly;
-            }
-        );
-
-        class DiscoverControlMessagesBehavior(Context testContext) : Behavior<ITransportReceiveContext>
+        public ProcessorEndpoint() => EndpointSetup<TransactionSessionWithOutboxEndpoint>((c, runDescriptor) =>
         {
-            public override async Task Invoke(ITransportReceiveContext context, Func<Task> next)
-            {
-                if (context.Message.Headers.ContainsKey("NServiceBus.TransactionalSession.CommitDelayIncrement"))
-                {
-                    testContext.ControlMessageReceived = true;
-                }
+            c.EnableOutbox();
+            c.ConfigureTransport().TransportTransactionMode = TransportTransactionMode.ReceiveOnly;
 
-                await next();
-            }
+            var persistence = c.UsePersistence<NHibernatePersistence>();
+
+            var options = new TransactionalSessionOptions();
+
+            persistence.EnableTransactionalSession(options);
         }
+        );
     }
 
     class SampleMessage : ICommand

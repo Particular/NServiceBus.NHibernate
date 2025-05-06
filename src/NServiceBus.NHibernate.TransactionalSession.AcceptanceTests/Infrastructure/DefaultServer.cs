@@ -7,25 +7,12 @@ using System.Threading.Tasks;
 using AcceptanceTesting;
 using AcceptanceTesting.Customization;
 using AcceptanceTesting.Support;
-using Configuration.AdvancedExtensibility;
 using global::NHibernate.Driver;
 using NUnit.Framework;
-using Persistence;
 using Persistence.NHibernate;
 
 public class DefaultServer : IEndpointSetupTemplate
 {
-    const string DefaultConnStr = @"Server=localhost\SqlExpress;Database=nservicebus;Trusted_Connection=True;";
-
-    public static string ConnectionString
-    {
-        get
-        {
-            string env = Environment.GetEnvironmentVariable("SQLServerConnectionString");
-            return string.IsNullOrEmpty(env) ? DefaultConnStr : env;
-        }
-    }
-
     public virtual async Task<EndpointConfiguration> GetConfiguration(RunDescriptor runDescriptor,
         EndpointCustomizationConfiguration endpointConfiguration,
         Func<EndpointConfiguration, Task> configurationBuilderCustomization)
@@ -52,15 +39,9 @@ public class DefaultServer : IEndpointSetupTemplate
 
         builder.UseTransport(new AcceptanceTestingTransport { StorageLocation = storageDir });
 
-        PersistenceExtensions<NHibernatePersistence> persistence = builder.UsePersistence<NHibernatePersistence>();
-        persistence.ConnectionString(ConnectionString);
-        persistence.EnableTransactionalSession();
-
-        builder.GetSettings().Set(persistence);
-
-        if (!typeof(IDoNotCaptureServiceProvider).IsAssignableFrom(endpointConfiguration.BuilderType))
+        if (runDescriptor.ScenarioContext is TransactionalSessionTestContext testContext)
         {
-            builder.RegisterStartupTask(sp => new CaptureServiceProviderStartupTask(sp, runDescriptor.ScenarioContext));
+            builder.RegisterStartupTask(sp => new CaptureServiceProviderStartupTask(sp, testContext, endpointConfiguration.EndpointName));
         }
 
         await configurationBuilderCustomization(builder).ConfigureAwait(false);

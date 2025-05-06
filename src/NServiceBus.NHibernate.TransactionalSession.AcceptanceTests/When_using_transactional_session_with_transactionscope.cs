@@ -69,11 +69,10 @@
             Assert.That(result, Is.EqualTo(rowId));
         }
 
-        class Context : ScenarioContext, IInjectServiceProvider
+        class Context : TransactionalSessionTestContext
         {
             public bool MessageReceived { get; set; }
             public bool CompleteMessageReceived { get; set; }
-            public IServiceProvider ServiceProvider { get; set; }
         }
 
         class AnEndpoint : EndpointConfigurationBuilder
