@@ -1,10 +1,12 @@
 ﻿namespace NServiceBus.TransactionalSession
 {
     using System;
+    using System.Configuration;
     using System.Threading;
     using System.Threading.Tasks;
     using Configuration.AdvancedExtensibility;
     using Features;
+    using NServiceBus.Persistence.NHibernate;
 
     /// <summary>
     /// Enables the transactional session feature.
@@ -31,6 +33,12 @@
 
             settings.Set(transactionalSessionOptions);
             settings.EnableFeatureByDefault<NHibernateTransactionalSession>();
+
+            if (!string.IsNullOrEmpty(transactionalSessionOptions.ProcessorAddress))
+            {
+                // remote processor configured, so turn off the outbox cleanup on this instance
+                ConfigurationManager.AppSettings.Set("NServiceBus/Outbox/NHibernate/FrequencyToRunDeduplicationDataCleanup", Timeout.InfiniteTimeSpan.ToString());
+            }
 
             return persistenceExtensions;
         }
