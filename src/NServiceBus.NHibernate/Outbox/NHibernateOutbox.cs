@@ -74,7 +74,7 @@ namespace NServiceBus.Features
             {
                 var holder = sp.GetRequiredService<SessionFactoryHolder>();
                 var endpointName = context.Settings.GetOrDefault<string>(EndpointNameKey) ?? context.Settings.EndpointName();
-                var persister = persisterFactory.Create(holder.SessionFactory, endpointName, pessimisticMode, transactionScopeMode, adoIsolationLevel, transactionScopeIsolationLevel);                
+                var persister = persisterFactory.Create(holder.SessionFactory, endpointName, pessimisticMode, transactionScopeMode, adoIsolationLevel, transactionScopeIsolationLevel);
                 return persister;
             });
 
