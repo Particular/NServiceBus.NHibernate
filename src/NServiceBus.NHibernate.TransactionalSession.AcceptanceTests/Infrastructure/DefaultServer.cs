@@ -8,13 +8,25 @@ using AcceptanceTesting;
 using AcceptanceTesting.Customization;
 using AcceptanceTesting.Support;
 using global::NHibernate.Driver;
+using NServiceBus.Configuration.AdvancedExtensibility;
 using NUnit.Framework;
 using Persistence.NHibernate;
+using Persistence;
 
 public class DefaultServer : IEndpointSetupTemplate
 {
-    public virtual async Task<EndpointConfiguration> GetConfiguration(RunDescriptor runDescriptor,
-        EndpointCustomizationConfiguration endpointConfiguration,
+    const string DefaultConnStr = @"Server=localhost\SqlExpress;Database=nservicebus;Trusted_Connection=True;";
+
+    public static string ConnectionString
+    {
+        get
+        {
+            string env = Environment.GetEnvironmentVariable("SQLServerConnectionString");
+            return string.IsNullOrEmpty(env) ? DefaultConnStr : env;
+        }
+    }
+
+    public virtual async Task<EndpointConfiguration> GetConfiguration(RunDescriptor runDescriptor, EndpointCustomizationConfiguration endpointCustomization,
         Func<EndpointConfiguration, Task> configurationBuilderCustomization)
     {
         NHibernateSettingRetriever.AppSettings = () => new NameValueCollection
@@ -26,29 +38,34 @@ public class DefaultServer : IEndpointSetupTemplate
             }
         };
 
-        var builder = new EndpointConfiguration(endpointConfiguration.EndpointName);
-        builder.UseSerialization<SystemJsonSerializer>();
-        builder.EnableInstallers();
+        var endpointConfiguration = new EndpointConfiguration(endpointCustomization.EndpointName);
 
-        builder.Recoverability()
+        endpointConfiguration.EnableInstallers();
+        endpointConfiguration.UseSerialization<SystemJsonSerializer>();
+        endpointConfiguration.Recoverability()
             .Delayed(delayed => delayed.NumberOfRetries(0))
             .Immediate(immediate => immediate.NumberOfRetries(0));
-        builder.SendFailedMessagesTo("error");
+        endpointConfiguration.SendFailedMessagesTo("error");
 
-        string storageDir = Path.Combine(Path.GetTempPath(), "learn", TestContext.CurrentContext.Test.ID);
+        var storageDir = Path.Combine(Path.GetTempPath(), "learn", TestContext.CurrentContext.Test.ID);
 
-        builder.UseTransport(new AcceptanceTestingTransport { StorageLocation = storageDir });
+        endpointConfiguration.UseTransport(new AcceptanceTestingTransport { StorageLocation = storageDir });
+
+        var persistence = endpointConfiguration.UsePersistence<NHibernatePersistence>();
+        persistence.ConnectionString(ConnectionString);
+
+        endpointConfiguration.GetSettings().Set(persistence);
 
         if (runDescriptor.ScenarioContext is TransactionalSessionTestContext testContext)
         {
-            builder.RegisterStartupTask(sp => new CaptureServiceProviderStartupTask(sp, testContext, endpointConfiguration.EndpointName));
+            endpointConfiguration.RegisterStartupTask(sp => new CaptureServiceProviderStartupTask(sp, testContext, endpointCustomization.EndpointName));
         }
 
-        await configurationBuilderCustomization(builder).ConfigureAwait(false);
+        await configurationBuilderCustomization(endpointConfiguration).ConfigureAwait(false);
 
         // scan types at the end so that all types used by the configuration have been loaded into the AppDomain
-        builder.TypesToIncludeInScan(endpointConfiguration.GetTypesScopedByTestClass());
+        endpointConfiguration.TypesToIncludeInScan(endpointCustomization.GetTypesScopedByTestClass());
 
-        return builder;
+        return endpointConfiguration;
     }
 }
