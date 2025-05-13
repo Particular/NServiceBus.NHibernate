@@ -6,7 +6,6 @@
     using System.Threading.Tasks;
     using Configuration.AdvancedExtensibility;
     using Features;
-    using NServiceBus.Persistence.NHibernate;
 
     /// <summary>
     /// Enables the transactional session feature.
