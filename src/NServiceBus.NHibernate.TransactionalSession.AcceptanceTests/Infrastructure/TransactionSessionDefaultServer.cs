@@ -3,6 +3,7 @@ namespace NServiceBus.TransactionalSession.AcceptanceTests;
 using System;
 using System.Threading.Tasks;
 using AcceptanceTesting.Support;
+using Configuration.AdvancedExtensibility;
 
 public class TransactionSessionDefaultServer : DefaultServer
 {
@@ -10,8 +11,7 @@ public class TransactionSessionDefaultServer : DefaultServer
         Func<EndpointConfiguration, Task> configurationBuilderCustomization) =>
         await base.GetConfiguration(runDescriptor, endpointConfiguration, async configuration =>
         {
-            PersistenceExtensions<NHibernatePersistence> persistence = configuration.UsePersistence<NHibernatePersistence>();
-            persistence.EnableTransactionalSession();
+            configuration.GetSettings().Get<PersistenceExtensions<NHibernatePersistence>>().EnableTransactionalSession();
 
             await configurationBuilderCustomization(configuration);
         });
