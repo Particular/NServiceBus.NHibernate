@@ -22,7 +22,8 @@
         /// <summary>
         /// Enables the transactional session for this endpoint using the specified TransactionalSessionOptions.
         /// </summary>
-        public static PersistenceExtensions<NHibernatePersistence> EnableTransactionalSession(this PersistenceExtensions<NHibernatePersistence> persistenceExtensions,
+        public static PersistenceExtensions<NHibernatePersistence> EnableTransactionalSession(
+            this PersistenceExtensions<NHibernatePersistence> persistenceExtensions,
             TransactionalSessionOptions transactionalSessionOptions)
         {
             ArgumentNullException.ThrowIfNull(persistenceExtensions);
@@ -33,11 +34,19 @@
             settings.Set(transactionalSessionOptions);
             settings.EnableFeatureByDefault<NHibernateTransactionalSession>();
 
-            if (!string.IsNullOrEmpty(transactionalSessionOptions.ProcessorAddress))
+            if (string.IsNullOrEmpty(transactionalSessionOptions.ProcessorAddress))
             {
-                // remote processor configured, so turn off the outbox cleanup on this instance
-                ConfigurationManager.AppSettings.Set("NServiceBus/Outbox/NHibernate/FrequencyToRunDeduplicationDataCleanup", Timeout.InfiniteTimeSpan.ToString());
+                return persistenceExtensions;
             }
+
+            // remote processor configured, so turn off the outbox cleanup on this instance
+            ConfigurationManager.AppSettings.Set(
+                "NServiceBus/Outbox/NHibernate/FrequencyToRunDeduplicationDataCleanup",
+                Timeout.InfiniteTimeSpan.ToString());
+
+            //set the endpoint name to be the processor address, this makes sure that the outbox uses this value when generate qualified message IDs.
+            //By default, the endpoint name used is automatically managed and set to the originating endpoint's name unless overridden by setting a value to NHibernateOutbox.ProcessorEndpointKey
+            settings.Set(NHibernateOutbox.ProcessorEndpointKey, transactionalSessionOptions.ProcessorAddress);
 
             return persistenceExtensions;
         }
@@ -45,7 +54,8 @@
         /// <summary>
         /// Opens the transactional session
         /// </summary>
-        public static Task Open(this ITransactionalSession transactionalSession, CancellationToken cancellationToken = default)
+        public static Task Open(this ITransactionalSession transactionalSession,
+            CancellationToken cancellationToken = default)
             => transactionalSession.Open(new NHibernateOpenSessionOptions(), cancellationToken);
     }
 }

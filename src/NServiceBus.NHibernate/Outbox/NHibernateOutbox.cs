@@ -24,7 +24,7 @@ namespace NServiceBus.Features
         internal const string OutboxTransactionModeSettingsKey = "NServiceBus.NHibernate.OutboxTransactionScopeMode";
         internal const string OutboxTransactionIsolationLevelSettingsKey = "NServiceBus.NHibernate.OutboxTransactionIsolationLevel";
         internal const string OutboxTransactionScopeModeIsolationLevelSettingsKey = "NServiceBus.NHibernate.OutboxTransactionScopeModeIsolationLevel";
-        internal const string EndpointNameKey = "NHibernate.Outbox.EndpointName";
+        internal const string ProcessorEndpointKey = "NHibernate.TransactionalSession.ProcessorEndpoint";
         /// <summary>
         /// Creates a new instance of the feature
         /// </summary>
@@ -73,7 +73,7 @@ namespace NServiceBus.Features
             context.Services.AddSingleton<IOutboxStorage>(sp =>
             {
                 var holder = sp.GetRequiredService<SessionFactoryHolder>();
-                var endpointName = context.Settings.GetOrDefault<string>(EndpointNameKey) ?? context.Settings.EndpointName();
+                var endpointName = context.Settings.GetOrDefault<string>(ProcessorEndpointKey) ?? context.Settings.EndpointName();
                 var persister = persisterFactory.Create(holder.SessionFactory, endpointName, pessimisticMode, transactionScopeMode, adoIsolationLevel, transactionScopeIsolationLevel);
                 return persister;
             });

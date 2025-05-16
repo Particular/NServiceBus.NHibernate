@@ -26,7 +26,6 @@ namespace NServiceBus
     }
     public static class OutboxSettingsExtensions
     {
-        public static void EndpointName(this NServiceBus.Outbox.OutboxSettings configuration, string endpointName) { }
         public static void TransactionIsolationLevel(this NServiceBus.Outbox.OutboxSettings outboxSettings, System.Data.IsolationLevel isolationLevel) { }
         public static void UsePessimisticConcurrencyControl(this NServiceBus.Outbox.OutboxSettings outboxSettings) { }
         public static void UseTransactionScope(this NServiceBus.Outbox.OutboxSettings outboxSettings) { }

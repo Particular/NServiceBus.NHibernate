@@ -71,18 +71,5 @@
             outboxSettings.GetSettings().Set(NHibernateOutbox.OutboxTransactionModeSettingsKey, true);
             outboxSettings.GetSettings().Set(NHibernateOutbox.OutboxTransactionScopeModeIsolationLevelSettingsKey, isolationLevel);
         }
-
-        /// <summary>
-        /// Sets the endpoint name used to generate qualified message IDs, ensuring uniqueness and preventing ID collisions. 
-        /// By default, this value is automatically managed and set to the originating endpoint's name. 
-        /// This function allows overriding the default endpoint name for specific scenarios, such as configuring a transactional session processor endpoint.
-        /// </summary>
-        public static void EndpointName(this OutboxSettings configuration, string endpointName)
-        {
-            ArgumentNullException.ThrowIfNull(configuration);
-            ArgumentException.ThrowIfNullOrWhiteSpace(endpointName);
-
-            configuration.GetSettings().Set(NHibernateOutbox.EndpointNameKey, endpointName);
-        }
     }
 }
