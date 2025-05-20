@@ -25,6 +25,7 @@ namespace NServiceBus.Features
         internal const string OutboxTransactionIsolationLevelSettingsKey = "NServiceBus.NHibernate.OutboxTransactionIsolationLevel";
         internal const string OutboxTransactionScopeModeIsolationLevelSettingsKey = "NServiceBus.NHibernate.OutboxTransactionScopeModeIsolationLevel";
         internal const string ProcessorEndpointKey = "NHibernate.TransactionalSession.ProcessorEndpoint";
+        internal const string DisableOutboxTableCreationSettingKey = "NServiceBus.NHibernate.DisableOutboxTableCreation";
         /// <summary>
         /// Creates a new instance of the feature
         /// </summary>
@@ -67,7 +68,9 @@ namespace NServiceBus.Features
                 throw new Exception("Custom outbox table name and custom outbox record type cannot be specified at the same time.");
             }
 
-            ApplyMappings(config.Configuration, actualOutboxRecordType, outboxTableName, outboxSchemaName);
+            var disableOutboxTableCreation = context.Settings.GetOrDefault<bool>(DisableOutboxTableCreationSettingKey);
+
+            ApplyMappings(config.Configuration, actualOutboxRecordType, outboxTableName, outboxSchemaName, disableOutboxTableCreation);
 
             var persisterFactory = context.Settings.Get<IOutboxPersisterFactory>();
             context.Services.AddSingleton<IOutboxStorage>(sp =>
@@ -87,11 +90,12 @@ namespace NServiceBus.Features
                 OutboxCleanupCriticalErrorTriggerTime = outboxCleanupCriticalErrorTriggerTime,
                 RecordType = actualOutboxRecordType.FullName,
                 CustomOutboxTableName = outboxTableName,
-                CustomOutboxSchemaName = outboxSchemaName
+                CustomOutboxSchemaName = outboxSchemaName,
+                OutboxTableCreationDisabled = disableOutboxTableCreation
             });
         }
 
-        static void ApplyMappings(Configuration config, Type outboxRecordType, string customOutboxTableName, string customOutboxSchemaName)
+        static void ApplyMappings(Configuration config, Type outboxRecordType, string customOutboxTableName, string customOutboxSchemaName, bool disableSchemaExport = false)
         {
             var mapper = new ModelMapper();
             mapper.BeforeMapClass += (inspector, type, customizer) =>
@@ -103,6 +107,12 @@ namespace NServiceBus.Features
                 if (customOutboxSchemaName != null)
                 {
                     customizer.Schema(customOutboxSchemaName);
+                }
+
+                // Set schema-export attribute to none if schema export is disabled
+                if (disableSchemaExport)
+                {
+                    customizer.SchemaAction(SchemaAction.None);
                 }
             };
             mapper.AddMapping(outboxRecordType);
