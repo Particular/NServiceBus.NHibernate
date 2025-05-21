@@ -34,7 +34,7 @@
             settings.Set(transactionalSessionOptions);
             settings.EnableFeatureByDefault<NHibernateTransactionalSession>();
 
-            if (string.IsNullOrEmpty(transactionalSessionOptions.ProcessorAddress))
+            if (string.IsNullOrEmpty(transactionalSessionOptions.ProcessorEndpoint))
             {
                 return persistenceExtensions;
             }
@@ -46,7 +46,7 @@
 
             //set the endpoint name to be the processor address, this makes sure that the outbox uses this value when generate qualified message IDs.
             //By default, the endpoint name used is automatically managed and set to the originating endpoint's name unless overridden by setting a value to NHibernateOutbox.ProcessorEndpointKey
-            settings.Set(NHibernateOutbox.ProcessorEndpointKey, transactionalSessionOptions.ProcessorAddress);
+            settings.Set(NHibernateOutbox.ProcessorEndpointKey, transactionalSessionOptions.ProcessorEndpoint);
 
             // If a remote processor is configured, this endpoint should not create the outbox tables.
             settings.Set(NHibernateOutbox.DisableOutboxTableCreationSettingKey, true);

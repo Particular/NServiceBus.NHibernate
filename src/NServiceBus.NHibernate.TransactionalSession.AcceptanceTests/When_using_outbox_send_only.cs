@@ -47,7 +47,7 @@ public class When_using_outbox_send_only : NServiceBusAcceptanceTest
         {
             var persistence = c.GetSettings().Get<PersistenceExtensions<NHibernatePersistence>>();
 
-            var options = new TransactionalSessionOptions { ProcessorAddress = Conventions.EndpointNamingConvention.Invoke(typeof(ProcessorEndpoint)) };
+            var options = new TransactionalSessionOptions { ProcessorEndpoint = Conventions.EndpointNamingConvention.Invoke(typeof(ProcessorEndpoint)) };
 
             persistence.EnableTransactionalSession(options);
 
