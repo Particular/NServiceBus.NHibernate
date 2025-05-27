@@ -27,6 +27,7 @@
   <ItemGroup>
     <InternalsVisibleTo Include="NServiceBus.NHibernate.PersistenceTests" Key="$(NServiceBusTestsKey)" />
     <InternalsVisibleTo Include="NServiceBus.NHibernate.Tests" Key="$(NServiceBusTestsKey)" />
+    <InternalsVisibleTo Include="NServiceBus.NHibernate.TransactionalSession" Key="$(NServiceBusKey)" />
   </ItemGroup>
 
 </Project>
