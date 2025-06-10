@@ -1,0 +1,16 @@
+<Solution>
+  <Folder Name="/Solution Items/">
+    <File Path="../.github/workflows/ci.yml" />
+    <File Path="../.github/workflows/release.yml" />
+    <File Path="Custom.Build.props" />
+  </Folder>
+  <Project Path="NServiceBus.NHibernate.AcceptanceTests.Oracle/NServiceBus.NHibernate.AcceptanceTests.Oracle.csproj" />
+  <Project Path="NServiceBus.NHibernate.AcceptanceTests.SqlTransport/NServiceBus.NHibernate.AcceptanceTests.SqlTransport.csproj" />
+  <Project Path="NServiceBus.NHibernate.AcceptanceTests/NServiceBus.NHibernate.AcceptanceTests.csproj" />
+  <Project Path="NServiceBus.NHibernate.PersistenceTests/NServiceBus.NHibernate.PersistenceTests.csproj" />
+  <Project Path="NServiceBus.NHibernate.Tests/NServiceBus.NHibernate.Tests.csproj" />
+  <Project Path="NServiceBus.NHibernate.TransactionalSession.AcceptanceTests/NServiceBus.NHibernate.TransactionalSession.AcceptanceTests.csproj" />
+  <Project Path="NServiceBus.NHibernate.TransactionalSession.Tests/NServiceBus.NHibernate.TransactionalSession.Tests.csproj" />
+  <Project Path="NServiceBus.NHibernate.TransactionalSession/NServiceBus.NHibernate.TransactionalSession.csproj" />
+  <Project Path="NServiceBus.NHibernate/NServiceBus.NHibernate.csproj" />
+</Solution>
