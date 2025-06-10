@@ -24,7 +24,7 @@
                 return;
             }
 
-            timer.Change(System.Threading.Timeout.Infinite, System.Threading.Timeout.Infinite);
+            timer.Change(Timeout.Infinite, Timeout.Infinite);
             Logger.InfoFormat("The circuit breaker for {0} is now disarmed", name);
         }
 
@@ -40,9 +40,24 @@
             }
         }
 
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposed)
+            {
+                if (disposing)
+                {
+                    timer?.Dispose();
+                }
+
+                disposed = true;
+            }
+        }
+
         public void Dispose()
         {
-            //Injected
+            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+            Dispose(disposing: true);
+            GC.SuppressFinalize(this);
         }
 
         void CircuitBreakerTriggered(object state)
@@ -61,6 +76,7 @@
         Timer timer;
         TimeSpan timeToWaitBeforeTriggering;
         Action<Exception> triggerAction;
+        bool disposed;
 
         static TimeSpan NoPeriodicTriggering = TimeSpan.FromMilliseconds(-1);
         static ILog Logger = LogManager.GetLogger<RepeatedFailuresOverTimeCircuitBreaker>();

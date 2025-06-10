@@ -5,12 +5,10 @@
     using System.Threading;
     using System.Threading.Tasks;
     using global::NHibernate;
-    using Janitor;
     using NServiceBus.Extensibility;
     using NServiceBus.Logging;
     using NServiceBus.Outbox;
 
-    [SkipWeaving]
     class NHibernateLocalOutboxTransaction : INHibernateOutboxTransaction
     {
         static ILog Log = LogManager.GetLogger<NHibernateLocalOutboxTransaction>();

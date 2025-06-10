@@ -5,10 +5,8 @@
     using System.Threading;
     using System.Threading.Tasks;
     using global::NHibernate;
-    using Janitor;
     using Persistence;
 
-    [SkipWeaving]
     class NHibernateLazyAmbientTransactionSynchronizedStorageSession : INHibernateStorageSessionInternal
     {
         readonly ISynchronizedStorageSession synchronizedStorageSession;

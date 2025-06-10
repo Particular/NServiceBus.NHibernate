@@ -4,14 +4,12 @@
     using System.Threading;
     using System.Threading.Tasks;
     using global::NHibernate;
-    using Janitor;
     using Persistence;
     using Persistence.NHibernate;
 
     /// <summary>
     /// Allows writing automated tests against handlers which use NServiceBus-managed NHibernate session.
     /// </summary>
-    [SkipWeaving]
     public class TestingNHibernateSynchronizedStorageSession : ISynchronizedStorageSession, INHibernateStorageSessionProvider, INHibernateStorageSession
     {
         /// <summary>
