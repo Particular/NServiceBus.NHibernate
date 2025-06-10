@@ -18,7 +18,6 @@
 
   <ItemGroup Label="Direct references to transitive dependencies to avoid versions with CVE">
     <PackageReference Include="Iesi.Collections" Version="4.1.1" />
-    <PackageReference Include="System.Net.Http" Version="4.3.4" />
   </ItemGroup>
 
   <ItemGroup>
