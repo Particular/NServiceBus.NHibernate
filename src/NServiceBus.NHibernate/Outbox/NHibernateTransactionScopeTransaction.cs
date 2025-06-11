@@ -8,10 +8,8 @@
     using Extensibility;
     using global::NHibernate;
     using global::NHibernate.Impl;
-    using Janitor;
     using Logging;
 
-    [SkipWeaving]
     class NHibernateTransactionScopeTransaction : INHibernateOutboxTransaction
     {
         static ILog Log = LogManager.GetLogger<NHibernateTransactionScopeTransaction>();

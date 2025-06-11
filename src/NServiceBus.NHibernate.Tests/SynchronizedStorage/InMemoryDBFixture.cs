@@ -10,7 +10,7 @@ namespace NServiceBus.NHibernate.Tests.SynchronizedStorage
     using NServiceBus.Outbox.NHibernate;
     using NUnit.Framework;
 
-    class InMemoryDBFixture
+    abstract class InMemoryDBFixture
     {
         protected ISessionFactory SessionFactory;
         SchemaExport schema;

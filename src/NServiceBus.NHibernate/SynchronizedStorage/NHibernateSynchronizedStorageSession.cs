@@ -8,13 +8,11 @@
     using Extensibility;
     using global::NHibernate;
     using global::NHibernate.Impl;
-    using Janitor;
     using NServiceBus.NHibernate.SynchronizedStorage;
     using Outbox;
     using Outbox.NHibernate;
     using Transport;
 
-    [SkipWeaving]
     class NHibernateSynchronizedStorageSession : ICompletableSynchronizedStorageSession, INHibernateStorageSessionProvider
     {
         public INHibernateStorageSession InternalSession => internalSession;

@@ -10,7 +10,7 @@ namespace NServiceBus.Unicast.Subscriptions.NHibernate.Tests
     using NServiceBus.NHibernate.Tests;
     using NUnit.Framework;
 
-    class InMemoryDBFixture
+    abstract class InMemoryDBFixture
     {
         protected SubscriptionPersister storage;
         protected ISessionFactory SessionFactory;

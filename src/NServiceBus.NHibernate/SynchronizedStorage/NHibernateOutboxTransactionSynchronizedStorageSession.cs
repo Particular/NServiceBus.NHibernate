@@ -4,11 +4,9 @@
     using System.Threading;
     using System.Threading.Tasks;
     using global::NHibernate;
-    using Janitor;
     using Outbox.NHibernate;
     using Persistence;
 
-    [SkipWeaving]
     class NHibernateOutboxTransactionSynchronizedStorageSession : INHibernateStorageSessionInternal
     {
         readonly INHibernateOutboxTransaction outboxTransaction;
