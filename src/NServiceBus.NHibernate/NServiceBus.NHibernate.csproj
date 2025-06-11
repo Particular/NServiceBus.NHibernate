@@ -16,10 +16,6 @@
     <PackageReference Include="Particular.Packaging" Version="4.4.0" PrivateAssets="All" />
   </ItemGroup>
 
-  <ItemGroup Label="Direct references to transitive dependencies to avoid versions with CVE">
-    <PackageReference Include="Iesi.Collections" Version="4.1.1" />
-  </ItemGroup>
-
   <ItemGroup>
     <InternalsVisibleTo Include="NServiceBus.NHibernate.PersistenceTests" Key="$(NServiceBusTestsKey)" />
     <InternalsVisibleTo Include="NServiceBus.NHibernate.Tests" Key="$(NServiceBusTestsKey)" />
