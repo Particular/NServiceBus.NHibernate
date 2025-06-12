@@ -61,7 +61,7 @@ namespace NServiceBus.Features
                 }
                 catch (Exception ex)
                 {
-                    circuitBreaker.Failure(ex);
+                    await circuitBreaker.Failure(ex, cancellationToken).ConfigureAwait(false);
                 }
             }
         }
