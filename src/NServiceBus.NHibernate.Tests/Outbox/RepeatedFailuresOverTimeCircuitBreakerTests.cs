@@ -81,7 +81,7 @@ namespace NServiceBus.NHibernate.Tests.Outbox
             var circuitBreaker = new RepeatedFailuresOverTimeCircuitBreaker(
                 "TestCircuitBreaker",
                 TimeSpan.FromMilliseconds(100),
-                ex => { },
+                _ => { },
                 () => throw new Exception("Exception from armed action"),
                 () => { },
                 timeToWaitWhenTriggered: TimeSpan.Zero,
