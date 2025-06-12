@@ -42,7 +42,7 @@ namespace NServiceBus.NHibernate.Tests.Outbox
             var circuitBreaker = new RepeatedFailuresOverTimeCircuitBreaker(
                 "TestCircuitBreaker",
                 TimeSpan.FromMilliseconds(100),
-                ex => { },
+                e => { },
                 () => { },
                 () => throw new Exception("Exception from disarmed action"),
                 timeToWaitWhenTriggered: TimeSpan.Zero,
@@ -81,7 +81,7 @@ namespace NServiceBus.NHibernate.Tests.Outbox
             var circuitBreaker = new RepeatedFailuresOverTimeCircuitBreaker(
                 "TestCircuitBreaker",
                 TimeSpan.FromMilliseconds(100),
-                _ => { },
+                e => { },
                 () => throw new Exception("Exception from armed action"),
                 () => { },
                 timeToWaitWhenTriggered: TimeSpan.Zero,
