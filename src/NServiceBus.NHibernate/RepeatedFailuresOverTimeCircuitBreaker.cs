@@ -3,6 +3,7 @@
     using System;
     using System.Threading;
     using System.Threading.Tasks;
+    using Janitor;
     using Logging;
 
     /// <summary>
@@ -10,6 +11,7 @@
     /// armed state, the <see cref="triggerAction"/> will fire. The <see cref="armedAction"/> and <see cref="disarmedAction"/> allow
     /// changing other state when the circuit breaker is armed or disarmed.
     /// </summary>
+    [SkipWeaving]
     sealed class RepeatedFailuresOverTimeCircuitBreaker
     {
         /// <summary>
@@ -156,6 +158,11 @@
                 return Task.Delay(timeToWait, cancellationToken);
             }
         }
+
+        /// <summary>
+        /// Disposes the resources associated with the circuit breaker.
+        /// </summary>
+        public void Dispose() => timer.Dispose();
 
         void CircuitBreakerTriggered(object state)
         {
