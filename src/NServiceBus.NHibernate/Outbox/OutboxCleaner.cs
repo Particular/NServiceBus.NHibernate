@@ -40,6 +40,7 @@ namespace NServiceBus.Features
 
         protected override Task OnStop(IMessageSession busSession, CancellationToken cancellationToken = default)
         {
+            circuitBreaker.Dispose();
             cancellationTokenSource.Cancel();
             return cleanup;
         }
@@ -61,7 +62,7 @@ namespace NServiceBus.Features
                 }
                 catch (Exception ex)
                 {
-                    circuitBreaker.Failure(ex);
+                    await circuitBreaker.Failure(ex, cancellationToken).ConfigureAwait(false);
                 }
             }
         }
