@@ -20,7 +20,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Data.SqlClient" Version="6.0.2" />
-    <PackageReference Include="NServiceBus.PersistenceTests.Sources" Version="10.0.0-alpha.3" GeneratePathProperty="true" />
+    <PackageReference Include="NServiceBus.PersistenceTests.Sources" Version="10.0.0-alpha.4" GeneratePathProperty="true" />
     <PackageReference Include="Oracle.ManagedDataAccess.Core" Version="23.8.0" />
   </ItemGroup>
 
