@@ -12,14 +12,14 @@
 
     sealed class NHibernateTransactionScopeTransaction : INHibernateOutboxTransaction
     {
-        static ILog Log = LogManager.GetLogger<NHibernateTransactionScopeTransaction>();
+        static readonly ILog Log = LogManager.GetLogger<NHibernateTransactionScopeTransaction>();
 
-        ConcurrencyControlStrategy concurrencyControlStrategy;
-        IsolationLevel isolationLevel;
+        readonly ConcurrencyControlStrategy concurrencyControlStrategy;
+        readonly IsolationLevel isolationLevel;
         Func<CancellationToken, Task> onSaveChangesCallback = _ => Task.CompletedTask;
         TransactionScope transactionScope;
         Transaction ambientTransaction;
-        SessionFactoryImpl sessionFactoryImpl;
+        readonly SessionFactoryImpl sessionFactoryImpl;
         bool commit;
         DbConnection connection;
 

@@ -9,23 +9,15 @@
     using NServiceBus.Logging;
     using NServiceBus.Outbox;
 
-    sealed class NHibernateLocalOutboxTransaction : INHibernateOutboxTransaction
+    sealed class NHibernateLocalOutboxTransaction(
+        ConcurrencyControlStrategy concurrencyControlStrategy,
+        ISessionFactory sessionFactory,
+        IsolationLevel isolationLevel)
+        : INHibernateOutboxTransaction
     {
         static ILog Log = LogManager.GetLogger<NHibernateLocalOutboxTransaction>();
 
-        readonly ConcurrencyControlStrategy concurrencyControlStrategy;
-        readonly ISessionFactory sessionFactory;
-        readonly IsolationLevel isolationLevel;
-
         public ISession Session { get; private set; }
-
-        public NHibernateLocalOutboxTransaction(ConcurrencyControlStrategy concurrencyControlStrategy,
-            ISessionFactory sessionFactory, IsolationLevel isolationLevel)
-        {
-            this.concurrencyControlStrategy = concurrencyControlStrategy;
-            this.sessionFactory = sessionFactory;
-            this.isolationLevel = isolationLevel;
-        }
 
         public void OnSaveChanges(Func<CancellationToken, Task> callback)
         {
@@ -78,9 +70,7 @@
         }
 
         public Task Complete(string endpointQualifiedMessageId, OutboxMessage outboxMessage, ContextBag context, CancellationToken cancellationToken = default)
-        {
-            return concurrencyControlStrategy.Complete(endpointQualifiedMessageId, Session, outboxMessage, context, cancellationToken);
-        }
+            => concurrencyControlStrategy.Complete(endpointQualifiedMessageId, Session, outboxMessage, context, cancellationToken);
 
         public void BeginSynchronizedSession(ContextBag context)
         {
