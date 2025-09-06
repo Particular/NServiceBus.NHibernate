@@ -10,7 +10,7 @@
     using global::NHibernate.Impl;
     using Logging;
 
-    class NHibernateTransactionScopeTransaction : INHibernateOutboxTransaction
+    sealed class NHibernateTransactionScopeTransaction : INHibernateOutboxTransaction
     {
         static ILog Log = LogManager.GetLogger<NHibernateTransactionScopeTransaction>();
 
@@ -62,18 +62,29 @@
                     Session.Flush();
                 }
                 Session.Dispose();
+                Session = null;
             }
             connection?.Dispose();
-            if (transactionScope != null)
+
+            if (transactionScope == null)
             {
-                if (commit)
-                {
-                    transactionScope.Complete();
-                }
-                transactionScope.Dispose();
-                transactionScope = null;
-                ambientTransaction = null;
+                return;
             }
+
+            if (commit)
+            {
+                transactionScope.Complete();
+            }
+
+            transactionScope.Dispose();
+            transactionScope = null;
+            ambientTransaction = null;
+        }
+
+        public ValueTask DisposeAsync()
+        {
+            Dispose();
+            return ValueTask.CompletedTask;
         }
 
         // Prepare is deliberately kept sync to allow floating of TxScope where needed

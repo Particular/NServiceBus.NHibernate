@@ -9,7 +9,7 @@
     using NServiceBus.Logging;
     using NServiceBus.Outbox;
 
-    class NHibernateLocalOutboxTransaction : INHibernateOutboxTransaction
+    sealed class NHibernateLocalOutboxTransaction : INHibernateOutboxTransaction
     {
         static ILog Log = LogManager.GetLogger<NHibernateLocalOutboxTransaction>();
 
@@ -51,7 +51,14 @@
             //If save changes callback failed, we need to dispose the transaction here.
             transaction?.Dispose();
             transaction = null;
-            Session.Dispose();
+            Session?.Dispose();
+            Session = null;
+        }
+
+        public ValueTask DisposeAsync()
+        {
+            Dispose();
+            return ValueTask.CompletedTask;
         }
 
         Func<CancellationToken, Task> onSaveChangesCallback = _ => Task.CompletedTask;
