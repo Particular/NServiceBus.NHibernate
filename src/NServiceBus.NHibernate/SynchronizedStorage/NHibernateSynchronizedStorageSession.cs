@@ -74,5 +74,12 @@
         public Task CompleteAsync(CancellationToken cancellationToken = new CancellationToken()) => internalSession.CompleteAsync(cancellationToken);
 
         public void Dispose() => internalSession?.Dispose();
+
+        public ValueTask DisposeAsync()
+        {
+            Dispose();
+
+            return ValueTask.CompletedTask;
+        }
     }
 }
