@@ -9,11 +9,12 @@
 
   <ItemGroup Label="Public dependencies">
     <PackageReference Include="NHibernate" Version="5.6.0" />
-    <PackageReference Include="NServiceBus" Version="10.0.0-alpha.6" />
+    <PackageReference Include="NServiceBus" Version="10.0.0-alpha.6.32" />
   </ItemGroup>
 
   <ItemGroup Label="Private dependencies">
     <PackageReference Include="Particular.Packaging" Version="4.5.0" PrivateAssets="All" />
+    <PackageReference Include="Particular.Obsoletes" Version="1.0.0" PrivateAssets="All" />
   </ItemGroup>
 
   <ItemGroup>

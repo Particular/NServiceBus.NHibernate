@@ -6,21 +6,18 @@
     /// <summary>
     /// NHibernate persistence for everything.
     /// </summary>
-    public class NHibernatePersistence : PersistenceDefinition
+    public partial class NHibernatePersistence : PersistenceDefinition, IPersistenceDefinitionFactory<NHibernatePersistence>
     {
-        /// <summary>
-        /// Constructor that defines the capabilities of the storage
-        /// </summary>
-        public NHibernatePersistence()
+        // constructor parameter is a temporary workaround until the public constructor is removed
+        NHibernatePersistence(object _)
         {
-            Defaults(s =>
-            {
-                s.SetDefault("NHibernate.Common.AutoUpdateSchema", true);
-            });
+            Defaults(static s => s.SetDefault("NHibernate.Common.AutoUpdateSchema", true));
 
-            Supports<StorageType.Sagas>(s => s.EnableFeatureByDefault<NHibernateSagaStorage>());
-            Supports<StorageType.Subscriptions>(s => s.EnableFeatureByDefault<NHibernateSubscriptionStorage>());
-            Supports<StorageType.Outbox>(s => s.EnableFeatureByDefault<NHibernateOutbox>());
+            Supports<StorageType.Sagas, NHibernateSagaStorage>();
+            Supports<StorageType.Subscriptions, NHibernateSubscriptionStorage>();
+            Supports<StorageType.Outbox, NHibernateOutbox>();
         }
+
+        static NHibernatePersistence IPersistenceDefinitionFactory<NHibernatePersistence>.Create() => new(null);
     }
 }
