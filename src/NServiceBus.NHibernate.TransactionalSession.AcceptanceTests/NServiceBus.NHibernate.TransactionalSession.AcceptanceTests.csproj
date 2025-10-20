@@ -20,7 +20,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Data.SqlClient" Version="6.1.2" />
-    <PackageReference Include="NServiceBus.AcceptanceTesting" Version="10.0.0-alpha.6.32" />
+    <PackageReference Include="NServiceBus.AcceptanceTesting" Version="10.0.0-alpha.7" />
   </ItemGroup>
 
 </Project>
