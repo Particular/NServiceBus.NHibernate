@@ -21,7 +21,7 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.Data.SqlClient" Version="6.1.2" />
     <PackageReference Include="NServiceBus.PersistenceTests.Sources" Version="10.0.0-alpha.6" GeneratePathProperty="true" />
-    <PackageReference Include="Oracle.ManagedDataAccess.Core" Version="23.8.0" />
+    <PackageReference Include="Oracle.ManagedDataAccess.Core" Version="23.26.0" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(PkgNServiceBus_PersistenceTests_Sources)' != ''">
