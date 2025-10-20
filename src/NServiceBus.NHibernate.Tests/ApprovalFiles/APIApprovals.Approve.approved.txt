@@ -21,8 +21,10 @@ namespace NServiceBus
         NHibernate.ISession Session { get; }
         void OnSaveChanges(System.Func<NServiceBus.Persistence.ISynchronizedStorageSession, System.Threading.CancellationToken, System.Threading.Tasks.Task> callback);
     }
-    public class NHibernatePersistence : NServiceBus.Persistence.PersistenceDefinition
+    public class NHibernatePersistence : NServiceBus.Persistence.PersistenceDefinition, NServiceBus.Persistence.IPersistenceDefinitionFactory<NServiceBus.NHibernatePersistence>
     {
+        [System.Obsolete("The NHibernatePersistence class is not supposed to be instantiated directly. Will" +
+            " be removed in version 12.0.0.", true)]
         public NHibernatePersistence() { }
     }
     public static class OutboxSettingsExtensions
