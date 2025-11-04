@@ -32,7 +32,7 @@
             var settings = persistenceExtensions.GetSettings();
 
             settings.Set(transactionalSessionOptions);
-            settings.EnableFeatureByDefault<NHibernateTransactionalSession>();
+            settings.EnableFeature<NHibernateTransactionalSession>();
 
             if (string.IsNullOrEmpty(transactionalSessionOptions.ProcessorEndpoint))
             {
