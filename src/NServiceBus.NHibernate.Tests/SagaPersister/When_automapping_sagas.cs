@@ -39,7 +39,7 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
         [Test]
         public void Id_generator_should_be_set_to_assigned()
         {
-            Assert.That(typeof(Assigned), Is.EqualTo(persisterForTestSaga.IdentifierGenerator.GetType()));
+            Assert.That(persisterForTestSaga.IdentifierGenerator.GetType(), Is.EqualTo(typeof(Assigned)));
         }
 
         [Test]
@@ -51,8 +51,8 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
         [Test]
         public void Related_entities_should_also_be_mapped()
         {
-            Assert.That(typeof(GuidCombGenerator), Is.EqualTo(sessionFactory.GetEntityPersisterFor<OrderLine>()
-                                .IdentifierGenerator.GetType()));
+            Assert.That(sessionFactory.GetEntityPersisterFor<OrderLine>()
+                                .IdentifierGenerator.GetType(), Is.EqualTo(typeof(GuidCombGenerator)));
         }
 
         [Test]
@@ -70,8 +70,8 @@ namespace NServiceBus.SagaPersisters.NHibernate.Tests
         [Test]
         public void Users_can_override_autoMappings_by_embedding_hbm_files()
         {
-            Assert.That(typeof(IdentityGenerator), Is.EqualTo(sessionFactory.GetEntityPersisterFor<TestSagaWithHbmlXmlOverride>()
-                                .IdentifierGenerator.GetType()));
+            Assert.That(sessionFactory.GetEntityPersisterFor<TestSagaWithHbmlXmlOverride>()
+                                .IdentifierGenerator.GetType(), Is.EqualTo(typeof(IdentityGenerator)));
         }
 
         [Test]
