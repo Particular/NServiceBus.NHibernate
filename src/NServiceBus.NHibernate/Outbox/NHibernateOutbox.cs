@@ -31,7 +31,7 @@ namespace NServiceBus.Features
         /// </summary>
         public NHibernateOutbox()
         {
-            Defaults(x => x.EnableFeatureByDefault<NHibernateStorageSession>());
+            EnableByDefault<NHibernateStorageSession>();
 
             DependsOn<Outbox>();
             DependsOn<NHibernateStorageSession>();
