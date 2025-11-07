@@ -4,13 +4,14 @@
 [assembly: System.Runtime.InteropServices.ComVisible(false)]
 namespace NServiceBus.Features
 {
-    public class NHibernateSagaStorage : NServiceBus.Features.Feature
+    public sealed class NHibernateSagaStorage : NServiceBus.Features.Feature
     {
         public NHibernateSagaStorage() { }
         protected override void Setup(NServiceBus.Features.FeatureConfigurationContext context) { }
     }
-    public class NHibernateStorageSession : NServiceBus.Features.Feature
+    public sealed class NHibernateStorageSession : NServiceBus.Features.Feature
     {
+        public NHibernateStorageSession() { }
         protected override void Setup(NServiceBus.Features.FeatureConfigurationContext context) { }
     }
 }
