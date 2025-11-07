@@ -14,7 +14,7 @@ namespace NServiceBus.Features
     using Configuration = global::NHibernate.Cfg.Configuration;
     using Environment = global::NHibernate.Cfg.Environment;
 
-    internal sealed class NHibernateOutbox : Feature
+    sealed class NHibernateOutbox : Feature
     {
 
         internal const string OutboxMappingSettingsKey = "NServiceBus.NHibernate.OutboxMapping";
@@ -27,7 +27,7 @@ namespace NServiceBus.Features
         internal const string ProcessorEndpointKey = "NHibernate.TransactionalSession.ProcessorEndpoint";
         internal const string DisableOutboxTableCreationSettingKey = "NServiceBus.NHibernate.DisableOutboxTableCreation";
 
-        internal NHibernateOutbox()
+        public NHibernateOutbox()
         {
             Enable<NHibernateStorageSession>();
 

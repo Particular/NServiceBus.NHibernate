@@ -15,12 +15,12 @@ namespace NServiceBus.Features
     /// <summary>
     /// NHibernate Subscription Storage
     /// </summary>
-    internal sealed class NHibernateSubscriptionStorage : Feature
+    sealed class NHibernateSubscriptionStorage : Feature
     {
         public static readonly string CacheExpirationSettingsKey = "NHibernate.Subscriptions.CacheExpiration";
         public static readonly string AutoupdateschemaSettingsKey = "NHibernate.Subscriptions.AutoUpdateSchema";
 
-        internal NHibernateSubscriptionStorage()
+        public NHibernateSubscriptionStorage()
         {
             DependsOn("NServiceBus.Features.MessageDrivenSubscriptions");
 
