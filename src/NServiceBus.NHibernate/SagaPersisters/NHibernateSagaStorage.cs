@@ -13,14 +13,14 @@ namespace NServiceBus.Features
     /// <summary>
     /// NHibernate Saga Storage.
     /// </summary>
-    public class NHibernateSagaStorage : Feature
+    public sealed class NHibernateSagaStorage : Feature
     {
         /// <summary>
-        /// Creates an instance of <see cref="NHibernateSagaStorage"/>.
+        /// Creates an instance of <see cref="NHibernateSagaStorage"/>. This constructor is called by NServiceBus.
         /// </summary>
         public NHibernateSagaStorage()
         {
-            EnableByDefault<NHibernateStorageSession>();
+            Enable<NHibernateStorageSession>();
 
             DependsOn<Sagas>();
             DependsOn<NHibernateStorageSession>();

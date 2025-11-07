@@ -18,10 +18,12 @@ namespace NServiceBus.Features
     /// <summary>
     /// NHibernate Storage Session.
     /// </summary>
-    public class NHibernateStorageSession : Feature
+    public sealed class NHibernateStorageSession : Feature
     {
-
-        internal NHibernateStorageSession()
+        /// <summary>
+        /// Creates an instance of <see cref="NHibernateStorageSession"/>. This constructor is called by NServiceBus.
+        /// </summary>
+        public NHibernateStorageSession()
         {
             Defaults(s =>
             {
