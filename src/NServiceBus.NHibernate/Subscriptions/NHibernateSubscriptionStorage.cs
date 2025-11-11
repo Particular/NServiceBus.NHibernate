@@ -4,13 +4,12 @@ namespace NServiceBus.Features
     using System.Dynamic;
     using System.Threading;
     using System.Threading.Tasks;
-    using global::NHibernate.Tool.hbm2ddl;
     using Microsoft.Extensions.DependencyInjection;
     using Persistence.NHibernate;
     using Unicast.Subscriptions.MessageDrivenSubscriptions;
     using Unicast.Subscriptions.NHibernate;
     using Unicast.Subscriptions.NHibernate.Config;
-    using Installer = Unicast.Subscriptions.NHibernate.Installer.Installer;
+    using Unicast.Subscriptions.NHibernate.Installer;
 
     /// <summary>
     /// NHibernate Subscription Storage
@@ -23,10 +22,6 @@ namespace NServiceBus.Features
         public NHibernateSubscriptionStorage()
         {
             DependsOn("NServiceBus.Features.MessageDrivenSubscriptions");
-
-            // since the installers are registered even if the feature isn't enabled we need to make
-            // this a no-op of there is no "schema updater" available
-            Defaults(c => c.Set(new Installer.SchemaUpdater()));
         }
 
         /// <summary>
@@ -42,12 +37,8 @@ namespace NServiceBus.Features
 
             if (RunInstaller(context))
             {
-                context.Settings.Get<Installer.SchemaUpdater>().Execute = identity =>
-                {
-                    new SchemaUpdate(config.Configuration).Execute(false, true);
-
-                    return Task.FromResult(0);
-                };
+                context.Services.AddSingleton(new SubscriptionNHibernateConfiguration(config.Configuration));
+                context.AddInstaller<SubscriptionsInstaller>();
             }
 
             var sessionFactory = config.Configuration.BuildSessionFactory();
