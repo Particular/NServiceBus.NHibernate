@@ -1,16 +1,11 @@
 namespace NServiceBus.Features
 {
-    using System;
     using System.Dynamic;
-    using System.Linq;
-    using System.Text;
-    using System.Threading.Tasks;
     using NServiceBus.NHibernate.Outbox;
     using Microsoft.Extensions.DependencyInjection;
     using NServiceBus.Outbox.NHibernate;
     using NServiceBus.Persistence;
     using NServiceBus.Persistence.NHibernate;
-    using global::NHibernate.Tool.hbm2ddl;
     using NHibernate.SynchronizedStorage;
     using Persistence.NHibernate.Installer;
 
