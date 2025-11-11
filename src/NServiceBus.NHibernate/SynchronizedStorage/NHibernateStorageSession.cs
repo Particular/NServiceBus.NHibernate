@@ -12,7 +12,7 @@ namespace NServiceBus.Features
     using NServiceBus.Persistence.NHibernate;
     using global::NHibernate.Tool.hbm2ddl;
     using NHibernate.SynchronizedStorage;
-    using Installer = Persistence.NHibernate.Installer.Installer;
+    using Persistence.NHibernate.Installer;
 
 
     /// <summary>
@@ -34,10 +34,6 @@ namespace NServiceBus.Features
                 s.SetDefault("NServiceBus.NHibernate.NHibernateStorageSessionDiagnostics", diagnosticsObject);
 
                 s.SetDefault<IOutboxPersisterFactory>(new OutboxPersisterFactory<OutboxRecord>());
-
-                // since the installers are registered even if the feature isn't enabled we need to make
-                // this a no-op of there is no "schema updater" available
-                s.Set(new Installer.SchemaUpdater());
             });
 
             DependsOn<SynchronizedStorage>();
@@ -64,28 +60,8 @@ namespace NServiceBus.Features
 
             if (runInstaller)
             {
-                context.Settings.Get<Installer.SchemaUpdater>().Execute = identity =>
-                {
-                    var schemaUpdate = new SchemaUpdate(config.Configuration);
-                    var sb = new StringBuilder();
-                    schemaUpdate.Execute(s => sb.AppendLine(s), true);
-
-                    if (schemaUpdate.Exceptions.Any())
-                    {
-                        var aggregate = new AggregateException(schemaUpdate.Exceptions);
-
-                        var errorMessage = @"Schema update failed.
-The following exception(s) were thrown:
-{0}
-
-TSql Script:
-{1}";
-                        throw new Exception(string.Format(errorMessage, aggregate.Flatten(), sb));
-                    }
-                    return Task.FromResult(0);
-                };
+                context.AddInstaller<PersistenceInstaller>();
             }
-
 
             context.Settings.AddStartupDiagnosticsSection("NServiceBus.Persistence.NHibernate.SynchronizedSession", context.Settings.Get("NServiceBus.NHibernate.NHibernateStorageSessionDiagnostics"));
         }
