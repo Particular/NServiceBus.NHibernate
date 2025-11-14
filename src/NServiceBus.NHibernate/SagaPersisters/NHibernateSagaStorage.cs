@@ -38,19 +38,24 @@ namespace NServiceBus.Features
             context.Services.AddSingleton<ISagaPersister, SagaPersister>();
         }
 
-        internal void ApplyMappings(IReadOnlySettings settings, Configuration configuration)
+        void ApplyMappings(IReadOnlySettings settings, Configuration configuration)
         {
+            var allSagaMetadata = settings.Get<SagaMetadataCollection>();
             var tableNamingConvention = settings.GetOrDefault<Func<Type, string>>("NHibernate.Sagas.TableNamingConvention");
 
+            var sagaEntities = allSagaMetadata.Select(metadata => metadata.SagaEntityType).ToArray();
             var scannedAssemblies = settings.GetAvailableTypes().Select(t => t.Assembly).Distinct();
+            var sagaAssemblies = sagaEntities.Select(sagaEntity => sagaEntity.Assembly).Distinct();
 
-            foreach (var assembly in scannedAssemblies)
+            foreach (var assembly in scannedAssemblies.Union(sagaAssemblies).Distinct())
             {
                 configuration.AddAssembly(assembly);
             }
 
-            var allSagaMetadata = settings.Get<SagaMetadataCollection>();
-            var types = settings.GetAvailableTypes().Except(configuration.ClassMappings.Select(x => x.MappedClass));
+            var types = settings.GetAvailableTypes()
+                .Union(sagaEntities)
+                .Except(configuration.ClassMappings.Select(x => x.MappedClass));
+
             var typesMappedByConvention = SagaModelMapper.AddMappings(configuration, allSagaMetadata, types, tableNamingConvention);
 
             settings.AddStartupDiagnosticsSection("NServiceBus.Persistence.NHibernate.Sagas", new
