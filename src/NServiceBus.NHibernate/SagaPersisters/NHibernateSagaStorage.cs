@@ -54,6 +54,7 @@ namespace NServiceBus.Features
 
             var types = settings.GetAvailableTypes()
                 .Union(sagaEntities)
+                .Append(typeof(ContainSagaData))
                 .Except(configuration.ClassMappings.Select(x => x.MappedClass));
 
             var typesMappedByConvention = SagaModelMapper.AddMappings(configuration, allSagaMetadata, types, tableNamingConvention);
