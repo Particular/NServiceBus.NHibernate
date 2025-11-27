@@ -1,20 +1,19 @@
-﻿namespace NServiceBus.NHibernate.Tests.API
-{
-    using NUnit.Framework;
-    using Particular.Approvals;
-    using PublicApiGenerator;
+﻿namespace NServiceBus.NHibernate.Tests.API;
 
-    [TestFixture]
-    public class APIApprovals
+using NUnit.Framework;
+using Particular.Approvals;
+using PublicApiGenerator;
+
+[TestFixture]
+public class APIApprovals
+{
+    [Test]
+    public void Approve()
     {
-        [Test]
-        public void Approve()
+        var publicApi = typeof(NHibernatePersistence).Assembly.GeneratePublicApi(new ApiGeneratorOptions
         {
-            var publicApi = typeof(NHibernatePersistence).Assembly.GeneratePublicApi(new ApiGeneratorOptions
-            {
-                ExcludeAttributes = ["System.Runtime.Versioning.TargetFrameworkAttribute", "System.Reflection.AssemblyMetadataAttribute"]
-            });
-            Approver.Verify(publicApi);
-        }
+            ExcludeAttributes = ["System.Runtime.Versioning.TargetFrameworkAttribute", "System.Reflection.AssemblyMetadataAttribute"]
+        });
+        Approver.Verify(publicApi);
     }
 }

@@ -1,183 +1,145 @@
-namespace NServiceBus.SagaPersisters.NHibernate.Tests
+namespace NServiceBus.SagaPersisters.NHibernate.Tests;
+
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+
+public class TestSaga : Saga<TestSagaData>, IAmStartedByMessages<SagaStartMessage>
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Threading.Tasks;
+    protected override void ConfigureHowToFindSaga(SagaPropertyMapper<TestSagaData> mapper) => mapper.MapSaga(s => s.SagaCorrelationId).ToMessage<SagaStartMessage>(m => m.CorrelationId);
 
-    public class TestSaga : Saga<TestSagaData>, IAmStartedByMessages<SagaStartMessage>
-    {
-        protected override void ConfigureHowToFindSaga(SagaPropertyMapper<TestSagaData> mapper)
-        {
-            mapper.ConfigureMapping<SagaStartMessage>(m => m.CorrelationId).ToSaga(s => s.SagaCorrelationId);
-        }
+    public Task Handle(SagaStartMessage message, IMessageHandlerContext context) => throw new NotImplementedException();
+}
 
-        public Task Handle(SagaStartMessage message, IMessageHandlerContext context)
-        {
-            throw new NotImplementedException();
-        }
-    }
+public class TestSagaData : ContainSagaData
+{
+    public virtual Guid SagaCorrelationId { get; set; }
+    public virtual RelatedClass RelatedClass { get; set; }
 
-    public class TestSagaData : ContainSagaData
-    {
-        public virtual Guid SagaCorrelationId { get; set; }
-        public virtual RelatedClass RelatedClass { get; set; }
+    public virtual IList<OrderLine> OrderLines { get; set; }
 
-        public virtual IList<OrderLine> OrderLines { get; set; }
+    public virtual Status Status { get; set; }
 
-        public virtual Status Status { get; set; }
+    public virtual DateTime DateTimeProperty { get; set; }
 
-        public virtual DateTime DateTimeProperty { get; set; }
+    public virtual TestComponent TestComponent { get; set; }
 
-        public virtual TestComponent TestComponent { get; set; }
+    public virtual PolymorphicPropertyBase PolymorphicRelatedProperty { get; set; }
 
-        public virtual PolymorphicPropertyBase PolymorphicRelatedProperty { get; set; }
+    public virtual int[] ArrayOfInts { get; set; }
+    public virtual string[] ArrayOfStrings { get; set; }
+    public virtual DateTime[] ArrayOfDates { get; set; }
+}
 
-        public virtual int[] ArrayOfInts { get; set; }
-        public virtual string[] ArrayOfStrings { get; set; }
-        public virtual DateTime[] ArrayOfDates { get; set; }
-    }
+public class PolymorphicProperty : PolymorphicPropertyBase
+{
+    public virtual int SomeInt { get; set; }
+}
 
-    public class PolymorphicProperty : PolymorphicPropertyBase
-    {
-        public virtual int SomeInt { get; set; }
-    }
+public class PolymorphicPropertyBase
+{
+    public virtual Guid Id { get; set; }
+}
 
-    public class PolymorphicPropertyBase
-    {
-        public virtual Guid Id { get; set; }
-    }
+public enum Status
+{
+    SomeStatus,
+    AnotherStatus
+}
 
-    public enum Status
-    {
-        SomeStatus,
-        AnotherStatus
-    }
+public class TestComponent
+{
+    public string Property { get; set; }
+    public string AnotherProperty { get; set; }
+}
 
-    public class TestComponent
-    {
-        public string Property { get; set; }
-        public string AnotherProperty { get; set; }
-    }
+public class OrderLine
+{
+    public virtual Guid Id { get; set; }
 
-    public class OrderLine
-    {
-        public virtual Guid Id { get; set; }
+    public virtual Guid ProductId { get; set; }
+}
 
-        public virtual Guid ProductId { get; set; }
-
-    }
+public class RelatedClass
+{
+    public virtual Guid Id { get; set; }
 
 
-    public class RelatedClass
-    {
-        public virtual Guid Id { get; set; }
+    public virtual TestSagaData ParentSaga { get; set; }
+}
 
+public class TestSagaWithHbmlXmlOverride : ContainSagaData
+{
+    public virtual string SomeProperty { get; set; }
+}
 
-        public virtual TestSagaData ParentSaga { get; set; }
-    }
+[TableName("MyTestTable", Schema = "MyTestSchema")]
+public class SagaWithTableNameData : ContainSagaData
+{
+    public virtual Guid CorrelationId { get; set; }
+    public virtual string SomeProperty { get; set; }
+}
 
-    public class TestSagaWithHbmlXmlOverride : ContainSagaData
-    {
-        public virtual string SomeProperty { get; set; }
-    }
+public class SagaStartMessage : IMessage
+{
+    public virtual Guid CorrelationId { get; set; }
+}
 
-    [TableName("MyTestTable", Schema = "MyTestSchema")]
-    public class SagaWithTableNameData : ContainSagaData
-    {
-        public virtual Guid CorrelationId { get; set; }
-        public virtual string SomeProperty { get; set; }
-    }
+public class SagaWithTableName : Saga<SagaWithTableNameData>, IAmStartedByMessages<SagaStartMessage>
+{
+    protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaWithTableNameData> mapper) => mapper.MapSaga(s => s.CorrelationId).ToMessage<SagaStartMessage>(m => m.CorrelationId);
 
-    public class SagaStartMessage : IMessage
-    {
-        public virtual Guid CorrelationId { get; set; }
-    }
+    public Task Handle(SagaStartMessage message, IMessageHandlerContext context) => throw new NotImplementedException();
+}
 
-    public class SagaWithTableName : Saga<SagaWithTableNameData>, IAmStartedByMessages<SagaStartMessage>
-    {
-        protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaWithTableNameData> mapper)
-        {
-            mapper.ConfigureMapping<SagaStartMessage>(m => m.CorrelationId).ToSaga(s => s.CorrelationId);
-        }
+public class DerivedFromSagaWithTableNameData : SagaWithTableNameData
+{
+}
 
-        public Task Handle(SagaStartMessage message, IMessageHandlerContext context)
-        {
-            throw new NotImplementedException();
-        }
-    }
+public class DerivedFromSagaWithTableName : Saga<DerivedFromSagaWithTableNameData>, IAmStartedByMessages<SagaStartMessage>
+{
+    protected override void ConfigureHowToFindSaga(SagaPropertyMapper<DerivedFromSagaWithTableNameData> mapper) => mapper.MapSaga(s => s.CorrelationId).ToMessage<SagaStartMessage>(m => m.CorrelationId);
 
-    public class DerivedFromSagaWithTableNameData : SagaWithTableNameData
-    { }
+    public Task Handle(SagaStartMessage message, IMessageHandlerContext context) => throw new NotImplementedException();
+}
 
-    public class DerivedFromSagaWithTableName : Saga<DerivedFromSagaWithTableNameData>, IAmStartedByMessages<SagaStartMessage>
-    {
-        protected override void ConfigureHowToFindSaga(SagaPropertyMapper<DerivedFromSagaWithTableNameData> mapper)
-        {
-            mapper.ConfigureMapping<SagaStartMessage>(m => m.CorrelationId).ToSaga(s => s.CorrelationId);
-        }
+[TableName("MyDerivedTestTable")]
+public class AlsoDerivedFromSagaWithTableNameData : SagaWithTableNameData
+{
+}
 
-        public Task Handle(SagaStartMessage message, IMessageHandlerContext context)
-        {
-            throw new NotImplementedException();
-        }
-    }
+public class AlsoDerivedFromSagaWithTableName : Saga<AlsoDerivedFromSagaWithTableNameData>, IAmStartedByMessages<SagaStartMessage>
+{
+    protected override void ConfigureHowToFindSaga(SagaPropertyMapper<AlsoDerivedFromSagaWithTableNameData> mapper) => mapper.MapSaga(s => s.CorrelationId).ToMessage<SagaStartMessage>(m => m.CorrelationId);
 
-    [TableName("MyDerivedTestTable")]
-    public class AlsoDerivedFromSagaWithTableNameData : SagaWithTableNameData
-    { }
+    public Task Handle(SagaStartMessage message, IMessageHandlerContext context) => throw new NotImplementedException();
+}
 
-    public class AlsoDerivedFromSagaWithTableName : Saga<AlsoDerivedFromSagaWithTableNameData>, IAmStartedByMessages<SagaStartMessage>
-    {
-        protected override void ConfigureHowToFindSaga(SagaPropertyMapper<AlsoDerivedFromSagaWithTableNameData> mapper)
-        {
-            mapper.ConfigureMapping<SagaStartMessage>(m => m.CorrelationId).ToSaga(s => s.CorrelationId);
-        }
+public class SagaWithVersionedPropertyData : IContainSagaData
+{
+    [RowVersion] public virtual int Version { get; set; }
+    public virtual Guid CorrelationId { get; set; }
+    public virtual Guid Id { get; set; }
+    public virtual string Originator { get; set; }
+    public virtual string OriginalMessageId { get; set; }
+}
 
-        public Task Handle(SagaStartMessage message, IMessageHandlerContext context)
-        {
-            throw new NotImplementedException();
-        }
-    }
+public class SagaWithoutVersionedPropertyData : ContainSagaData
+{
+    public virtual Guid CorrelationId { get; set; }
+    public virtual int Version { get; set; }
+}
 
-    public class SagaWithVersionedPropertyData : IContainSagaData
-    {
-        [RowVersion]
-        public virtual int Version { get; set; }
-        public virtual Guid CorrelationId { get; set; }
-        public virtual Guid Id { get; set; }
-        public virtual string Originator { get; set; }
-        public virtual string OriginalMessageId { get; set; }
-    }
+public class SagaWithVersionedProperty : Saga<SagaWithVersionedPropertyData>, IAmStartedByMessages<SagaStartMessage>
+{
+    protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaWithVersionedPropertyData> mapper) => mapper.MapSaga(s => s.CorrelationId).ToMessage<SagaStartMessage>(m => m.CorrelationId);
 
-    public class SagaWithoutVersionedPropertyData : ContainSagaData
-    {
-        public virtual Guid CorrelationId { get; set; }
-        public virtual int Version { get; set; }
-    }
+    public Task Handle(SagaStartMessage message, IMessageHandlerContext context) => throw new NotImplementedException();
+}
 
-    public class SagaWithVersionedProperty : Saga<SagaWithVersionedPropertyData>, IAmStartedByMessages<SagaStartMessage>
-    {
-        protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaWithVersionedPropertyData> mapper)
-        {
-            mapper.ConfigureMapping<SagaStartMessage>(m => m.CorrelationId).ToSaga(s => s.CorrelationId);
-        }
+public class SagaWithoutVersionedProperty : Saga<SagaWithoutVersionedPropertyData>, IAmStartedByMessages<SagaStartMessage>
+{
+    protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaWithoutVersionedPropertyData> mapper) => mapper.MapSaga(s => s.CorrelationId).ToMessage<SagaStartMessage>(m => m.CorrelationId);
 
-        public Task Handle(SagaStartMessage message, IMessageHandlerContext context)
-        {
-            throw new NotImplementedException();
-        }
-    }
-
-    public class SagaWithoutVersionedProperty : Saga<SagaWithoutVersionedPropertyData>, IAmStartedByMessages<SagaStartMessage>
-    {
-        protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaWithoutVersionedPropertyData> mapper)
-        {
-            mapper.ConfigureMapping<SagaStartMessage>(m => m.CorrelationId).ToSaga(s => s.CorrelationId);
-        }
-
-        public Task Handle(SagaStartMessage message, IMessageHandlerContext context)
-        {
-            throw new NotImplementedException();
-        }
-    }
+    public Task Handle(SagaStartMessage message, IMessageHandlerContext context) => throw new NotImplementedException();
 }

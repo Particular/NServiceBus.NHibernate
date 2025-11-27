@@ -1,22 +1,18 @@
-namespace NServiceBus.NHibernate.Tests.Outbox
+namespace NServiceBus.NHibernate.Tests.Outbox;
+
+using System.Data;
+using NServiceBus.Outbox;
+
+class FakeDbConnectionProvider : IDbConnectionProvider
 {
-    using System.Data;
-    using NServiceBus.Outbox;
+    readonly IDbConnection dbConnection;
 
-    class FakeDbConnectionProvider : IDbConnectionProvider
+    public FakeDbConnectionProvider(IDbConnection dbConnection) => this.dbConnection = dbConnection;
+
+    public bool TryGetConnection(out IDbConnection connection, string connectionString)
     {
-        readonly IDbConnection dbConnection;
+        connection = dbConnection;
 
-        public FakeDbConnectionProvider(IDbConnection dbConnection)
-        {
-            this.dbConnection = dbConnection;
-        }
-
-        public bool TryGetConnection(out IDbConnection connection, string connectionString)
-        {
-            connection = dbConnection;
-
-            return connection != null;
-        }
+        return connection != null;
     }
 }
