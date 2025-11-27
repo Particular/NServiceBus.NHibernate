@@ -1,64 +1,57 @@
-namespace NServiceBus.SagaPersisters.NHibernate.Tests
+namespace NServiceBus.SagaPersisters.NHibernate.Tests;
+
+using System;
+using System.Threading.Tasks;
+using global::NHibernate.Impl;
+using global::NHibernate.Persister.Entity;
+using NUnit.Framework;
+
+[TestFixture]
+public class When_autoMapping_sagas_with_abstract_base_class
 {
-    using System;
-    using System.Threading.Tasks;
-    using global::NHibernate.Impl;
-    using global::NHibernate.Persister.Entity;
-    using NUnit.Framework;
+    SessionFactoryImpl sessionFactory;
 
-    [TestFixture]
-    public class When_autoMapping_sagas_with_abstract_base_class
+    [SetUp]
+    public void SetUp() =>
+        sessionFactory = SessionFactoryHelper.Build([
+            typeof(SagaWithAbstractBaseClassActualSaga),
+            typeof(SagaWithAbstractBaseClass),
+            typeof(ContainSagaData),
+            typeof(MyOwnAbstractBase)
+        ]);
+
+    [TearDown]
+    public void TearDown() => sessionFactory.Dispose();
+
+    [Test]
+    public void Should_not_generate_join_table_for_base_class()
     {
-        SessionFactoryImpl sessionFactory;
-
-        [SetUp]
-        public void SetUp() =>
-            sessionFactory = SessionFactoryHelper.Build([
-                typeof(SagaWithAbstractBaseClassActualSaga),
-                typeof(SagaWithAbstractBaseClass),
-                typeof(ContainSagaData),
-                typeof(MyOwnAbstractBase)
-            ]);
-
-        [TearDown]
-        public void TearDown() => sessionFactory.Dispose();
-
-        [Test]
-        public void Should_not_generate_join_table_for_base_class()
-        {
-            var persister = sessionFactory.GetEntityPersister(typeof(SagaWithAbstractBaseClass).FullName);
-            Assert.That(persister, Is.InstanceOf<UnionSubclassEntityPersister>());
-        }
-
-        [Test]
-        public void Concrete_class_persister_includes_all_properties_from_abstract_base_classes()
-        {
-            var persister = sessionFactory.GetEntityPersister(typeof(SagaWithAbstractBaseClass).FullName);
-            Assert.That(persister.PropertyNames, Is.EquivalentTo(new[] { "AbstractBaseProp", "CorrelationId", "OrderId", "Originator", "OriginalMessageId" }));
-        }
+        var persister = sessionFactory.GetEntityPersister(typeof(SagaWithAbstractBaseClass).FullName);
+        Assert.That(persister, Is.InstanceOf<UnionSubclassEntityPersister>());
     }
 
-    public class SagaWithAbstractBaseClassActualSaga : Saga<SagaWithAbstractBaseClass>, IAmStartedByMessages<SagaStartMessage>
+    [Test]
+    public void Concrete_class_persister_includes_all_properties_from_abstract_base_classes()
     {
-        protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaWithAbstractBaseClass> mapper)
-        {
-            mapper.ConfigureMapping<SagaStartMessage>(m => m.CorrelationId).ToSaga(s => s.CorrelationId);
-        }
-
-        public Task Handle(SagaStartMessage message, IMessageHandlerContext context)
-        {
-            throw new NotImplementedException();
-        }
+        var persister = sessionFactory.GetEntityPersister(typeof(SagaWithAbstractBaseClass).FullName);
+        Assert.That(persister.PropertyNames, Is.EquivalentTo(["AbstractBaseProp", "CorrelationId", "OrderId", "Originator", "OriginalMessageId"]));
     }
+}
 
-    public class SagaWithAbstractBaseClass : MyOwnAbstractBase
-    {
-        public virtual Guid OrderId { get; set; }
-    }
+public class SagaWithAbstractBaseClassActualSaga : Saga<SagaWithAbstractBaseClass>, IAmStartedByMessages<SagaStartMessage>
+{
+    protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SagaWithAbstractBaseClass> mapper) => mapper.MapSaga(s => s.CorrelationId).ToMessage<SagaStartMessage>(m => m.CorrelationId);
 
-    public abstract class MyOwnAbstractBase : ContainSagaData
-    {
-        public virtual Guid CorrelationId { get; set; }
-        public virtual string AbstractBaseProp { get; set; }
-    }
+    public Task Handle(SagaStartMessage message, IMessageHandlerContext context) => throw new NotImplementedException();
+}
+
+public class SagaWithAbstractBaseClass : MyOwnAbstractBase
+{
+    public virtual Guid OrderId { get; set; }
+}
+
+public abstract class MyOwnAbstractBase : ContainSagaData
+{
+    public virtual Guid CorrelationId { get; set; }
+    public virtual string AbstractBaseProp { get; set; }
 }

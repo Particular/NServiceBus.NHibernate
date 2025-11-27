@@ -1,132 +1,124 @@
-namespace NServiceBus.Persistence.NHibernate.Tests
+namespace NServiceBus.Persistence.NHibernate.Tests;
+
+using System.Collections.Generic;
+using System.Collections.Specialized;
+using System.Configuration;
+using System.Dynamic;
+using NUnit.Framework;
+using Settings;
+
+[TestFixture]
+public class NHibernateConfigurationBuilderTests
 {
-    using System.Collections.Generic;
-    using System.Collections.Specialized;
-    using System.Configuration;
-    using System.Dynamic;
-    using NUnit.Framework;
-    using Settings;
+    const string connectionString = "Data Source=nsb;New=True;";
 
-    [TestFixture]
-    public class NHibernateConfigurationBuilderTests
+    [Test]
+    public void Should_fail_validation_if_no_connection_string_is_defined() => Assert.That(NHibernateConfigurationBuilder.ContainsRequiredProperties(new Dictionary<string, string>()), Is.False);
+
+    [Test]
+    public void Should_pass_validation_if_connection_string_is_defined_literally() =>
+        Assert.That(NHibernateConfigurationBuilder.ContainsRequiredProperties(new Dictionary<string, string>
+        {
+            {"connection.connection_string", "aString"}
+        }), Is.True);
+
+    [Test]
+    public void Should_pass_validation_if_connection_string_is_defined_by_name() =>
+        Assert.That(NHibernateConfigurationBuilder.ContainsRequiredProperties(new Dictionary<string, string>
+        {
+            {"connection.connection_string_name", "aString"}
+        }), Is.True);
+
+    [Test]
+    public void Should_assign_default_properties()
     {
-        const string connectionString = "Data Source=nsb;New=True;";
+        NHibernateSettingRetriever.AppSettings = () => [];
 
-        [Test]
-        public void Should_fail_validation_if_no_connection_string_is_defined()
+        NHibernateSettingRetriever.ConnectionStrings = () =>
+        [
+            new ConnectionStringSettings("NServiceBus/Persistence", connectionString)
+        ];
+
+        var builder = new NHibernateConfigurationBuilder(new SettingsHolder(), new ExpandoObject(), "NotUsed", "NotUsed");
+
+        var expected = new Dictionary<string, string>
         {
-            Assert.That(NHibernateConfigurationBuilder.ContainsRequiredProperties(new Dictionary<string, string>()), Is.False);
-        }
+            {"dialect", NHibernateConfigurationBuilder.DefaultDialect},
+            {"connection.connection_string", connectionString}
+        };
 
-        [Test]
-        public void Should_pass_validation_if_connection_string_is_defined_literally()
+        Assert.That(expected, Is.SubsetOf(builder.Build().Configuration.Properties));
+    }
+
+    [Test]
+    public void Should_assign_overridden_connectionString_if_specified()
+    {
+        NHibernateSettingRetriever.AppSettings = () => [];
+
+        NHibernateSettingRetriever.ConnectionStrings = () =>
+        [
+            new ConnectionStringSettings("NServiceBus/Persistence", connectionString),
+            new ConnectionStringSettings("NServiceBus/Persistence/NHibernate/Timeout",
+                "timeout_connection_string")
+        ];
+
+        var builder = new NHibernateConfigurationBuilder(new SettingsHolder(), new ExpandoObject(), "Timeout", "NotUsed");
+
+        var expected = new Dictionary<string, string>
         {
-            Assert.That(NHibernateConfigurationBuilder.ContainsRequiredProperties(new Dictionary<string, string>
-                                                                                                  {
-                                                                                                      {"connection.connection_string", "aString"}
-                                                                                                  }), Is.True);
-        }
+            {"connection.connection_string", "timeout_connection_string"}
+        };
 
-        [Test]
-        public void Should_pass_validation_if_connection_string_is_defined_by_name()
+        Assert.That(expected, Is.SubsetOf(builder.Build().Configuration.Properties));
+    }
+
+    [Test]
+    public void Should_assign_all_optional_properties()
+    {
+        NHibernateSettingRetriever.AppSettings = () => new NameValueCollection
         {
-            Assert.That(NHibernateConfigurationBuilder.ContainsRequiredProperties(new Dictionary<string, string>
-                                                                                                  {
-                                                                                                      {"connection.connection_string_name", "aString"}
-                                                                                                  }), Is.True);
-        }
+            {"NServiceBus/Persistence/NHibernate/connection.provider", "provider"},
+            {"NServiceBus/Persistence/NHibernate/connection.driver_class", "driver_class"},
+        };
 
-        [Test]
-        public void Should_assign_default_properties()
+        NHibernateSettingRetriever.ConnectionStrings = () =>
+        [
+            new ConnectionStringSettings("NServiceBus/Persistence", connectionString)
+        ];
+
+        var builder = new NHibernateConfigurationBuilder(new SettingsHolder(), new ExpandoObject(), "NotUsed", "NotUsed");
+
+        var expected = new Dictionary<string, string>
         {
-            NHibernateSettingRetriever.AppSettings = () => [];
+            {"connection.connection_string", connectionString},
+            {"connection.provider", "provider"},
+            {"connection.driver_class", "driver_class"},
+        };
 
-            NHibernateSettingRetriever.ConnectionStrings = () =>
-            [
-                    new ConnectionStringSettings("NServiceBus/Persistence", connectionString)
-            ];
+        Assert.That(expected, Is.SubsetOf(builder.Build().Configuration.Properties));
+    }
 
-            var builder = new NHibernateConfigurationBuilder(new SettingsHolder(), new ExpandoObject(), "NotUsed", "NotUsed");
-
-            var expected = new Dictionary<string, string>
-                {
-                     {"dialect", NHibernateConfigurationBuilder.DefaultDialect},
-                     {"connection.connection_string", connectionString}
-                };
-
-            Assert.That(expected, Is.SubsetOf(builder.Build().Configuration.Properties));
-        }
-
-        [Test]
-        public void Should_assign_overridden_connectionString_if_specified()
+    [Test]
+    public void Should_skip_settings_that_are_not_for_persistence()
+    {
+        NHibernateSettingRetriever.AppSettings = () => new NameValueCollection
         {
-            NHibernateSettingRetriever.AppSettings = () => [];
+            {"myOtherSetting1", "provider"},
+            {"myOtherSetting2", "driver_class"},
+        };
 
-            NHibernateSettingRetriever.ConnectionStrings = () =>
-                [
-                    new ConnectionStringSettings("NServiceBus/Persistence", connectionString),
-                    new ConnectionStringSettings("NServiceBus/Persistence/NHibernate/Timeout",
-                                                 "timeout_connection_string")
-                ];
+        NHibernateSettingRetriever.ConnectionStrings = () =>
+        [
+            new ConnectionStringSettings("NServiceBus/Persistence", connectionString)
+        ];
 
-            var builder = new NHibernateConfigurationBuilder(new SettingsHolder(), new ExpandoObject(), "Timeout", "NotUsed");
+        var builder = new NHibernateConfigurationBuilder(new SettingsHolder(), new ExpandoObject(), "NotUsed", "NotUsed");
 
-            var expected = new Dictionary<string, string>
-                {
-                   {"connection.connection_string", "timeout_connection_string"}
-                };
-
-            Assert.That(expected, Is.SubsetOf(builder.Build().Configuration.Properties));
-        }
-
-        [Test]
-        public void Should_assign_all_optional_properties()
+        var expected = new Dictionary<string, string>
         {
-            NHibernateSettingRetriever.AppSettings = () => new NameValueCollection
-                {
-                    {"NServiceBus/Persistence/NHibernate/connection.provider", "provider"},
-                    {"NServiceBus/Persistence/NHibernate/connection.driver_class", "driver_class"},
-                };
+            {"connection.connection_string", connectionString},
+        };
 
-            NHibernateSettingRetriever.ConnectionStrings = () =>
-                [
-                    new ConnectionStringSettings("NServiceBus/Persistence", connectionString)
-                ];
-
-            var builder = new NHibernateConfigurationBuilder(new SettingsHolder(), new ExpandoObject(), "NotUsed", "NotUsed");
-
-            var expected = new Dictionary<string, string>
-                {
-                    {"connection.connection_string", connectionString},
-                    {"connection.provider", "provider"},
-                    {"connection.driver_class", "driver_class"},
-                };
-
-            Assert.That(expected, Is.SubsetOf(builder.Build().Configuration.Properties));
-        }
-
-        [Test]
-        public void Should_skip_settings_that_are_not_for_persistence()
-        {
-            NHibernateSettingRetriever.AppSettings = () => new NameValueCollection
-                {
-                    {"myOtherSetting1", "provider"},
-                    {"myOtherSetting2", "driver_class"},
-                };
-
-            NHibernateSettingRetriever.ConnectionStrings = () =>
-                [
-                    new ConnectionStringSettings("NServiceBus/Persistence", connectionString)
-                ];
-
-            var builder = new NHibernateConfigurationBuilder(new SettingsHolder(), new ExpandoObject(), "NotUsed", "NotUsed");
-
-            var expected = new Dictionary<string, string>
-                {
-                    {"connection.connection_string", connectionString},
-                };
-
-            Assert.That(expected, Is.SubsetOf(builder.Build().Configuration.Properties));
-        }
+        Assert.That(expected, Is.SubsetOf(builder.Build().Configuration.Properties));
     }
 }

@@ -13,7 +13,7 @@
         {
             Defaults(static s => s.SetDefault("NHibernate.Common.AutoUpdateSchema", true));
 
-            Supports<StorageType.Sagas, NHibernateSagaStorage>();
+            Supports<StorageType.Sagas, NHibernateSagaStorage>(new StorageType.SagasOptions { SupportsFinders = true });
             Supports<StorageType.Subscriptions, NHibernateSubscriptionStorage>();
             Supports<StorageType.Outbox, NHibernateOutbox>();
         }

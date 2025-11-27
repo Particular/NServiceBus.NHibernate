@@ -1,26 +1,25 @@
-namespace NServiceBus.Unicast.Subscriptions.NHibernate.Tests
+namespace NServiceBus.Unicast.Subscriptions.NHibernate.Tests;
+
+using System.Threading.Tasks;
+using Extensibility;
+using NUnit.Framework;
+
+[TestFixture]
+class When_receiving_a_unsubscribe_message : InMemoryDBFixture
 {
-    using System.Threading.Tasks;
-    using Extensibility;
-    using NUnit.Framework;
-
-    [TestFixture]
-    class When_receiving_a_unsubscribe_message : InMemoryDBFixture
+    [Test]
+    public async Task All_subscription_entries_for_specified_message_types_should_be_removed()
     {
-        [Test]
-        public async Task All_subscription_entries_for_specified_message_types_should_be_removed()
+        await storage.Subscribe(TestClients.ClientA, new MessageType(typeof(MessageA)), new ContextBag()).ConfigureAwait(false);
+        await storage.Subscribe(TestClients.ClientA, new MessageType(typeof(MessageB)), new ContextBag()).ConfigureAwait(false);
+
+        await storage.Unsubscribe(TestClients.ClientA, new MessageType(typeof(MessageA)), new ContextBag()).ConfigureAwait(false);
+        await storage.Unsubscribe(TestClients.ClientA, new MessageType(typeof(MessageB)), new ContextBag()).ConfigureAwait(false);
+
+        using (var session = SessionFactory.OpenSession())
         {
-            await storage.Subscribe(TestClients.ClientA, new MessageType(typeof(MessageA)), new ContextBag()).ConfigureAwait(false);
-            await storage.Subscribe(TestClients.ClientA, new MessageType(typeof(MessageB)), new ContextBag()).ConfigureAwait(false);
-
-            await storage.Unsubscribe(TestClients.ClientA, new MessageType(typeof(MessageA)), new ContextBag()).ConfigureAwait(false);
-            await storage.Unsubscribe(TestClients.ClientA, new MessageType(typeof(MessageB)), new ContextBag()).ConfigureAwait(false);
-
-            using (var session = SessionFactory.OpenSession())
-            {
-                var subscriptions = session.CreateCriteria(typeof(Subscription)).List<Subscription>();
-                Assert.That(subscriptions.Count, Is.EqualTo(0));
-            }
+            var subscriptions = session.CreateCriteria(typeof(Subscription)).List<Subscription>();
+            Assert.That(subscriptions.Count, Is.EqualTo(0));
         }
     }
 }

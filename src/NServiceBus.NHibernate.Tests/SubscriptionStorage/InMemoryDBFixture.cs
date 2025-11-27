@@ -1,49 +1,48 @@
-namespace NServiceBus.Unicast.Subscriptions.NHibernate.Tests
+namespace NServiceBus.Unicast.Subscriptions.NHibernate.Tests;
+
+using System.Threading.Tasks;
+using global::NHibernate;
+using global::NHibernate.Cfg;
+using global::NHibernate.Dialect;
+using global::NHibernate.Driver;
+using global::NHibernate.Mapping.ByCode;
+using global::NHibernate.Tool.hbm2ddl;
+using NServiceBus.NHibernate.Tests;
+using NUnit.Framework;
+
+abstract class InMemoryDBFixture
 {
-    using System.Threading.Tasks;
-    using global::NHibernate;
-    using global::NHibernate.Cfg;
-    using global::NHibernate.Dialect;
-    using global::NHibernate.Driver;
-    using global::NHibernate.Mapping.ByCode;
-    using global::NHibernate.Tool.hbm2ddl;
-    using NServiceBus.NHibernate.Tests;
-    using NUnit.Framework;
+    protected SubscriptionPersister storage;
+    protected ISessionFactory SessionFactory;
+    SchemaExport schema;
 
-    abstract class InMemoryDBFixture
+    [SetUp]
+    public async Task SetupContext()
     {
-        protected SubscriptionPersister storage;
-        protected ISessionFactory SessionFactory;
-        SchemaExport schema;
+        var cfg = new Configuration()
+            .DataBaseIntegration(x =>
+            {
+                x.Dialect<MsSql2012Dialect>();
+                x.Driver<MicrosoftDataSqlClientDriver>();
+                x.ConnectionString = Consts.SqlConnectionString;
+            });
 
-        [SetUp]
-        public async Task SetupContext()
-        {
-            var cfg = new Configuration()
-                .DataBaseIntegration(x =>
-                {
-                    x.Dialect<MsSql2012Dialect>();
-                    x.Driver<MicrosoftDataSqlClientDriver>();
-                    x.ConnectionString = Consts.SqlConnectionString;
-                });
+        var mapper = new ModelMapper();
+        mapper.AddMapping<Config.SubscriptionMap>();
 
-            var mapper = new ModelMapper();
-            mapper.AddMapping<Config.SubscriptionMap>();
+        cfg.AddMapping(mapper.CompileMappingForAllExplicitlyAddedEntities());
 
-            cfg.AddMapping(mapper.CompileMappingForAllExplicitlyAddedEntities());
+        schema = new SchemaExport(cfg);
+        await schema.CreateAsync(false, true);
 
-            schema = new SchemaExport(cfg);
-            await schema.CreateAsync(false, true);
+        SessionFactory = cfg.BuildSessionFactory();
+        storage = new SubscriptionPersister(SessionFactory);
+    }
 
-            SessionFactory = cfg.BuildSessionFactory();
-            storage = new SubscriptionPersister(SessionFactory);
-        }
-
-        [TearDown]
-        public async Task TearDown()
-        {
-            await schema.DropAsync(false, true);
-            SessionFactory.Dispose();
-        }
+    [TearDown]
+    public async Task TearDown()
+    {
+        await schema.DropAsync(false, true);
+        SessionFactory.Dispose();
     }
 }

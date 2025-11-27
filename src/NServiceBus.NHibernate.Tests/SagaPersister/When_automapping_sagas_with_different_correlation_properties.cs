@@ -1,130 +1,113 @@
-﻿namespace NServiceBus.NHibernate.Tests
+﻿namespace NServiceBus.NHibernate.Tests;
+
+using System;
+using System.Threading.Tasks;
+using Extensibility;
+using Sagas;
+using Testing;
+using NUnit.Framework;
+
+[TestFixture]
+class When_automapping_sagas_with_different_correlation_properties : InMemoryFixture
 {
-    using System;
-    using System.Threading.Tasks;
-    using Extensibility;
-    using Sagas;
-    using Testing;
-    using NUnit.Framework;
+    protected override Type[] SagaTypes => [typeof(FirstAutomappedSaga), typeof(SecondAutomappedSaga)];
 
-    [TestFixture]
-    class When_automapping_sagas_with_different_correlation_properties : InMemoryFixture
+    [Test]
+    public async Task Value_uniqueness_should_be_enforced()
     {
-        protected override Type[] SagaTypes => new[]
+        var firstFailed = false;
+        using (var session = SessionFactory.OpenSession())
+        using (var transaction = session.BeginTransaction())
         {
-            typeof(FirstAutomappedSaga),
-            typeof(SecondAutomappedSaga)
-        };
+            var storageSession = new TestingNHibernateSynchronizedStorageSession(session);
 
-        [Test]
-        public async Task Value_uniqueness_should_be_enforced()
-        {
-            var firstFailed = false;
-            using (var session = SessionFactory.OpenSession())
-            using (var transaction = session.BeginTransaction())
+            var correlationProperty = new SagaCorrelationProperty("FirstId", "whatever");
+
+            await SagaPersister.Save(new FirstAutomappedSagaData
             {
-                var storageSession = new TestingNHibernateSynchronizedStorageSession(session);
+                Id = Guid.NewGuid(),
+                FirstId = "whatever"
+            }, correlationProperty, storageSession, new ContextBag()).ConfigureAwait(false);
 
-                var correlationProperty = new SagaCorrelationProperty("FirstId", "whatever");
+            await SagaPersister.Save(new FirstAutomappedSagaData
+            {
+                Id = Guid.NewGuid(),
+                FirstId = "whatever"
+            }, correlationProperty, storageSession, new ContextBag()).ConfigureAwait(false);
 
-                await SagaPersister.Save(new FirstAutomappedSagaData
-                {
-                    Id = Guid.NewGuid(),
-                    FirstId = "whatever"
-                }, correlationProperty, storageSession, new ContextBag()).ConfigureAwait(false);
-
-                await SagaPersister.Save(new FirstAutomappedSagaData
-                {
-                    Id = Guid.NewGuid(),
-                    FirstId = "whatever"
-                }, correlationProperty, storageSession, new ContextBag()).ConfigureAwait(false);
-
-                try
-                {
-                    await transaction.CommitAsync().ConfigureAwait(false);
-                }
-                catch (Exception)
-                {
-                    firstFailed = true;
-                }
+            try
+            {
+                await transaction.CommitAsync().ConfigureAwait(false);
             }
-
-            var secondFailed = false;
-            using (var session = SessionFactory.OpenSession())
-            using (var transaction = session.BeginTransaction())
+            catch (Exception)
             {
-                var storageSession = new TestingNHibernateSynchronizedStorageSession(session);
-
-                var correlationProperty = new SagaCorrelationProperty("SecondId", "whatever");
-
-                await SagaPersister.Save(new SecondAutomappedSagaData
-                {
-                    Id = Guid.NewGuid(),
-                    SecondId = "whatever"
-                }, correlationProperty, storageSession, new ContextBag()).ConfigureAwait(false);
-
-                await SagaPersister.Save(new SecondAutomappedSagaData
-                {
-                    Id = Guid.NewGuid(),
-                    SecondId = "whatever"
-                }, correlationProperty, storageSession, new ContextBag()).ConfigureAwait(false);
-
-                try
-                {
-                    await transaction.CommitAsync().ConfigureAwait(false);
-                }
-                catch (Exception)
-                {
-                    secondFailed = true;
-                }
+                firstFailed = true;
             }
+        }
 
-            Assert.Multiple(() =>
+        var secondFailed = false;
+        using (var session = SessionFactory.OpenSession())
+        using (var transaction = session.BeginTransaction())
+        {
+            var storageSession = new TestingNHibernateSynchronizedStorageSession(session);
+
+            var correlationProperty = new SagaCorrelationProperty("SecondId", "whatever");
+
+            await SagaPersister.Save(new SecondAutomappedSagaData
             {
-                Assert.That(firstFailed, Is.True);
-                Assert.That(secondFailed, Is.True);
-            });
-        }
-    }
+                Id = Guid.NewGuid(),
+                SecondId = "whatever"
+            }, correlationProperty, storageSession, new ContextBag()).ConfigureAwait(false);
 
-    class FirstAutomappedSaga : Saga<FirstAutomappedSagaData>, IAmStartedByMessages<SomeMessage>
-    {
-        public Task Handle(SomeMessage message, IMessageHandlerContext context)
+            await SagaPersister.Save(new SecondAutomappedSagaData
+            {
+                Id = Guid.NewGuid(),
+                SecondId = "whatever"
+            }, correlationProperty, storageSession, new ContextBag()).ConfigureAwait(false);
+
+            try
+            {
+                await transaction.CommitAsync().ConfigureAwait(false);
+            }
+            catch (Exception)
+            {
+                secondFailed = true;
+            }
+        }
+
+        Assert.Multiple(() =>
         {
-            throw new NotImplementedException();
-        }
-
-        protected override void ConfigureHowToFindSaga(SagaPropertyMapper<FirstAutomappedSagaData> mapper)
-        {
-            mapper.ConfigureMapping<SomeMessage>(m => m.Id).ToSaga(s => s.FirstId);
-        }
+            Assert.That(firstFailed, Is.True);
+            Assert.That(secondFailed, Is.True);
+        });
     }
+}
 
-    public class FirstAutomappedSagaData : ContainSagaData
-    {
-        public virtual string FirstId { get; set; }
-    }
+class FirstAutomappedSaga : Saga<FirstAutomappedSagaData>, IAmStartedByMessages<SomeMessage>
+{
+    public Task Handle(SomeMessage message, IMessageHandlerContext context) => throw new NotImplementedException();
 
-    class SecondAutomappedSaga : Saga<SecondAutomappedSagaData>, IAmStartedByMessages<SomeMessage>
-    {
-        public Task Handle(SomeMessage message, IMessageHandlerContext context)
-        {
-            throw new NotImplementedException();
-        }
+    protected override void ConfigureHowToFindSaga(SagaPropertyMapper<FirstAutomappedSagaData> mapper) => mapper.MapSaga(s => s.FirstId).ToMessage<SomeMessage>(m => m.Id);
+}
 
-        protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SecondAutomappedSagaData> mapper)
-        {
-            mapper.ConfigureMapping<SomeMessage>(m => m.Id).ToSaga(s => s.SecondId);
-        }
-    }
+public class FirstAutomappedSagaData : ContainSagaData
+{
+    public virtual string FirstId { get; set; }
+}
 
-    public class SecondAutomappedSagaData : ContainSagaData
-    {
-        public virtual string SecondId { get; set; }
-    }
+class SecondAutomappedSaga : Saga<SecondAutomappedSagaData>, IAmStartedByMessages<SomeMessage>
+{
+    public Task Handle(SomeMessage message, IMessageHandlerContext context) => throw new NotImplementedException();
 
-    public class SomeMessage : ICommand
-    {
-        public string Id { get; set; }
-    }
+    protected override void ConfigureHowToFindSaga(SagaPropertyMapper<SecondAutomappedSagaData> mapper) => mapper.MapSaga(s => s.SecondId).ToMessage<SomeMessage>(m => m.Id);
+}
+
+public class SecondAutomappedSagaData : ContainSagaData
+{
+    public virtual string SecondId { get; set; }
+}
+
+public class SomeMessage : ICommand
+{
+    public string Id { get; set; }
 }

@@ -1,66 +1,65 @@
-﻿namespace NServiceBus.NHibernate.Tests
+﻿namespace NServiceBus.NHibernate.Tests;
+
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using global::NHibernate;
+using global::NHibernate.Cfg;
+using global::NHibernate.Dialect;
+using global::NHibernate.Driver;
+using global::NHibernate.Tool.hbm2ddl;
+using NUnit.Framework;
+using SagaPersisters.NHibernate;
+using SagaPersisters.NHibernate.AutoPersistence;
+using Sagas;
+
+abstract class InMemoryFixture
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Threading.Tasks;
-    using global::NHibernate;
-    using global::NHibernate.Cfg;
-    using global::NHibernate.Dialect;
-    using global::NHibernate.Driver;
-    using global::NHibernate.Tool.hbm2ddl;
-    using NUnit.Framework;
-    using SagaPersisters.NHibernate;
-    using SagaPersisters.NHibernate.AutoPersistence;
-    using Sagas;
+    protected abstract Type[] SagaTypes { get; }
 
-    abstract class InMemoryFixture
+    [SetUp]
+    public async Task SetUp()
     {
-        protected abstract Type[] SagaTypes { get; }
-
-        [SetUp]
-        public async Task SetUp()
-        {
-            var cfg = new Configuration()
-                .DataBaseIntegration(x =>
-                {
-                    x.Dialect<MsSql2012Dialect>();
-                    x.Driver<MicrosoftDataSqlClientDriver>();
-                    x.ConnectionString = Consts.SqlConnectionString;
-                });
-
-            var metaModel = new SagaMetadataCollection();
-
-            metaModel.Initialize(SagaTypes);
-
-            var sagaDataTypes = new List<Type>();
-            using (var enumerator = metaModel.GetEnumerator())
+        var cfg = new Configuration()
+            .DataBaseIntegration(x =>
             {
-                while (enumerator.MoveNext())
-                {
-                    sagaDataTypes.Add(enumerator.Current.SagaEntityType);
-                }
-            }
+                x.Dialect<MsSql2012Dialect>();
+                x.Driver<MicrosoftDataSqlClientDriver>();
+                x.ConnectionString = Consts.SqlConnectionString;
+            });
 
-            sagaDataTypes.Add(typeof(ContainSagaData));
+        var metaModel = new SagaMetadataCollection();
 
-            SagaModelMapper.AddMappings(cfg, metaModel, sagaDataTypes);
-            SessionFactory = cfg.BuildSessionFactory();
+        metaModel.Initialize(SagaTypes);
 
-            schema = new SchemaExport(cfg);
-            await schema.CreateAsync(false, true);
-
-            SagaPersister = new SagaPersister();
-        }
-
-        [TearDown]
-        public async Task Cleanup()
+        var sagaDataTypes = new List<Type>();
+        using (var enumerator = metaModel.GetEnumerator())
         {
-            await SessionFactory.CloseAsync();
-            await schema.DropAsync(false, true);
+            while (enumerator.MoveNext())
+            {
+                sagaDataTypes.Add(enumerator.Current.SagaEntityType);
+            }
         }
 
-        protected SagaPersister SagaPersister;
-        protected ISessionFactory SessionFactory;
-        SchemaExport schema;
+        sagaDataTypes.Add(typeof(ContainSagaData));
+
+        SagaModelMapper.AddMappings(cfg, metaModel, sagaDataTypes);
+        SessionFactory = cfg.BuildSessionFactory();
+
+        schema = new SchemaExport(cfg);
+        await schema.CreateAsync(false, true);
+
+        SagaPersister = new SagaPersister();
     }
+
+    [TearDown]
+    public async Task Cleanup()
+    {
+        await SessionFactory.CloseAsync();
+        await schema.DropAsync(false, true);
+    }
+
+    protected SagaPersister SagaPersister;
+    protected ISessionFactory SessionFactory;
+    SchemaExport schema;
 }

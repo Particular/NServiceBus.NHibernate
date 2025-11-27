@@ -1,36 +1,35 @@
-﻿namespace NServiceBus.Unicast.Subscriptions.NHibernate.Tests
+﻿namespace NServiceBus.Unicast.Subscriptions.NHibernate.Tests;
+
+using System.Threading.Tasks;
+using Extensibility;
+using NUnit.Framework;
+
+[TestFixture]
+class When_receiving_a_subscription_message : InMemoryDBFixture
 {
-    using System.Threading.Tasks;
-    using Extensibility;
-    using NUnit.Framework;
-
-    [TestFixture]
-    class When_receiving_a_subscription_message : InMemoryDBFixture
+    [Test]
+    public async Task A_subscription_entry_should_be_added_to_the_database()
     {
-        [Test]
-        public async Task A_subscription_entry_should_be_added_to_the_database()
-        {
-            await storage.Subscribe(TestClients.ClientA, new MessageType(typeof(MessageA)), new ContextBag());
-            await storage.Subscribe(TestClients.ClientA, new MessageType(typeof(MessageB)), new ContextBag());
+        await storage.Subscribe(TestClients.ClientA, new MessageType(typeof(MessageA)), new ContextBag());
+        await storage.Subscribe(TestClients.ClientA, new MessageType(typeof(MessageB)), new ContextBag());
 
-            using (var session = SessionFactory.OpenSession())
-            {
-                var subscriptions = session.CreateCriteria(typeof(Subscription)).List<Subscription>();
-                Assert.That(subscriptions, Has.Count.EqualTo(2));
-            }
+        using (var session = SessionFactory.OpenSession())
+        {
+            var subscriptions = session.CreateCriteria(typeof(Subscription)).List<Subscription>();
+            Assert.That(subscriptions, Has.Count.EqualTo(2));
         }
+    }
 
-        [Test]
-        public async Task Duplicate_subscription_shouldnt_create_additional_db_rows()
+    [Test]
+    public async Task Duplicate_subscription_shouldnt_create_additional_db_rows()
+    {
+        await storage.Subscribe(TestClients.ClientA, MessageTypes.MessageA, new ContextBag());
+        await storage.Subscribe(TestClients.ClientA, MessageTypes.MessageA, new ContextBag());
+
+        using (var session = SessionFactory.OpenSession())
         {
-            await storage.Subscribe(TestClients.ClientA, MessageTypes.MessageA, new ContextBag());
-            await storage.Subscribe(TestClients.ClientA, MessageTypes.MessageA, new ContextBag());
-
-            using (var session = SessionFactory.OpenSession())
-            {
-                var subscriptions = session.CreateCriteria(typeof(Subscription)).List<Subscription>();
-                Assert.That(subscriptions, Has.Count.EqualTo(1));
-            }
+            var subscriptions = session.CreateCriteria(typeof(Subscription)).List<Subscription>();
+            Assert.That(subscriptions, Has.Count.EqualTo(1));
         }
     }
 }
