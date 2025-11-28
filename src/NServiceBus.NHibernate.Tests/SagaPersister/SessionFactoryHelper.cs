@@ -24,7 +24,7 @@ public static class SessionFactoryHelper
 
         var metaModel = new SagaMetadataCollection();
 
-        metaModel.Initialize(types);
+        metaModel.AddRange(SagaMetadata.CreateMany(types));
 
         var assemblies = types.Select(t => t.Assembly).Distinct();
 
