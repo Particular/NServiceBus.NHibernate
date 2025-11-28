@@ -30,7 +30,7 @@ abstract class InMemoryFixture
 
         var metaModel = new SagaMetadataCollection();
 
-        metaModel.Initialize(SagaTypes);
+        metaModel.AddRange(SagaMetadata.CreateMany(SagaTypes));
 
         var sagaDataTypes = new List<Type>();
         using (var enumerator = metaModel.GetEnumerator())

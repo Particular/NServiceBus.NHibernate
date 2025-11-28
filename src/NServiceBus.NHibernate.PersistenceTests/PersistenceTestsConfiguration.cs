@@ -175,8 +175,8 @@
 
             }).ToArray();
 
-            SagaMetadataCollection = new SagaMetadataCollection();
-            SagaMetadataCollection.Initialize(sagaTypes);
+            SagaMetadataCollection = [];
+            SagaMetadataCollection.AddRange(SagaMetadata.CreateMany(sagaTypes));
 
             SagaModelMapper.AddMappings(cfg, SagaMetadataCollection, allTypes, type => ShortenSagaName(type.Name));
 
