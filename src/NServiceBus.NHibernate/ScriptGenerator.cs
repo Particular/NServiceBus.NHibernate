@@ -48,8 +48,7 @@
             var sagaBase = typeof(TSaga).BaseType;
             var sagaDataType = sagaBase.GetGenericArguments()[0];
 
-            var metadata = new SagaMetadataCollection();
-            metadata.Add(SagaMetadata.Create<TSaga>());
+            var metadata = new SagaMetadataCollection { SagaMetadata.Create<TSaga>() };
             var typesToScan = new List<Type>
             {
                 sagaDataType
