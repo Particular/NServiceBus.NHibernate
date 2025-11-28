@@ -49,10 +49,10 @@
             var sagaDataType = sagaBase.GetGenericArguments()[0];
 
             var metadata = new SagaMetadataCollection();
-            metadata.Initialize(new[]
+            metadata.AddRange(SagaMetadata.CreateMany(new[]
             {
                 typeof(TSaga)
-            });
+            }));
             var typesToScan = new List<Type>
             {
                 sagaDataType
