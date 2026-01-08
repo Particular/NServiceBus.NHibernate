@@ -28,12 +28,10 @@
                         UniqueId = sagaId
                     }).ConfigureAwait(false);
                 }).DoNotFailOnErrorMessages())
-                .Done(c => c.Done)
-                .Run(TimeSpan.FromSeconds(20));
+                .Run();
 
             Assert.Multiple(() =>
             {
-                Assert.That(ctx.Done, Is.True);
                 Assert.That(ctx.SagaStarted, Is.True);
                 Assert.That(ctx.Logs.Any(x => x.Level == LogLevel.Warn && x.Message.StartsWith("The endpoint is configured to use Outbox with TransactionScope but a different TransactionScope")), Is.True);
             });
@@ -42,7 +40,6 @@
         class Context : ScenarioContext
         {
             public bool SagaStarted { get; set; }
-            public bool Done { get; set; }
         }
 
         public class OutboxTransactionScopeSagaEndpoint : EndpointConfigurationBuilder
@@ -70,17 +67,10 @@
                 }
             }
 
-            class OutboxTransactionScopeSaga : Saga<OutboxTransactionScopeSagaData>,
+            class OutboxTransactionScopeSaga(Context testContext) : Saga<OutboxTransactionScopeSagaData>,
                 IAmStartedByMessages<StartSagaMessage>,
                 IAmStartedByMessages<CheckSagaMessage>
             {
-                Context testContext;
-
-                public OutboxTransactionScopeSaga(Context testContext)
-                {
-                    this.testContext = testContext;
-                }
-
                 protected override void ConfigureHowToFindSaga(SagaPropertyMapper<OutboxTransactionScopeSagaData> mapper)
                 {
                     mapper.MapSaga(s => s.UniqueId)
@@ -100,7 +90,7 @@
                 public Task Handle(CheckSagaMessage message, IMessageHandlerContext context)
                 {
                     testContext.SagaStarted = Data.Started;
-                    testContext.Done = true;
+                    testContext.MarkAsCompleted();
                     return Task.FromResult(0);
                 }
             }

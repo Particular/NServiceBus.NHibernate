@@ -17,7 +17,7 @@
                 return Scenario.Define<Context>()
                     .WithEndpoint<NonDtcReceivingEndpoint>(b => b.When(session => session.SendLocal(new MyMessage())).DoNotFailOnErrorMessages())
                     .Done(c => c.FailedMessages.Any())
-                    .Run(TimeSpan.FromSeconds(20));
+                    .Run();
             });
 
             Assert.That(exception.Message.Contains("ReceiveOnly") && exception.Message.Contains("TransportTransactionMode"), Is.True);
