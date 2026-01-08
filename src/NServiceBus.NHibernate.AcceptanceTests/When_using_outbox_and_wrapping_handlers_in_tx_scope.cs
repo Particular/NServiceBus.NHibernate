@@ -26,12 +26,10 @@
                         UniqueId = sagaId
                     }).ConfigureAwait(false);
                 }).DoNotFailOnErrorMessages())
-                .Done(c => c.Done)
-                .Run(TimeSpan.FromSeconds(20));
+                .Run();
 
             Assert.Multiple(() =>
             {
-                Assert.That(ctx.Done, Is.True);
                 Assert.That(ctx.SagaStarted, Is.True);
                 Assert.That(ctx.Logs.Any(x => x.Level == LogLevel.Warn && x.Message.StartsWith("The endpoint is configured to use Outbox but a TransactionScope has been detected.")), Is.True);
             });
@@ -40,7 +38,6 @@
         class Context : ScenarioContext
         {
             public bool SagaStarted { get; set; }
-            public bool Done { get; set; }
         }
 
         public class OutboxTransactionScopeSagaEndpoint : EndpointConfigurationBuilder
@@ -86,7 +83,7 @@
                 public Task Handle(CheckSagaMessage message, IMessageHandlerContext context)
                 {
                     testContext.SagaStarted = Data.Started;
-                    testContext.Done = true;
+                    testContext.MarkAsCompleted();
                     return Task.FromResult(0);
                 }
             }
