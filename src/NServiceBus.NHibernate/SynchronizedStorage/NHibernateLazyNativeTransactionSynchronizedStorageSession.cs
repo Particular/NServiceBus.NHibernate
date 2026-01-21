@@ -59,11 +59,8 @@
         public void Dispose()
         {
             //If save changes callback failed, we need to dispose the transaction here.
-            if (transaction != null)
-            {
-                transaction.Dispose();
-                transaction = null;
-            }
+            transaction?.Dispose();
+            transaction = null;
             if (session.IsValueCreated)
             {
                 session.Value.Dispose();
