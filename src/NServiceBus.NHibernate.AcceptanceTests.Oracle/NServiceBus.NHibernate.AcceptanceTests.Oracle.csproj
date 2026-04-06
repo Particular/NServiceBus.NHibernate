@@ -18,7 +18,7 @@
 
   <ItemGroup>
     <PackageReference Include="NServiceBus.AcceptanceTests.Sources" Version="10.0.0" GeneratePathProperty="true" />
-    <PackageReference Include="Oracle.ManagedDataAccess.Core" Version="23.26.100" />
+    <PackageReference Include="Oracle.ManagedDataAccess.Core" Version="23.26.200" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(PkgNServiceBus_AcceptanceTests_Sources)' != ''">
