@@ -3,6 +3,7 @@
     using System.Threading.Tasks;
     using NServiceBus.AcceptanceTesting;
     using NServiceBus.AcceptanceTests.EndpointTemplates;
+    using NServiceBus.Features;
     using NUnit.Framework;
     using global::NHibernate;
     using Microsoft.Extensions.DependencyInjection;
@@ -36,12 +37,22 @@
                 {
                     c.ConfigureTransport().TransportTransactionMode = TransportTransactionMode.ReceiveOnly;
                     c.EnableOutbox();
-                    c.RegisterComponents(cc =>
-                    {
-                        cc.AddScoped<MyRepository>();
-                        cc.AddScoped(b => b.GetRequiredService<INHibernateStorageSession>().Session);
-                    });
+                    c.EnableFeature<RegisterTestServicesFeature>();
                 });
+            }
+
+            sealed class RegisterTestServicesFeature : Feature
+            {
+                public RegisterTestServicesFeature()
+                {
+                    DependsOn<NHibernateStorageSession>();
+                }
+
+                protected override void Setup(FeatureConfigurationContext context)
+                {
+                    context.Services.AddScoped<MyRepository>();
+                    context.Services.AddScoped(sp => sp.GetRequiredService<INHibernateStorageSession>().Session);
+                }
             }
 
             public class MyMessageHandler : IHandleMessages<MyMessage>
