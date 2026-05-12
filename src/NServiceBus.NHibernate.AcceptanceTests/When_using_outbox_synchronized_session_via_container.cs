@@ -3,7 +3,6 @@
     using System.Threading.Tasks;
     using NServiceBus.AcceptanceTesting;
     using NServiceBus.AcceptanceTests.EndpointTemplates;
-    using NServiceBus.Features;
     using NUnit.Framework;
     using global::NHibernate;
     using Microsoft.Extensions.DependencyInjection;
@@ -15,17 +14,20 @@
         public async Task Should_inject_synchronized_session_into_handler()
         {
             var context = await Scenario.Define<Context>()
-                .WithEndpoint<Endpoint>(b => b.When(s => s.SendLocal(new MyMessage())))
-                .Done(c => c.Done)
-                .Run()
-                .ConfigureAwait(false);
+                .WithEndpoint<Endpoint>(b => 
+                    b.Services(services =>
+                    {
+                        services.AddScoped<MyRepository>();
+                        services.AddScoped(sp => sp.GetRequiredService<INHibernateStorageSession>().Session);
+                    })
+                    .When(s => s.SendLocal(new MyMessage())))
+                .Run();
 
             Assert.That(context.RepositoryHasSession, Is.True);
         }
 
         public class Context : ScenarioContext
         {
-            public bool Done { get; set; }
             public bool RepositoryHasSession { get; set; }
         }
 
@@ -37,22 +39,7 @@
                 {
                     c.ConfigureTransport().TransportTransactionMode = TransportTransactionMode.ReceiveOnly;
                     c.EnableOutbox();
-                    c.EnableFeature<RegisterTestServicesFeature>();
                 });
-            }
-
-            sealed class RegisterTestServicesFeature : Feature
-            {
-                public RegisterTestServicesFeature()
-                {
-                    DependsOn<NHibernateStorageSession>();
-                }
-
-                protected override void Setup(FeatureConfigurationContext context)
-                {
-                    context.Services.AddScoped<MyRepository>();
-                    context.Services.AddScoped(sp => sp.GetRequiredService<INHibernateStorageSession>().Session);
-                }
             }
 
             public class MyMessageHandler : IHandleMessages<MyMessage>
@@ -70,7 +57,7 @@
                 public Task Handle(MyMessage message, IMessageHandlerContext handlerContext)
                 {
                     repository.DoSomething();
-                    context.Done = true;
+                    context.MarkAsCompleted();
                     return Task.CompletedTask;
                 }
             }

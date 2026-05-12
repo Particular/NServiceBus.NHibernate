@@ -3,7 +3,6 @@
     using System.Threading.Tasks;
     using NServiceBus.AcceptanceTesting;
     using NServiceBus.AcceptanceTests.EndpointTemplates;
-    using NServiceBus.Features;
     using NUnit.Framework;
     using global::NHibernate;
     using Microsoft.Extensions.DependencyInjection;
@@ -15,10 +14,13 @@
         public async Task Should_inject_synchronized_session_into_handler()
         {
             var context = await Scenario.Define<Context>()
-                .WithEndpoint<Endpoint>(b => b.When(s => s.SendLocal(new MyMessage())))
-                .Done(c => c.Done)
-                .Run()
-                .ConfigureAwait(false);
+                .WithEndpoint<Endpoint>(b => 
+                    b.Services(services =>
+                    {
+                        services.AddScoped(sp => sp.GetRequiredService<INHibernateStorageSession>().Session);
+                    })
+                    .When(s => s.SendLocal(new MyMessage())))
+                .Run();
 
             Assert.Multiple(() =>
             {
@@ -35,30 +37,13 @@
             public ISession SessionInjectedToFirstHandler { get; set; }
             public ISession SessionInjectedToSecondHandler { get; set; }
             public ISession SessionInjectedToThirdHandler { get; set; }
-            public bool Done { get; set; }
         }
 
         public class Endpoint : EndpointConfigurationBuilder
         {
             public Endpoint()
             {
-                EndpointSetup<DefaultServer>(c =>
-                {
-                    c.EnableFeature<RegisterTestServicesFeature>();
-                });
-            }
-
-            sealed class RegisterTestServicesFeature : Feature
-            {
-                public RegisterTestServicesFeature()
-                {
-                    DependsOn<NHibernateStorageSession>();
-                }
-
-                protected override void Setup(FeatureConfigurationContext context)
-                {
-                    context.Services.AddScoped(sp => sp.GetRequiredService<INHibernateStorageSession>().Session);
-                }
+                EndpointSetup<DefaultServer>();
             }
 
             public class MyMessageHandler : IHandleMessages<MyMessage>
@@ -117,7 +102,7 @@
                 public Task Handle(FollowUpMessage message, IMessageHandlerContext handlerContext)
                 {
                     context.SessionInjectedToThirdHandler = session;
-                    context.Done = true;
+                    context.MarkAsCompleted();
                     return Task.CompletedTask;
                 }
             }
