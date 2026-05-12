@@ -14,8 +14,8 @@
         public async Task Should_inject_synchronized_session_into_handler()
         {
             var context = await Scenario.Define<Context>()
-                .WithEndpoint<Endpoint>(b => 
-                    b.Services(services =>
+                .WithEndpoint<Endpoint>(b => b
+                    .Services(services =>
                     {
                         services.AddScoped(sp => sp.GetRequiredService<INHibernateStorageSession>().Session);
                     })
