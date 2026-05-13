@@ -14,17 +14,20 @@
         public async Task Should_inject_synchronized_session_into_handler()
         {
             var context = await Scenario.Define<Context>()
-                .WithEndpoint<Endpoint>(b => b.When(s => s.SendLocal(new MyMessage())))
-                .Done(c => c.Done)
-                .Run()
-                .ConfigureAwait(false);
+                .WithEndpoint<Endpoint>(b => b
+                    .Services(services =>
+                    {
+                        services.AddScoped<MyRepository>();
+                        services.AddScoped(sp => sp.GetRequiredService<INHibernateStorageSession>().Session);
+                    })
+                    .When(s => s.SendLocal(new MyMessage())))
+                .Run();
 
             Assert.That(context.RepositoryHasSession, Is.True);
         }
 
         public class Context : ScenarioContext
         {
-            public bool Done { get; set; }
             public bool RepositoryHasSession { get; set; }
         }
 
@@ -36,11 +39,6 @@
                 {
                     c.ConfigureTransport().TransportTransactionMode = TransportTransactionMode.ReceiveOnly;
                     c.EnableOutbox();
-                    c.RegisterComponents(cc =>
-                    {
-                        cc.AddScoped<MyRepository>();
-                        cc.AddScoped(b => b.GetRequiredService<INHibernateStorageSession>().Session);
-                    });
                 });
             }
 
@@ -59,7 +57,7 @@
                 public Task Handle(MyMessage message, IMessageHandlerContext handlerContext)
                 {
                     repository.DoSomething();
-                    context.Done = true;
+                    context.MarkAsCompleted();
                     return Task.CompletedTask;
                 }
             }

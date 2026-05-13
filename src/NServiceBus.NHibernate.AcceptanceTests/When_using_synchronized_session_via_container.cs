@@ -14,10 +14,13 @@
         public async Task Should_inject_synchronized_session_into_handler()
         {
             var context = await Scenario.Define<Context>()
-                .WithEndpoint<Endpoint>(b => b.When(s => s.SendLocal(new MyMessage())))
-                .Done(c => c.Done)
-                .Run()
-                .ConfigureAwait(false);
+                .WithEndpoint<Endpoint>(b => b
+                    .Services(services =>
+                    {
+                        services.AddScoped(sp => sp.GetRequiredService<INHibernateStorageSession>().Session);
+                    })
+                    .When(s => s.SendLocal(new MyMessage())))
+                .Run();
 
             Assert.Multiple(() =>
             {
@@ -34,20 +37,13 @@
             public ISession SessionInjectedToFirstHandler { get; set; }
             public ISession SessionInjectedToSecondHandler { get; set; }
             public ISession SessionInjectedToThirdHandler { get; set; }
-            public bool Done { get; set; }
         }
 
         public class Endpoint : EndpointConfigurationBuilder
         {
             public Endpoint()
             {
-                EndpointSetup<DefaultServer>(c =>
-                {
-                    c.RegisterComponents(cc =>
-                    {
-                        cc.AddScoped(b => b.GetRequiredService<INHibernateStorageSession>().Session);
-                    });
-                });
+                EndpointSetup<DefaultServer>();
             }
 
             public class MyMessageHandler : IHandleMessages<MyMessage>
@@ -106,7 +102,7 @@
                 public Task Handle(FollowUpMessage message, IMessageHandlerContext handlerContext)
                 {
                     context.SessionInjectedToThirdHandler = session;
-                    context.Done = true;
+                    context.MarkAsCompleted();
                     return Task.CompletedTask;
                 }
             }
