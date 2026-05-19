@@ -24,18 +24,12 @@
         /// Generates the table creation script for the outbox.
         /// </summary>
         /// <param name="outboxRecordMappingType">Optional: custom outbox record mapping class.</param>
-        public static string GenerateOutboxScript(Type outboxRecordMappingType = null)
-        {
-            return GenerateScript(outboxRecordMappingType ?? typeof(OutboxRecordMapping));
-        }
+        public static string GenerateOutboxScript(Type outboxRecordMappingType = null) => GenerateScript(outboxRecordMappingType ?? typeof(OutboxRecordMapping));
 
         /// <summary>
         /// Generates the table creation script for the subscription store.
         /// </summary>
-        public static string GenerateSubscriptionStoreScript()
-        {
-            return GenerateScript(typeof(SubscriptionMap));
-        }
+        public static string GenerateSubscriptionStoreScript() => GenerateScript(typeof(SubscriptionMap));
 
         /// <summary>
         /// Generates the table creation script for the saga data table
@@ -66,7 +60,12 @@
             return GenerateScript(config);
         }
 
-        static string GenerateScript(Type mappingType)
+        /// <summary>
+        /// Generates the table creation script for a mapping class.
+        /// </summary>
+        /// <param name="mappingType"></param>
+        /// <returns></returns>
+        public static string GenerateScript(Type mappingType)
         {
             var config = new Configuration();
             config.DataBaseIntegration(db => { db.Dialect<T>(); });
