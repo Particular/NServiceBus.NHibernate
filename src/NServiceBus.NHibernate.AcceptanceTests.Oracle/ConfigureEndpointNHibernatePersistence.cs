@@ -56,7 +56,6 @@ public class ConfigureEndpointNHibernatePersistence : IConfigureEndpointTestExec
 
     static string DefaultTableNameConvention(Type type)
     {
-        //if the type is nested use the name of the parent
         if (type.DeclaringType == null)
         {
             return type.Name;

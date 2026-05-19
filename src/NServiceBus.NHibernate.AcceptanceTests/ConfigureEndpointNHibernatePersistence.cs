@@ -20,7 +20,6 @@ public class ConfigureEndpointNHibernatePersistence : EndpointConfigurer
             .ConnectionString(ConnectionString)
             .SagaTableNamingConvention(type =>
             {
-                //if the type is nested use the name of the parent
                 if (type.DeclaringType == null)
                 {
                     return type.Name;
