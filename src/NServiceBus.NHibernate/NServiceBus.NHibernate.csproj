@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
@@ -9,11 +9,11 @@
 
   <ItemGroup Label="Public dependencies">
     <PackageReference Include="NHibernate" Version="5.6.0" />
-    <PackageReference Include="NServiceBus" Version="10.1.4" />
+    <PackageReference Include="NServiceBus" Version="10.2.0-alpha.12" />
   </ItemGroup>
 
   <ItemGroup Label="Private dependencies">
-    <PackageReference Include="Particular.Obsoletes" Version="1.1.0" PrivateAssets="All" ExcludeAssets="runtime"/>
+    <PackageReference Include="Particular.Obsoletes" Version="1.1.0" PrivateAssets="All" ExcludeAssets="runtime" />
     <PackageReference Include="Particular.Packaging" Version="4.5.0" PrivateAssets="All" />
   </ItemGroup>
 
