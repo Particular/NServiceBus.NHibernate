@@ -14,9 +14,9 @@ public class ConfigureEndpointNHibernatePersistence : IConfigureEndpointTestExec
     {
         NHibernateSettingRetriever.AppSettings = () => new NameValueCollection
         {
-            {"NServiceBus/Persistence/NHibernate/connection.driver_class", "NHibernate.Driver.OracleManagedDataClientDriver"},
-            {"NServiceBus/Persistence/NHibernate/dialect", "NHibernate.Dialect.Oracle10gDialect"},
-            {"NServiceBus/Persistence/NHibernate/show_sql", "true"}
+            { "NServiceBus/Persistence/NHibernate/connection.driver_class", "NHibernate.Driver.OracleManagedDataClientDriver" },
+            { "NServiceBus/Persistence/NHibernate/dialect", "NHibernate.Dialect.Oracle10gDialect" },
+            { "NServiceBus/Persistence/NHibernate/show_sql", "true" }
         };
 
         var connectionString = Environment.GetEnvironmentVariable("OracleConnectionString");
@@ -60,11 +60,6 @@ public class ConfigureEndpointNHibernatePersistence : IConfigureEndpointTestExec
         if (type.DeclaringType == null)
         {
             return type.Name;
-        }
-
-        if (typeof(IContainSagaData).IsAssignableFrom(type))
-        {
-            return type.DeclaringType.Name;
         }
 
         return type.DeclaringType.Name + "_" + type.Name;
