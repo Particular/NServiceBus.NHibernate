@@ -60,6 +60,7 @@ namespace NServiceBus.NHibernate
         public static string GenerateOutboxScript(System.Type outboxRecordMappingType = null) { }
         public static string GenerateSagaScript<TSaga>(System.Func<System.Type, string> tableNamingConvention = null)
             where TSaga : NServiceBus.Saga { }
+        public static string GenerateScript(System.Type mappingType) { }
         public static string GenerateSubscriptionStoreScript() { }
     }
 }
