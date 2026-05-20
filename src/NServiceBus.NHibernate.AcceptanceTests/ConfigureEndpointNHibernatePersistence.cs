@@ -12,12 +12,21 @@ public class ConfigureEndpointNHibernatePersistence : EndpointConfigurer
     {
         NHibernateSettingRetriever.AppSettings = () => new NameValueCollection
         {
-            {"NServiceBus/Persistence/NHibernate/show_sql", "true"},
-            {"NServiceBus/Persistence/NHibernate/connection.driver_class", typeof(MicrosoftDataSqlClientDriver).FullName}
+            { "NServiceBus/Persistence/NHibernate/show_sql", "true" },
+            { "NServiceBus/Persistence/NHibernate/connection.driver_class", typeof(MicrosoftDataSqlClientDriver).FullName }
         };
 
         configuration.UsePersistence<NHibernatePersistence>()
-            .ConnectionString(ConnectionString);
+            .ConnectionString(ConnectionString)
+            .SagaTableNamingConvention(type =>
+            {
+                if (type.DeclaringType == null)
+                {
+                    return type.Name;
+                }
+
+                return type.DeclaringType.Name + "_" + type.Name;
+            });
 
         return Task.FromResult(0);
     }

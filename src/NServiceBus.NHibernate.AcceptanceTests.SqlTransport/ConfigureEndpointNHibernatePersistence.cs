@@ -7,6 +7,7 @@ using NHibernate.Driver;
 using NServiceBus;
 using NServiceBus.AcceptanceTesting.Support;
 using NServiceBus.Persistence;
+using NServiceBus.Persistence.NHibernate;
 
 public class ConfigureEndpointNHibernatePersistence : EndpointConfigurer
 {
@@ -16,16 +17,25 @@ public class ConfigureEndpointNHibernatePersistence : EndpointConfigurer
         {
             Properties =
             {
-                {Environment.ConnectionString, ConnectionString},
-                {Environment.Dialect, typeof(MsSql2008Dialect).FullName},
-                {Environment.ConnectionDriver, typeof(MicrosoftDataSqlClientDriver).FullName}
+                { Environment.ConnectionString, ConnectionString },
+                { Environment.Dialect, typeof(MsSql2008Dialect).FullName },
+                { Environment.ConnectionDriver, typeof(MicrosoftDataSqlClientDriver).FullName }
             },
         };
 
         cfg.BeforeBindMapping += (sender, e) => PrefixMapping(e, "sqlTest_");
 
         configuration.UsePersistence<NHibernatePersistence>()
-            .UseConfiguration(cfg);
+            .UseConfiguration(cfg)
+            .SagaTableNamingConvention(type =>
+            {
+                if (type.DeclaringType == null)
+                {
+                    return type.Name;
+                }
+
+                return type.DeclaringType.Name + "_" + type.Name;
+            });
 
         return Task.CompletedTask;
     }
