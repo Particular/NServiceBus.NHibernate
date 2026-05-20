@@ -67,6 +67,8 @@
         /// <returns></returns>
         public static string GenerateScript(Type mappingType)
         {
+            ArgumentNullException.ThrowIfNull(mappingType);
+
             var config = new Configuration();
             config.DataBaseIntegration(db => { db.Dialect<T>(); });
 
