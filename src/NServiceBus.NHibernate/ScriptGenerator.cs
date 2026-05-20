@@ -63,7 +63,7 @@
         /// <summary>
         /// Generates the table creation script for a mapping class.
         /// </summary>
-        /// <param name="mappingType"></param>
+        /// <param name="mappingType">The NHibernate mapping class.</param>
         /// <returns></returns>
         public static string GenerateScript(Type mappingType)
         {
