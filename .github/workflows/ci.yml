@@ -47,11 +47,6 @@ jobs:
           retention-days: 7
       - name: Setup WSL
         uses: Particular/setup-wsl-action@v1.2.0
-      - name: Azure login
-        if: matrix.name == 'Windows'
-        uses: azure/login@v3.0.1
-        with:
-          creds: ${{ secrets.AZURE_ACI_CREDENTIALS }}
       - name: Install SQL Server
         uses: Particular/install-sql-server-action@v3.0.0
         with:
