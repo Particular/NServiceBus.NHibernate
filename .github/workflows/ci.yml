@@ -57,7 +57,6 @@ jobs:
         uses: Particular/setup-oracle-action@v2.0.0
         with:
           connection-string-name: OracleConnectionString
-          tag: NHibernatePersistence
           registry-username: ${{ secrets.DOCKERHUB_USERNAME }}
           registry-password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: Run tests
