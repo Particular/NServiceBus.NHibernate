@@ -22,7 +22,7 @@
   </ItemGroup>
 
   <ItemGroup Label="Direct references to transitive dependencies to avoid versions with CVEs">
-    <PackageReference Include="System.Security.Cryptography.Pkcs" Version="10.0.14" />
+    <PackageReference Include="System.Security.Cryptography.Pkcs" Version="9.0.22" />
   </ItemGroup>
 
   <ItemGroup>
