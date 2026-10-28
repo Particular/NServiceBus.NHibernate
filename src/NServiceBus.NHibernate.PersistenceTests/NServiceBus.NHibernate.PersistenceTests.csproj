@@ -25,7 +25,7 @@
   </ItemGroup>
 
   <ItemGroup Label="Direct references to transitive dependencies to avoid versions with CVEs">
-    <PackageReference Include="System.Security.Cryptography.Pkcs" Version="9.0.22" />
+    <PackageReference Include="System.Security.Cryptography.Pkcs" Version="10.0.14" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(PkgNServiceBus_PersistenceTests_Sources)' != ''">
