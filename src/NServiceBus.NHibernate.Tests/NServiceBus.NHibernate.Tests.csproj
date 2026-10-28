@@ -25,6 +25,10 @@
     <PackageReference Include="PublicApiGenerator" Version="11.5.4" />
   </ItemGroup>
 
+  <ItemGroup Label="Direct references to transitive dependencies to avoid versions with CVE">
+    <PackageReference Include="System.Security.Cryptography.Pkcs" Version="9.0.22" />
+  </ItemGroup>
+
   <ItemGroup>
     <None Remove="SagaPersister\TestSagaWithHbmlXmlOverride.hbm.xml" />
     <EmbeddedResource Include="SagaPersister\TestSagaWithHbmlXmlOverride.hbm.xml" />
